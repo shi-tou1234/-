@@ -20,9 +20,7 @@
   let replyEmail = '';
   let replyUrl = '';
   let replyContent = '';
-  
-  // 防止重复提交 - 每个回复表单独立的状态
-  let replySubmitting = false;
+  let replyHint = '';
   
   const dispatch = createEventDispatcher();
   
@@ -104,20 +102,18 @@
     {#if replyingToId === c.id}
       <div class="mt-4 pl-4 border-l-2 border-gray-200">
         <form on:submit|preventDefault={() => {
-          if (replySubmitting) return;
-          
           if (!replyAuthor || !replyEmail || !replyContent) {
-            alert(t('comments.fillRequired') || '请填写昵称、邮箱和评论内容');
+            replyHint = t('comments.fillRequired') || '请填写昵称、邮箱和评论内容';
             return;
           }
 
           // 检查字数限制
           if (!isContentWithinLimit(replyContent)) {
-            alert(t('comments.contentTooLong') || '评论内容超出限制：不超过2000汉字或1000单词');
+            replyHint = t('comments.contentTooLong') || '评论内容超出限制：不超过2000汉字或1000单词';
             return;
           }
-          
-          replySubmitting = true;
+
+          replyHint = '';
           dispatch('submit', {
             parentId: c.id,
             author: replyAuthor,
@@ -156,17 +152,20 @@
                 <span class="text-red-500 ml-2">{t('comments.contentTooLong') || '内容超出限制'}</span>
               {/if}
             </div>
+            {#if replyHint}
+              <p class="mt-1 text-xs text-[var(--warning-text-color)]">{replyHint}</p>
+            {/if}
           </div>
 
           <div class="flex justify-end gap-2">
             <button type="button" on:click={() => {
               dispatch('cancel');
-              replySubmitting = false; // 取消时重置提交状态
+              replyHint = '';
             }} class="rounded px-3 py-1 text-sm text-[var(--text-color)] border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">
               {t('comments.cancel')}
             </button>
-            <button type="submit" disabled={replySubmitting || !isContentWithinLimit(replyContent)} class="rounded px-3 py-1 text-sm font-medium text-[var(--text-color)] border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] disabled:opacity-50">
-              {replySubmitting ? t('comments.sending') : t('comments.reply')}
+            <button type="submit" disabled={!isContentWithinLimit(replyContent)} class="rounded px-3 py-1 text-sm font-medium text-[var(--text-color)] border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] disabled:opacity-50">
+              {t('comments.reply')}
             </button>
           </div>
         </form>

@@ -32,6 +32,7 @@ export interface Translation {
     };
     search: {
         placeholder: string;
+        searching: string;
         noresult: string;
         error: string;
     };

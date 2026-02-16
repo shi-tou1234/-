@@ -12,6 +12,7 @@ const t = i18nit(currentLang);
 
 const translations = {
   placeholder: t("search.placeholder"),
+  searching: t("search.searching"),
   error: t("search.error"),
   noresult: t("search.noresult")
 };
@@ -74,7 +75,9 @@ function initSearchModal() {
   const modalBackdrop = searchModal?.firstElementChild;
   const modalContent = searchModal?.querySelector('.search-modal-content');
 
-  if (!searchButton || !searchModal) return; // 防止重复绑定
+  if (!searchButton || !searchModal) return;
+  if (searchModal.dataset.bound === 'true') return;
+  searchModal.dataset.bound = 'true';
 
   const openModal = () => {
     searchModal.classList.remove('opacity-0', 'pointer-events-none');
@@ -164,11 +167,24 @@ document.addEventListener('astro:after-swap', initSearchModal);
 </style>
 
 <script define:vars={{ fakeResult, translations }}>
+let searchRequestId = 0;
+
+function renderSearchStatus(message, extraClass = '') {
+  const searchResults = document.getElementById('search-results');
+  if (!searchResults) return;
+
+  const className = extraClass ? ` ${extraClass}` : '';
+  searchResults.innerHTML = `
+    <div class="p-8 text-center text-[var(--cover-subtitle-color)]${className}">
+      <p>${message}</p>
+    </div>
+  `;
+}
+
 function initPagefindSearch() {
   const searchInput = document.getElementById('search-input');
-  const searchResults = document.getElementById('search-results');
   
-  if (!searchInput || !searchResults) return;
+  if (!searchInput) return;
 
   // 避免重复绑定
   if (searchInput.dataset.bound === 'true') return;
@@ -196,21 +212,23 @@ function initPagefindSearch() {
 }
 
 async function performSearch(query) {
-  const searchResults = document.getElementById('search-results');
+  const requestId = ++searchRequestId;
+  renderSearchStatus(translations.searching);
+
   const isDev = !window.pagefind;
 
   if (isDev) {
+    if (requestId !== searchRequestId) return;
     displayResults(fakeResult);
   } else if (window.pagefind) {
-    await window.pagefind.destroy();
-    await window.pagefind.init();
-    // console.log('Pagefind is initialized');
     try {
       const searchResultsData = await window.pagefind.search(query);
+      if (requestId !== searchRequestId) return;
       const results = [];
 
       for (const result of searchResultsData.results) {
         const data = await result.data();
+        if (requestId !== searchRequestId) return;
         results.push({
           url: data.url,
           meta: { title: data.meta.title },
@@ -220,20 +238,13 @@ async function performSearch(query) {
 
       displayResults(results);
     } catch (error) {
+      if (requestId !== searchRequestId) return;
       console.error('Search failed:', error);
-      searchResults.innerHTML = `
-        <div class="p-8 text-center text-red-500">
-          <p>${translations.error}</p>
-        </div>
-      `;
+      renderSearchStatus(translations.error, ' text-red-500');
     }
   } else {
     console.log('Pagefind is not available');
-    searchResults.innerHTML = `
-      <div class="p-8 text-center text-[var(--cover-subtitle-color)]">
-        <p>搜索功能暂时不可用</p>
-      </div>
-    `;
+    renderSearchStatus('搜索功能暂时不可用');
   }
 }
 

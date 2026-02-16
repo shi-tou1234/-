@@ -19,6 +19,9 @@
   let limit = 20;
   let hasMore = false;
   const LOAD_TIMEOUT_MS = 6000;
+  let statusMessage = '';
+  let statusType: 'success' | 'error' | 'warning' | '' = '';
+  let statusTimer: ReturnType<typeof setTimeout> | null = null;
 
   // 顶层评论表单数据
   let author = '';
@@ -71,6 +74,18 @@
   function isContentWithinLimit(text: string): boolean {
     const { chars, words } = getWordCount(text);
     return chars <= 2000 && words <= 1000;
+  }
+
+  function showStatus(message: string, type: 'success' | 'error' | 'warning' = 'success') {
+    statusMessage = message;
+    statusType = type;
+    if (statusTimer) {
+      clearTimeout(statusTimer);
+    }
+    statusTimer = setTimeout(() => {
+      statusMessage = '';
+      statusType = '';
+    }, 2200);
   }
 
   async function loadComments() {
@@ -131,13 +146,13 @@
     }
 
     if (!submitAuthor || !submitEmail || !submitContent) {
-      alert(t('comments.fillRequired') || '请填写昵称、邮箱和评论内容');
+      showStatus(t('comments.fillRequired') || '请填写昵称、邮箱和评论内容', 'warning');
       return;
     }
 
     // 检查字数限制
     if (!isContentWithinLimit(submitContent)) {
-      alert(t('comments.contentTooLong') || '评论内容超出限制：不超过2000汉字或1000单词');
+      showStatus(t('comments.contentTooLong') || '评论内容超出限制：不超过2000汉字或1000单词', 'warning');
       return;
     }
 
@@ -161,8 +176,11 @@
           post_title: postTitle,
         }),
       });
-      const data = await res.json();
-      alert(data.message || t('comments.submitSuccess') || '提交成功');
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data?.message || t('comments.submitFailed') || '提交失败，请稍后再试');
+      }
+      showStatus(data?.message || t('comments.submitSuccess') || '提交成功', 'success');
       
       // 重置表单
       if (!replyData) {
@@ -175,7 +193,7 @@
       // 重新加载评论
       await loadComments();
     } catch (err) {
-      alert(t('comments.submitFailed') || '提交失败，请稍后再试');
+      showStatus(t('comments.submitFailed') || '提交失败，请稍后再试', 'error');
     } finally {
       // 只有在提交顶层评论时才重置 submitting 状态
       if (!parentId) {
@@ -204,6 +222,16 @@
   <!-- <div class="my-6 border border-[var(--text-color)]/70"></div> -->
   <!-- 评论输入 -->
   <div data-aos="fade-up" class="mt-4">
+    {#if statusMessage}
+      <p class={`mb-3 rounded border px-3 py-2 text-sm ${
+        statusType === 'warning' || statusType === 'error'
+          ? 'border-[var(--warning-border-color)] bg-[var(--warning-bg-color)] text-[var(--warning-text-color)]'
+          : 'border-[var(--button-border-color)] text-[var(--text-color)]/80'
+      }`}>
+        {statusMessage}
+      </p>
+    {/if}
+
     <form on:submit|preventDefault={() => submitComment()} class="space-y-4">
       <div class="grid grid-cols-3 gap-3">
         <div>

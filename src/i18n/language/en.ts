@@ -34,6 +34,7 @@ const translation: Translation = {
     },
     search: {
         placeholder: "Enter keywords to start searching",
+        searching: "Searching...",
         noresult: "No results found.",
         error: "Search error occurred. Please try again later."
     },
