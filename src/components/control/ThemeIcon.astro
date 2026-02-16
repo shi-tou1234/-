@@ -11,6 +11,8 @@ import { Icon } from "astro-icon/components";
 
 <script is:inline>
 if (typeof window !== 'undefined') {
+  const THEME_MEDIA_QUERY = '(prefers-color-scheme: dark)';
+
   function initThemeToggle() {
     const htmlRoot = document.querySelector('html');
     const themeToggle = document.getElementById('themeToggle');
@@ -52,21 +54,23 @@ if (typeof window !== 'undefined') {
       }
     };
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    mediaQuery.removeEventListener?.('change', handleSystemThemeChange);
+    const mediaQuery = window.matchMedia(THEME_MEDIA_QUERY);
+    const oldSystemThemeChangeHandler = window.__themeSystemThemeChangeHandler;
+    if (oldSystemThemeChangeHandler) {
+      mediaQuery.removeEventListener('change', oldSystemThemeChangeHandler);
+    }
     mediaQuery.addEventListener('change', handleSystemThemeChange);
+    window.__themeSystemThemeChangeHandler = handleSystemThemeChange;
 
     const handleToggleClick = () => {
-      const currentTheme = localStorage.getItem('theme') || 'system';
-      let nextTheme;
-      if (currentTheme === 'light') nextTheme = 'dark';
-      else if (currentTheme === 'dark') nextTheme = 'system';
-      else nextTheme = 'light';
+      const isCurrentlyDark = htmlRoot.getAttribute('data-theme') === 'dark';
+      const nextTheme = isCurrentlyDark ? 'light' : 'dark';
       setTheme(nextTheme);
     };
 
-    themeToggle?.removeEventListener('click', handleToggleClick);
-    themeToggle?.addEventListener('click', handleToggleClick);
+    if (themeToggle) {
+      themeToggle.onclick = handleToggleClick;
+    }
 
     setTheme(getTheme());
   }
