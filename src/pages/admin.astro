@@ -54,118 +54,148 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       </div>
 
       <div class="rounded-lg border border-[var(--button-border-color)] p-5">
-        <h2 class="text-xl font-semibold mb-4">发布文章</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label class="block text-sm mb-2">语言</label>
-            <select id="post-lang" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2">
-              <option value="zh-cn">中文（zh-cn）</option>
-              <option value="en">English（en）</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm mb-2">文章目录 slug（例如：my-first-post）</label>
-            <input id="post-slug" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-          </div>
-          <div>
-            <label class="block text-sm mb-2">标题</label>
-            <input id="post-title" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-          </div>
-          <div>
-            <label class="block text-sm mb-2">发布日期</label>
-            <input id="post-date" type="datetime-local" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-          </div>
-          <div>
-            <label class="block text-sm mb-2">简介</label>
-            <input id="post-desc" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-          </div>
-          <div>
-            <label class="block text-sm mb-2">封面图片路径（可选）</label>
-            <input id="post-cover" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="例如：./assets/cover.jpg" />
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h2 class="text-xl font-semibold">文章管理</h2>
+          <div class="flex flex-wrap gap-2">
+            <button id="refresh-post-list-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">刷新列表</button>
+            <button id="new-post-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">新建文章</button>
+            <a class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]" href="/-/" target="_blank">打开前台</a>
           </div>
         </div>
 
-        <div class="mb-3 flex flex-wrap gap-3 items-center">
-          <input id="post-files" type="file" multiple accept="image/*,video/*" class="text-sm" />
-          <button id="upload-files-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">上传图片/视频到当前文章目录</button>
-          <button id="insert-iframe-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">插入 iframe 模板</button>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div class="lg:col-span-1">
+            <label class="block text-sm mb-2">已发布文章（可直接编辑）</label>
+            <select id="post-select" size="14" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2 text-sm"></select>
+            <button id="load-selected-post-btn" class="mt-3 w-full rounded border border-[var(--button-border-color)] px-3 py-2 hover:bg-[var(--button-hover-color)]">编辑所选文章</button>
+          </div>
+
+          <div class="lg:col-span-2 space-y-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm mb-1">语言</label>
+                <select id="post-lang" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2">
+                  <option value="zh-cn">中文（zh-cn）</option>
+                  <option value="en">English（en）</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm mb-1">slug（可留空自动生成）</label>
+                <input id="post-slug" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm mb-1">标题</label>
+              <input id="post-title" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
+            </div>
+
+            <div>
+              <label class="block text-sm mb-1">正文 Markdown</label>
+              <textarea id="post-content" class="w-full min-h-[280px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="在这里写文章内容"></textarea>
+            </div>
+
+            <details class="rounded border border-[var(--button-border-color)] p-3">
+              <summary class="cursor-pointer text-sm">更多设置（可选）</summary>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+                <div>
+                  <label class="block text-sm mb-1">发布日期</label>
+                  <input id="post-date" type="datetime-local" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
+                </div>
+                <div>
+                  <label class="block text-sm mb-1">简介</label>
+                  <input id="post-desc" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
+                </div>
+                <div>
+                  <label class="block text-sm mb-1">封面路径</label>
+                  <input id="post-cover" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="例如：./assets/cover.jpg" />
+                </div>
+              </div>
+            </details>
+
+            <div class="flex flex-wrap gap-2 items-center">
+              <input id="post-files" type="file" multiple accept="image/*,video/*" class="text-sm" />
+              <button id="upload-files-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">上传资源</button>
+              <button id="insert-iframe-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">插入 iframe</button>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <button id="publish-post-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">保存文章</button>
+              <button id="delete-post-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">删除当前语言</button>
+              <button id="delete-post-all-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">删除整个博客目录</button>
+            </div>
+          </div>
         </div>
 
-        <label class="block text-sm mb-2">Markdown 正文（支持 HTML 与 iframe）</label>
-        <textarea id="post-content" class="w-full min-h-[320px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="在这里写文章内容"></textarea>
-
-        <div class="mt-4 flex gap-3">
-          <button id="publish-post-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">发布/更新文章</button>
-          <button id="delete-post-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">删除当前语言文章</button>
-          <button id="delete-post-all-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">删除整个博客目录</button>
-          <a class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]" href="/-/" target="_blank">打开前台</a>
-        </div>
-        <p class="text-xs mt-2 text-[var(--text-color)]/60">删除当前语言文章：仅删除 `slug/lang.md`。删除整个博客目录：删除该 slug 下所有文件（含图片视频资源）。</p>
         <p id="post-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
       </div>
 
       <div class="rounded-lg border border-[var(--button-border-color)] p-5">
-        <h2 class="text-xl font-semibold mb-4">指定博客删除</h2>
-        <div class="flex flex-wrap items-center gap-3 mb-3">
-          <button id="load-delete-posts-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载博客列表</button>
-          <select id="delete-post-select" class="min-w-[280px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2">
-            <option value="">请先加载并选择博客</option>
-          </select>
-        </div>
-        <div class="flex flex-wrap items-center gap-3">
-          <button id="delete-selected-post-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">删除所选语言文章</button>
-          <button id="delete-selected-post-all-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">删除所选博客目录</button>
-        </div>
-        <p id="delete-select-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
-      </div>
+        <h2 class="text-xl font-semibold mb-4">站点内容设置</h2>
 
-      <div class="rounded-lg border border-[var(--button-border-color)] p-5">
-        <h2 class="text-xl font-semibold mb-4">编辑 About 内容</h2>
-        <div class="flex flex-wrap items-center gap-3 mb-3">
-          <select id="about-lang" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2">
-            <option value="zh-cn">中文（zh-cn）</option>
-            <option value="en">English（en）</option>
-          </select>
-          <button id="load-about-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载 About</button>
-          <button id="save-about-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存 About</button>
-        </div>
-        <textarea id="about-content" class="w-full min-h-[220px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="About Markdown 内容"></textarea>
-        <p id="about-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
-      </div>
-
-      <div class="rounded-lg border border-[var(--button-border-color)] p-5">
-        <h2 class="text-xl font-semibold mb-4">编辑友链内容</h2>
-        <div class="flex flex-wrap items-center gap-3 mb-3">
-          <button id="load-friends-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载友链</button>
-          <button id="save-friends-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存友链</button>
-        </div>
-        <textarea id="friends-content" class="w-full min-h-[220px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder='请输入 JSON 数组，例如：[{"name":"GitHub","avatar":"...","url":"...","description":"..."}]'></textarea>
-        <p id="friends-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
-      </div>
-
-      <div class="rounded-lg border border-[var(--button-border-color)] p-5">
-        <h2 class="text-xl font-semibold mb-4">编辑右上角联系方式</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-          <div>
-            <label class="block text-sm mb-2">GitHub 首页链接</label>
-            <input id="header-github" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="https://github.com/your-name" />
+        <div class="space-y-4">
+          <div class="rounded border border-[var(--button-border-color)] p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <div class="text-sm font-semibold">About（Markdown）</div>
+              <div class="flex flex-wrap items-center gap-2">
+                <select id="about-lang" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-1.5 text-sm">
+                  <option value="zh-cn">中文（zh-cn）</option>
+                  <option value="en">English（en）</option>
+                </select>
+                <button id="load-about-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
+                <button id="save-about-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
+              </div>
+            </div>
+            <textarea id="about-content" class="w-full min-h-[180px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="About Markdown 内容"></textarea>
+            <p id="about-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
           </div>
-          <div>
-            <label class="block text-sm mb-2">邮箱地址（点击图标复制）</label>
-            <input id="header-email" type="email" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="you@example.com" />
+
+          <div class="rounded border border-[var(--button-border-color)] p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <div class="text-sm font-semibold">友链（JSON）</div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button id="load-friends-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
+                <button id="save-friends-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
+              </div>
+            </div>
+            <textarea id="friends-content" class="w-full min-h-[180px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder='请输入 JSON 数组，例如：[{"name":"GitHub","avatar":"...","url":"...","description":"..."}]'></textarea>
+            <p id="friends-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
+          </div>
+
+          <div class="rounded border border-[var(--button-border-color)] p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <div class="text-sm font-semibold">右上角联系方式</div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button id="load-header-contact-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
+                <button id="save-header-contact-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input id="header-github" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="GitHub 首页链接：https://github.com/your-name" />
+              <input id="header-email" type="email" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="邮箱地址：you@example.com" />
+            </div>
+            <p id="header-contact-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
           </div>
         </div>
-        <div class="flex flex-wrap items-center gap-3 mb-2">
-          <button id="load-header-contact-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载联系方式</button>
-          <button id="save-header-contact-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存联系方式</button>
-        </div>
-        <p id="header-contact-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
       </div>
     </section>
   </div>
 </MainPageLayout>
 
 <script>
+  import {
+    AdminService,
+    buildFriendLinksTs,
+    buildHeaderContactTs,
+    buildPostMarkdown,
+    decodeFileContent,
+    getNowDateTimeLocal,
+    normalizeSlug,
+    parseFriendLinksFromTs,
+    parseHeaderContactFromTs,
+    toIsoDateTime
+  } from "@/utils/admin-service";
+
   const SESSION_KEY = "cmchen_admin_ok";
   const ADMIN_GH_TOKEN_KEY = "cmchen_admin_gh_token";
   const ADMIN_GH_BRANCH_KEY = "cmchen_admin_gh_branch";
@@ -175,18 +205,16 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   const ADMIN_SECURITY_URL = `${window.location.origin}/-/admin-security.json`;
   const HEADER_CONTACT_PATH = "src/data/header-contact.ts";
 
-  const fallbackSecurityConfig = {
-    algorithm: "PBKDF2-SHA256",
-    iterations: 150000,
-    salt: "sZPlZ007W2b7Jl5bq4HwKA==",
-    hash: "Y8U44x/bJKZkj056F/Ot0JVT0fs0rZS+xIsVE7dY/6Q="
-  };
-
-  let securityConfig = fallbackSecurityConfig;
-
   const loginSection = document.getElementById("login-section");
   const adminPanel = document.getElementById("admin-panel");
   const loginMsg = document.getElementById("login-msg");
+
+  const adminService = new AdminService({
+    repoOwner: REPO_OWNER,
+    repoName: REPO_NAME,
+    securityPath: ADMIN_SECURITY_PATH,
+    securityUrl: ADMIN_SECURITY_URL
+  });
 
   function setMsg(el, message, isError = false) {
     if (!el) return;
@@ -199,123 +227,6 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     adminPanel?.classList.remove("hidden");
     sessionStorage.setItem(SESSION_KEY, "1");
   }
-
-  function toBase64(bytes) {
-    let binary = "";
-    bytes.forEach((byte) => {
-      binary += String.fromCharCode(byte);
-    });
-    return btoa(binary);
-  }
-
-  function fromBase64(base64) {
-    return Uint8Array.from(atob(base64), char => char.charCodeAt(0));
-  }
-
-  async function hashPassword(password, saltBase64, iterations) {
-    const encoder = new TextEncoder();
-    const keyMaterial = await crypto.subtle.importKey(
-      "raw",
-      encoder.encode(password),
-      "PBKDF2",
-      false,
-      ["deriveBits"]
-    );
-
-    const bits = await crypto.subtle.deriveBits(
-      {
-        name: "PBKDF2",
-        hash: "SHA-256",
-        salt: fromBase64(saltBase64),
-        iterations
-      },
-      keyMaterial,
-      256
-    );
-
-    return toBase64(new Uint8Array(bits));
-  }
-
-  async function verifyPassword(password) {
-    const hashed = await hashPassword(password, securityConfig.salt, securityConfig.iterations);
-    return hashed === securityConfig.hash;
-  }
-
-  async function loadSecurityConfig() {
-    try {
-      const response = await fetch(`${ADMIN_SECURITY_URL}?t=${Date.now()}`);
-      if (!response.ok) throw new Error("fetch failed");
-      const json = await response.json();
-      if (!json?.salt || !json?.hash || !json?.iterations) throw new Error("invalid config");
-      securityConfig = json;
-    } catch (_error) {
-      securityConfig = fallbackSecurityConfig;
-    }
-  }
-
-  if (sessionStorage.getItem(SESSION_KEY) === "1") {
-    unlockPanel();
-  }
-
-  loadSecurityConfig();
-
-  document.getElementById("login-btn")?.addEventListener("click", async () => {
-    const pwd = document.getElementById("admin-password")?.value || "";
-    const passed = await verifyPassword(pwd);
-    if (passed) {
-      setMsg(loginMsg, "登录成功");
-      unlockPanel();
-    } else {
-      setMsg(loginMsg, "密码错误", true);
-    }
-  });
-
-  document.getElementById("change-password-btn")?.addEventListener("click", async () => {
-    const msgEl = document.getElementById("pwd-msg");
-    const oldPwd = document.getElementById("old-password")?.value || "";
-    const newPwd = document.getElementById("new-password")?.value || "";
-    const token = getToken();
-    const branch = getBranch();
-
-    if (!token) {
-      setMsg(msgEl, "请先填写 GitHub Token", true);
-      return;
-    }
-
-    const oldPassed = await verifyPassword(oldPwd);
-    if (!oldPassed) {
-      setMsg(msgEl, "当前密码不正确", true);
-      return;
-    }
-    if (newPwd.trim().length < 6) {
-      setMsg(msgEl, "新密码至少 6 位", true);
-      return;
-    }
-
-    const saltBytes = new Uint8Array(16);
-    crypto.getRandomValues(saltBytes);
-    const nextSecurity = {
-      algorithm: "PBKDF2-SHA256",
-      iterations: 180000,
-      salt: toBase64(saltBytes),
-      hash: await hashPassword(newPwd.trim(), toBase64(saltBytes), 180000)
-    };
-
-    await upsertFile(
-      ADMIN_SECURITY_PATH,
-      `${JSON.stringify(nextSecurity, null, 2)}\n`,
-      "admin: update password hash",
-      token,
-      branch
-    );
-
-    securityConfig = nextSecurity;
-    setMsg(msgEl, "密码修改成功，已全站生效（跨设备统一）");
-    const oldInput = document.getElementById("old-password");
-    const newInput = document.getElementById("new-password");
-    if (oldInput) oldInput.value = "";
-    if (newInput) newInput.value = "";
-  });
 
   function getToken() {
     return (document.getElementById("gh-token")?.value || "").trim();
@@ -341,158 +252,93 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     localStorage.setItem(ADMIN_GH_BRANCH_KEY, branch || "main");
   }
 
+  async function verifyPassword(password) {
+    return adminService.verifyPassword(password);
+  }
+
+  async function loadSecurityConfig() {
+    await adminService.loadSecurityConfig();
+  }
+
+  async function githubRequest(path, token, options = {}) {
+    return adminService.githubRequest(path, token, options);
+  }
+
+  async function getFileMeta(repoPath, token, branch) {
+    return adminService.getFileMeta(repoPath, token, branch);
+  }
+
+  async function upsertFile(repoPath, content, message, token, branch) {
+    return adminService.upsertFile(repoPath, content, message, token, branch);
+  }
+
+  async function deleteFile(repoPath, message, token, branch) {
+    return adminService.deleteFile(repoPath, message, token, branch);
+  }
+
+  async function listFilesByPrefix(prefix, token, branch) {
+    return adminService.listFilesByPrefix(prefix, token, branch);
+  }
+
+  async function listBlogMarkdownEntries(token, branch) {
+    return adminService.listBlogMarkdownEntries(token, branch);
+  }
+
+  if (sessionStorage.getItem(SESSION_KEY) === "1") {
+    unlockPanel();
+  }
+
   loadGitHubDraft();
   document.getElementById("gh-token")?.addEventListener("change", saveGitHubDraft);
   document.getElementById("gh-branch")?.addEventListener("change", saveGitHubDraft);
 
-  function encodeUtf8ToBase64(content) {
-    return btoa(unescape(encodeURIComponent(content)));
+  loadSecurityConfig();
+
+  if (sessionStorage.getItem(SESSION_KEY) === "1") {
+    loadPostList().catch((error) => {
+      setMsg(document.getElementById("post-msg"), String(error), true);
+    });
   }
 
-  async function githubRequest(path, token, options = {}) {
-    const res = await fetch(`https://api.github.com${path}`, {
-      ...options,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github+json",
-        ...(options.headers || {})
-      }
-    });
+  document.getElementById("login-btn")?.addEventListener("click", async () => {
+    const pwd = document.getElementById("admin-password")?.value || "";
+    const passed = await verifyPassword(pwd);
+    if (passed) {
+      setMsg(loginMsg, "登录成功");
+      unlockPanel();
+      loadPostList().catch((error) => {
+        setMsg(document.getElementById("post-msg"), String(error), true);
+      });
+    } else {
+      setMsg(loginMsg, "密码错误", true);
+    }
+  });
 
-    if (!res.ok) {
-      const text = await res.text();
-      let detail = text;
-      try {
-        const parsed = JSON.parse(text);
-        detail = parsed?.message || text;
-      } catch (_e) {
-        detail = text;
-      }
-      throw new Error(`GitHub API 错误 ${res.status}: ${detail}`);
+  document.getElementById("change-password-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("pwd-msg");
+    const oldPwd = document.getElementById("old-password")?.value || "";
+    const newPwd = document.getElementById("new-password")?.value || "";
+    const token = getToken();
+    const branch = getBranch();
+
+    if (!token) {
+      setMsg(msgEl, "请先填写 GitHub Token", true);
+      return;
     }
 
-    return res.status === 204 ? null : res.json();
-  }
-
-  async function getFileMeta(repoPath, token, branch) {
-    try {
-      return await githubRequest(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${encodeURIComponent(repoPath).replace(/%2F/g, "/")}?ref=${encodeURIComponent(branch)}`, token);
-    } catch (error) {
-      if (String(error).includes("404")) return null;
-      throw error;
-    }
-  }
-
-  async function upsertFile(repoPath, content, message, token, branch) {
-    const meta = await getFileMeta(repoPath, token, branch);
-    const body = {
-      message,
-      content: encodeUtf8ToBase64(content),
-      branch,
-      ...(meta?.sha ? { sha: meta.sha } : {})
-    };
-
-    await githubRequest(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${encodeURIComponent(repoPath).replace(/%2F/g, "/")}`, token, {
-      method: "PUT",
-      body: JSON.stringify(body)
-    });
-  }
-
-  async function deleteFile(repoPath, message, token, branch) {
-    const meta = await getFileMeta(repoPath, token, branch);
-    if (!meta?.sha) return false;
-
-    await githubRequest(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${encodeURIComponent(repoPath).replace(/%2F/g, "/")}`, token, {
-      method: "DELETE",
-      body: JSON.stringify({
-        message,
-        sha: meta.sha,
-        branch
-      })
+    await adminService.changePassword({
+      oldPassword: oldPwd,
+      newPassword: newPwd,
+      token,
+      branch
     });
 
-    return true;
-  }
-
-  async function listFilesByPrefix(prefix, token, branch) {
-    const tree = await githubRequest(`/repos/${REPO_OWNER}/${REPO_NAME}/git/trees/${encodeURIComponent(branch)}?recursive=1`, token);
-    const items = Array.isArray(tree?.tree) ? tree.tree : [];
-
-    return items
-      .filter((item) => item?.type === "blob" && typeof item?.path === "string" && item.path.startsWith(prefix))
-      .map((item) => item.path);
-  }
-
-  async function listBlogMarkdownEntries(token, branch) {
-    const files = await listFilesByPrefix("src/content/blog/", token, branch);
-    const entries = files
-      .map((path) => {
-        const matched = path.match(/^src\/content\/blog\/(.+)\/(zh-cn|en)\.md$/);
-        if (!matched) return null;
-        return {
-          path,
-          slug: matched[1],
-          lang: matched[2]
-        };
-      })
-      .filter(Boolean)
-      .sort((a, b) => `${a.slug}/${a.lang}`.localeCompare(`${b.slug}/${b.lang}`));
-
-    return entries;
-  }
-
-  function decodeFileContent(raw) {
-    return decodeURIComponent(escape(atob((raw || "").replace(/\n/g, ""))));
-  }
-
-  function parseFriendLinksFromTs(content) {
-    const matched = content.match(/const\s+friendLinks:\s*FriendLink\[\]\s*=\s*(\[[\s\S]*?\])\s*\n\s*export\s+default\s+friendLinks/);
-    if (!matched?.[1]) throw new Error("无法解析友链文件");
-    return JSON.parse(matched[1]);
-  }
-
-  function buildFriendLinksTs(friendLinks) {
-    return `import type { FriendLink } from "@/types/friend"\n\nconst friendLinks: FriendLink[] = ${JSON.stringify(friendLinks, null, 2)}\n\nexport default friendLinks\n`;
-  }
-
-  function parseHeaderContactFromTs(content) {
-    const matched = content.match(/const\s+headerContact:\s*HeaderContact\s*=\s*(\{[\s\S]*?\})\s*\n\s*export\s+default\s+headerContact/);
-    if (!matched?.[1]) throw new Error("无法解析联系方式文件");
-    return JSON.parse(matched[1]);
-  }
-
-  function buildHeaderContactTs(contact) {
-    return `export type HeaderContact = {\n  githubUrl: string\n  email: string\n}\n\nconst headerContact: HeaderContact = ${JSON.stringify(contact, null, 2)}\n\nexport default headerContact\n`;
-  }
-
-  function normalizeSlug(input) {
-    return input
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[<>:"\\|?*#%{}\[\]^`~]/g, "")
-      .replace(/\.{2,}/g, ".")
-      .replace(/^-+|-+$/g, "");
-  }
-
-  function buildPostMarkdown(data) {
-    const imageLine = data.image ? `image: ${data.image}\n` : "";
-    return `---\ntitle: ${data.title}\npubDate: ${data.date}\ndraft: false\ndescription: ${data.description}\n${imageLine}slugId: ${data.slugId}\n---\n\n${data.content}\n`;
-  }
-
-  function toIsoDateTime(dateTimeLocalValue) {
-    if (!dateTimeLocalValue) return "";
-    const date = new Date(dateTimeLocalValue);
-    if (Number.isNaN(date.getTime())) return "";
-    return date.toISOString();
-  }
-
-  function getNowDateTimeLocal() {
-    const now = new Date();
-    now.setSeconds(0, 0);
-    const pad = (n) => String(n).padStart(2, "0");
-    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
-  }
+    setMsg(msgEl, "密码修改成功，已全站生效（跨设备统一）");
+    const oldInput = document.getElementById("old-password");
+    const newInput = document.getElementById("new-password");
+    if (oldInput) oldInput.value = "";
+    if (newInput) newInput.value = "";
+  });
 
   function initPostDateDefault() {
     const input = document.getElementById("post-date");
@@ -501,7 +347,154 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     }
   }
 
+  function toDateTimeLocalValue(isoLikeValue) {
+    if (!isoLikeValue) return "";
+    const date = new Date(isoLikeValue);
+    if (Number.isNaN(date.getTime())) return "";
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  function parsePostMarkdown(markdown) {
+    const matched = markdown.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+    if (!matched) {
+      return {
+        frontmatter: {},
+        content: markdown || ""
+      };
+    }
+
+    const rawFrontmatter = matched[1] || "";
+    const bodyContent = matched[2] || "";
+    const frontmatter = {};
+    rawFrontmatter.split("\n").forEach((line) => {
+      const idx = line.indexOf(":");
+      if (idx <= 0) return;
+      const key = line.slice(0, idx).trim();
+      const value = line.slice(idx + 1).trim();
+      frontmatter[key] = value;
+    });
+
+    return { frontmatter, content: bodyContent };
+  }
+
+  function clearPostEditor() {
+    const titleInput = document.getElementById("post-title");
+    const slugInput = document.getElementById("post-slug");
+    const langInput = document.getElementById("post-lang");
+    const dateInput = document.getElementById("post-date");
+    const descInput = document.getElementById("post-desc");
+    const coverInput = document.getElementById("post-cover");
+    const contentInput = document.getElementById("post-content");
+
+    if (titleInput) titleInput.value = "";
+    if (slugInput) slugInput.value = "";
+    if (langInput) langInput.value = "zh-cn";
+    if (dateInput) dateInput.value = getNowDateTimeLocal();
+    if (descInput) descInput.value = "";
+    if (coverInput) coverInput.value = "";
+    if (contentInput) contentInput.value = "";
+  }
+
+  async function loadPostList() {
+    const msgEl = document.getElementById("post-msg");
+    const selectEl = document.getElementById("post-select");
+    const token = getToken();
+    const branch = getBranch();
+
+    if (!token) {
+      if (selectEl) {
+        selectEl.innerHTML = "";
+      }
+      setMsg(msgEl, "请先填写 GitHub Token 后再加载文章列表", true);
+      return;
+    }
+
+    setMsg(msgEl, "加载文章列表中...");
+    saveGitHubDraft();
+    const entries = await listBlogMarkdownEntries(token, branch);
+
+    if (selectEl) {
+      selectEl.innerHTML = "";
+      if (entries.length === 0) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "暂无文章";
+        selectEl.appendChild(option);
+      } else {
+        entries.forEach((entry) => {
+          const option = document.createElement("option");
+          option.value = entry.path;
+          option.textContent = `${entry.slug} (${entry.lang})`;
+          selectEl.appendChild(option);
+        });
+      }
+    }
+
+    setMsg(msgEl, `已加载 ${entries.length} 篇文章`);
+  }
+
+  async function loadSelectedPostToEditor() {
+    const msgEl = document.getElementById("post-msg");
+    const selectEl = document.getElementById("post-select");
+    const selectedPath = selectEl?.value || "";
+    const token = getToken();
+    const branch = getBranch();
+
+    if (!token) throw new Error("请先填写 GitHub Token");
+    if (!selectedPath) throw new Error("请先选择文章");
+
+    const meta = await getFileMeta(selectedPath, token, branch);
+    if (!meta?.content) throw new Error("文章内容为空或不存在");
+
+    const rawMarkdown = decodeFileContent(meta.content);
+    const { frontmatter, content } = parsePostMarkdown(rawMarkdown);
+
+    const slugMatched = selectedPath.match(/^src\/content\/blog\/(.+)\/(zh-cn|en)\.md$/);
+    const slug = slugMatched?.[1] || "";
+    const lang = slugMatched?.[2] || "zh-cn";
+
+    const titleInput = document.getElementById("post-title");
+    const slugInput = document.getElementById("post-slug");
+    const langInput = document.getElementById("post-lang");
+    const dateInput = document.getElementById("post-date");
+    const descInput = document.getElementById("post-desc");
+    const coverInput = document.getElementById("post-cover");
+    const contentInput = document.getElementById("post-content");
+
+    if (titleInput) titleInput.value = frontmatter.title || "";
+    if (slugInput) slugInput.value = slug;
+    if (langInput) langInput.value = lang;
+    if (dateInput) dateInput.value = toDateTimeLocalValue(frontmatter.pubDate || "") || getNowDateTimeLocal();
+    if (descInput) descInput.value = frontmatter.description || "";
+    if (coverInput) coverInput.value = frontmatter.image || "";
+    if (contentInput) contentInput.value = (content || "").trim();
+
+    setMsg(msgEl, `已载入：${slug} (${lang})`);
+  }
+
   initPostDateDefault();
+  document.getElementById("refresh-post-list-btn")?.addEventListener("click", loadPostList);
+  document.getElementById("load-selected-post-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("post-msg");
+    try {
+      await loadSelectedPostToEditor();
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+  document.getElementById("new-post-btn")?.addEventListener("click", () => {
+    clearPostEditor();
+    setMsg(document.getElementById("post-msg"), "已切换到新建文章模式");
+  });
+  document.getElementById("post-select")?.addEventListener("dblclick", async () => {
+    const msgEl = document.getElementById("post-msg");
+    try {
+      await loadSelectedPostToEditor();
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
 
   document.getElementById("insert-iframe-btn")?.addEventListener("click", () => {
     const textarea = document.getElementById("post-content");
@@ -577,7 +570,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const lang = (document.getElementById("post-lang")?.value || "zh-cn").trim();
       const title = (document.getElementById("post-title")?.value || "").trim();
       const dateInput = (document.getElementById("post-date")?.value || "").trim();
-      const date = toIsoDateTime(dateInput);
+      const date = toIsoDateTime(dateInput) || new Date().toISOString();
       const description = (document.getElementById("post-desc")?.value || "").trim();
       const image = (document.getElementById("post-cover")?.value || "").trim();
       const content = document.getElementById("post-content")?.value || "";
@@ -586,7 +579,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const slug = inputSlug || fallbackSlug || `post-${Date.now()}`;
 
       if (!token) throw new Error("请先填写 GitHub Token");
-      if (!title || !date) throw new Error("请填写标题、发布日期");
+      if (!title) throw new Error("请填写标题");
 
       const slugInput = document.getElementById("post-slug");
       if (slugInput && !slugInput.value.trim()) {
@@ -607,6 +600,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       saveGitHubDraft();
       await upsertFile(path, markdown, `post: update ${slug}/${lang}`, token, branch);
       setMsg(msgEl, `发布成功：${path}`);
+      await loadPostList();
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }
@@ -636,6 +630,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       }
 
       setMsg(msgEl, `删除成功：${path}`);
+      await loadPostList();
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }
@@ -668,109 +663,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       }
 
       setMsg(msgEl, `删除成功：${prefix}（已删除 ${files.length} 个文件）`);
-    } catch (error) {
-      setMsg(msgEl, String(error), true);
-    }
-  });
-
-  document.getElementById("load-delete-posts-btn")?.addEventListener("click", async () => {
-    const msgEl = document.getElementById("delete-select-msg");
-    const selectEl = document.getElementById("delete-post-select");
-    try {
-      const token = getToken();
-      const branch = getBranch();
-      if (!token) throw new Error("请先填写 GitHub Token");
-
-      setMsg(msgEl, "加载中...");
-      saveGitHubDraft();
-      const entries = await listBlogMarkdownEntries(token, branch);
-
-      if (selectEl) {
-        selectEl.innerHTML = "";
-        if (entries.length === 0) {
-          const option = document.createElement("option");
-          option.value = "";
-          option.textContent = "没有可删除的博客";
-          selectEl.appendChild(option);
-        } else {
-          const placeholder = document.createElement("option");
-          placeholder.value = "";
-          placeholder.textContent = "请选择要删除的博客";
-          selectEl.appendChild(placeholder);
-
-          entries.forEach((entry) => {
-            const option = document.createElement("option");
-            option.value = `${entry.slug}\t${entry.lang}`;
-            option.textContent = `${entry.slug} (${entry.lang})`;
-            selectEl.appendChild(option);
-          });
-        }
-      }
-
-      setMsg(msgEl, `加载成功：${entries.length} 篇`);
-    } catch (error) {
-      setMsg(msgEl, String(error), true);
-    }
-  });
-
-  document.getElementById("delete-selected-post-btn")?.addEventListener("click", async () => {
-    const msgEl = document.getElementById("delete-select-msg");
-    const selectEl = document.getElementById("delete-post-select");
-    try {
-      const token = getToken();
-      const branch = getBranch();
-      if (!token) throw new Error("请先填写 GitHub Token");
-
-      const selected = selectEl?.value || "";
-      if (!selected) throw new Error("请先选择要删除的博客");
-
-      const [slug, lang] = selected.split("\t");
-      if (!slug || !lang) throw new Error("所选博客格式无效，请重新加载");
-
-      const path = `src/content/blog/${slug}/${lang}.md`;
-      const confirmed = window.confirm(`确认删除所选文章？\n${path}`);
-      if (!confirmed) return;
-
-      setMsg(msgEl, "删除中...");
-      saveGitHubDraft();
-      const deleted = await deleteFile(path, `post: delete selected ${slug}/${lang}`, token, branch);
-      if (!deleted) throw new Error(`未找到文件：${path}`);
-
-      setMsg(msgEl, `删除成功：${path}`);
-    } catch (error) {
-      setMsg(msgEl, String(error), true);
-    }
-  });
-
-  document.getElementById("delete-selected-post-all-btn")?.addEventListener("click", async () => {
-    const msgEl = document.getElementById("delete-select-msg");
-    const selectEl = document.getElementById("delete-post-select");
-    try {
-      const token = getToken();
-      const branch = getBranch();
-      if (!token) throw new Error("请先填写 GitHub Token");
-
-      const selected = selectEl?.value || "";
-      if (!selected) throw new Error("请先选择要删除的博客");
-
-      const [slug] = selected.split("\t");
-      if (!slug) throw new Error("所选博客格式无效，请重新加载");
-
-      const prefix = `src/content/blog/${slug}/`;
-      const confirmed = window.confirm(`确认删除所选博客目录？\n${prefix}\n\n这会删除该目录下全部语言文件和资源文件。`);
-      if (!confirmed) return;
-
-      setMsg(msgEl, "扫描目录中...");
-      const files = await listFilesByPrefix(prefix, token, branch);
-      if (files.length === 0) throw new Error(`目录为空或不存在：${prefix}`);
-
-      setMsg(msgEl, `删除中...（共 ${files.length} 个文件）`);
-      saveGitHubDraft();
-      for (const file of files) {
-        await deleteFile(file, `post: delete selected ${slug} directory`, token, branch);
-      }
-
-      setMsg(msgEl, `删除成功：${prefix}（已删除 ${files.length} 个文件）`);
+      await loadPostList();
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }
