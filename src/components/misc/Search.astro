@@ -35,11 +35,12 @@ const fakeResult: SearchResult[] = [
   }
 ]
 ---
-<div id="search-modal" class="fixed inset-0 z-[100] opacity-0 pointer-events-none">
+<div id="search-modal" class="fixed inset-0 z-[100] opacity-0 pointer-events-none" role="dialog" aria-modal="true" aria-labelledby="search-dialog-title" aria-hidden="true">
   <div class="absolute inset-0 modal-backdrop opacity-0" aria-hidden="true"></div>
 
   <div class="fixed inset-0 flex items-start justify-center p-4 pt-[25vh]">
     <div class="search-modal-content bg-[var(--bg-color)] rounded-xl shadow-xl w-full max-w-2xl border border-[var(--button-border-color)] overflow-hidden scale-80 transition-all duration-300 opacity-0 flex flex-col max-h-[40vh]">
+      <h2 id="search-dialog-title" class="sr-only">{t("search.placeholder")}</h2>
       <div class="flex items-center p-4 border-b border-[var(--button-border-color)]">
         <svg class="w-5 h-5 text-[var(--cover-subtitle-color)] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -79,8 +80,27 @@ function initSearchModal() {
   if (searchModal.dataset.bound === 'true') return;
   searchModal.dataset.bound = 'true';
 
+  let previousFocusedElement = null;
+
+  const isModalOpen = () => !searchModal.classList.contains('opacity-0');
+
+  const getFocusableElements = () => {
+    if (!modalContent) return [];
+    return Array.from(
+      modalContent.querySelectorAll('a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])')
+    );
+  };
+
+  const shouldIgnoreShortcut = (target) => {
+    if (!target) return false;
+    const tag = target.tagName;
+    return target.isContentEditable || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+  };
+
   const openModal = () => {
+    previousFocusedElement = document.activeElement;
     searchModal.classList.remove('opacity-0', 'pointer-events-none');
+    searchModal.setAttribute('aria-hidden', 'false');
     searchModal.offsetHeight;
     requestAnimationFrame(() => {
       modalBackdrop?.classList.remove('opacity-0');
@@ -100,6 +120,8 @@ function initSearchModal() {
     });
     setTimeout(() => {
       searchModal.classList.add('opacity-0', 'pointer-events-none');
+      searchModal.setAttribute('aria-hidden', 'true');
+      previousFocusedElement?.focus?.();
     }, 300);
   };
 
@@ -109,8 +131,39 @@ function initSearchModal() {
     if (!modalContent?.contains(e.target)) closeModal();
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !searchModal.classList.contains('opacity-0')) {
+    if (e.key === 'Escape' && isModalOpen()) {
       closeModal();
+      return;
+    }
+
+    if (isModalOpen() && e.key === 'Tab') {
+      const focusableElements = getFocusableElements();
+      if (focusableElements.length === 0) return;
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      const active = document.activeElement;
+
+      if (e.shiftKey && active === firstElement) {
+        e.preventDefault();
+        lastElement.focus();
+      } else if (!e.shiftKey && active === lastElement) {
+        e.preventDefault();
+        firstElement.focus();
+      }
+      return;
+    }
+
+    const target = e.target;
+    if (!isModalOpen() && !e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey && e.key === '/' && !shouldIgnoreShortcut(target)) {
+      e.preventDefault();
+      openModal();
+      return;
+    }
+
+    if (!isModalOpen() && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      openModal();
     }
   });
 }
@@ -183,8 +236,9 @@ function renderSearchStatus(message, extraClass = '') {
 
 function initPagefindSearch() {
   const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
   
-  if (!searchInput) return;
+  if (!searchInput || !searchResults) return;
 
   // 避免重复绑定
   if (searchInput.dataset.bound === 'true') return;
