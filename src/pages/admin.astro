@@ -396,6 +396,35 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     if (contentInput) contentInput.value = "";
   }
 
+  function getSelectedPostSlug() {
+    const selectEl = document.getElementById("post-select");
+    const selectedPath = selectEl?.value || "";
+    if (!selectedPath) return "";
+    const matched = selectedPath.match(/^src\/content\/blog\/(.+)\/(zh-cn|en)\.md$/);
+    return matched?.[1] || "";
+  }
+
+  function ensurePostSlug() {
+    const slugInput = document.getElementById("post-slug");
+    const title = (document.getElementById("post-title")?.value || "").trim();
+    const currentSlug = normalizeSlug(slugInput?.value || "");
+    if (currentSlug) {
+      if (slugInput) slugInput.value = currentSlug;
+      return currentSlug;
+    }
+
+    const selectedSlug = normalizeSlug(getSelectedPostSlug());
+    if (selectedSlug) {
+      if (slugInput) slugInput.value = selectedSlug;
+      return selectedSlug;
+    }
+
+    const titleSlug = normalizeSlug(title);
+    const fallbackSlug = titleSlug || `post-${Date.now()}`;
+    if (slugInput) slugInput.value = fallbackSlug;
+    return fallbackSlug;
+  }
+
   async function loadPostList() {
     const msgEl = document.getElementById("post-msg");
     const selectEl = document.getElementById("post-select");
@@ -507,15 +536,14 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     try {
       const token = getToken();
       const branch = getBranch();
-      const slug = normalizeSlug(document.getElementById("post-slug")?.value || "");
+      const slug = ensurePostSlug();
       const lang = (document.getElementById("post-lang")?.value || "zh-cn").trim();
       const files = document.getElementById("post-files")?.files;
 
       if (!token) throw new Error("请先填写 GitHub Token");
-      if (!slug) throw new Error("请先填写文章 slug");
       if (!files || files.length === 0) throw new Error("请先选择文件");
 
-      setMsg(msgEl, "上传中...");
+      setMsg(msgEl, `上传中...（${files.length} 个文件）`);
 
       const uploaded = [];
       for (const file of files) {
@@ -556,7 +584,9 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       }
 
       textarea.value = `${textarea.value || ""}\n\n${snippets}\n`;
-      setMsg(msgEl, `上传成功：${uploaded.length} 个文件`);
+      const fileInput = document.getElementById("post-files");
+      if (fileInput) fileInput.value = "";
+      setMsg(msgEl, `上传成功：${uploaded.length} 个文件（目录：${slug}/assets）`);
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }
@@ -574,7 +604,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const description = (document.getElementById("post-desc")?.value || "").trim();
       const image = (document.getElementById("post-cover")?.value || "").trim();
       const content = document.getElementById("post-content")?.value || "";
-      const inputSlug = normalizeSlug(document.getElementById("post-slug")?.value || "");
+      const inputSlug = ensurePostSlug();
       const fallbackSlug = normalizeSlug(title);
       const slug = inputSlug || fallbackSlug || `post-${Date.now()}`;
 
@@ -612,10 +642,9 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const token = getToken();
       const branch = getBranch();
       const lang = (document.getElementById("post-lang")?.value || "zh-cn").trim();
-      const slug = normalizeSlug(document.getElementById("post-slug")?.value || "");
+      const slug = ensurePostSlug();
 
       if (!token) throw new Error("请先填写 GitHub Token");
-      if (!slug) throw new Error("请先填写文章 slug");
 
       const path = `src/content/blog/${slug}/${lang}.md`;
       const confirmed = window.confirm(`确认删除文章文件？\n${path}`);
@@ -641,10 +670,9 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     try {
       const token = getToken();
       const branch = getBranch();
-      const slug = normalizeSlug(document.getElementById("post-slug")?.value || "");
+      const slug = ensurePostSlug();
 
       if (!token) throw new Error("请先填写 GitHub Token");
-      if (!slug) throw new Error("请先填写文章 slug");
 
       const prefix = `src/content/blog/${slug}/`;
       const confirmed = window.confirm(`确认删除整个博客目录？\n${prefix}\n\n这会删除该目录下所有语言文件和资源文件。`);
