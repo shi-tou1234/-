@@ -119,8 +119,13 @@
         }
       );
       if (!res.ok) {
-        comments = [];
-        hasMore = false;
+        if (append) {
+          loadMoreError = t('comments.loadMoreFailed') || '加载更多失败，请重试';
+        } else {
+          comments = [];
+          hasMore = false;
+          error = t('comments.loadFailed') || '加载失败';
+        }
         return;
       }
       const data = await res.json();
