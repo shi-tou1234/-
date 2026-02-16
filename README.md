@@ -1,4 +1,6 @@
 # 📝 Momo Blog (cmchen 的博客)
+感谢开源仓库https://github.com/motues/Momo
+https://github.com/motues/Momo-Backend
 
 [![Astro](https://img.shields.io/badge/Astro-5.x-BC52EE?logo=astro)](https://astro.build)
 [![Svelte](https://img.shields.io/badge/Svelte-5.x-FF3E00?logo=svelte)](https://svelte.dev)
