@@ -96,8 +96,11 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
         <div class="mt-4 flex gap-3">
           <button id="publish-post-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">发布/更新文章</button>
+          <button id="delete-post-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">删除当前语言文章</button>
+          <button id="delete-post-all-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">删除整个博客目录</button>
           <a class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]" href="/-/" target="_blank">打开前台</a>
         </div>
+        <p class="text-xs mt-2 text-[var(--text-color)]/60">删除当前语言文章：仅删除 `slug/lang.md`。删除整个博客目录：删除该 slug 下所有文件（含图片视频资源）。</p>
         <p id="post-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
       </div>
 
@@ -380,6 +383,31 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     });
   }
 
+  async function deleteFile(repoPath, message, token, branch) {
+    const meta = await getFileMeta(repoPath, token, branch);
+    if (!meta?.sha) return false;
+
+    await githubRequest(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${encodeURIComponent(repoPath).replace(/%2F/g, "/")}`, token, {
+      method: "DELETE",
+      body: JSON.stringify({
+        message,
+        sha: meta.sha,
+        branch
+      })
+    });
+
+    return true;
+  }
+
+  async function listFilesByPrefix(prefix, token, branch) {
+    const tree = await githubRequest(`/repos/${REPO_OWNER}/${REPO_NAME}/git/trees/${encodeURIComponent(branch)}?recursive=1`, token);
+    const items = Array.isArray(tree?.tree) ? tree.tree : [];
+
+    return items
+      .filter((item) => item?.type === "blob" && typeof item?.path === "string" && item.path.startsWith(prefix))
+      .map((item) => item.path);
+  }
+
   function decodeFileContent(raw) {
     return decodeURIComponent(escape(atob((raw || "").replace(/\n/g, ""))));
   }
@@ -523,6 +551,67 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       saveGitHubDraft();
       await upsertFile(path, markdown, `post: update ${slug}/${lang}`, token, branch);
       setMsg(msgEl, `发布成功：${path}`);
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("delete-post-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("post-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      const lang = (document.getElementById("post-lang")?.value || "zh-cn").trim();
+      const slug = normalizeSlug(document.getElementById("post-slug")?.value || "");
+
+      if (!token) throw new Error("请先填写 GitHub Token");
+      if (!slug) throw new Error("请先填写文章 slug");
+
+      const path = `src/content/blog/${slug}/${lang}.md`;
+      const confirmed = window.confirm(`确认删除文章文件？\n${path}`);
+      if (!confirmed) return;
+
+      setMsg(msgEl, "删除中...");
+      saveGitHubDraft();
+      const deleted = await deleteFile(path, `post: delete ${slug}/${lang}`, token, branch);
+
+      if (!deleted) {
+        throw new Error(`未找到文件：${path}`);
+      }
+
+      setMsg(msgEl, `删除成功：${path}`);
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("delete-post-all-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("post-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      const slug = normalizeSlug(document.getElementById("post-slug")?.value || "");
+
+      if (!token) throw new Error("请先填写 GitHub Token");
+      if (!slug) throw new Error("请先填写文章 slug");
+
+      const prefix = `src/content/blog/${slug}/`;
+      const confirmed = window.confirm(`确认删除整个博客目录？\n${prefix}\n\n这会删除该目录下所有语言文件和资源文件。`);
+      if (!confirmed) return;
+
+      setMsg(msgEl, "扫描目录中...");
+      const files = await listFilesByPrefix(prefix, token, branch);
+      if (files.length === 0) {
+        throw new Error(`目录为空或不存在：${prefix}`);
+      }
+
+      setMsg(msgEl, `删除中...（共 ${files.length} 个文件）`);
+      saveGitHubDraft();
+      for (const file of files) {
+        await deleteFile(file, `post: delete ${slug} directory`, token, branch);
+      }
+
+      setMsg(msgEl, `删除成功：${prefix}（已删除 ${files.length} 个文件）`);
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }
