@@ -572,21 +572,27 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
       const textarea = document.getElementById("post-content");
       const coverInput = document.getElementById("post-cover");
-      const snippets = uploaded.map((f) => {
+      const firstImage = uploaded.find((f) => f.type.startsWith("image/"));
+      const coverWasEmpty = !!(coverInput && !coverInput.value.trim());
+      const coverNameToSkip = coverWasEmpty && firstImage ? firstImage.name : "";
+
+      const snippets = uploaded.filter((f) => f.name !== coverNameToSkip).map((f) => {
         if (f.type.startsWith("image/")) return `![${f.name}](./assets/${f.name})`;
         if (f.type.startsWith("video/")) return `<video controls src=\"./assets/${f.name}\"></video>`;
         return `[${f.name}](./assets/${f.name})`;
       }).join("\n\n");
 
-      const firstImage = uploaded.find((f) => f.type.startsWith("image/"));
       if (coverInput && !coverInput.value.trim() && firstImage) {
         coverInput.value = `./assets/${firstImage.name}`;
       }
 
-      textarea.value = `${textarea.value || ""}\n\n${snippets}\n`;
+      if (snippets) {
+        textarea.value = `${textarea.value || ""}\n\n${snippets}\n`;
+      }
       const fileInput = document.getElementById("post-files");
       if (fileInput) fileInput.value = "";
-      setMsg(msgEl, `上传成功：${uploaded.length} 个文件（目录：${slug}/assets）`);
+      const coverMsg = coverNameToSkip ? `，已将 ${coverNameToSkip} 设为封面且不插入正文` : "";
+      setMsg(msgEl, `上传成功：${uploaded.length} 个文件（目录：${slug}/assets）${coverMsg}`);
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }
