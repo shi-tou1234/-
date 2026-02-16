@@ -68,8 +68,8 @@ const image = blogCoverUrl(entry.data.image, entry.id);
             <p class="font-bold text-[var(--text-color)]/60 pt-4 pb-10">{ formatFullDate(entry.data.pubDate, currentLang) }</p>
         </div>
         {image && (
-            <div class="cover overflow-hidden rounded-xl border border-[var(--button-border-color)] bg-[var(--button-hover-color)]">
-                <ImageModule src={image} class="w-full h-auto max-h-[70vh] object-contain"/>
+            <div class="cover h-[55vh] min-h-[260px] max-h-[620px] overflow-hidden rounded-xl border border-[var(--button-border-color)]">
+                <ImageModule src={image} class="w-full h-full object-cover object-center"/>
             </div>
         )}
         {entry.isFallback && (
