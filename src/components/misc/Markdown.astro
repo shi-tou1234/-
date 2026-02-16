@@ -13,6 +13,16 @@ const className = Astro.props.class
 </div>
 
 <script>
+  function stabilizeMarkdownImages() {
+    const images = document.querySelectorAll('.markdown-content img');
+    images.forEach((img) => {
+      img.setAttribute('loading', 'eager');
+      img.setAttribute('decoding', 'sync');
+      img.setAttribute('fetchpriority', 'high');
+      img.style.imageRendering = 'auto';
+    });
+  }
+
   function setupSpoilers() {
     const spoilers = document.querySelectorAll('.spoiler');
     
@@ -51,7 +61,9 @@ const className = Astro.props.class
     });
   }
 
+  stabilizeMarkdownImages();
   setupSpoilers();
+  document.addEventListener('astro:page-load', stabilizeMarkdownImages);
   document.addEventListener('astro:page-load', setupSpoilers);
 </script>
 

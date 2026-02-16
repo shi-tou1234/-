@@ -3,6 +3,12 @@ import { visit } from 'unist-util-visit';
 export function customFigurePlugin() {
   return (tree) => {
     visit(tree, { type: 'element', tagName: 'img' }, (node, index, parent) => {
+      if (!node.properties) {
+        node.properties = {};
+      }
+      node.properties.loading = 'eager';
+      node.properties.decoding = 'sync';
+
       // 检查是否存在 title 属性
       const title = node.properties?.title;
       if (!title) return;
