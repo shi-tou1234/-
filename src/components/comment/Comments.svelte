@@ -19,6 +19,8 @@
   let limit = 20;
   let hasMore = false;
   const LOAD_TIMEOUT_MS = 6000;
+  let loadingMore = false;
+  let loadMoreError = '';
   let statusMessage = '';
   let statusType: 'success' | 'error' | 'warning' | '' = '';
   let statusTimer: ReturnType<typeof setTimeout> | null = null;
@@ -88,9 +90,18 @@
     }, 2200);
   }
 
-  async function loadComments() {
-    loading = true;
-    error = '';
+  async function loadComments(options: { append?: boolean; showLoading?: boolean } = {}) {
+    const { append = false, showLoading = true } = options;
+
+    if (showLoading) {
+      loading = true;
+      error = '';
+    }
+    if (append) {
+      loadingMore = true;
+      loadMoreError = '';
+    }
+
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => controller.abort(), LOAD_TIMEOUT_MS);
     try {
@@ -113,15 +124,35 @@
         return;
       }
       const data = await res.json();
-      comments = Array.isArray(data?.data) ? data.data : [];
+      const nextComments = Array.isArray(data?.data) ? data.data : [];
+      comments = append ? [...comments, ...nextComments] : nextComments;
       hasMore = Boolean(data?.pagination?.total > page * limit);
     } catch (err: any) {
-      comments = [];
-      hasMore = false;
-      error = '';
+      if (append) {
+        loadMoreError = t('comments.loadMoreFailed') || '加载更多失败，请重试';
+      } else {
+        comments = [];
+        hasMore = false;
+        error = t('comments.loadFailed') || '加载失败';
+      }
     } finally {
       window.clearTimeout(timeoutId);
-      loading = false;
+      if (showLoading) {
+        loading = false;
+      }
+      if (append) {
+        loadingMore = false;
+      }
+    }
+  }
+
+  async function handleLoadMore() {
+    if (loadingMore) return;
+    const nextPage = page + 1;
+    page = nextPage;
+    await loadComments({ append: true, showLoading: false });
+    if (loadMoreError) {
+      page = nextPage - 1;
     }
   }
 
@@ -214,7 +245,7 @@
 
   onMount(() => {
     loadUserInfoFromStorage();
-    loadComments();
+    loadComments({ append: false, showLoading: true });
   });
 </script>
 
@@ -277,7 +308,15 @@
     {#if loading}
       <p data-aos="fade-up" class="text-[var(--text-color)] text-center">{t('comments.loading') || '正在加载评论...'}</p>
     {:else if error}
-      <p data-aos="fade-up" class="text-red-500 text-center">{t('comments.loadFailed') || '加载失败：'}{error}</p>
+      <div data-aos="fade-up" class="text-center">
+        <p class="text-[var(--warning-text-color)]">{error}</p>
+        <button
+          class="mt-3 rounded px-3 py-1.5 text-sm border border-[var(--button-border-color)] text-[var(--text-color)] hover:bg-[var(--button-hover-color)]"
+          on:click={() => loadComments({ append: false, showLoading: true })}
+        >
+          {t('comments.retry') || '重试'}
+        </button>
+      </div>
     {:else}
       <h4 data-aos="fade-up" class="text-[var(--text-color)] text-base font-semibold mb-4">{comments.length} {t('comments.comments')}</h4>
 
@@ -300,8 +339,18 @@
 
       {#if hasMore}
         <div data-aos="fade-up" class="flex justify-center mt-6">
-          <button on:click={() => { page++; loadComments(); }}
-            class="text-indigo-600 hover:underline text-sm">{t('comments.loadMore') || '加载更多'}</button>
+          <div class="text-center">
+            <button
+              on:click={handleLoadMore}
+              disabled={loadingMore}
+              class="rounded px-3 py-1.5 text-sm border border-[var(--button-border-color)] text-[var(--text-color)] hover:bg-[var(--button-hover-color)] disabled:opacity-50"
+            >
+              {loadingMore ? (t('comments.loadingMore') || '加载中...') : (t('comments.loadMore') || '加载更多')}
+            </button>
+            {#if loadMoreError}
+              <p class="mt-2 text-xs text-[var(--warning-text-color)]">{loadMoreError}</p>
+            {/if}
+          </div>
         </div>
       {/if}
     {/if}

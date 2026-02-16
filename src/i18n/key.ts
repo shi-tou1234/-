@@ -59,6 +59,9 @@ export interface Translation {
         reply: string;
         replyPlaceholder: string;
         loadMore: string;
+        loadingMore: string;
+        loadMoreFailed: string;
+        retry: string;
         loading: string;
         loadFailed: string;
         submitSuccess: string;
