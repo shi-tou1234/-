@@ -73,11 +73,15 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
           </div>
           <div>
             <label class="block text-sm mb-2">发布日期</label>
-            <input id="post-date" type="date" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
+            <input id="post-date" type="datetime-local" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
           </div>
           <div>
             <label class="block text-sm mb-2">简介</label>
             <input id="post-desc" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
+          </div>
+          <div>
+            <label class="block text-sm mb-2">封面图片路径（可选）</label>
+            <input id="post-cover" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="例如：./assets/cover.jpg" />
           </div>
         </div>
 
@@ -472,8 +476,32 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   }
 
   function buildPostMarkdown(data) {
-    return `---\ntitle: ${data.title}\npubDate: ${data.date}\ndraft: false\ndescription: ${data.description}\nslugId: ${data.slugId}\n---\n\n${data.content}\n`;
+    const imageLine = data.image ? `image: ${data.image}\n` : "";
+    return `---\ntitle: ${data.title}\npubDate: ${data.date}\ndraft: false\ndescription: ${data.description}\n${imageLine}slugId: ${data.slugId}\n---\n\n${data.content}\n`;
   }
+
+  function toIsoDateTime(dateTimeLocalValue) {
+    if (!dateTimeLocalValue) return "";
+    const date = new Date(dateTimeLocalValue);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toISOString();
+  }
+
+  function getNowDateTimeLocal() {
+    const now = new Date();
+    now.setSeconds(0, 0);
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  }
+
+  function initPostDateDefault() {
+    const input = document.getElementById("post-date");
+    if (input && !input.value) {
+      input.value = getNowDateTimeLocal();
+    }
+  }
+
+  initPostDateDefault();
 
   document.getElementById("insert-iframe-btn")?.addEventListener("click", () => {
     const textarea = document.getElementById("post-content");
@@ -522,11 +550,17 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       }
 
       const textarea = document.getElementById("post-content");
+      const coverInput = document.getElementById("post-cover");
       const snippets = uploaded.map((f) => {
         if (f.type.startsWith("image/")) return `![${f.name}](./assets/${f.name})`;
         if (f.type.startsWith("video/")) return `<video controls src=\"./assets/${f.name}\"></video>`;
         return `[${f.name}](./assets/${f.name})`;
       }).join("\n\n");
+
+      const firstImage = uploaded.find((f) => f.type.startsWith("image/"));
+      if (coverInput && !coverInput.value.trim() && firstImage) {
+        coverInput.value = `./assets/${firstImage.name}`;
+      }
 
       textarea.value = `${textarea.value || ""}\n\n${snippets}\n`;
       setMsg(msgEl, `上传成功：${uploaded.length} 个文件`);
@@ -542,8 +576,10 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const branch = getBranch();
       const lang = (document.getElementById("post-lang")?.value || "zh-cn").trim();
       const title = (document.getElementById("post-title")?.value || "").trim();
-      const date = (document.getElementById("post-date")?.value || "").trim();
+      const dateInput = (document.getElementById("post-date")?.value || "").trim();
+      const date = toIsoDateTime(dateInput);
       const description = (document.getElementById("post-desc")?.value || "").trim();
+      const image = (document.getElementById("post-cover")?.value || "").trim();
       const content = document.getElementById("post-content")?.value || "";
       const inputSlug = normalizeSlug(document.getElementById("post-slug")?.value || "");
       const fallbackSlug = normalizeSlug(title);
@@ -561,6 +597,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         title,
         date,
         description,
+        image,
         slugId: slug,
         content
       });

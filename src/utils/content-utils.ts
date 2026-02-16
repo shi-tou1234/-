@@ -24,7 +24,9 @@ export async function getBlogEntrySort(
   };
 
   const defaultSort = (a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => {
-    return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+    const timeDiff = b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+    if (timeDiff !== 0) return timeDiff;
+    return b.id.localeCompare(a.id);
   };
 
   const blogEntries = await getCollection('blog', filter || defaultFilter);
