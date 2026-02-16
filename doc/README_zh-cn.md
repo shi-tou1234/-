@@ -1,9 +1,9 @@
 # Momo
 
 <div align="center">
-    <img src="./doc/images/index-light.jpg">
+    <img src="./images/index-light.jpg">
     <p>一个极简的Blog模板，使用 <a href="https://astro.build/">Astro</a> 搭建</p>
-    <!-- <small><a href="../README.md">English</a></small> <small><ins>简体中文</ins></small> -->
+    <small><a href="../README.md">English</a></small> <small><ins>简体中文</ins></small>
 </div>
 
 ## ✨ 特性
@@ -14,8 +14,8 @@
 
 ## 💻 环境要求
 
-* Node.js （建议版本大于22.x）
-* pnpm （使用 `npm install -g pnpm` 安装）
+* Node.js （建议版本大于20.x）
+* pnpm （使用 `npm -g pnpm` 安装）
 
 ## 🚀 快速开始
 
@@ -29,7 +29,7 @@
 
 # 🔧 配置
 
-参考[配置指南](./doc/config_zh-ch.md)，详细信息可以访问[Momo](https://momo.motues.top/)，阅读对应文章获取详细信息。
+参考[配置指南](./config_zh-cn.md)
 
 ## ⚡ 指令
 
@@ -42,7 +42,6 @@
 | `pnpm build` | 构建发布版本到 `./dist` 目录下 |
 | `pnpm preview` | 预览构建后的发布版本 |
 | `pnpm astro ...` | 运行 `astro` 命令，例如 `astro add` |
-| `pnpm new <path> <lang>` | 创建新文章，例如 `pnpm new docs/test.md zh-cn`，语言可以省略，默认为`zh-cn` |
 
 
 ## 📜 TODO
@@ -54,13 +53,11 @@
 - [x] 设置文章分页
 - [x] 添加目录
 - [x] 添加RSS
-- [ ] 支持文章分类
 - [ ] 其他小功能，比如~~回到顶部~~，预计阅读时间等
-- [x] 评论功能（支持零服务器部署，[Backend](https://github.com/Motues/Momo-Backend)）
-- [x] 国际化（i18n）
+- [ ] 完善备忘录页面
+- [ ] 国际化（i18n）
 
 ## 📚 参考
 
 * [Astro](https://astro.build/)
 * [Fuwari](https://github.com/saicaca/fuwari)
-* [Tyndall](https://github.com/moyuin-aka/tyndall-public)

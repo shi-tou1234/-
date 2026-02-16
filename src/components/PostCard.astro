@@ -1,0 +1,49 @@
+---
+import "@styles/global.css"
+import ImageModule from "./misc/ImageModule.astro";
+
+import { getRelativeLocaleUrl } from '@utils/url-utils';
+import { formatFullDate } from '@/utils/time'
+
+import { i18n } from "astro:config/client";
+import i18nit from '@i18n/translation'
+
+interface Props {
+    title: string;
+    description: string;
+    image: string;
+    pubDate: Date;
+    url: string;
+    fallback: boolean;
+}
+
+const { title, description, image, pubDate, url, fallback } = Astro.props;
+
+
+
+const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const t = i18nit(currentLang);
+
+
+const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
+---
+
+<a data-aos="fade-up" href={pageUrl} class="block min-w-0 w-full max-w-[var(--page-width)] mx-auto my-6  rounded-xl shadow border border-[var(--button-border-color)] overflow-hidden transition-all duration-300 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)]">
+    {image && (
+        <div class="cover h-60 overflow-hidden">
+            <ImageModule src={image} alt={title} class="w-full h-full object-cover"/>
+        </div>
+    )}
+    <div class="content p-6">
+        <h2 class="title text-xl font-semibold text-[var(--text-color)] mb-3">
+            {title}
+            {
+                fallback && (
+                <span class="self-center px-1 ml-2 text-sm text-[var(--text-color)]/70 font-mono uppercase bg-[var(--button-hover-color)] rounded border border-[var(--button-border-color)]">{i18n!.defaultLocale}</span>
+                )
+            }
+        </h2>
+        <p class="description text-[var(--text-color)]/40 leading-relaxed">{description}</p>
+        <p class="pubdate text-sm text-[var(--text-color)]/70 mt-4">{formatFullDate(pubDate, currentLang)}</p>
+    </div>
+</a>

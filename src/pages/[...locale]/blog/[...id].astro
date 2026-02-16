@@ -1,0 +1,109 @@
+---
+import '@styles/global.css'
+import { siteConfig, licenseConfig, profileConfig } from '@/config'
+import MainPageLayout from '@layouts/MainPageLayout.astro'
+import Markdown from '@components/misc/Markdown.astro'
+import ImageModule from '@components/misc/ImageModule.astro'
+import BackTop from '@components/control/BackTop.astro'
+import TOC from '@components/TOC.svelte'
+import LicenseCard from '@components/misc/LicenseCard.astro'
+import Comments from '@components/comment/Comments.svelte'
+import BlogNavi from '@components/control/BlogNavi.astro'
+
+import { getCollection, render } from 'astro:content'
+import { i18n } from "astro:config/client";
+import i18nit from '@i18n/translation'
+
+import { blogCoverUrl } from '@/utils/url-utils'
+import { formatFullDate } from '@/utils/time'
+import { getBlogEntrySort } from '@utils/content-utils'
+
+
+const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const t = i18nit(currentLang);
+
+export async function getStaticPaths() {
+    
+    // 获取所有支持的语言
+    const locales = i18n?.locales || [i18n?.defaultLocale];
+    
+    // 为每种语言和每篇文章组合生成路由
+    const paths = [];
+    
+    for (const locale of locales) {
+        const blogEntries = await getBlogEntrySort(locale);
+
+        for (let i = 0; i < blogEntries.length; i++) {
+            const entry = blogEntries[i];
+            const next = i > 0 ? blogEntries[i - 1] : null;
+            const prev = i < blogEntries.length - 1 ? blogEntries[i + 1] : null;
+
+            paths.push({
+                params: {
+                    locale: locale === i18n?.defaultLocale ? undefined : locale,
+                    id: entry.id
+                },
+                props: { 
+                    entry,
+                    prev,
+                    next
+                }
+            });
+        }
+    }
+    
+    return paths;
+}
+const { entry, prev, next } = Astro.props;
+const { Content, headings } = await render(entry); // 获取渲染后的正文内容
+
+const pageTitle = entry.data.title + ' - ' + siteConfig.title;
+const image = blogCoverUrl(entry.data.image, entry.id);
+
+---
+<MainPageLayout title={pageTitle} lang={currentLang}>
+    <div class="mx-auto w-full max-w-[var(--page-width)] py-8 md:mt-0 mt-18">
+        <div class="mb-8 text-center">
+            <h1 class="font-bold text-3xl mb-2 pt-10 text-[var(--text-color)]">{ entry.data.title }</h1>
+            <p class="font-bold text-[var(--text-color)]/60 pt-4 pb-10">{ formatFullDate(entry.data.pubDate, currentLang) }</p>
+        </div>
+        {image && (
+            <div class="cover overflow-hidden">
+                <ImageModule src={image} class="w-full h-full object-cover"/>
+            </div>
+        )}
+        {entry.isFallback && (
+        <div class="my-8 flex items-start gap-3 rounded-lg border border-[var(--warning-border-color)] bg-[var(--warning-bg-color)] p-4 text-sm text-[var(--warning-text-color)] transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0 opacity-80">
+            <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+            </svg>
+            
+            <div>
+            <p class="leading-relaxed">
+                <span class="font-semibold">{t("langNote.note")}</span> 
+                {t("langNote.description")}
+            </p>
+            </div>
+        </div>
+        )}
+        <Markdown class="mb-6 markdown-content onload-animation">
+            <Content />
+        </Markdown>
+        {licenseConfig.enable &&
+        <LicenseCard title={entry.data.title} pubDate={entry.data.pubDate}/>
+        }
+        {
+            siteConfig.blogNavi.enable &&
+            <BlogNavi prev={prev} next={next}/>
+        }
+        {
+            siteConfig.comments.enable && 
+            <Comments postSlug={entry.data.slugId} language={currentLang} postTitle={entry.data.title} client:visible/>
+        }
+    </div>
+    {
+        siteConfig.toc.enable &&
+        <TOC headings={headings} language={currentLang} client:load/>
+    }
+    <BackTop />
+</MainPageLayout>
