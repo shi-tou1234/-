@@ -105,6 +105,21 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       </div>
 
       <div class="rounded-lg border border-[var(--button-border-color)] p-5">
+        <h2 class="text-xl font-semibold mb-4">指定博客删除</h2>
+        <div class="flex flex-wrap items-center gap-3 mb-3">
+          <button id="load-delete-posts-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载博客列表</button>
+          <select id="delete-post-select" class="min-w-[280px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2">
+            <option value="">请先加载并选择博客</option>
+          </select>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <button id="delete-selected-post-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">删除所选语言文章</button>
+          <button id="delete-selected-post-all-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">删除所选博客目录</button>
+        </div>
+        <p id="delete-select-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
+      </div>
+
+      <div class="rounded-lg border border-[var(--button-border-color)] p-5">
         <h2 class="text-xl font-semibold mb-4">编辑 About 内容</h2>
         <div class="flex flex-wrap items-center gap-3 mb-3">
           <select id="about-lang" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2">
@@ -408,6 +423,24 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       .map((item) => item.path);
   }
 
+  async function listBlogMarkdownEntries(token, branch) {
+    const files = await listFilesByPrefix("src/content/blog/", token, branch);
+    const entries = files
+      .map((path) => {
+        const matched = path.match(/^src\/content\/blog\/(.+)\/(zh-cn|en)\.md$/);
+        if (!matched) return null;
+        return {
+          path,
+          slug: matched[1],
+          lang: matched[2]
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => `${a.slug}/${a.lang}`.localeCompare(`${b.slug}/${b.lang}`));
+
+    return entries;
+  }
+
   function decodeFileContent(raw) {
     return decodeURIComponent(escape(atob((raw || "").replace(/\n/g, ""))));
   }
@@ -609,6 +642,109 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       saveGitHubDraft();
       for (const file of files) {
         await deleteFile(file, `post: delete ${slug} directory`, token, branch);
+      }
+
+      setMsg(msgEl, `删除成功：${prefix}（已删除 ${files.length} 个文件）`);
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("load-delete-posts-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("delete-select-msg");
+    const selectEl = document.getElementById("delete-post-select");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      setMsg(msgEl, "加载中...");
+      saveGitHubDraft();
+      const entries = await listBlogMarkdownEntries(token, branch);
+
+      if (selectEl) {
+        selectEl.innerHTML = "";
+        if (entries.length === 0) {
+          const option = document.createElement("option");
+          option.value = "";
+          option.textContent = "没有可删除的博客";
+          selectEl.appendChild(option);
+        } else {
+          const placeholder = document.createElement("option");
+          placeholder.value = "";
+          placeholder.textContent = "请选择要删除的博客";
+          selectEl.appendChild(placeholder);
+
+          entries.forEach((entry) => {
+            const option = document.createElement("option");
+            option.value = `${entry.slug}\t${entry.lang}`;
+            option.textContent = `${entry.slug} (${entry.lang})`;
+            selectEl.appendChild(option);
+          });
+        }
+      }
+
+      setMsg(msgEl, `加载成功：${entries.length} 篇`);
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("delete-selected-post-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("delete-select-msg");
+    const selectEl = document.getElementById("delete-post-select");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const selected = selectEl?.value || "";
+      if (!selected) throw new Error("请先选择要删除的博客");
+
+      const [slug, lang] = selected.split("\t");
+      if (!slug || !lang) throw new Error("所选博客格式无效，请重新加载");
+
+      const path = `src/content/blog/${slug}/${lang}.md`;
+      const confirmed = window.confirm(`确认删除所选文章？\n${path}`);
+      if (!confirmed) return;
+
+      setMsg(msgEl, "删除中...");
+      saveGitHubDraft();
+      const deleted = await deleteFile(path, `post: delete selected ${slug}/${lang}`, token, branch);
+      if (!deleted) throw new Error(`未找到文件：${path}`);
+
+      setMsg(msgEl, `删除成功：${path}`);
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("delete-selected-post-all-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("delete-select-msg");
+    const selectEl = document.getElementById("delete-post-select");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const selected = selectEl?.value || "";
+      if (!selected) throw new Error("请先选择要删除的博客");
+
+      const [slug] = selected.split("\t");
+      if (!slug) throw new Error("所选博客格式无效，请重新加载");
+
+      const prefix = `src/content/blog/${slug}/`;
+      const confirmed = window.confirm(`确认删除所选博客目录？\n${prefix}\n\n这会删除该目录下全部语言文件和资源文件。`);
+      if (!confirmed) return;
+
+      setMsg(msgEl, "扫描目录中...");
+      const files = await listFilesByPrefix(prefix, token, branch);
+      if (files.length === 0) throw new Error(`目录为空或不存在：${prefix}`);
+
+      setMsg(msgEl, `删除中...（共 ${files.length} 个文件）`);
+      saveGitHubDraft();
+      for (const file of files) {
+        await deleteFile(file, `post: delete selected ${slug} directory`, token, branch);
       }
 
       setMsg(msgEl, `删除成功：${prefix}（已删除 ${files.length} 个文件）`);
