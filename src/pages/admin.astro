@@ -114,15 +114,35 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         <textarea id="about-content" class="w-full min-h-[220px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="About Markdown 内容"></textarea>
         <p id="about-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
       </div>
+
+      <div class="rounded-lg border border-[var(--button-border-color)] p-5">
+        <h2 class="text-xl font-semibold mb-4">编辑友链内容</h2>
+        <div class="flex flex-wrap items-center gap-3 mb-3">
+          <button id="load-friends-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载友链</button>
+          <button id="save-friends-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存友链</button>
+        </div>
+        <textarea id="friends-content" class="w-full min-h-[220px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder='请输入 JSON 数组，例如：[{"name":"GitHub","avatar":"...","url":"...","description":"..."}]'></textarea>
+        <p id="friends-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
+      </div>
     </section>
   </div>
 </MainPageLayout>
 
 <script>
-  const DEFAULT_ADMIN_PASSWORD = "cmchen-admin";
-  const ADMIN_PASSWORD_KEY = "cmchen_admin_password";
+  const SESSION_KEY = "cmchen_admin_ok";
   const REPO_OWNER = "shi-tou1234";
   const REPO_NAME = "-";
+  const ADMIN_SECURITY_PATH = "public/admin-security.json";
+  const ADMIN_SECURITY_URL = `${window.location.origin}/-/admin-security.json`;
+
+  const fallbackSecurityConfig = {
+    algorithm: "PBKDF2-SHA256",
+    iterations: 150000,
+    salt: "sZPlZ007W2b7Jl5bq4HwKA==",
+    hash: "Y8U44x/bJKZkj056F/Ot0JVT0fs0rZS+xIsVE7dY/6Q="
+  };
+
+  let securityConfig = fallbackSecurityConfig;
 
   const loginSection = document.getElementById("login-section");
   const adminPanel = document.getElementById("admin-panel");
@@ -137,20 +157,72 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   function unlockPanel() {
     loginSection?.classList.add("hidden");
     adminPanel?.classList.remove("hidden");
-    localStorage.setItem("cmchen_admin_ok", "1");
+    sessionStorage.setItem(SESSION_KEY, "1");
   }
 
-  function getAdminPassword() {
-    return localStorage.getItem(ADMIN_PASSWORD_KEY) || DEFAULT_ADMIN_PASSWORD;
+  function toBase64(bytes) {
+    let binary = "";
+    bytes.forEach((byte) => {
+      binary += String.fromCharCode(byte);
+    });
+    return btoa(binary);
   }
 
-  if (localStorage.getItem("cmchen_admin_ok") === "1") {
+  function fromBase64(base64) {
+    return Uint8Array.from(atob(base64), char => char.charCodeAt(0));
+  }
+
+  async function hashPassword(password, saltBase64, iterations) {
+    const encoder = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(password),
+      "PBKDF2",
+      false,
+      ["deriveBits"]
+    );
+
+    const bits = await crypto.subtle.deriveBits(
+      {
+        name: "PBKDF2",
+        hash: "SHA-256",
+        salt: fromBase64(saltBase64),
+        iterations
+      },
+      keyMaterial,
+      256
+    );
+
+    return toBase64(new Uint8Array(bits));
+  }
+
+  async function verifyPassword(password) {
+    const hashed = await hashPassword(password, securityConfig.salt, securityConfig.iterations);
+    return hashed === securityConfig.hash;
+  }
+
+  async function loadSecurityConfig() {
+    try {
+      const response = await fetch(`${ADMIN_SECURITY_URL}?t=${Date.now()}`);
+      if (!response.ok) throw new Error("fetch failed");
+      const json = await response.json();
+      if (!json?.salt || !json?.hash || !json?.iterations) throw new Error("invalid config");
+      securityConfig = json;
+    } catch (_error) {
+      securityConfig = fallbackSecurityConfig;
+    }
+  }
+
+  if (sessionStorage.getItem(SESSION_KEY) === "1") {
     unlockPanel();
   }
 
-  document.getElementById("login-btn")?.addEventListener("click", () => {
+  loadSecurityConfig();
+
+  document.getElementById("login-btn")?.addEventListener("click", async () => {
     const pwd = document.getElementById("admin-password")?.value || "";
-    if (pwd === getAdminPassword()) {
+    const passed = await verifyPassword(pwd);
+    if (passed) {
       setMsg(loginMsg, "登录成功");
       unlockPanel();
     } else {
@@ -158,12 +230,20 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     }
   });
 
-  document.getElementById("change-password-btn")?.addEventListener("click", () => {
+  document.getElementById("change-password-btn")?.addEventListener("click", async () => {
     const msgEl = document.getElementById("pwd-msg");
     const oldPwd = document.getElementById("old-password")?.value || "";
     const newPwd = document.getElementById("new-password")?.value || "";
+    const token = getToken();
+    const branch = getBranch();
 
-    if (oldPwd !== getAdminPassword()) {
+    if (!token) {
+      setMsg(msgEl, "请先填写 GitHub Token", true);
+      return;
+    }
+
+    const oldPassed = await verifyPassword(oldPwd);
+    if (!oldPassed) {
       setMsg(msgEl, "当前密码不正确", true);
       return;
     }
@@ -172,8 +252,25 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       return;
     }
 
-    localStorage.setItem(ADMIN_PASSWORD_KEY, newPwd.trim());
-    setMsg(msgEl, "密码修改成功（仅当前浏览器生效）");
+    const saltBytes = new Uint8Array(16);
+    crypto.getRandomValues(saltBytes);
+    const nextSecurity = {
+      algorithm: "PBKDF2-SHA256",
+      iterations: 180000,
+      salt: toBase64(saltBytes),
+      hash: await hashPassword(newPwd.trim(), toBase64(saltBytes), 180000)
+    };
+
+    await upsertFile(
+      ADMIN_SECURITY_PATH,
+      `${JSON.stringify(nextSecurity, null, 2)}\n`,
+      "admin: update password hash",
+      token,
+      branch
+    );
+
+    securityConfig = nextSecurity;
+    setMsg(msgEl, "密码修改成功，已全站生效（跨设备统一）");
     const oldInput = document.getElementById("old-password");
     const newInput = document.getElementById("new-password");
     if (oldInput) oldInput.value = "";
@@ -232,6 +329,20 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       method: "PUT",
       body: JSON.stringify(body)
     });
+  }
+
+  function decodeFileContent(raw) {
+    return decodeURIComponent(escape(atob((raw || "").replace(/\n/g, ""))));
+  }
+
+  function parseFriendLinksFromTs(content) {
+    const matched = content.match(/const\s+friendLinks:\s*FriendLink\[\]\s*=\s*(\[[\s\S]*?\])\s*\n\s*export\s+default\s+friendLinks/);
+    if (!matched?.[1]) throw new Error("无法解析友链文件");
+    return JSON.parse(matched[1]);
+  }
+
+  function buildFriendLinksTs(friendLinks) {
+    return `import type { FriendLink } from "@/types/friend"\n\nconst friendLinks: FriendLink[] = ${JSON.stringify(friendLinks, null, 2)}\n\nexport default friendLinks\n`;
   }
 
   function normalizeSlug(input) {
@@ -354,7 +465,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
       const path = `src/content/spec/about/${lang}.md`;
       const meta = await getFileMeta(path, token, branch);
-      const content = decodeURIComponent(escape(atob((meta?.content || "").replace(/\n/g, ""))));
+      const content = decodeFileContent(meta?.content || "");
       document.getElementById("about-content").value = content;
       setMsg(msgEl, "加载成功");
     } catch (error) {
@@ -374,6 +485,55 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const path = `src/content/spec/about/${lang}.md`;
       await upsertFile(path, content, `about: update ${lang}`, token, branch);
       setMsg(msgEl, "保存成功");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("load-friends-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("friends-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const path = "src/data/friend-links.ts";
+      const meta = await getFileMeta(path, token, branch);
+      const content = decodeFileContent(meta?.content || "");
+      const links = parseFriendLinksFromTs(content);
+      document.getElementById("friends-content").value = JSON.stringify(links, null, 2);
+      setMsg(msgEl, "友链加载成功");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("save-friends-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("friends-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      const raw = document.getElementById("friends-content")?.value || "[]";
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const links = JSON.parse(raw);
+      if (!Array.isArray(links)) throw new Error("友链内容必须是 JSON 数组");
+
+      links.forEach((item, index) => {
+        if (
+          typeof item?.name !== "string" ||
+          typeof item?.avatar !== "string" ||
+          typeof item?.url !== "string" ||
+          typeof item?.description !== "string"
+        ) {
+          throw new Error(`第 ${index + 1} 条友链格式不正确`);
+        }
+      });
+
+      const path = "src/data/friend-links.ts";
+      const content = buildFriendLinksTs(links);
+      await upsertFile(path, content, "friends: update links", token, branch);
+      setMsg(msgEl, "友链保存成功");
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }

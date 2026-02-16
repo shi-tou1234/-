@@ -5,6 +5,7 @@ import type {
 } from "./types/config"
 
 import type { FriendLink } from "./types/friend"
+import friendLinks from "./data/friend-links"
 
 export const siteConfig: SiteConfig = {
     title: "cmchen的博客",
@@ -40,12 +41,4 @@ export const licenseConfig: LicenseConfig = {
 	url: "https://creativecommons.org/licenses/by-nc-sa/4.0/",
 };
 
-export const friendLinkConfig: FriendLink[] = [
-    {
-        name: 'GitHub',
-        avatar: 'https://avatars.githubusercontent.com/u/9919',
-        url: 'https://github.com/shi-tou1234',
-        description: '我的 GitHub 主页'
-    }
-    // Add more friend links here
-]
+export const friendLinkConfig: FriendLink[] = friendLinks
