@@ -90,6 +90,17 @@
     }, 2200);
   }
 
+  function isSubmitFailureMessage(message: string): boolean {
+    if (!message) return false;
+    const lower = message.toLowerCase();
+    const successHints = ['success', 'submitted', '提交成功', '已提交'];
+    if (successHints.some((hint) => lower.includes(hint))) {
+      return false;
+    }
+    const failureHints = ['limit', 'exceeded', 'too many', 'failed', 'error', '频繁', '失败', '稍后'];
+    return failureHints.some((hint) => lower.includes(hint));
+  }
+
   async function loadComments(options: { append?: boolean; showLoading?: boolean } = {}) {
     const { append = false, showLoading = true } = options;
 
@@ -219,10 +230,12 @@
         }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data?.message || t('comments.submitFailed') || '提交失败，请稍后再试');
+      const serverMessage = String(data?.message || '').trim();
+
+      if (!res.ok || isSubmitFailureMessage(serverMessage)) {
+        throw new Error(serverMessage || t('comments.submitFailed') || '提交失败，请稍后再试');
       }
-      showStatus(data?.message || t('comments.submitSuccess') || '提交成功', 'success');
+      showStatus(serverMessage || t('comments.submitSuccess') || '提交成功', 'success');
       
       // 重置表单
       if (!replyData) {
@@ -234,8 +247,8 @@
       
       // 重新加载评论
       await loadComments();
-    } catch (err) {
-      showStatus(t('comments.submitFailed') || '提交失败，请稍后再试', 'error');
+    } catch (err: any) {
+      showStatus(String(err?.message || t('comments.submitFailed') || '提交失败，请稍后再试'), 'error');
     } finally {
       // 只有在提交顶层评论时才重置 submitting 状态
       if (!parentId) {
