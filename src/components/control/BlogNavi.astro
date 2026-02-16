@@ -2,6 +2,7 @@
 import { i18n } from "astro:config/client";
 import { Icon } from "astro-icon/components";
 import i18nit from '@i18n/translation'
+import { getRelativeLocaleUrl } from '@utils/url-utils';
 
 interface Props {
     prev: any;
@@ -15,8 +16,7 @@ const t = i18nit(currentLang);
 
 // 辅助函数：根据文章 id 和当前语言生成正确的 URL
 function getPostUrl(id: string) {
-  const isDefault = currentLang === i18n?.defaultLocale;
-  return isDefault ? `/blog/${id}` : `/${currentLang}/blog/${id}`;
+    return getRelativeLocaleUrl(currentLang, `/blog/${id}`);
 }
 ---
 

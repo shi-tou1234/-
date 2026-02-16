@@ -11,26 +11,8 @@ import { getRelativeLocaleUrl } from '@utils/url-utils';
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
-
-
-// 获取当前页面在不同语言下的路径
-const getLocalePath = (path: string, targetLocale: string) => {
-  const currentPath = Astro.url.pathname;
-  const defaultLocale = i18n?.defaultLocale || "zh-cn";
-  
-  // 移除当前语言前缀
-  let basePath = currentPath;
-  if (currentLang && currentLang !== defaultLocale) {
-    basePath = currentPath.replace(`/${currentLang}`, "") || "/";
-  }
-  
-  // 添加目标语言前缀（默认语言不需要前缀）
-  if (targetLocale && targetLocale !== defaultLocale) {
-    return `/${targetLocale}${basePath}`;
-  }
-  
-  return basePath;
-};
+const locales = (i18n?.locales || []).map(locale => String(locale));
+const showLanguageSwitcher = locales.length > 1;
 
 const indexPage = getRelativeLocaleUrl(currentLang, "/");
 const archivesPage = getRelativeLocaleUrl(currentLang, "/archives/");
@@ -61,6 +43,7 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
             <Icon name="simple-icons:rss" class="w-4 h-4" />
         </a> -->
         <!-- Language Switcher -->
+        {showLanguageSwitcher && (
         <div class="relative">
             <button id="language-button" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
                 <Icon name="fa6-solid:globe" class="w-4 h-4" />
@@ -69,21 +52,17 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
           <!-- Language Dropdown Menu -->
           <div id="language-menu" class="hidden absolute right-0 mt-2 w-30 bg-[var(--bg-color)] border border-[var(--button-border-color)] rounded-lg shadow-lg z-50">
               <div class="py-1 text-right">
-                  <!-- 中文链接 -->
-                  <a href={getLocalePath("/", "zh-cn")} class=`block mx-2 my-1 p-2 text-sm rounded ${
-                    currentLang === "zh-cn" ? "bg-[var(--button-hover-color)]" : "hover:bg-[var(--button-hover-color)]"}`>
-                    {currentLang === "zh-cn" ? <Icon name="fa6-solid:circle" class="w-2 h-2 inline mr-2" /> : ""}
-                    简体中文
-                  </a>
-                  <!-- 英文链接 -->
-                  <a href={getLocalePath("/", "en")} class=`block mx-2 my-1 p-2 text-sm rounded ${
-                    currentLang === "en" ? "bg-[var(--button-hover-color)]" : "hover:bg-[var(--button-hover-color)]"}`>
-                    {currentLang === "en" ? <Icon name="fa6-solid:circle" class="w-2 h-2 inline mr-2" /> : ""}
-                    English
-                  </a>
+                  {locales.map((locale) => (
+                    <a href={getRelativeLocaleUrl(locale, "/")} class={`block mx-2 my-1 p-2 text-sm rounded ${
+                      currentLang === locale ? "bg-[var(--button-hover-color)]" : "hover:bg-[var(--button-hover-color)]"}`}>
+                      {currentLang === locale ? <Icon name="fa6-solid:circle" class="w-2 h-2 inline mr-2" /> : ""}
+                      {locale === "zh-cn" ? "简体中文" : locale}
+                    </a>
+                  ))}
               </div>
           </div>
         </div>
+        )}
         <div class="relative md:hidden">
           <!-- Mobile Menu -->
           <button id="mobile-menu-button" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
