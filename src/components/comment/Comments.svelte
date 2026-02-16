@@ -108,6 +108,10 @@
       if (!apiUrl) {
         comments = [];
         hasMore = false;
+        error = '';
+        if (!append) {
+          showStatus('评论服务暂不可用，已切换为空评论模式', 'warning');
+        }
         return;
       }
 
@@ -124,7 +128,8 @@
         } else {
           comments = [];
           hasMore = false;
-          error = t('comments.loadFailed') || '加载失败';
+          error = '';
+          showStatus('评论服务暂时不可用，已切换为空评论模式', 'warning');
         }
         return;
       }
@@ -138,7 +143,8 @@
       } else {
         comments = [];
         hasMore = false;
-        error = t('comments.loadFailed') || '加载失败';
+        error = '';
+        showStatus('评论服务暂时不可用，已切换为空评论模式', 'warning');
       }
     } finally {
       window.clearTimeout(timeoutId);
