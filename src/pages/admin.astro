@@ -124,6 +124,25 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         <textarea id="friends-content" class="w-full min-h-[220px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder='请输入 JSON 数组，例如：[{"name":"GitHub","avatar":"...","url":"...","description":"..."}]'></textarea>
         <p id="friends-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
       </div>
+
+      <div class="rounded-lg border border-[var(--button-border-color)] p-5">
+        <h2 class="text-xl font-semibold mb-4">编辑右上角联系方式</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+          <div>
+            <label class="block text-sm mb-2">GitHub 首页链接</label>
+            <input id="header-github" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="https://github.com/your-name" />
+          </div>
+          <div>
+            <label class="block text-sm mb-2">邮箱地址（点击图标复制）</label>
+            <input id="header-email" type="email" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="you@example.com" />
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 mb-2">
+          <button id="load-header-contact-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载联系方式</button>
+          <button id="save-header-contact-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存联系方式</button>
+        </div>
+        <p id="header-contact-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
+      </div>
     </section>
   </div>
 </MainPageLayout>
@@ -134,6 +153,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   const REPO_NAME = "-";
   const ADMIN_SECURITY_PATH = "public/admin-security.json";
   const ADMIN_SECURITY_URL = `${window.location.origin}/-/admin-security.json`;
+  const HEADER_CONTACT_PATH = "src/data/header-contact.ts";
 
   const fallbackSecurityConfig = {
     algorithm: "PBKDF2-SHA256",
@@ -345,6 +365,16 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     return `import type { FriendLink } from "@/types/friend"\n\nconst friendLinks: FriendLink[] = ${JSON.stringify(friendLinks, null, 2)}\n\nexport default friendLinks\n`;
   }
 
+  function parseHeaderContactFromTs(content) {
+    const matched = content.match(/const\s+headerContact:\s*HeaderContact\s*=\s*(\{[\s\S]*?\})\s*\n\s*export\s+default\s+headerContact/);
+    if (!matched?.[1]) throw new Error("无法解析联系方式文件");
+    return JSON.parse(matched[1]);
+  }
+
+  function buildHeaderContactTs(contact) {
+    return `export type HeaderContact = {\n  githubUrl: string\n  email: string\n}\n\nconst headerContact: HeaderContact = ${JSON.stringify(contact, null, 2)}\n\nexport default headerContact\n`;
+  }
+
   function normalizeSlug(input) {
     return input.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-_/]/g, "");
   }
@@ -534,6 +564,45 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const content = buildFriendLinksTs(links);
       await upsertFile(path, content, "friends: update links", token, branch);
       setMsg(msgEl, "友链保存成功");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("load-header-contact-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("header-contact-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const meta = await getFileMeta(HEADER_CONTACT_PATH, token, branch);
+      const content = decodeFileContent(meta?.content || "");
+      const contact = parseHeaderContactFromTs(content);
+
+      document.getElementById("header-github").value = contact.githubUrl || "";
+      document.getElementById("header-email").value = contact.email || "";
+      setMsg(msgEl, "联系方式加载成功");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("save-header-contact-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("header-contact-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      const githubUrl = (document.getElementById("header-github")?.value || "").trim();
+      const email = (document.getElementById("header-email")?.value || "").trim();
+
+      if (!token) throw new Error("请先填写 GitHub Token");
+      if (!githubUrl) throw new Error("请填写 GitHub 首页链接");
+      if (!email) throw new Error("请填写邮箱地址");
+
+      const content = buildHeaderContactTs({ githubUrl, email });
+      await upsertFile(HEADER_CONTACT_PATH, content, "header: update contact links", token, branch);
+      setMsg(msgEl, "联系方式保存成功");
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }

@@ -4,6 +4,7 @@ import { Icon } from "astro-icon/components"
 import { profileConfig, siteConfig } from "@/config"
 import ThemeIcon from "./control/ThemeIcon.astro"
 import { baseUrl } from "@utils/url-utils"
+import headerContact from "@/data/header-contact"
 
 import { i18n } from "astro:config/client";
 import i18nit from '@i18n/translation'
@@ -39,6 +40,14 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
         </button>
         <!-- Dark Mode -->
         <ThemeIcon class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] rounded-lg hover:text-current active:scale-90 border border-[var(--button-border-color)] transition-all duration-300"/>
+        <!-- GitHub -->
+        <a href={headerContact.githubUrl} target="_blank" rel="noopener noreferrer" title="GitHub" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+          <Icon name="simple-icons:github" class="w-4 h-4" />
+        </a>
+        <!-- Email Copy -->
+        <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+          <Icon name="fa6-solid:envelope" class="w-4 h-4" />
+        </button>
         <!-- RSS -->
         <!-- <a href="/rss.xml" target="_blank" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
             <Icon name="simple-icons:rss" class="w-4 h-4" />
@@ -261,6 +270,31 @@ function initLanguageMenu() {
 }
 document.addEventListener('astro:page-load', initLanguageMenu);
 document.addEventListener('astro:after-swap', initLanguageMenu);
+</script>
+
+<script>
+function initHeaderContactCopy() {
+  const copyEmailBtn = document.getElementById('copy-email-btn');
+  if (!copyEmailBtn || copyEmailBtn.dataset.bound === 'true') return;
+  copyEmailBtn.dataset.bound = 'true';
+
+  copyEmailBtn.addEventListener('click', async () => {
+    const email = copyEmailBtn.getAttribute('data-email') || '';
+    if (!email) return;
+    try {
+      await navigator.clipboard.writeText(email);
+      copyEmailBtn.setAttribute('title', '已复制邮箱');
+      setTimeout(() => copyEmailBtn.setAttribute('title', '复制邮箱'), 1500);
+    } catch (_error) {
+      copyEmailBtn.setAttribute('title', '复制失败');
+      setTimeout(() => copyEmailBtn.setAttribute('title', '复制邮箱'), 1500);
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', initHeaderContactCopy);
+document.addEventListener('astro:page-load', initHeaderContactCopy);
+document.addEventListener('astro:after-swap', initHeaderContactCopy);
 </script>
 
 <script>
