@@ -4,13 +4,15 @@ const translation: Translation = {
     header: {
         home: "Home",
         archive: "Archive",
+        categories: "Categories",
         about: "About",
         friends: "Friends",
     },
     cover: {
         title: {
-            home: "Welcome to Momo's Blog",
+            home: "Welcome to cmchen's blog",
             archive: "Archive",
+            categories: "Categories",
             about: "About",
             friends: "Friends",
             page404: "Secret",
@@ -18,6 +20,7 @@ const translation: Translation = {
         subTitle: {
             home: "Life is colorful!",
             archive: "Total of {count} articles",
+            categories: "Total {count} categories",
             about: "A minimalist blog template",
             friends: "Interesting Souls",
             page404: "Congratulations on finding a new world, this world is still under construction, please wait a bit longer."

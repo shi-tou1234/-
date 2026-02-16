@@ -4,13 +4,15 @@ const translation: Translation = {
     header: {
         home: "首页",
         archive: "归档",
+        categories: "分类",
         about: "关于",
         friends: "友链",
     },
     cover: {
         title: {
-            home: "欢迎来到Momo的博客",
+            home: "欢迎来到 cmchen 的博客",
             archive: "文章归档",
+            categories: "文章分类",
             about: "关于",
             friends: "友链",
             page404: "秘密",
@@ -18,6 +20,7 @@ const translation: Translation = {
         subTitle: {
             home: "生活多彩！",
             archive: "共 {count} 篇文章",
+            categories: "共 {count} 个分类",
             about: "一个极简的Blog模板",
             friends: "有趣的灵魂",
             page404: "恭喜你发现一片未知的世界，这片世界还处于建设之中，请过段时间再来看看呢！"

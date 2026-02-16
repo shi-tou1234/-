@@ -1,0 +1,45 @@
+---
+import MainPageLayout from '@layouts/MainPageLayout.astro';
+import Cover from '@components/Cover.astro';
+import { getBlogEntrySort } from '@utils/content-utils';
+import { getRelativeLocaleUrl } from '@utils/url-utils';
+import { siteConfig } from '@/config';
+import { i18n } from "astro:config/client";
+import i18nit from '@i18n/translation';
+
+export async function getStaticPaths() {
+	return i18n?.locales.map(locale => ({ params: { locale: locale == i18n?.defaultLocale ? undefined : (locale as string) } }));
+}
+
+const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const t = i18nit(currentLang);
+
+const blogEntries = await getBlogEntrySort(currentLang);
+const counter = new Map<string, number>();
+
+for (const entry of blogEntries) {
+  for (const category of (entry.data.categories || [])) {
+    counter.set(category, (counter.get(category) || 0) + 1);
+  }
+}
+
+const categories = [...counter.entries()].sort((a, b) => b[1] - a[1]);
+const pageTitle = `${t("header.categories")} - ${siteConfig.title}`;
+---
+
+<MainPageLayout title={pageTitle} lang={currentLang}>
+  <div class="mx-auto w-full max-w-[var(--page-width)]">
+    <Cover title={t("cover.title.categories")} subTitle={t("cover.subTitle.categories", { count: categories.length })}/>
+
+    <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+      {categories.length === 0 ? (
+        <div class="text-[var(--text-color)]/60">{currentLang === 'en' ? 'No categories yet.' : '暂无分类'}</div>
+      ) : categories.map(([name, count]) => (
+        <a href={getRelativeLocaleUrl(currentLang, `/category/${encodeURIComponent(name)}/`)} class="rounded-lg border border-[var(--button-border-color)] p-4 hover:bg-[var(--button-hover-color)] transition-colors">
+          <div class="text-lg font-semibold text-[var(--text-color)]">{name}</div>
+          <div class="text-sm text-[var(--text-color)]/60 mt-1">{currentLang === 'en' ? `${count} posts` : `${count} 篇文章`}</div>
+        </a>
+      ))}
+    </div>
+  </div>
+</MainPageLayout>

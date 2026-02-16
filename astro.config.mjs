@@ -24,7 +24,7 @@ export default defineConfig({
   site: 'https://shi-tou1234.github.io',
   base: '/-/',
   i18n: {
-    locales: ['zh-cn'],
+    locales: ['zh-cn', 'en'],
     defaultLocale: 'zh-cn',
     routing: {
       prefixDefaultLocale: false,

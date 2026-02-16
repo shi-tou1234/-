@@ -1,0 +1,336 @@
+---
+import MainPageLayout from '@layouts/MainPageLayout.astro';
+import { siteConfig } from '@/config';
+
+const pageTitle = `后台管理 - ${siteConfig.title}`;
+---
+
+<MainPageLayout title={pageTitle} lang="zh-cn">
+  <div class="mx-auto w-full max-w-[var(--page-width)] py-8">
+    <h1 class="text-3xl font-bold text-[var(--text-color)] mb-4">后台管理</h1>
+    <p class="text-[var(--text-color)]/70 mb-6">通过 GitHub API 直接写入仓库内容。首次使用请准备一个具有 repo 权限的 GitHub Token。</p>
+
+    <section id="login-section" class="rounded-lg border border-[var(--button-border-color)] p-5 mb-6">
+      <h2 class="text-xl font-semibold mb-3">登录</h2>
+      <label class="block text-sm mb-2">后台密码</label>
+      <div class="flex gap-3">
+        <input id="admin-password" type="password" class="flex-1 rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="输入后台密码" />
+        <button id="login-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">进入后台</button>
+      </div>
+      <p id="login-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
+    </section>
+
+    <section id="admin-panel" class="hidden space-y-6">
+      <div class="rounded-lg border border-[var(--button-border-color)] p-5">
+        <h2 class="text-xl font-semibold mb-4">GitHub 连接</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm mb-2">GitHub Token（repo 权限）</label>
+            <input id="gh-token" type="password" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="ghp_xxx" />
+          </div>
+          <div>
+            <label class="block text-sm mb-2">分支</label>
+            <input id="gh-branch" type="text" value="main" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-[var(--button-border-color)] p-5">
+        <h2 class="text-xl font-semibold mb-4">发布文章</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm mb-2">语言</label>
+            <select id="post-lang" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2">
+              <option value="zh-cn">中文（zh-cn）</option>
+              <option value="en">English（en）</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm mb-2">文章目录 slug（例如：my-first-post）</label>
+            <input id="post-slug" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
+          </div>
+          <div>
+            <label class="block text-sm mb-2">标题</label>
+            <input id="post-title" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
+          </div>
+          <div>
+            <label class="block text-sm mb-2">发布日期</label>
+            <input id="post-date" type="date" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
+          </div>
+          <div>
+            <label class="block text-sm mb-2">简介</label>
+            <input id="post-desc" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
+          </div>
+          <div>
+            <label class="block text-sm mb-2">分类（逗号分隔）</label>
+            <input id="post-categories" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="技术,Astro" />
+          </div>
+        </div>
+
+        <div class="mb-3 flex flex-wrap gap-3 items-center">
+          <input id="post-files" type="file" multiple accept="image/*,video/*" class="text-sm" />
+          <button id="upload-files-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">上传图片/视频到当前文章目录</button>
+          <button id="insert-iframe-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">插入 iframe 模板</button>
+        </div>
+
+        <label class="block text-sm mb-2">Markdown 正文（支持 HTML 与 iframe）</label>
+        <textarea id="post-content" class="w-full min-h-[320px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="在这里写文章内容"></textarea>
+
+        <div class="mt-4 flex gap-3">
+          <button id="publish-post-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">发布/更新文章</button>
+          <a class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]" href="/-/" target="_blank">打开前台</a>
+        </div>
+        <p id="post-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
+      </div>
+
+      <div class="rounded-lg border border-[var(--button-border-color)] p-5">
+        <h2 class="text-xl font-semibold mb-4">编辑 About 内容</h2>
+        <div class="flex flex-wrap items-center gap-3 mb-3">
+          <select id="about-lang" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2">
+            <option value="zh-cn">中文（zh-cn）</option>
+            <option value="en">English（en）</option>
+          </select>
+          <button id="load-about-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载 About</button>
+          <button id="save-about-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存 About</button>
+        </div>
+        <textarea id="about-content" class="w-full min-h-[220px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="About Markdown 内容"></textarea>
+        <p id="about-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
+      </div>
+    </section>
+  </div>
+</MainPageLayout>
+
+<script>
+  const ADMIN_PASSWORD = "cmchen-admin";
+  const REPO_OWNER = "shi-tou1234";
+  const REPO_NAME = "-";
+
+  const loginSection = document.getElementById("login-section");
+  const adminPanel = document.getElementById("admin-panel");
+  const loginMsg = document.getElementById("login-msg");
+
+  function setMsg(el, message, isError = false) {
+    if (!el) return;
+    el.textContent = message;
+    el.style.color = isError ? "#dc2626" : "";
+  }
+
+  function unlockPanel() {
+    loginSection?.classList.add("hidden");
+    adminPanel?.classList.remove("hidden");
+    localStorage.setItem("cmchen_admin_ok", "1");
+  }
+
+  if (localStorage.getItem("cmchen_admin_ok") === "1") {
+    unlockPanel();
+  }
+
+  document.getElementById("login-btn")?.addEventListener("click", () => {
+    const pwd = document.getElementById("admin-password")?.value || "";
+    if (pwd === ADMIN_PASSWORD) {
+      setMsg(loginMsg, "登录成功");
+      unlockPanel();
+    } else {
+      setMsg(loginMsg, "密码错误", true);
+    }
+  });
+
+  function getToken() {
+    return (document.getElementById("gh-token")?.value || "").trim();
+  }
+
+  function getBranch() {
+    return (document.getElementById("gh-branch")?.value || "main").trim();
+  }
+
+  function encodeUtf8ToBase64(content) {
+    return btoa(unescape(encodeURIComponent(content)));
+  }
+
+  async function githubRequest(path, token, options = {}) {
+    const res = await fetch(`https://api.github.com${path}`, {
+      ...options,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+        ...(options.headers || {})
+      }
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`GitHub API 错误 ${res.status}: ${text}`);
+    }
+
+    return res.status === 204 ? null : res.json();
+  }
+
+  async function getFileMeta(repoPath, token, branch) {
+    try {
+      return await githubRequest(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${encodeURIComponent(repoPath).replace(/%2F/g, "/")}?ref=${encodeURIComponent(branch)}`, token);
+    } catch (error) {
+      if (String(error).includes("404")) return null;
+      throw error;
+    }
+  }
+
+  async function upsertFile(repoPath, content, message, token, branch) {
+    const meta = await getFileMeta(repoPath, token, branch);
+    const body = {
+      message,
+      content: encodeUtf8ToBase64(content),
+      branch,
+      ...(meta?.sha ? { sha: meta.sha } : {})
+    };
+
+    await githubRequest(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${encodeURIComponent(repoPath).replace(/%2F/g, "/")}`, token, {
+      method: "PUT",
+      body: JSON.stringify(body)
+    });
+  }
+
+  function normalizeSlug(input) {
+    return input.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-_/]/g, "");
+  }
+
+  function buildPostMarkdown(data) {
+    const categories = data.categories.length
+      ? `categories:\n${data.categories.map(c => `  - ${c}`).join("\n")}`
+      : `categories: []`;
+
+    return `---\ntitle: ${data.title}\npubDate: ${data.date}\ndraft: false\ndescription: ${data.description}\nslugId: ${data.slugId}\n${categories}\n---\n\n${data.content}\n`;
+  }
+
+  document.getElementById("insert-iframe-btn")?.addEventListener("click", () => {
+    const textarea = document.getElementById("post-content");
+    const iframeTpl = `\n<iframe src=\"https://www.youtube.com/embed/VIDEO_ID\" title=\"Video\" frameborder=\"0\" allowfullscreen></iframe>\n`;
+    textarea.value = `${textarea.value || ""}${iframeTpl}`;
+  });
+
+  document.getElementById("upload-files-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("post-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      const slug = normalizeSlug(document.getElementById("post-slug")?.value || "");
+      const lang = (document.getElementById("post-lang")?.value || "zh-cn").trim();
+      const files = document.getElementById("post-files")?.files;
+
+      if (!token) throw new Error("请先填写 GitHub Token");
+      if (!slug) throw new Error("请先填写文章 slug");
+      if (!files || files.length === 0) throw new Error("请先选择文件");
+
+      setMsg(msgEl, "上传中...");
+
+      const uploaded = [];
+      for (const file of files) {
+        const arrayBuffer = await file.arrayBuffer();
+        const bytes = new Uint8Array(arrayBuffer);
+        let binary = "";
+        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+        const b64 = btoa(binary);
+
+        const safeName = file.name.replace(/\s+/g, "-");
+        const path = `src/content/blog/${slug}/assets/${safeName}`;
+
+        const meta = await getFileMeta(path, token, branch);
+        await githubRequest(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${encodeURIComponent(path).replace(/%2F/g, "/")}`, token, {
+          method: "PUT",
+          body: JSON.stringify({
+            message: `upload: ${safeName} for ${slug} (${lang})`,
+            content: b64,
+            branch,
+            ...(meta?.sha ? { sha: meta.sha } : {})
+          })
+        });
+
+        uploaded.push({ name: safeName, type: file.type });
+      }
+
+      const textarea = document.getElementById("post-content");
+      const snippets = uploaded.map((f) => {
+        if (f.type.startsWith("image/")) return `![${f.name}](./assets/${f.name})`;
+        if (f.type.startsWith("video/")) return `<video controls src=\"./assets/${f.name}\"></video>`;
+        return `[${f.name}](./assets/${f.name})`;
+      }).join("\n\n");
+
+      textarea.value = `${textarea.value || ""}\n\n${snippets}\n`;
+      setMsg(msgEl, `上传成功：${uploaded.length} 个文件`);
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("publish-post-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("post-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      const lang = (document.getElementById("post-lang")?.value || "zh-cn").trim();
+      const slug = normalizeSlug(document.getElementById("post-slug")?.value || "");
+      const title = (document.getElementById("post-title")?.value || "").trim();
+      const date = (document.getElementById("post-date")?.value || "").trim();
+      const description = (document.getElementById("post-desc")?.value || "").trim();
+      const categoriesRaw = (document.getElementById("post-categories")?.value || "").trim();
+      const content = document.getElementById("post-content")?.value || "";
+
+      if (!token) throw new Error("请先填写 GitHub Token");
+      if (!slug || !title || !date) throw new Error("请填写 slug、标题、发布日期");
+
+      const categories = categoriesRaw
+        ? categoriesRaw.split(",").map(x => x.trim()).filter(Boolean)
+        : [];
+
+      const markdown = buildPostMarkdown({
+        title,
+        date,
+        description,
+        slugId: slug,
+        categories,
+        content
+      });
+
+      const path = `src/content/blog/${slug}/${lang}.md`;
+      setMsg(msgEl, "发布中...");
+      await upsertFile(path, markdown, `post: update ${slug}/${lang}`, token, branch);
+      setMsg(msgEl, `发布成功：${path}`);
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("load-about-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("about-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      const lang = (document.getElementById("about-lang")?.value || "zh-cn").trim();
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const path = `src/content/spec/about/${lang}.md`;
+      const meta = await getFileMeta(path, token, branch);
+      const content = decodeURIComponent(escape(atob((meta?.content || "").replace(/\n/g, ""))));
+      document.getElementById("about-content").value = content;
+      setMsg(msgEl, "加载成功");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("save-about-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("about-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      const lang = (document.getElementById("about-lang")?.value || "zh-cn").trim();
+      const content = document.getElementById("about-content")?.value || "";
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const path = `src/content/spec/about/${lang}.md`;
+      await upsertFile(path, content, `about: update ${lang}`, token, branch);
+      setMsg(msgEl, "保存成功");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+</script>

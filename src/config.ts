@@ -7,7 +7,7 @@ import type {
 import type { FriendLink } from "./types/friend"
 
 export const siteConfig: SiteConfig = {
-    title: "石头的博客",
+    title: "cmchen的博客",
     subTitle: "记录技术与生活",
 
     favicon: "/favicon/favicon.ico", // Path of the favicon, relative to the /public directory

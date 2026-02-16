@@ -178,14 +178,14 @@
   margin: 1.5rem 0;
   padding: 1rem;
   overflow: auto;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 6px;
+  border-radius: 10px;
+  border: 1px solid var(--button-border-color);
   font-family: 'JetBrains Mono Variable', ui-monospace;
   line-height: 1.5;
 }
 
 [data-theme="dark"] .markdown-content pre {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.25);
 }
 
 .markdown-content pre code {
@@ -198,6 +198,36 @@
   padding: 0;
   background: none;
   font-size: 0.9rem;
+}
+
+.markdown-content pre.astro-code {
+  border: 1px solid var(--button-border-color);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.markdown-content .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0.25rem;
+}
+
+.markdown-content .katex {
+  font-size: 1.02em;
+}
+
+.markdown-content iframe,
+.markdown-content video {
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid var(--button-border-color);
+  border-radius: 10px;
+  margin: 1rem 0;
+  background: var(--button-hover-color);
+}
+
+.markdown-content iframe {
+  aspect-ratio: 16 / 9;
+  min-height: 320px;
 }
 
 .markdown-content hr {
@@ -245,10 +275,11 @@
 }
 
 .note, .tip, .warning, .important, .caution {
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
+  padding: 0.8rem 1rem;
+  border-radius: 0.6rem;
   margin: 1rem 0;
-  /* border-left: 6px solid; */
+  border-left: 4px solid;
+  border: 1px solid var(--button-border-color);
 }
 
 .note {

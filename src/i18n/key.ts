@@ -2,6 +2,7 @@ export interface Translation {
     header: {
         home: string;
         archive: string;
+        categories: string;
         about: string;
         friends: string;
     };
@@ -9,6 +10,7 @@ export interface Translation {
         title: {
             home: string;
             archive: string;
+            categories: string;
             about: string;
             friends: string;
             page404: string;
@@ -16,6 +18,7 @@ export interface Translation {
         subTitle: {
             home: string;
             archive: string;
+            categories: string;
             about: string;
             friends: string;
             page404: string;

@@ -15,9 +15,10 @@ interface Props {
     pubDate: Date;
     url: string;
     fallback: boolean;
+    categories?: string[];
 }
 
-const { title, description, image, pubDate, url, fallback } = Astro.props;
+const { title, description, image, pubDate, url, fallback, categories = [] } = Astro.props;
 
 
 
@@ -44,6 +45,13 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
             }
         </h2>
         <p class="description text-[var(--text-color)]/40 leading-relaxed">{description}</p>
+        {categories.length > 0 && (
+            <div class="mt-4 flex flex-wrap gap-2">
+                {categories.map((category) => (
+                    <span class="text-xs px-2 py-1 rounded border border-[var(--button-border-color)] bg-[var(--button-hover-color)] text-[var(--text-color)]/80">{category}</span>
+                ))}
+            </div>
+        )}
         <p class="pubdate text-sm text-[var(--text-color)]/70 mt-4">{formatFullDate(pubDate, currentLang)}</p>
     </div>
 </a>

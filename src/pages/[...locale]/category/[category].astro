@@ -1,0 +1,68 @@
+---
+import MainPageLayout from '@layouts/MainPageLayout.astro';
+import Cover from '@components/Cover.astro';
+import PostCard from '@components/PostCard.astro';
+import { blogCoverUrl, getRelativeLocaleUrl } from '@utils/url-utils';
+import { getBlogEntrySort } from '@utils/content-utils';
+import { siteConfig } from '@/config';
+import { i18n } from "astro:config/client";
+
+export async function getStaticPaths() {
+  const paths = [];
+  const locales = i18n?.locales || [i18n?.defaultLocale];
+
+  for (const locale of locales) {
+    const localeCode = String(locale);
+    const posts = await getBlogEntrySort(localeCode);
+    const categories = new Set<string>();
+
+    for (const post of posts) {
+      for (const category of (post.data.categories || [])) {
+        categories.add(category);
+      }
+    }
+
+    for (const category of categories) {
+      paths.push({
+        params: {
+          locale: localeCode === i18n?.defaultLocale ? undefined : localeCode,
+          category: encodeURIComponent(category)
+        }
+      });
+    }
+  }
+
+  return paths;
+}
+
+const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const categoryName = decodeURIComponent(Astro.params.category || '');
+
+const allPosts = await getBlogEntrySort(currentLang);
+const posts = allPosts.filter(post => (post.data.categories || []).includes(categoryName));
+const pageTitle = `${categoryName} - ${siteConfig.title}`;
+---
+
+<MainPageLayout title={pageTitle} lang={currentLang}>
+  <div class="mx-auto w-full max-w-[var(--page-width)]">
+    <Cover title={categoryName} subTitle={currentLang === 'en' ? `${posts.length} posts` : `${posts.length} 篇文章`} />
+
+    {posts.length > 0 ? posts.map((entry) => (
+      <PostCard
+        title={entry.data.title}
+        description={entry.data.description}
+        image={blogCoverUrl(entry.data.image, entry.id)}
+        pubDate={entry.data.pubDate}
+        url={entry.id}
+        fallback={entry.isFallback}
+        categories={entry.data.categories}
+      />
+    )) : (
+      <div class="text-[var(--text-color)]/60">{currentLang === 'en' ? 'No posts in this category yet.' : '该分类暂无文章。'}</div>
+    )}
+
+    <div class="mt-8 mb-6">
+      <a href={getRelativeLocaleUrl(currentLang, '/categories/')} class="text-[var(--link-color)] hover:underline">{currentLang === 'en' ? '← Back to categories' : '← 返回分类列表'}</a>
+    </div>
+  </div>
+</MainPageLayout>
