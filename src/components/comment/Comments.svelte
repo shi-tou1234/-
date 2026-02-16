@@ -18,6 +18,7 @@
   let page = 1;
   let limit = 20;
   let hasMore = false;
+  const LOAD_TIMEOUT_MS = 6000;
 
   // 顶层评论表单数据
   let author = '';
@@ -75,9 +76,21 @@
   async function loadComments() {
     loading = true;
     error = '';
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), LOAD_TIMEOUT_MS);
     try {
+      if (!apiUrl) {
+        comments = [];
+        hasMore = false;
+        return;
+      }
+
       const res = await fetch(
-        `${apiUrl}/api/comments?post_slug=${encodeURIComponent(postSlug)}&nested=true&page=${page}&limit=${limit}`
+        `${apiUrl}/api/comments?post_slug=${encodeURIComponent(postSlug)}&nested=true&page=${page}&limit=${limit}`,
+        {
+          signal: controller.signal,
+          cache: 'no-store',
+        }
       );
       if (!res.ok) {
         comments = [];
@@ -92,6 +105,7 @@
       hasMore = false;
       error = '';
     } finally {
+      window.clearTimeout(timeoutId);
       loading = false;
     }
   }
