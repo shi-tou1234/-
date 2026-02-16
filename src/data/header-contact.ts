@@ -4,8 +4,8 @@ export type HeaderContact = {
 }
 
 const headerContact: HeaderContact = {
-  githubUrl: "https://github.com/shi-tou1234",
-  email: "your-email@example.com"
+  "githubUrl": "https://github.com/shi-tou1234",
+  "email": "2369192794@qq.com"
 }
 
 export default headerContact
