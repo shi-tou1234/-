@@ -127,28 +127,24 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
   import AOS from 'aos';
 
   function initApp() {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
     // 1. 先处理 Markdown 的动态注入 (如果有)
     const container = document.querySelector('.markdown-content');
     if (container) {
       const elements = container.querySelectorAll(':scope > *');
       elements.forEach((el, i) => {
         el.setAttribute('data-aos', 'fade-up');
-        el.setAttribute('data-aos-delay', (i % 3 * 35).toString());
+        el.setAttribute('data-aos-delay', (i % 5 * 50).toString());
       });
     }
 
     // 2. 统一初始化
     AOS.init({
-      duration: 520,
-      easing: 'ease-out-cubic',
+      duration: 800,
       once: true,
-      disable: prefersReducedMotion,
     });
     
     // 3. 强力刷新
-    AOS.refresh();
+    AOS.refreshHard();
   }
 
   document.addEventListener('astro:page-load', initApp);
