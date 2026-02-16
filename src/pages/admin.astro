@@ -22,6 +22,24 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
     <section id="admin-panel" class="hidden space-y-6">
       <div class="rounded-lg border border-[var(--button-border-color)] p-5">
+        <h2 class="text-xl font-semibold mb-4">安全设置</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm mb-2">当前密码</label>
+            <input id="old-password" type="password" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="输入当前密码" />
+          </div>
+          <div>
+            <label class="block text-sm mb-2">新密码</label>
+            <input id="new-password" type="password" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="输入新密码" />
+          </div>
+          <div class="flex items-end">
+            <button id="change-password-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">修改密码</button>
+          </div>
+        </div>
+        <p id="pwd-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
+      </div>
+
+      <div class="rounded-lg border border-[var(--button-border-color)] p-5">
         <h2 class="text-xl font-semibold mb-4">GitHub 连接</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -101,7 +119,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 </MainPageLayout>
 
 <script>
-  const ADMIN_PASSWORD = "cmchen-admin";
+  const DEFAULT_ADMIN_PASSWORD = "cmchen-admin";
+  const ADMIN_PASSWORD_KEY = "cmchen_admin_password";
   const REPO_OWNER = "shi-tou1234";
   const REPO_NAME = "-";
 
@@ -121,18 +140,44 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     localStorage.setItem("cmchen_admin_ok", "1");
   }
 
+  function getAdminPassword() {
+    return localStorage.getItem(ADMIN_PASSWORD_KEY) || DEFAULT_ADMIN_PASSWORD;
+  }
+
   if (localStorage.getItem("cmchen_admin_ok") === "1") {
     unlockPanel();
   }
 
   document.getElementById("login-btn")?.addEventListener("click", () => {
     const pwd = document.getElementById("admin-password")?.value || "";
-    if (pwd === ADMIN_PASSWORD) {
+    if (pwd === getAdminPassword()) {
       setMsg(loginMsg, "登录成功");
       unlockPanel();
     } else {
       setMsg(loginMsg, "密码错误", true);
     }
+  });
+
+  document.getElementById("change-password-btn")?.addEventListener("click", () => {
+    const msgEl = document.getElementById("pwd-msg");
+    const oldPwd = document.getElementById("old-password")?.value || "";
+    const newPwd = document.getElementById("new-password")?.value || "";
+
+    if (oldPwd !== getAdminPassword()) {
+      setMsg(msgEl, "当前密码不正确", true);
+      return;
+    }
+    if (newPwd.trim().length < 6) {
+      setMsg(msgEl, "新密码至少 6 位", true);
+      return;
+    }
+
+    localStorage.setItem(ADMIN_PASSWORD_KEY, newPwd.trim());
+    setMsg(msgEl, "密码修改成功（仅当前浏览器生效）");
+    const oldInput = document.getElementById("old-password");
+    const newInput = document.getElementById("new-password");
+    if (oldInput) oldInput.value = "";
+    if (newInput) newInput.value = "";
   });
 
   function getToken() {
