@@ -38,9 +38,21 @@ function initBackTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  window.addEventListener('scroll', handleScroll);
+  const oldScrollHandler = window.__backTopScrollHandler;
+  const oldResizeHandler = window.__backTopResizeHandler;
+  if (oldScrollHandler) {
+    window.removeEventListener('scroll', oldScrollHandler);
+  }
+  if (oldResizeHandler) {
+    window.removeEventListener('resize', oldResizeHandler);
+  }
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
   window.addEventListener('resize', handleScroll);
-  backTopButton.addEventListener('click', scrollToTop);
+  window.__backTopScrollHandler = handleScroll;
+  window.__backTopResizeHandler = handleScroll;
+
+  backTopButton.onclick = scrollToTop;
   handleScroll();
 }
 

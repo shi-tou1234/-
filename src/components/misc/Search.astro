@@ -130,7 +130,12 @@ function initSearchModal() {
   searchModal.addEventListener('click', (e) => {
     if (!modalContent?.contains(e.target)) closeModal();
   });
-  document.addEventListener('keydown', (e) => {
+  const oldKeydownHandler = window.__searchModalKeydownHandler;
+  if (oldKeydownHandler) {
+    document.removeEventListener('keydown', oldKeydownHandler);
+  }
+
+  const handleKeydown = (e) => {
     if (e.key === 'Escape' && isModalOpen()) {
       closeModal();
       return;
@@ -165,7 +170,10 @@ function initSearchModal() {
       e.preventDefault();
       openModal();
     }
-  });
+  };
+
+  document.addEventListener('keydown', handleKeydown);
+  window.__searchModalKeydownHandler = handleKeydown;
 }
 
 document.addEventListener('DOMContentLoaded', initSearchModal);

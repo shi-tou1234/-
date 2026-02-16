@@ -182,17 +182,19 @@ function initMobileNav() {
   const navBar = document.getElementById('nav-bar');
   const navBarList = document.getElementById('nav-bar-list');
 
+  if (!menuButton) return;
 
-  if (!menuButton || menuButton.dataset.bound === 'true') return;
-  menuButton.dataset.bound = 'true';
-
-  menuButton.addEventListener('click', (e) => {
+  menuButton.onclick = (e) => {
     e.stopPropagation();
     languageMenu?.classList.add('hidden');
     mobileMenu?.classList.toggle('hidden');
-  });
+  };
 
-  document.addEventListener('click', (event) => {
+  const oldDocClickHandler = window.__headerMobileOutsideClickHandler;
+  if (oldDocClickHandler) {
+    document.removeEventListener('click', oldDocClickHandler);
+  }
+  const handleDocClick = (event) => {
     if (
       menuButton &&
       mobileMenu &&
@@ -201,10 +203,17 @@ function initMobileNav() {
     ) {
       mobileMenu.classList.add('hidden');
     }
-  });
+  };
+  document.addEventListener('click', handleDocClick);
+  window.__headerMobileOutsideClickHandler = handleDocClick;
 
   let isFixed = false;
-  window.addEventListener('scroll', () => {
+  const oldNavScrollHandler = window.__headerNavScrollHandler;
+  if (oldNavScrollHandler) {
+    window.removeEventListener('scroll', oldNavScrollHandler);
+  }
+
+  const handleNavScroll = () => {
     if (window.scrollY > 0 && !isFixed && navBar && navBarList) {
       navBar.classList.add('fixed');
       navBarList.classList.add(
@@ -222,7 +231,11 @@ function initMobileNav() {
       );
       isFixed = false;
     }
-  });
+  };
+
+  window.addEventListener('scroll', handleNavScroll, { passive: true });
+  window.__headerNavScrollHandler = handleNavScroll;
+  handleNavScroll();
 }
 
 document.addEventListener('DOMContentLoaded', initMobileNav);
@@ -234,16 +247,20 @@ function initLanguageMenu() {
   const languageMenu = document.getElementById('language-menu');
   const mobileMenu = document.getElementById('mobile-menu'); // 添加移动端菜单引用
 
-  if (!languageButton || languageButton.dataset.bound === 'true') return;
-  languageButton.dataset.bound = 'true';
+  if (!languageButton) return;
 
-  languageButton.addEventListener('click', (e) => {
+  languageButton.onclick = (e) => {
     e.stopPropagation();
     mobileMenu?.classList.add('hidden');
     languageMenu?.classList.toggle('hidden');
-  });
+  };
 
-  document.addEventListener('click', (event) => {
+  const oldDocClickHandler = window.__headerLanguageOutsideClickHandler;
+  if (oldDocClickHandler) {
+    document.removeEventListener('click', oldDocClickHandler);
+  }
+
+  const handleDocClick = (event) => {
     if (
       languageButton &&
       languageMenu &&
@@ -252,7 +269,10 @@ function initLanguageMenu() {
     ) {
       languageMenu.classList.add('hidden');
     }
-  });
+  };
+
+  document.addEventListener('click', handleDocClick);
+  window.__headerLanguageOutsideClickHandler = handleDocClick;
 }
 document.addEventListener('astro:page-load', initLanguageMenu);
 document.addEventListener('astro:after-swap', initLanguageMenu);
@@ -348,8 +368,13 @@ document.addEventListener('astro:after-swap', initHeaderContactCopy);
       }
     }
 
-    window.removeEventListener('scroll', onScroll);
+    const oldHeaderScrollHandler = window.__headerScrollHandler;
+    if (oldHeaderScrollHandler) {
+      window.removeEventListener('scroll', oldHeaderScrollHandler);
+    }
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.__headerScrollHandler = onScroll;
+    onScroll();
   }
 
   document.addEventListener('astro:page-load', initHeaderScroll);
@@ -358,6 +383,7 @@ document.addEventListener('astro:after-swap', initHeaderContactCopy);
 
 {import.meta.env.PROD && 
 <script is:inline define:vars={{ scriptUrl: baseUrl('/pagefind/pagefind.js') }}>
+if (window.__headerPagefindBindingDone !== true) {
 function initPagefind() {
   if (window.pagefind && typeof window.pagefind.search === 'function') {
     document.dispatchEvent(new CustomEvent('pagefindready'));
@@ -397,6 +423,8 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initPagefind);
 } else {
   initPagefind();
+}
+window.__headerPagefindBindingDone = true;
 }
 </script>
 }
