@@ -239,6 +239,10 @@
     {:else}
       <h4 data-aos="fade-up" class="text-[var(--text-color)] text-base font-semibold mb-4">{comments.length} {t('comments.comments')}</h4>
 
+      {#if comments.length === 0}
+        <p data-aos="fade-up" class="text-[var(--text-color)]/80 text-sm text-center mb-4">暂无评论，欢迎抢沙发</p>
+      {/if}
+
       <div class="space-y-6">
         {#each comments as c}
           <CommentItem {c} {postSlug} {author} {email} {url} {language}

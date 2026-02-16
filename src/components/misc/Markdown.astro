@@ -13,6 +13,23 @@ const className = Astro.props.class
 </div>
 
 <script>
+  function bindImageSkeleton(img) {
+    const markLoaded = () => {
+      img.classList.remove('markdown-image-loading');
+      img.classList.add('markdown-image-loaded');
+    };
+
+    if (img.complete && img.naturalWidth > 0) {
+      markLoaded();
+      return;
+    }
+
+    img.classList.add('markdown-image-loading');
+    img.classList.remove('markdown-image-loaded');
+    img.addEventListener('load', markLoaded, { once: true });
+    img.addEventListener('error', markLoaded, { once: true });
+  }
+
   function stabilizeMarkdownImages() {
     const images = document.querySelectorAll('.markdown-content img');
     images.forEach((img) => {
@@ -20,6 +37,7 @@ const className = Astro.props.class
       img.setAttribute('decoding', 'sync');
       img.setAttribute('fetchpriority', 'high');
       img.style.imageRendering = 'auto';
+      bindImageSkeleton(img);
     });
   }
 
@@ -68,6 +86,31 @@ const className = Astro.props.class
 </script>
 
 <style is:global>
+  .markdown-content img {
+    transition: opacity .25s ease;
+  }
+
+  .markdown-content img.markdown-image-loading {
+    opacity: 0;
+    background: linear-gradient(90deg,
+      var(--button-hover-color) 25%,
+      color-mix(in srgb, var(--button-hover-color) 70%, white) 37%,
+      var(--button-hover-color) 63%
+    );
+    background-size: 300% 100%;
+    animation: markdown-image-skeleton 1.2s ease-in-out infinite;
+  }
+
+  .markdown-content img.markdown-image-loaded {
+    opacity: 1;
+    animation: none;
+  }
+
+  @keyframes markdown-image-skeleton {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+  }
+
   .code-block-wrapper {
     position: relative !important;
     width: 100%;
