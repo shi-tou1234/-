@@ -74,16 +74,23 @@
 
   async function loadComments() {
     loading = true;
+    error = '';
     try {
       const res = await fetch(
         `${apiUrl}/api/comments?post_slug=${encodeURIComponent(postSlug)}&nested=true&page=${page}&limit=${limit}`
       );
-      if (!res.ok) throw new Error(t('comments.loadFailed') || '加载失败');
+      if (!res.ok) {
+        comments = [];
+        hasMore = false;
+        return;
+      }
       const data = await res.json();
-      comments = data.data;
-      hasMore = data.pagination.total > page * limit;
+      comments = Array.isArray(data?.data) ? data.data : [];
+      hasMore = Boolean(data?.pagination?.total > page * limit);
     } catch (err: any) {
-      error = err.message;
+      comments = [];
+      hasMore = false;
+      error = '';
     } finally {
       loading = false;
     }
