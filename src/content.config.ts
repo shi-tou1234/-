@@ -7,9 +7,9 @@ const blogCollection = defineCollection({
         title: z.string(),
         pubDate: z.date(),
         draft: z.boolean().optional().default(false),
-        description: z.string().optional().default(''),
-        image: z.string().optional().default(''),
-        categories: z.array(z.string()).optional().default([]),
+        description: z.union([z.string(), z.null()]).optional().transform((value) => value ?? ''),
+        image: z.union([z.string(), z.null()]).optional().transform((value) => value ?? ''),
+        categories: z.union([z.array(z.string()), z.null()]).optional().transform((value) => value ?? []),
         slugId: z.string()
     }),
 })

@@ -149,6 +149,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
 <script>
   const SESSION_KEY = "cmchen_admin_ok";
+  const ADMIN_GH_TOKEN_KEY = "cmchen_admin_gh_token";
+  const ADMIN_GH_BRANCH_KEY = "cmchen_admin_gh_branch";
   const REPO_OWNER = "shi-tou1234";
   const REPO_NAME = "-";
   const ADMIN_SECURITY_PATH = "public/admin-security.json";
@@ -305,6 +307,26 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     return (document.getElementById("gh-branch")?.value || "main").trim();
   }
 
+  function loadGitHubDraft() {
+    const tokenInput = document.getElementById("gh-token");
+    const branchInput = document.getElementById("gh-branch");
+    const savedToken = localStorage.getItem(ADMIN_GH_TOKEN_KEY) || "";
+    const savedBranch = localStorage.getItem(ADMIN_GH_BRANCH_KEY) || "main";
+    if (tokenInput && savedToken) tokenInput.value = savedToken;
+    if (branchInput && savedBranch) branchInput.value = savedBranch;
+  }
+
+  function saveGitHubDraft() {
+    const token = getToken();
+    const branch = getBranch();
+    localStorage.setItem(ADMIN_GH_TOKEN_KEY, token);
+    localStorage.setItem(ADMIN_GH_BRANCH_KEY, branch || "main");
+  }
+
+  loadGitHubDraft();
+  document.getElementById("gh-token")?.addEventListener("change", saveGitHubDraft);
+  document.getElementById("gh-branch")?.addEventListener("change", saveGitHubDraft);
+
   function encodeUtf8ToBase64(content) {
     return btoa(unescape(encodeURIComponent(content)));
   }
@@ -321,7 +343,14 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
     if (!res.ok) {
       const text = await res.text();
-      throw new Error(`GitHub API 错误 ${res.status}: ${text}`);
+      let detail = text;
+      try {
+        const parsed = JSON.parse(text);
+        detail = parsed?.message || text;
+      } catch (_e) {
+        detail = text;
+      }
+      throw new Error(`GitHub API 错误 ${res.status}: ${detail}`);
     }
 
     return res.status === 204 ? null : res.json();
@@ -376,7 +405,13 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   }
 
   function normalizeSlug(input) {
-    return input.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-_/]/g, "");
+    return input
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[<>:"\\|?*#%{}\[\]^`~]/g, "")
+      .replace(/\.{2,}/g, ".")
+      .replace(/^-+|-+$/g, "");
   }
 
   function buildPostMarkdown(data) {
@@ -453,15 +488,22 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const token = getToken();
       const branch = getBranch();
       const lang = (document.getElementById("post-lang")?.value || "zh-cn").trim();
-      const slug = normalizeSlug(document.getElementById("post-slug")?.value || "");
       const title = (document.getElementById("post-title")?.value || "").trim();
       const date = (document.getElementById("post-date")?.value || "").trim();
       const description = (document.getElementById("post-desc")?.value || "").trim();
       const categoriesRaw = (document.getElementById("post-categories")?.value || "").trim();
       const content = document.getElementById("post-content")?.value || "";
+      const inputSlug = normalizeSlug(document.getElementById("post-slug")?.value || "");
+      const fallbackSlug = normalizeSlug(title);
+      const slug = inputSlug || fallbackSlug || `post-${Date.now()}`;
 
       if (!token) throw new Error("请先填写 GitHub Token");
-      if (!slug || !title || !date) throw new Error("请填写 slug、标题、发布日期");
+      if (!title || !date) throw new Error("请填写标题、发布日期");
+
+      const slugInput = document.getElementById("post-slug");
+      if (slugInput && !slugInput.value.trim()) {
+        slugInput.value = slug;
+      }
 
       const categories = categoriesRaw
         ? categoriesRaw.split(",").map(x => x.trim()).filter(Boolean)
@@ -478,6 +520,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
       const path = `src/content/blog/${slug}/${lang}.md`;
       setMsg(msgEl, "发布中...");
+      saveGitHubDraft();
       await upsertFile(path, markdown, `post: update ${slug}/${lang}`, token, branch);
       setMsg(msgEl, `发布成功：${path}`);
     } catch (error) {
