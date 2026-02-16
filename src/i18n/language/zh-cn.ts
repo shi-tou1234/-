@@ -21,7 +21,7 @@ const translation: Translation = {
             home: "生活多彩！",
             archive: "共 {count} 篇文章",
             categories: "共 {count} 个分类",
-            about: "一个极简的Blog模板",
+            about: "",
             friends: "有趣的灵魂",
             page404: "恭喜你发现一片未知的世界，这片世界还处于建设之中，请过段时间再来看看呢！"
         }

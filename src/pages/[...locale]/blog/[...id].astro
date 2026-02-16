@@ -15,7 +15,6 @@ import { i18n } from "astro:config/client";
 import i18nit from '@i18n/translation'
 
 import { blogCoverUrl } from '@/utils/url-utils'
-import { getRelativeLocaleUrl } from '@/utils/url-utils'
 import { formatFullDate } from '@/utils/time'
 import { getBlogEntrySort } from '@utils/content-utils'
 
@@ -67,13 +66,6 @@ const image = blogCoverUrl(entry.data.image, entry.id);
         <div class="mb-8 text-center">
             <h1 class="font-bold text-3xl mb-2 pt-10 text-[var(--text-color)]">{ entry.data.title }</h1>
             <p class="font-bold text-[var(--text-color)]/60 pt-4 pb-10">{ formatFullDate(entry.data.pubDate, currentLang) }</p>
-            {entry.data.categories && entry.data.categories.length > 0 && (
-                <div class="-mt-6 mb-8 flex flex-wrap justify-center gap-2">
-                    {entry.data.categories.map((category) => (
-                        <a href={getRelativeLocaleUrl(currentLang, `/category/${encodeURIComponent(category)}/`)} class="text-xs px-2 py-1 rounded border border-[var(--button-border-color)] bg-[var(--button-hover-color)] text-[var(--text-color)]/80 hover:text-[var(--link-color)] transition-colors">{category}</a>
-                    ))}
-                </div>
-            )}
         </div>
         {image && (
             <div class="cover overflow-hidden">

@@ -79,10 +79,6 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
             <label class="block text-sm mb-2">简介</label>
             <input id="post-desc" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
           </div>
-          <div>
-            <label class="block text-sm mb-2">分类（逗号分隔）</label>
-            <input id="post-categories" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="技术,Astro" />
-          </div>
         </div>
 
         <div class="mb-3 flex flex-wrap gap-3 items-center">
@@ -476,11 +472,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   }
 
   function buildPostMarkdown(data) {
-    const categories = data.categories.length
-      ? `categories:\n${data.categories.map(c => `  - ${c}`).join("\n")}`
-      : `categories: []`;
-
-    return `---\ntitle: ${data.title}\npubDate: ${data.date}\ndraft: false\ndescription: ${data.description}\nslugId: ${data.slugId}\n${categories}\n---\n\n${data.content}\n`;
+    return `---\ntitle: ${data.title}\npubDate: ${data.date}\ndraft: false\ndescription: ${data.description}\nslugId: ${data.slugId}\n---\n\n${data.content}\n`;
   }
 
   document.getElementById("insert-iframe-btn")?.addEventListener("click", () => {
@@ -552,7 +544,6 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const title = (document.getElementById("post-title")?.value || "").trim();
       const date = (document.getElementById("post-date")?.value || "").trim();
       const description = (document.getElementById("post-desc")?.value || "").trim();
-      const categoriesRaw = (document.getElementById("post-categories")?.value || "").trim();
       const content = document.getElementById("post-content")?.value || "";
       const inputSlug = normalizeSlug(document.getElementById("post-slug")?.value || "");
       const fallbackSlug = normalizeSlug(title);
@@ -566,16 +557,11 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         slugInput.value = slug;
       }
 
-      const categories = categoriesRaw
-        ? categoriesRaw.split(",").map(x => x.trim()).filter(Boolean)
-        : [];
-
       const markdown = buildPostMarkdown({
         title,
         date,
         description,
         slugId: slug,
-        categories,
         content
       });
 

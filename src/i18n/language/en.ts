@@ -21,7 +21,7 @@ const translation: Translation = {
             home: "Life is colorful!",
             archive: "Total of {count} articles",
             categories: "Total {count} categories",
-            about: "A minimalist blog template",
+            about: "",
             friends: "Interesting Souls",
             page404: "Congratulations on finding a new world, this world is still under construction, please wait a bit longer."
         }

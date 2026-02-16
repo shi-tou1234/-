@@ -28,7 +28,8 @@ export const getStaticPaths = (async ({ paginate }) => {
     const localeCode = typeof locale === 'string' ? locale : locale.path;
     const localeParam = localeCode === i18n.defaultLocale ? undefined : localeCode;
     const blogEntries = await getBlogEntrySort(localeParam);
-    const paginatedPaths = paginate(blogEntries, { 
+    const sortedBlogEntries = [...blogEntries].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+    const paginatedPaths = paginate(sortedBlogEntries, { 
       pageSize: siteConfig.pageSize,
       params: { locale: localeParam }
     });
