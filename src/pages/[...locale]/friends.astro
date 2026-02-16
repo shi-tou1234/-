@@ -28,7 +28,7 @@ const pageTitle = t("header.friends") + " - " + siteConfig.title;
                         href={friend.url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        class="flex items-center p-4 border border-[var(--button-border-color)] rounded-lg shadow-sm active:bg-[var(--button-hover-color)] hover:bg-[var(--button-hover-color)] transition-all duration-300 hover:scale-105"
+                        class="flex items-center p-4 border border-[var(--button-border-color)] rounded-lg shadow-sm active:bg-[var(--button-hover-color)] hover:bg-[var(--button-hover-color)] transition-[transform,background-color,box-shadow] duration-200 hover:-translate-y-0.5"
                     >
                         <img 
                             src={friend.avatar} 

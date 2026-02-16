@@ -732,7 +732,7 @@ rt {
   color: transparent;
   background-size: 200% auto;
   font-weight: bold;
-  animation: rainbow-animation 3s linear infinite;
+  animation: rainbow-animation 4.5s linear infinite;
   display: inline-block;
 }
 
@@ -743,6 +743,12 @@ rt {
 
 [data-theme='dark'] .rainbow-text {
   filter: brightness(1.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rainbow-text {
+    animation: none;
+  }
 }
 
 .typst-render {

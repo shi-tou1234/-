@@ -34,17 +34,17 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
     <!-- tools -->
     <div class="ml-auto flex gap-2 pl-4 py-2 justify-end z-30">
         <!-- Search -->
-        <button id="search-button" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+        <button id="search-button" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-95 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-[transform,background-color,color] duration-200">
             <Icon name="fa6-solid:magnifying-glass" class="w-4 h-4" />
         </button>
         <!-- Dark Mode -->
-        <ThemeIcon class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] rounded-lg hover:text-current active:scale-90 border border-[var(--button-border-color)] transition-all duration-300"/>
+        <ThemeIcon class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] rounded-lg hover:text-current active:scale-95 border border-[var(--button-border-color)] transition-[transform,background-color,color] duration-200"/>
         <!-- GitHub -->
-        <a href={headerContact.githubUrl} target="_blank" rel="noopener noreferrer" title="GitHub" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+        <a href={headerContact.githubUrl} target="_blank" rel="noopener noreferrer" title="GitHub" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-95 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-[transform,background-color,color] duration-200">
           <Icon name="simple-icons:github" class="w-4 h-4" />
         </a>
         <!-- Email Copy -->
-        <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+        <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-95 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-[transform,background-color,color] duration-200">
           <Icon name="fa6-solid:envelope" class="w-4 h-4" />
         </button>
         <!-- RSS -->
@@ -54,7 +54,7 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
         <!-- Language Switcher -->
         {showLanguageSwitcher && (
         <div class="relative">
-            <button id="language-button" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+            <button id="language-button" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-95 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-[transform,background-color,color] duration-200">
                 <Icon name="fa6-solid:globe" class="w-4 h-4" />
             </button>
             
@@ -74,7 +74,7 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
         )}
         <div class="relative md:hidden">
           <!-- Mobile Menu -->
-          <button id="mobile-menu-button" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+          <button id="mobile-menu-button" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-95 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-[transform,background-color,color] duration-200">
               <Icon name="fa6-solid:align-justify" class="w-5 h-5" />
           </button>
               <!-- Mobile Menu -->
