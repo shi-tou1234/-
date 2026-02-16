@@ -97,7 +97,7 @@ const image = blogCoverUrl(entry.data.image, entry.id);
         }
         {
             siteConfig.comments.enable && 
-            <Comments postSlug={entry.data.slugId} language={currentLang} postTitle={entry.data.title} client:visible/>
+            <Comments postSlug={entry.data.slugId} language={currentLang} postTitle={entry.data.title} client:load/>
         }
     </div>
     <BackTop />
