@@ -1,0 +1,60 @@
+---
+import MainPageLayout from '@layouts/MainPageLayout.astro'
+import Cover from '@components/Cover.astro'
+
+import { siteConfig } from '@/config'
+import { getBlogEntrySort } from '@utils/content-utils'
+import i18nit from '@i18n/translation'
+
+import { i18n } from "astro:config/client";
+import { getRelativeLocaleUrl } from '@utils/url-utils';
+
+const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const t = i18nit(currentLang);
+
+export async function getStaticPaths() {
+	return i18n?.locales.map(locale => ({ params: { locale: locale == i18n?.defaultLocale ? undefined : (locale as string) } }));
+}
+
+const allBlogPosts = await getBlogEntrySort(currentLang);
+const uncategorized = currentLang === 'zh-cn' ? '未分类' : 'Uncategorized';
+
+const categoriesMap = allBlogPosts.reduce((acc, post) => {
+  const category = (post.data.category || '').trim() || uncategorized;
+  if (!acc[category]) {
+    acc[category] = [];
+  }
+  acc[category].push(post);
+  return acc;
+}, {} as Record<string, typeof allBlogPosts>);
+
+const categories = Object.keys(categoriesMap).sort((a, b) => categoriesMap[b].length - categoriesMap[a].length || a.localeCompare(b));
+const pageTitle = t("header.categories") + " - " + siteConfig.title;
+---
+
+<MainPageLayout title={pageTitle} lang={currentLang}>
+  <div class="mx-auto w-full max-w-[var(--page-width)]">
+    <Cover title={t("cover.title.categories")} subTitle={t("cover.subTitle.categories", {count: categories.length})} />
+
+    <div class="py-6 text-[var(--text-color)] space-y-10">
+      {categories.map((category) => (
+        <section>
+          <h2 data-aos="fade-up" class="text-2xl font-bold mb-4">{category} <span class="text-sm font-normal text-[var(--text-color)]/70">({categoriesMap[category].length})</span></h2>
+          <div class="space-y-2">
+            {categoriesMap[category].map((post) => (
+              <a data-aos="fade-up" href={getRelativeLocaleUrl(currentLang, `/blog/${post.id}`)}
+                class="block rounded p-2 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)] transition-colors duration-200">
+                <span class="text-lg hover:text-[var(--link-color)]">{post.data.title}</span>
+                {
+                  post.isFallback && (
+                    <span class="self-center px-1 ml-2 text-sm text-[var(--text-color)]/70 font-mono uppercase bg-[var(--button-hover-color)] rounded border border-[var(--button-border-color)]">{i18n!.defaultLocale}</span>
+                  )
+                }
+              </a>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  </div>
+</MainPageLayout>

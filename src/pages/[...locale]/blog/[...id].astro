@@ -7,7 +7,6 @@ import ImageModule from '@components/misc/ImageModule.astro'
 import BackTop from '@components/control/BackTop.astro'
 import LicenseCard from '@components/misc/LicenseCard.astro'
 import BlogNavi from '@components/control/BlogNavi.astro'
-import TOC from '@components/TOC.svelte'
 import ReadingTime from '@components/misc/ReadingTime.astro'
 
 import { getCollection, render } from 'astro:content'
@@ -56,7 +55,7 @@ export async function getStaticPaths() {
     return paths;
 }
 const { entry, prev, next } = Astro.props;
-const { Content, headings } = await render(entry); // 获取渲染后的正文内容与标题目录
+const { Content } = await render(entry); // 获取渲染后的正文内容
 
 const pageTitle = entry.data.title + ' - ' + siteConfig.title;
 const image = blogCoverUrl(entry.data.image, entry.id);
@@ -100,10 +99,6 @@ const readingMinutes = estimateReadingMinutes(entry.body || '');
         {
             siteConfig.blogNavi.enable &&
             <BlogNavi prev={prev} next={next}/>
-        }
-        {
-            siteConfig.toc.enable && headings.length > 0 &&
-            <TOC headings={headings} language={currentLang} client:load />
         }
     </div>
     <BackTop />

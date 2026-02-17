@@ -14,10 +14,6 @@ export const siteConfig: SiteConfig = {
     favicon: "/favicon/favicon.ico", // Path of the favicon, relative to the /public directory
 
     pageSize: 6, // Number of posts per page
-    toc: {
-        enable: true,
-        depth: 3 // Max depth of the table of contents, between 1 and 4
-    },
     blogNavi: {
         enable: true // Whether to enable blog navigation in the blog footer
     }

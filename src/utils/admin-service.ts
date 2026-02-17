@@ -106,11 +106,13 @@ export function buildPostMarkdown(data: {
   date: string;
   description: string;
   image: string;
+  category: string;
   slugId: string;
   content: string;
 }): string {
   const imageLine = data.image ? `image: ${data.image}\n` : "";
-  return `---\ntitle: ${data.title}\npubDate: ${data.date}\ndraft: false\ndescription: ${data.description}\n${imageLine}slugId: ${data.slugId}\n---\n\n${data.content}\n`;
+  const categoryLine = data.category ? `category: ${data.category}\n` : "";
+  return `---\ntitle: ${data.title}\npubDate: ${data.date}\ndraft: false\ndescription: ${data.description}\n${imageLine}${categoryLine}slugId: ${data.slugId}\n---\n\n${data.content}\n`;
 }
 
 export function toIsoDateTime(dateTimeLocalValue: string): string {

@@ -97,7 +97,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
             <details class="rounded border border-[var(--button-border-color)] p-3">
               <summary class="cursor-pointer text-sm">更多设置（可选）</summary>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3">
                 <div>
                   <label class="block text-sm mb-1">发布日期</label>
                   <input id="post-date" type="datetime-local" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
@@ -109,6 +109,10 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
                 <div>
                   <label class="block text-sm mb-1">封面路径</label>
                   <input id="post-cover" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="例如：./assets/cover.jpg" />
+                </div>
+                <div>
+                  <label class="block text-sm mb-1">分类</label>
+                  <input id="post-category" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="例如：技术" />
                 </div>
               </div>
             </details>
@@ -461,6 +465,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     const dateInput = document.getElementById("post-date");
     const descInput = document.getElementById("post-desc");
     const coverInput = document.getElementById("post-cover");
+    const categoryInput = document.getElementById("post-category");
     const contentInput = document.getElementById("post-content");
 
     if (titleInput) titleInput.value = "";
@@ -469,6 +474,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     if (dateInput) dateInput.value = getNowDateTimeLocal();
     if (descInput) descInput.value = "";
     if (coverInput) coverInput.value = "";
+    if (categoryInput) categoryInput.value = "";
     if (contentInput) contentInput.value = "";
   }
 
@@ -565,6 +571,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     const dateInput = document.getElementById("post-date");
     const descInput = document.getElementById("post-desc");
     const coverInput = document.getElementById("post-cover");
+    const categoryInput = document.getElementById("post-category");
     const contentInput = document.getElementById("post-content");
 
     if (titleInput) titleInput.value = frontmatter.title || "";
@@ -573,6 +580,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     if (dateInput) dateInput.value = toDateTimeLocalValue(frontmatter.pubDate || "") || getNowDateTimeLocal();
     if (descInput) descInput.value = frontmatter.description || "";
     if (coverInput) coverInput.value = frontmatter.image || "";
+    if (categoryInput) categoryInput.value = frontmatter.category || "";
     if (contentInput) contentInput.value = (content || "").trim();
 
     setMsg(msgEl, `已载入：${slug} (${lang})`);
@@ -688,6 +696,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const date = toIsoDateTime(dateInput) || new Date().toISOString();
       const description = (document.getElementById("post-desc")?.value || "").trim();
       const image = (document.getElementById("post-cover")?.value || "").trim();
+      const category = (document.getElementById("post-category")?.value || "").trim();
       const content = document.getElementById("post-content")?.value || "";
       const inputSlug = ensurePostSlug();
       const fallbackSlug = normalizeSlug(title);
@@ -706,6 +715,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         date,
         description,
         image,
+        category,
         slugId: slug,
         content
       });

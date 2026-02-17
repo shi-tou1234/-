@@ -5,10 +5,6 @@ export type SiteConfig = {
     favicon: string;
 
     pageSize: number;
-    toc: {
-        enable: boolean;
-        depth: number;
-    };
     blogNavi: {
         enable: boolean;
     }

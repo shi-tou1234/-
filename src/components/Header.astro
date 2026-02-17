@@ -17,6 +17,7 @@ const showLanguageSwitcher = locales.length > 1;
 
 const indexPage = getRelativeLocaleUrl(currentLang, "/");
 const archivesPage = getRelativeLocaleUrl(currentLang, "/archives/");
+const categoriesPage = getRelativeLocaleUrl(currentLang, "/categories/");
 const friendsPage = getRelativeLocaleUrl(currentLang, "/friends/");
 const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 ---
@@ -92,6 +93,12 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
                       : 'hover:bg-[var(--button-hover-color)]'
                   }`}>{t("header.archive")}</a>
 
+                  <a href={ categoriesPage } class={`mx-2 my-1 p-2 text-sm rounded ${
+                    Astro.url.pathname === categoriesPage 
+                      ? 'bg-[var(--button-hover-color)]' 
+                      : 'hover:bg-[var(--button-hover-color)]'
+                  }`}>{t("header.categories")}</a>
+
                   <a href={ aboutPage } class={`mx-2 my-1 p-2 text-sm rounded ${
                     Astro.url.pathname === aboutPage 
                       ? 'bg-[var(--button-hover-color)]' 
@@ -129,6 +136,14 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
               }`}>
               {t("header.archive")}
           </a>
+            <!-- 分类链接 -->
+            <a href={ categoriesPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current ${
+              Astro.url.pathname === categoriesPage 
+                ? 'bg-[var(--button-hover-color)]' 
+                : 'hover:bg-[var(--button-hover-color)]'
+              }`}>
+              {t("header.categories")}
+            </a>
           <!-- 关于链接 -->
           <a href={ aboutPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current ${
               Astro.url.pathname === aboutPage 
