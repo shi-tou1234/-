@@ -19,12 +19,26 @@ export async function getStaticPaths() {
 const allBlogPosts = await getBlogEntrySort(currentLang);
 const uncategorized = currentLang === 'zh-cn' ? '未分类' : 'Uncategorized';
 
-const categoriesMap = allBlogPosts.reduce((acc, post) => {
-  const category = (post.data.category || '').trim() || uncategorized;
-  if (!acc[category]) {
-    acc[category] = [];
-  }
-  acc[category].push(post);
+function getPostCategories(post: (typeof allBlogPosts)[number]): string[] {
+  const legacyCategories = Array.isArray(post.data.categories)
+    ? post.data.categories.map((item) => String(item).trim()).filter(Boolean)
+    : [];
+  const singleCategory = String(post.data.category || '').trim();
+  const merged = [...legacyCategories, ...(singleCategory ? [singleCategory] : [])];
+  const unique = [...new Set(merged)];
+  return unique.length > 0 ? unique : [uncategorized];
+}
+
+const categoriesMap = allBlogPosts
+  .filter((post) => post.id !== 'welcome')
+  .reduce((acc, post) => {
+  const categories = getPostCategories(post);
+  categories.forEach((category) => {
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(post);
+  });
   return acc;
 }, {} as Record<string, typeof allBlogPosts>);
 
@@ -38,7 +52,7 @@ const pageTitle = t("header.categories") + " - " + siteConfig.title;
 
     <div class="py-6 text-[var(--text-color)] grid grid-cols-1 sm:grid-cols-2 gap-3">
       {categories.map((category) => (
-        <a href={getRelativeLocaleUrl(currentLang, `/categories/${encodeURIComponent(category)}`)}
+        <a href={getRelativeLocaleUrl(currentLang, `/categories/${category}`)}
           class="block rounded border border-[var(--button-border-color)] p-3 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)] transition-colors duration-200">
           <div class="flex items-center justify-between gap-2">
             <span class="text-lg font-semibold">{category}</span>

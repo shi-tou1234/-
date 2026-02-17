@@ -14,6 +14,16 @@ const t = i18nit(currentLang);
 
 const uncategorized = currentLang === 'zh-cn' ? '未分类' : 'Uncategorized';
 
+function getPostCategories(post: any): string[] {
+  const legacyCategories = Array.isArray(post.data.categories)
+    ? post.data.categories.map((item) => String(item).trim()).filter(Boolean)
+    : [];
+  const singleCategory = String(post.data.category || '').trim();
+  const merged = [...legacyCategories, ...(singleCategory ? [singleCategory] : [])];
+  const unique = [...new Set(merged)];
+  return unique.length > 0 ? unique : [uncategorized];
+}
+
 export async function getStaticPaths() {
   const locales = i18n?.locales || [i18n?.defaultLocale];
   const paths = [];
@@ -22,18 +32,28 @@ export async function getStaticPaths() {
     const localeCode = typeof locale === 'string' ? locale : locale.path;
     const localeParam = localeCode === i18n?.defaultLocale ? undefined : localeCode;
     const posts = await getBlogEntrySort(localeCode);
+    const localeUncategorized = localeCode === 'zh-cn' ? '未分类' : 'Uncategorized';
+
+    const getLocalePostCategories = (post: (typeof posts)[number]): string[] => {
+      const legacyCategories = Array.isArray(post.data.categories)
+        ? post.data.categories.map((item) => String(item).trim()).filter(Boolean)
+        : [];
+      const singleCategory = String(post.data.category || '').trim();
+      const merged = [...legacyCategories, ...(singleCategory ? [singleCategory] : [])];
+      const unique = [...new Set(merged)];
+      return unique.length > 0 ? unique : [localeUncategorized];
+    };
 
     const categorySet = new Set<string>();
-    posts.forEach((post) => {
-      const category = (post.data.category || '').trim() || (localeCode === 'zh-cn' ? '未分类' : 'Uncategorized');
-      categorySet.add(category);
+    posts.filter((post) => post.id !== 'welcome').forEach((post) => {
+      getLocalePostCategories(post).forEach((category) => categorySet.add(category));
     });
 
     categorySet.forEach((categoryName) => {
       paths.push({
         params: {
           locale: localeParam,
-          category: encodeURIComponent(categoryName)
+          category: categoryName
         }
       });
     });
@@ -42,14 +62,12 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const categoryParam = Astro.params.category || '';
-const currentCategory = decodeURIComponent(categoryParam);
+const currentCategory = Astro.params.category || '';
 
 const allBlogPosts = await getBlogEntrySort(currentLang);
-const categoryPosts = allBlogPosts.filter((post) => {
-  const postCategory = (post.data.category || '').trim() || uncategorized;
-  return postCategory === currentCategory;
-});
+const categoryPosts = allBlogPosts
+  .filter((post) => post.id !== 'welcome')
+  .filter((post) => getPostCategories(post).includes(currentCategory));
 
 const pageTitle = `${currentCategory} - ${t("header.categories")} - ${siteConfig.title}`;
 const categoriesRoot = getRelativeLocaleUrl(currentLang, '/categories/');

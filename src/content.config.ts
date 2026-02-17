@@ -10,6 +10,16 @@ const blogCollection = defineCollection({
         description: z.union([z.string(), z.null()]).optional().transform((value) => value ?? ''),
         image: z.union([z.string(), z.null()]).optional().transform((value) => value ?? ''),
         category: z.union([z.string(), z.null()]).optional().transform((value) => value ?? ''),
+                categories: z
+                    .union([z.array(z.string()), z.string(), z.null()])
+                    .optional()
+                    .transform((value) => {
+                        if (Array.isArray(value)) {
+                            return value.map((item) => String(item).trim()).filter(Boolean);
+                        }
+                        const single = String(value ?? '').trim();
+                        return single ? [single] : [];
+                    }),
         slugId: z.string()
     }),
 })
