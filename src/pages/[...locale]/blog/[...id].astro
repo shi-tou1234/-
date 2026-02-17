@@ -67,6 +67,9 @@ const readingMinutes = estimateReadingMinutes(entry.body || '');
     <div class="mx-auto w-full max-w-[var(--page-width)] py-8 md:mt-0 mt-18">
         <div class="mb-8 text-center">
             <h1 class="font-bold text-3xl mb-2 pt-10 text-[var(--text-color)]">{ entry.data.title }</h1>
+            <div class="pt-2">
+                <ReadingTime minutes={readingMinutes} language={currentLang} />
+            </div>
             <p class="font-bold text-[var(--text-color)]/60 pt-4 pb-10">{ formatFullDate(entry.data.pubDate, currentLang) }</p>
         </div>
         {image && (
@@ -88,12 +91,9 @@ const readingMinutes = estimateReadingMinutes(entry.body || '');
             </div>
         </div>
         )}
-        <div class="relative mb-6 pb-8">
-            <Markdown class="markdown-content onload-animation">
-                <Content />
-            </Markdown>
-            <ReadingTime minutes={readingMinutes} language={currentLang} />
-        </div>
+        <Markdown class="mb-6 markdown-content onload-animation">
+            <Content />
+        </Markdown>
         {licenseConfig.enable &&
         <LicenseCard title={entry.data.title} pubDate={entry.data.pubDate}/>
         }

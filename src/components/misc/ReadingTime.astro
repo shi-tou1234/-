@@ -10,8 +10,8 @@ const { minutes, language } = Astro.props;
 const t = i18nit(language);
 ---
 
-<div class="pointer-events-none absolute bottom-3 right-0 z-10">
-  <span class="rounded border border-[var(--button-border-color)] bg-[var(--bg-color)]/85 px-2 py-1 text-xs text-[var(--text-color)] shadow-sm backdrop-blur-sm">
+<div class="inline-flex items-center">
+  <span class="rounded border border-[var(--button-border-color)] bg-[var(--bg-color)]/85 px-2 py-1 text-xs text-[var(--text-color)] shadow-sm">
     {t('readingTime.minutes', { minutes })}
   </span>
 </div>

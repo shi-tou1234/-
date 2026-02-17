@@ -114,7 +114,9 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
             </details>
 
             <div class="flex flex-wrap gap-2 items-center">
-              <input id="post-files" type="file" multiple accept="image/*,video/*,.pdf,application/pdf" class="text-sm" />
+              <input id="post-files" type="file" multiple accept="image/*,video/*,.pdf,application/pdf" class="hidden" />
+              <label for="post-files" class="cursor-pointer rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm font-medium text-[var(--text-color)] hover:bg-[var(--button-hover-color)]">选择文件</label>
+              <span id="post-files-count" class="text-sm text-[var(--text-color)]/70">未选择文件</span>
               <button id="upload-files-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">上传资源</button>
               <button id="insert-iframe-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">插入 iframe</button>
             </div>
@@ -577,6 +579,14 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   }
 
   initPostDateDefault();
+  document.getElementById("post-files")?.addEventListener("change", () => {
+    const files = document.getElementById("post-files")?.files;
+    const countEl = document.getElementById("post-files-count");
+    if (!countEl) return;
+    const count = files?.length || 0;
+    countEl.textContent = count > 0 ? `已选择 ${count} 个文件` : "未选择文件";
+  });
+
   document.getElementById("refresh-post-list-btn")?.addEventListener("click", loadPostList);
   document.getElementById("load-selected-post-btn")?.addEventListener("click", async () => {
     const msgEl = document.getElementById("post-msg");
@@ -628,18 +638,18 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
           const imageFiles = await renderPdfPagesToImages(file);
           for (const imageFile of imageFiles) {
             const result = await uploadBlogAssetFile({ slug, lang, file: imageFile, token, branch });
-            uploaded.push(result);
+            uploaded.push({ ...result, fromPdf: true });
           }
           continue;
         }
 
         const result = await uploadBlogAssetFile({ slug, lang, file, token, branch });
-        uploaded.push(result);
+        uploaded.push({ ...result, fromPdf: false });
       }
 
       const textarea = document.getElementById("post-content");
       const coverInput = document.getElementById("post-cover");
-      const firstImage = uploaded.find((f) => f.type.startsWith("image/"));
+      const firstImage = uploaded.find((f) => f.type.startsWith("image/") && !f.fromPdf);
       const coverWasEmpty = !!(coverInput && !coverInput.value.trim());
       const coverNameToSkip = coverWasEmpty && firstImage ? firstImage.name : "";
 
@@ -658,6 +668,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       }
       const fileInput = document.getElementById("post-files");
       if (fileInput) fileInput.value = "";
+      const countEl = document.getElementById("post-files-count");
+      if (countEl) countEl.textContent = "未选择文件";
       const coverMsg = coverNameToSkip ? `，已将 ${coverNameToSkip} 设为封面且不插入正文` : "";
       setMsg(msgEl, `上传成功：${uploaded.length} 个文件（目录：${slug}/assets）${coverMsg}`);
     } catch (error) {
