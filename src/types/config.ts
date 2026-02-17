@@ -12,10 +12,6 @@ export type SiteConfig = {
     blogNavi: {
         enable: boolean;
     }
-    comments: {
-        enable: boolean;
-        backendUrl: string;
-    }
 }
 
 export type ProfileConfig = {

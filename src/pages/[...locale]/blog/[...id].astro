@@ -6,8 +6,9 @@ import Markdown from '@components/misc/Markdown.astro'
 import ImageModule from '@components/misc/ImageModule.astro'
 import BackTop from '@components/control/BackTop.astro'
 import LicenseCard from '@components/misc/LicenseCard.astro'
-import Comments from '@components/comment/Comments.svelte'
 import BlogNavi from '@components/control/BlogNavi.astro'
+import TOC from '@components/TOC.svelte'
+import ReadingTime from '@components/misc/ReadingTime.astro'
 
 import { getCollection, render } from 'astro:content'
 import { i18n } from "astro:config/client";
@@ -16,6 +17,7 @@ import i18nit from '@i18n/translation'
 import { blogCoverUrl } from '@/utils/url-utils'
 import { formatFullDate } from '@/utils/time'
 import { getBlogEntrySort } from '@utils/content-utils'
+import { estimateReadingMinutes } from '@utils/reading-time'
 
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
@@ -54,10 +56,11 @@ export async function getStaticPaths() {
     return paths;
 }
 const { entry, prev, next } = Astro.props;
-const { Content } = await render(entry); // 获取渲染后的正文内容
+const { Content, headings } = await render(entry); // 获取渲染后的正文内容与标题目录
 
 const pageTitle = entry.data.title + ' - ' + siteConfig.title;
 const image = blogCoverUrl(entry.data.image, entry.id);
+const readingMinutes = estimateReadingMinutes(entry.body || '');
 
 ---
 <MainPageLayout title={pageTitle} lang={currentLang}>
@@ -85,9 +88,12 @@ const image = blogCoverUrl(entry.data.image, entry.id);
             </div>
         </div>
         )}
-        <Markdown class="mb-6 markdown-content onload-animation">
-            <Content />
-        </Markdown>
+        <div class="relative mb-6 pb-8">
+            <Markdown class="markdown-content onload-animation">
+                <Content />
+            </Markdown>
+            <ReadingTime minutes={readingMinutes} language={currentLang} />
+        </div>
         {licenseConfig.enable &&
         <LicenseCard title={entry.data.title} pubDate={entry.data.pubDate}/>
         }
@@ -96,8 +102,8 @@ const image = blogCoverUrl(entry.data.image, entry.id);
             <BlogNavi prev={prev} next={next}/>
         }
         {
-            siteConfig.comments.enable && 
-            <Comments postSlug={entry.data.slugId} language={currentLang} postTitle={entry.data.title} client:load/>
+            siteConfig.toc.enable && headings.length > 0 &&
+            <TOC headings={headings} language={currentLang} client:load />
         }
     </div>
     <BackTop />

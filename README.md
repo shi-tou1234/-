@@ -1,6 +1,5 @@
 # 📝 Momo Blog (cmchen 的博客)
 感谢开源仓库https://github.com/motues/Momo
-https://github.com/motues/Momo-Backend
 
 [![Astro](https://img.shields.io/badge/Astro-5.x-BC52EE?logo=astro)](https://astro.build)
 [![Svelte](https://img.shields.io/badge/Svelte-5.x-FF3E00?logo=svelte)](https://svelte.dev)
@@ -19,14 +18,13 @@ https://github.com/motues/Momo-Backend
 - **🌐 多语言支持 (i18n)**: 完整支持中英文切换，适配国际化阅读。
 - **⚙️ 后台在线管理**: 访问 `/-/admin/` 即可进入管理面板：
     - **内容创作**: 在线发布、更新或删除博客文章。
-    - **媒体管理**: 支持图片、视频上传及 iframe 模板插入。
+    - **媒体管理**: 支持图片、视频上传，PDF 上传后自动转图片并插入正文。
     - **全局配置**: 编辑 About 页面、友链及联系方式。
     - **安全保障**: 跨设备统一的管理员密码哈希验证。
 - **🎨 强大的渲染能力**:
     - **数学公式**: 支持 KaTeX 与 Typst (`remark-typst`) 渲染。
     - **丰富组件**: 内置 GitHub 卡片、音乐卡片、自定义引用及多种警告提示框 (Admonitions)。
 - **🔍 全文检索**: 集成 [Pagefind](https://pagefind.app/) 实现静态站点的丝滑搜索。
-- **💬 评论系统**: 对接专用后端 `Momo-Backend`。
 
 ## 🛠️ 技术栈
 

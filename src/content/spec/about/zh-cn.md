@@ -23,6 +23,5 @@
 
 - **2026.2.12** 使用 claude和gpt开始开发
 - **2026.2.14** 参考 [https://github.com/motues/Momo](https://github.com/motues/Momo) 提供的开源页面模仿设计
-- **2026.2.15** 增加评论功能，参考开源的[https://github.com/motues/Momo-Backend](https://github.com/motues/Momo-Backend)仓库
 
 目前正在不断优化中... 🚀

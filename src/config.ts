@@ -20,10 +20,6 @@ export const siteConfig: SiteConfig = {
     },
     blogNavi: {
         enable: true // Whether to enable blog navigation in the blog footer
-    },
-    comments: {
-        enable: true, // Whether to enable comments
-        backendUrl: "https://api-momo.motues.top" // 替换为你自己部署的 Momo-Backend 地址
     }
 }
 

@@ -24,6 +24,7 @@
     "katex": "^0.16.22",
     "overlayscrollbars": "^2.12.0",
     "pagefind": "^1.4.0",
+    "pdfjs-dist": "^5.4.296",
     "rehype-components": "^0.3.0",
     "rehype-katex": "^7.0.1",
     "remark-directive": "^4.0.0",

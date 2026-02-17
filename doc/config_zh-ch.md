@@ -23,9 +23,6 @@
 * `toc`
     * `enable`: 是否启用目录
     * `depth`: 目录的深度
-* `comments`
-    * `enable`: 是否启用评论功能
-    * `backendUrl`： 后端的地址
 
 ### `profileConfig`
 
