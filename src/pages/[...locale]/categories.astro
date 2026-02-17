@@ -36,24 +36,15 @@ const pageTitle = t("header.categories") + " - " + siteConfig.title;
   <div class="mx-auto w-full max-w-[var(--page-width)]">
     <Cover title={t("cover.title.categories")} subTitle={t("cover.subTitle.categories", {count: categories.length})} />
 
-    <div class="py-6 text-[var(--text-color)] space-y-10">
+    <div class="py-6 text-[var(--text-color)] grid grid-cols-1 sm:grid-cols-2 gap-3">
       {categories.map((category) => (
-        <section>
-          <h2 data-aos="fade-up" class="text-2xl font-bold mb-4">{category} <span class="text-sm font-normal text-[var(--text-color)]/70">({categoriesMap[category].length})</span></h2>
-          <div class="space-y-2">
-            {categoriesMap[category].map((post) => (
-              <a data-aos="fade-up" href={getRelativeLocaleUrl(currentLang, `/blog/${post.id}`)}
-                class="block rounded p-2 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)] transition-colors duration-200">
-                <span class="text-lg hover:text-[var(--link-color)]">{post.data.title}</span>
-                {
-                  post.isFallback && (
-                    <span class="self-center px-1 ml-2 text-sm text-[var(--text-color)]/70 font-mono uppercase bg-[var(--button-hover-color)] rounded border border-[var(--button-border-color)]">{i18n!.defaultLocale}</span>
-                  )
-                }
-              </a>
-            ))}
+        <a href={getRelativeLocaleUrl(currentLang, `/categories/${encodeURIComponent(category)}`)}
+          class="block rounded border border-[var(--button-border-color)] p-3 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)] transition-colors duration-200">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-lg font-semibold">{category}</span>
+            <span class="text-sm text-[var(--text-color)]/70">{categoriesMap[category].length}</span>
           </div>
-        </section>
+        </a>
       ))}
     </div>
   </div>

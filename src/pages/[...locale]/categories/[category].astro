@@ -1,0 +1,78 @@
+---
+import MainPageLayout from '@layouts/MainPageLayout.astro'
+import Cover from '@components/Cover.astro'
+
+import { siteConfig } from '@/config'
+import { getBlogEntrySort } from '@utils/content-utils'
+import i18nit from '@i18n/translation'
+
+import { i18n } from "astro:config/client";
+import { getRelativeLocaleUrl } from '@utils/url-utils';
+
+const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const t = i18nit(currentLang);
+
+const uncategorized = currentLang === 'zh-cn' ? '未分类' : 'Uncategorized';
+
+export async function getStaticPaths() {
+  const locales = i18n?.locales || [i18n?.defaultLocale];
+  const paths = [];
+
+  for (const locale of locales) {
+    const localeCode = typeof locale === 'string' ? locale : locale.path;
+    const localeParam = localeCode === i18n?.defaultLocale ? undefined : localeCode;
+    const posts = await getBlogEntrySort(localeCode);
+
+    const categorySet = new Set<string>();
+    posts.forEach((post) => {
+      const category = (post.data.category || '').trim() || (localeCode === 'zh-cn' ? '未分类' : 'Uncategorized');
+      categorySet.add(category);
+    });
+
+    categorySet.forEach((categoryName) => {
+      paths.push({
+        params: {
+          locale: localeParam,
+          category: encodeURIComponent(categoryName)
+        }
+      });
+    });
+  }
+
+  return paths;
+}
+
+const categoryParam = Astro.params.category || '';
+const currentCategory = decodeURIComponent(categoryParam);
+
+const allBlogPosts = await getBlogEntrySort(currentLang);
+const categoryPosts = allBlogPosts.filter((post) => {
+  const postCategory = (post.data.category || '').trim() || uncategorized;
+  return postCategory === currentCategory;
+});
+
+const pageTitle = `${currentCategory} - ${t("header.categories")} - ${siteConfig.title}`;
+const categoriesRoot = getRelativeLocaleUrl(currentLang, '/categories/');
+---
+
+<MainPageLayout title={pageTitle} lang={currentLang}>
+  <div class="mx-auto w-full max-w-[var(--page-width)]">
+    <Cover title={currentCategory} subTitle={t("cover.subTitle.archive", {count: categoryPosts.length})} />
+
+    <div class="py-6 text-[var(--text-color)] space-y-2">
+      <a href={categoriesRoot} class="inline-block mb-4 rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">← {t("header.categories")}</a>
+
+      {categoryPosts.map((post) => (
+        <a href={getRelativeLocaleUrl(currentLang, `/blog/${post.id}`)}
+          class="block rounded p-2 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)] transition-colors duration-200">
+          <span class="text-lg hover:text-[var(--link-color)]">{post.data.title}</span>
+          {
+            post.isFallback && (
+              <span class="self-center px-1 ml-2 text-sm text-[var(--text-color)]/70 font-mono uppercase bg-[var(--button-hover-color)] rounded border border-[var(--button-border-color)]">{i18n!.defaultLocale}</span>
+            )
+          }
+        </a>
+      ))}
+    </div>
+  </div>
+</MainPageLayout>
