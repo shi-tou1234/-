@@ -3,10 +3,9 @@ title: 极限笔记
 pubDate: 2026-02-17T14:05:00.000Z
 draft: false
 description: 
+category: 笔记
 slugId: post-1771337135601
 ---
-
-
 
 ![极限-p01.png](./assets/极限-p01.png)
 
@@ -31,4 +30,3 @@ slugId: post-1771337135601
 ![极限-p11.png](./assets/极限-p11.png)
 
 ![极限-p12.png](./assets/极限-p12.png)
-
