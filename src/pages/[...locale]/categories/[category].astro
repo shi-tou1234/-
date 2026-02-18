@@ -14,6 +14,14 @@ const t = i18nit(currentLang);
 
 const uncategorized = currentLang === 'zh-cn' ? '未分类' : 'Uncategorized';
 
+function decodeCategoryParam(categoryParam: string): string {
+  try {
+    return decodeURIComponent(categoryParam);
+  } catch {
+    return categoryParam;
+  }
+}
+
 function getPostCategories(post: any): string[] {
   const legacyCategories = Array.isArray(post.data.categories)
     ? post.data.categories.map((item) => String(item).trim()).filter(Boolean)
@@ -53,7 +61,7 @@ export async function getStaticPaths() {
       paths.push({
         params: {
           locale: localeParam,
-          category: categoryName
+          category: encodeURIComponent(categoryName)
         }
       });
     });
@@ -62,7 +70,8 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const currentCategory = Astro.params.category || '';
+const currentCategoryParam = Astro.params.category || '';
+const currentCategory = decodeCategoryParam(currentCategoryParam);
 
 const allBlogPosts = await getBlogEntrySort(currentLang);
 const categoryPosts = allBlogPosts

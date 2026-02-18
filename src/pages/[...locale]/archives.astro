@@ -3,11 +3,9 @@ import MainPageLayout from '@layouts/MainPageLayout.astro'
 import Cover from '@components/Cover.astro'
 
 import { siteConfig } from '@/config'
-import { formatMonthDay } from '@/utils/time'
 import { getBlogEntrySort } from '@utils/content-utils'
 import i18nit from '@i18n/translation'
 
-import { getCollection } from 'astro:content'
 import { i18n } from "astro:config/client";
 import { getRelativeLocaleUrl } from '@utils/url-utils';
 
@@ -23,15 +21,50 @@ export async function getStaticPaths() {
 // 获取所有博客文章并按发布日期降序排序
 const allBlogPosts = await getBlogEntrySort(currentLang);
 
-// 按年份分组文章
+const getMonthKey = (date: Date) => {
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    return `${date.getFullYear()}-${month}`;
+};
+
+const getDayKey = (date: Date) => {
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${date.getFullYear()}-${month}-${day}`;
+};
+
+const monthTitleFormatter = new Intl.DateTimeFormat(currentLang, {
+    year: 'numeric',
+    month: 'long',
+});
+
+const dayTitleFormatter = new Intl.DateTimeFormat(currentLang, {
+    month: 'short',
+    day: 'numeric',
+    weekday: 'short',
+});
+
+// 按年份 -> 月份 -> 日期分组文章
 const postsByYear = allBlogPosts.reduce((acc, post) => {
-  const year = post.data.pubDate.getFullYear();
-  if (!acc[year]) {
-    acc[year] = [];
-  }
-  acc[year].push(post);
-  return acc;
-}, {} as Record<number, typeof allBlogPosts>);
+    const pubDate = post.data.pubDate;
+    const year = pubDate.getFullYear();
+    const monthKey = getMonthKey(pubDate);
+    const dayKey = getDayKey(pubDate);
+
+    if (!acc[year]) {
+        acc[year] = {};
+    }
+
+    if (!acc[year][monthKey]) {
+        acc[year][monthKey] = {};
+    }
+
+    if (!acc[year][monthKey][dayKey]) {
+        acc[year][monthKey][dayKey] = [];
+    }
+
+    acc[year][monthKey][dayKey].push(post);
+    return acc;
+}, {} as Record<number, Record<string, Record<string, typeof allBlogPosts>>>);
 
 const pageTitle = t("header.archive") + " - " + siteConfig.title;
 const postNumber = allBlogPosts.length;
@@ -46,25 +79,38 @@ const indexPage = getRelativeLocaleUrl(currentLang, "");
             {Object.keys(postsByYear).sort().reverse().map(year => (
                 <div>
                     <h2 data-aos="fade-up" class="text-2xl font-bold my-4">{year}</h2>
-                    <div class="">
-                            {postsByYear[Number(year)].map((post, index, array) => (
-                                <div class="pb-2">
-                                    <a data-aos="fade-up" href={getRelativeLocaleUrl(currentLang, `/blog/${post.id}`)} 
-                                    class="flex items-center gap-2 active:bg-[var(--button-hover-color)] hover:bg-[var(--button-hover-color)] p-2 rounded transition-colors duration-200 group">
-                                        <span class=" text-[var(--text-color)]/70 min-w-[100px] md:min-w-[120px]">
-                                            {formatMonthDay(post.data.pubDate, currentLang)}
-                                        </span>
-                                        <span class="text-lg group-hover:pl-2 group-hover:text-[var(--link-color)] group-hover:font-bold transition-all duration-200">
-                                            {post.data.title}
-                                            {
-                                                post.isFallback && (
-                                                    <span class="self-center px-1 ml-2 text-sm text-[var(--text-color)]/70 font-mono uppercase bg-[var(--button-hover-color)] rounded border border-[var(--button-border-color)]">{i18n!.defaultLocale}</span>
-                                                )
-                                            }
-                                        </span>
-                                    </a>
-                                </div>
-                            ))}
+                    <div>
+                        {Object.keys(postsByYear[Number(year)]).sort().reverse().map((monthKey) => (
+                            <div class="mb-4">
+                                <h3 data-aos="fade-up" class="text-lg font-semibold my-3 text-[var(--text-color)]/90">
+                                    {monthTitleFormatter.format(new Date(`${monthKey}-01T00:00:00`))}
+                                </h3>
+
+                                {Object.keys(postsByYear[Number(year)][monthKey]).sort().reverse().map((dayKey) => (
+                                    <div class="mb-3">
+                                        <h4 data-aos="fade-up" class="text-sm font-semibold my-2 text-[var(--text-color)]/70">
+                                            {dayTitleFormatter.format(new Date(`${dayKey}T00:00:00`))}
+                                        </h4>
+
+                                        {postsByYear[Number(year)][monthKey][dayKey].map((post) => (
+                                            <div class="pb-2">
+                                                <a data-aos="fade-up" href={getRelativeLocaleUrl(currentLang, `/blog/${post.id}`)} 
+                                                class="flex items-center gap-2 active:bg-[var(--button-hover-color)] hover:bg-[var(--button-hover-color)] p-2 rounded transition-colors duration-200 group">
+                                                    <span class="text-lg group-hover:pl-2 group-hover:text-[var(--link-color)] group-hover:font-bold transition-all duration-200">
+                                                        {post.data.title}
+                                                        {
+                                                            post.isFallback && (
+                                                                <span class="self-center px-1 ml-2 text-sm text-[var(--text-color)]/70 font-mono uppercase bg-[var(--button-hover-color)] rounded border border-[var(--button-border-color)]">{i18n!.defaultLocale}</span>
+                                                            )
+                                                        }
+                                                    </span>
+                                                </a>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
                     </div>
                 </div>
             ))}

@@ -19,6 +19,10 @@ export async function getStaticPaths() {
 const allBlogPosts = await getBlogEntrySort(currentLang);
 const uncategorized = currentLang === 'zh-cn' ? '未分类' : 'Uncategorized';
 
+function encodeCategoryParam(category: string): string {
+  return encodeURIComponent(category);
+}
+
 function getPostCategories(post: (typeof allBlogPosts)[number]): string[] {
   const legacyCategories = Array.isArray(post.data.categories)
     ? post.data.categories.map((item) => String(item).trim()).filter(Boolean)
@@ -52,7 +56,7 @@ const pageTitle = t("header.categories") + " - " + siteConfig.title;
 
     <div class="py-6 text-[var(--text-color)] grid grid-cols-1 sm:grid-cols-2 gap-3">
       {categories.map((category) => (
-        <a href={getRelativeLocaleUrl(currentLang, `/categories/${category}`)}
+        <a href={getRelativeLocaleUrl(currentLang, `/categories/${encodeCategoryParam(category)}`)}
           class="block rounded border border-[var(--button-border-color)] p-3 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)] transition-colors duration-200">
           <div class="flex items-center justify-between gap-2">
             <span class="text-lg font-semibold">{category}</span>
