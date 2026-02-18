@@ -1,6 +1,6 @@
 ---
 title: AI工具
-pubDate: 2026-02-18T06:08:00.000Z
+pubDate: 2026-02-21T06:08:00.000Z
 draft: false
 description: 
 category: 工具使用
@@ -65,4 +65,3 @@ slugId: ai工具
 ###github codespace
 
 需要学生认证，要注册教育邮箱和上传相关申请材料，通过后获得 github pro 会员 2 年，可以免费在虚拟机上使用 gpt claude gemini 最新的模型，非常香。
-
