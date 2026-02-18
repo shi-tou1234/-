@@ -16,7 +16,7 @@ const uncategorized = currentLang === 'zh-cn' ? '未分类' : 'Uncategorized';
 
 function decodeCategoryParam(categoryParam: string): string {
   try {
-    return decodeURIComponent(categoryParam);
+    return Buffer.from(categoryParam, 'base64url').toString('utf-8');
   } catch {
     return categoryParam;
   }
@@ -61,7 +61,7 @@ export async function getStaticPaths() {
       paths.push({
         params: {
           locale: localeParam,
-          category: encodeURIComponent(categoryName)
+          category: Buffer.from(categoryName, 'utf-8').toString('base64url')
         }
       });
     });
