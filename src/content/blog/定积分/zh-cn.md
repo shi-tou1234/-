@@ -3,11 +3,9 @@ title: 定积分
 pubDate: 2026-02-18T04:56:00.000Z
 draft: false
 description: 
-category: 笔记
+category: 高数笔记
 slugId: 定积分
 ---
-
-
 
 ![定积分-p01.png](./assets/定积分-p01.png)
 
@@ -22,4 +20,3 @@ slugId: 定积分
 ![定积分-p06.png](./assets/定积分-p06.png)
 
 ![定积分-p07.png](./assets/定积分-p07.png)
-
