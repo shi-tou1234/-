@@ -3,6 +3,7 @@ title: 不定积分
 pubDate: 2026-02-18T03:43:00.000Z
 draft: false
 description: 
+category: 笔记
 slugId: 不定积分
 ---
 
