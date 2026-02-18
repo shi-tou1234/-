@@ -13,10 +13,23 @@ const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
 
 const uncategorized = currentLang === 'zh-cn' ? '未分类' : 'Uncategorized';
+const CATEGORY_PARAM_PREFIX = 'b64-';
 
 function decodeCategoryParam(categoryParam: string): string {
+  if (!categoryParam) return '';
+
+  if (categoryParam.startsWith(CATEGORY_PARAM_PREFIX)) {
+    const encoded = categoryParam.slice(CATEGORY_PARAM_PREFIX.length);
+    if (encoded) {
+      try {
+        return Buffer.from(encoded, 'base64url').toString('utf-8');
+      } catch {
+      }
+    }
+  }
+
   try {
-    return Buffer.from(categoryParam, 'base64url').toString('utf-8');
+    return decodeURIComponent(categoryParam);
   } catch {
     return categoryParam;
   }
@@ -61,7 +74,7 @@ export async function getStaticPaths() {
       paths.push({
         params: {
           locale: localeParam,
-          category: Buffer.from(categoryName, 'utf-8').toString('base64url')
+          category: `b64-${Buffer.from(categoryName, 'utf-8').toString('base64url')}`
         }
       });
     });

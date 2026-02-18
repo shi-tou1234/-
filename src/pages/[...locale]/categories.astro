@@ -20,7 +20,7 @@ const allBlogPosts = await getBlogEntrySort(currentLang);
 const uncategorized = currentLang === 'zh-cn' ? '未分类' : 'Uncategorized';
 
 function encodeCategoryParam(category: string): string {
-  return Buffer.from(category, 'utf-8').toString('base64url');
+  return `b64-${Buffer.from(category, 'utf-8').toString('base64url')}`;
 }
 
 function getPostCategories(post: (typeof allBlogPosts)[number]): string[] {

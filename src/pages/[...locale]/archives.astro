@@ -13,6 +13,7 @@ import { getRelativeLocaleUrl } from '@utils/url-utils';
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
+const archiveTimeZone = currentLang.toLowerCase().startsWith('zh') ? 'Asia/Shanghai' : 'UTC';
 
 export async function getStaticPaths() {
 	return i18n?.locales.map(locale => ({ params: { locale: locale == i18n?.defaultLocale ? undefined : (locale as string) } }));
@@ -21,26 +22,33 @@ export async function getStaticPaths() {
 // 获取所有博客文章并按发布日期降序排序
 const allBlogPosts = await getBlogEntrySort(currentLang);
 
-const getMonthKey = (date: Date) => {
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    return `${date.getFullYear()}-${month}`;
-};
+const monthKeyFormatter = new Intl.DateTimeFormat('en-CA', {
+    year: 'numeric',
+    month: '2-digit',
+    timeZone: archiveTimeZone,
+});
 
-const getDayKey = (date: Date) => {
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${date.getFullYear()}-${month}-${day}`;
-};
+const dayKeyFormatter = new Intl.DateTimeFormat('en-CA', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: archiveTimeZone,
+});
+
+const getMonthKey = (date: Date) => monthKeyFormatter.format(date);
+
+const getDayKey = (date: Date) => dayKeyFormatter.format(date);
 
 const monthTitleFormatter = new Intl.DateTimeFormat(currentLang, {
     year: 'numeric',
     month: 'long',
+    timeZone: archiveTimeZone,
 });
 
 const dayTitleFormatter = new Intl.DateTimeFormat(currentLang, {
-    month: 'short',
     day: 'numeric',
     weekday: 'short',
+    timeZone: archiveTimeZone,
 });
 
 // 按年份 -> 月份 -> 日期分组文章
@@ -89,7 +97,7 @@ const indexPage = getRelativeLocaleUrl(currentLang, "");
                                 {Object.keys(postsByYear[Number(year)][monthKey]).sort().reverse().map((dayKey) => (
                                     <div class="mb-3">
                                         <h4 data-aos="fade-up" class="text-sm font-semibold my-2 text-[var(--text-color)]/70">
-                                            {dayTitleFormatter.format(new Date(`${dayKey}T00:00:00`))}
+                                            {dayTitleFormatter.format(new Date(`${dayKey}T12:00:00Z`))}
                                         </h4>
 
                                         {postsByYear[Number(year)][monthKey][dayKey].map((post) => (
