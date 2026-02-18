@@ -8,15 +8,15 @@ category: 工具使用
 slugId: ide
 ---
 
-##我使用过的一些IDE推荐(纯主观，勿喷）
+我使用过的一些IDE推荐(纯主观，勿喷）
 
-#C/C++ :
+C/C++ :
 
 初学者直接无脑选择dev c++,轻量且不用配置环境，对新手非常友好。
 
 ![无标题.png](./assets/无标题.png)
 
-#Python:
+Python:
 
 可以直接使用Python自带的编译环境，或者你下载一个IDE,至于怎么选IDE,见下文。
 
