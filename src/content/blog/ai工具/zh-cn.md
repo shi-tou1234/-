@@ -15,7 +15,7 @@ slugId: ai工具
 
 qwen
 
-这是我用的比较多的一个模型，多模态支持，生成速度快，幻觉低，国内使用免费，就是一贯的阿里风格，ui 真的很丑。建议使用 [国外站] （https://chat.qwen.ai/  ）。
+这是我用的比较多的一个模型，多模态支持，生成速度快，幻觉低，国内使用免费，就是一贯的阿里风格，ui 真的很丑。建议使用 [国外站]（https://chat.qwen.ai/  ）。
 
 deepseek
 
@@ -48,20 +48,20 @@ Gemini
 需要梯子，多模态能力非常强，拥有非常好的前端审美，就是写后端能力不行，注册需要谷歌邮箱（国外软件通信证）。[国外站]（https://gemini.google.com/app  
 ）
 
-如果因为地区原因无法使用，建议转到 [国外站]（https://aistudio.google.com/prompts/new_chat），但还是要梯子。
+如果因为地区原因无法使用，建议转到 [国外站]（https://aistudio.google.com/prompts/new_cha  t），但还是要梯子。
 
-###Claude
+Claude
 
 需要梯子，非常严格的地区限制，我真的服了。代码能力非常强，写文章也不错，价格很贵 [国外站]（https://claude.com  /）
 
-##AI IDE
+AI IDE
 
-###trae
+trae
 
 国内版免费使用，可以使用大多数国内模型。
 
 国外版也有免费额度，一个月可以使用 10 次超级模型，1000 次快速模型（我用 gemini 3 flash) 比较多。
 
-###github codespace
+github codespace
 
 需要学生认证，要注册教育邮箱和上传相关申请材料，通过后获得 github pro 会员 2 年，可以免费在虚拟机上使用 gpt claude gemini 最新的模型，非常香。
