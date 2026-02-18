@@ -100,7 +100,10 @@ const categoriesRoot = getRelativeLocaleUrl(currentLang, '/categories/');
     <Cover title={currentCategory} subTitle={t("cover.subTitle.archive", {count: categoryPosts.length})} />
 
     <div class="py-6 text-[var(--text-color)] space-y-2">
-      <a href={categoriesRoot} class="inline-block mb-4 rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">← {t("header.categories")}</a>
+      <a href={categoriesRoot} class="group inline-flex items-center gap-1.5 mb-4 rounded-full border border-[var(--button-border-color)] px-3 py-1.5 text-sm transition-all duration-200 hover:border-[var(--link-color)] hover:bg-[var(--button-hover-color)] hover:text-[var(--link-color)] active:scale-95">
+        <span class="inline-block transition-transform duration-200 group-hover:-translate-x-0.5">←</span>
+        <span>{t("header.categories")}</span>
+      </a>
 
       {categoryPosts.map((post) => (
         <a href={getRelativeLocaleUrl(currentLang, `/blog/${post.id}`)}

@@ -57,10 +57,10 @@ const pageTitle = t("header.categories") + " - " + siteConfig.title;
     <div class="py-6 text-[var(--text-color)] grid grid-cols-1 sm:grid-cols-2 gap-3">
       {categories.map((category) => (
         <a href={getRelativeLocaleUrl(currentLang, `/categories/${encodeCategoryParam(category)}`)}
-          class="group block rounded border border-[var(--button-border-color)] p-3 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)] transition-colors duration-200">
+          class="group block rounded-lg border border-[var(--button-border-color)] p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--link-color)] hover:bg-[var(--button-hover-color)] active:translate-y-0">
           <div class="flex items-center justify-between gap-2">
-            <span class="text-lg font-semibold transition-all duration-200 group-hover:pl-2 group-hover:text-[var(--link-color)] group-hover:font-bold">{category}</span>
-            <span class="text-sm text-[var(--text-color)]/70 transition-colors duration-200 group-hover:text-[var(--link-color)]">{categoriesMap[category].length}</span>
+            <span class="text-lg font-semibold transition-colors duration-200 group-hover:text-[var(--link-color)]">{category}</span>
+            <span class="rounded-full border border-[var(--button-border-color)] px-2 py-0.5 text-xs text-[var(--text-color)]/70 transition-all duration-200 group-hover:border-[var(--link-color)] group-hover:text-[var(--link-color)] group-hover:bg-[var(--bg-color)]">{categoriesMap[category].length}</span>
           </div>
         </a>
       ))}
