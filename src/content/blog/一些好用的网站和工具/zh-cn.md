@@ -30,7 +30,9 @@ slugId: 一些好用的网站和工具
 
 可以解决github登录不了的问题。同时也是一个游戏加速器。
 
-* 6.snipaste,免费好用[截图软件] (https://zh.snipaste.com/)，画图必备。
+* 6.snipaste,免费好用[截图软件] (https://zh.snipaste.com/)，
+
+画图必备。
 
 * 7.ngrok,实现公网穿透[网站]（https://ngrok.com/)，
 
