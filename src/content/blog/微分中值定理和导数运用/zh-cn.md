@@ -3,7 +3,7 @@ title: 微分中值定理和导数运用
 pubDate: 2026-02-18T02:50:00.000Z
 draft: false
 description: 
-category: 笔记
+category: 数学笔记
 slugId: 微分中值定理和导数运用
 ---
 
