@@ -3,7 +3,7 @@ title: 极限
 pubDate: 2026-02-17T14:05:00.000Z
 draft: false
 description: 
-category: 笔记
+category: 数学笔记
 slugId: 极限
 ---
 
