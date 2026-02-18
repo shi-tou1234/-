@@ -15,6 +15,7 @@ import { QuoteComponent } from "./src/plugins/rehype-component-quote.mjs"
 import { customFigurePlugin } from "./src/plugins/rehype-figure-plugin.mjs";
 import { remarkCombined } from './src/plugins/remark-combined.mjs';
 import { remarkTypst } from './src/plugins/remark-typst.mjs';
+import { remarkAutoMath } from './src/plugins/remark-auto-math.mjs';
 
 import svelte from "@astrojs/svelte";
 
@@ -48,6 +49,7 @@ export default defineConfig({
     },
     remarkPlugins: [
       remarkMath,
+      remarkAutoMath,
       remarkDirective,
       remarkTypst,
       parseDirectiveNode,
