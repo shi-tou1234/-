@@ -1,78 +1,131 @@
 import { visit } from 'unist-util-visit';
 
-const LATEX_COMMAND_PATTERN = /\\(?:int|frac|sqrt|sum|prod|lim|sin|cos|tan|log|ln|arcsin|arccos|arctan|cdot|times|left|right|begin|end|alpha|beta|gamma|delta|theta|lambda|pi|omega|infty|leq|geq|neq|to|partial|nabla|vec|hat|bar|overline|underline|displaystyle)\b/;
-const STRONG_MATH_FEATURE_PATTERN = /[=^_]|\\(?:frac|sqrt|int|sum|prod|lim|begin|end)\b/;
-const INLINE_WRAPPED_PATTERN = /\[([^\[\]\n]+)\]|\(([^()\n]+)\)/g;
+const BRACKET_PAIRS = [
+  ['(', ')'],
+  ['[', ']'],
+  ['（', '）'],
+  ['【', '】'],
+];
 
-function looksLikeBareLatex(text) {
-  const trimmed = text.trim();
-  if (!trimmed) return false;
-  if (trimmed.startsWith('$')) return false;
-  if (trimmed.startsWith('`')) return false;
-  if (trimmed.includes('http://') || trimmed.includes('https://')) return false;
+const OPENERS = new Set(BRACKET_PAIRS.map(([open]) => open));
+const PAIR_MAP = new Map(BRACKET_PAIRS);
 
-  return LATEX_COMMAND_PATTERN.test(trimmed) && STRONG_MATH_FEATURE_PATTERN.test(trimmed);
+const LATEX_COMMAND_PATTERN = /\\[A-Za-z]+/;
+const MATH_SYMBOL_PATTERN = /[=^_]|\\[A-Za-z]+|[∑∫√π∞≤≥≠]/;
+const LETTER_OR_NUMBER_PATTERN = /[A-Za-z0-9]/;
+
+function shouldSkipParent(parentType) {
+  return new Set([
+    'inlineCode',
+    'code',
+    'math',
+    'inlineMath',
+    'html',
+    'link',
+    'linkReference',
+    'definition',
+  ]).has(parentType);
 }
 
-function looksLikeInlineLatex(text) {
-  const trimmed = text.trim();
-  if (!trimmed) return false;
-  if (trimmed.length < 3) return false;
-  if (trimmed.includes('http://') || trimmed.includes('https://')) return false;
+function looksLikeMathExpression(value) {
+  const text = value.trim();
+  if (!text) return false;
+  if (text.startsWith('$')) return false;
+  if (text.startsWith('`')) return false;
+  if (text.includes('http://') || text.includes('https://')) return false;
 
-  return LATEX_COMMAND_PATTERN.test(trimmed) || STRONG_MATH_FEATURE_PATTERN.test(trimmed);
+  if (LATEX_COMMAND_PATTERN.test(text)) return true;
+  if (!MATH_SYMBOL_PATTERN.test(text)) return false;
+
+  return LETTER_OR_NUMBER_PATTERN.test(text);
 }
 
-function splitInlineMathNodes(text) {
-  const nodes = [];
-  let lastIndex = 0;
-  let match;
+function parseBracketSegment(text, start) {
+  const open = text[start];
+  const close = PAIR_MAP.get(open);
+  if (!close) return null;
 
-  while ((match = INLINE_WRAPPED_PATTERN.exec(text)) !== null) {
-    const fullMatch = match[0];
-    const candidate = (match[1] ?? match[2] ?? '').trim();
+  let depth = 1;
+  for (let index = start + 1; index < text.length; index += 1) {
+    const current = text[index];
+    const previous = text[index - 1];
 
-    if (!looksLikeInlineLatex(candidate)) {
+    if (current === open && previous !== '\\') {
+      depth += 1;
       continue;
     }
 
-    if (match.index > lastIndex) {
-      nodes.push({ type: 'text', value: text.slice(lastIndex, match.index) });
+    if (current === close && previous !== '\\') {
+      depth -= 1;
+      if (depth === 0) {
+        return {
+          open,
+          close,
+          start,
+          end: index,
+          content: text.slice(start + 1, index),
+        };
+      }
+    }
+  }
+
+  return null;
+}
+
+function splitTextWithInlineMath(text) {
+  const nodes = [];
+  let cursor = 0;
+
+  while (cursor < text.length) {
+    const char = text[cursor];
+    if (!OPENERS.has(char)) {
+      cursor += 1;
+      continue;
+    }
+
+    const segment = parseBracketSegment(text, cursor);
+    if (!segment) {
+      cursor += 1;
+      continue;
+    }
+
+    const candidate = segment.content.trim();
+    if (!looksLikeMathExpression(candidate)) {
+      cursor = segment.end + 1;
+      continue;
+    }
+
+    if (segment.start > 0) {
+      const before = text.slice(0, segment.start);
+      if (before) nodes.push({ type: 'text', value: before });
     }
 
     nodes.push({ type: 'inlineMath', value: candidate });
-    lastIndex = match.index + fullMatch.length;
+
+    const rest = text.slice(segment.end + 1);
+    if (rest) {
+      const tailNodes = splitTextWithInlineMath(rest);
+      nodes.push(...tailNodes);
+    }
+
+    return nodes;
   }
 
-  if (lastIndex < text.length) {
-    nodes.push({ type: 'text', value: text.slice(lastIndex) });
-  }
+  return [{ type: 'text', value: text }];
+}
 
-  return nodes.length ? nodes : [{ type: 'text', value: text }];
+function unwrapSingleBracket(text) {
+  const trimmed = text.trim();
+  for (const [open, close] of BRACKET_PAIRS) {
+    if (trimmed.startsWith(open) && trimmed.endsWith(close)) {
+      return trimmed.slice(open.length, trimmed.length - close.length).trim();
+    }
+  }
+  return null;
 }
 
 export function remarkAutoMath() {
   return (tree) => {
-    visit(tree, 'text', (node, index, parent) => {
-      if (!parent || typeof index !== 'number') return;
-
-      if (parent.type === 'inlineCode' || parent.type === 'code' || parent.type === 'math' || parent.type === 'inlineMath') {
-        return;
-      }
-
-      const value = String(node.value || '');
-      if (!value) return;
-
-      INLINE_WRAPPED_PATTERN.lastIndex = 0;
-      if (!INLINE_WRAPPED_PATTERN.test(value)) return;
-
-      const replacement = splitInlineMathNodes(value);
-      if (replacement.length === 1 && replacement[0].type === 'text') return;
-
-      parent.children.splice(index, 1, ...replacement);
-      return index + replacement.length;
-    });
-
     visit(tree, 'paragraph', (node, index, parent) => {
       if (!parent || typeof index !== 'number') return;
       if (!Array.isArray(node.children) || node.children.length !== 1) return;
@@ -80,15 +133,35 @@ export function remarkAutoMath() {
       const onlyChild = node.children[0];
       if (onlyChild.type !== 'text') return;
 
-      const value = String(onlyChild.value || '').trim();
-      if (!looksLikeBareLatex(value)) return;
+      const raw = String(onlyChild.value || '').trim();
+      if (!raw) return;
+
+      const unwrapped = unwrapSingleBracket(raw);
+      const candidate = unwrapped ?? raw;
+
+      if (!looksLikeMathExpression(candidate)) return;
+      if (!LATEX_COMMAND_PATTERN.test(candidate) && candidate.length < 12) return;
 
       parent.children.splice(index, 1, {
         type: 'math',
-        value,
+        value: candidate,
       });
 
       return index + 1;
+    });
+
+    visit(tree, 'text', (node, index, parent) => {
+      if (!parent || typeof index !== 'number') return;
+      if (shouldSkipParent(parent.type)) return;
+
+      const value = String(node.value || '');
+      if (!value) return;
+
+      const nextNodes = splitTextWithInlineMath(value);
+      if (nextNodes.length === 1 && nextNodes[0].type === 'text') return;
+
+      parent.children.splice(index, 1, ...nextNodes);
+      return index + nextNodes.length;
     });
   };
 }
