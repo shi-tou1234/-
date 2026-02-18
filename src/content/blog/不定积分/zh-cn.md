@@ -23,11 +23,10 @@ slugId: 不定积分
 
 ![不定积分-p07.png](./assets/不定积分-p07.png)
 
-以下是公式 **(14) 到 (27)** 的详细推导过程，全部采用三角换元、分部积分等初等方法。
-
 ---
+# 不定积分公式 (14) 到 (27) 的详细推导
 
-### (14) \(\int \tan x \, dx = -\ln |\cos x| + C = \ln |\sec x| + C\)
+## (14) \(\int \tan x \, dx = -\ln |\cos x| + C = \ln |\sec x| + C\)
 
 **推导：**  
 \[
@@ -42,7 +41,7 @@ slugId: 不定积分
 
 ---
 
-### (15) \(\int \cot x \, dx = \ln |\sin x| + C = -\ln |\csc x| + C\)
+## (15) \(\int \cot x \, dx = \ln |\sin x| + C = -\ln |\csc x| + C\)
 
 **推导：**  
 \[
@@ -56,7 +55,7 @@ slugId: 不定积分
 
 ---
 
-### (16) \(\int \sec x \, dx = \ln |\sec x + \tan x| + C\)
+## (16) \(\int \sec x \, dx = \ln |\sec x + \tan x| + C\)
 
 **推导：**  
 分子分母同乘 \(\sec x + \tan x\)：
@@ -75,7 +74,7 @@ slugId: 不定积分
 
 ---
 
-### (17) \(\int \csc x \, dx = \ln |\csc x - \cot x| + C\)
+## (17) \(\int \csc x \, dx = \ln |\csc x - \cot x| + C\)
 
 **推导：**  
 分子分母同乘 \(\csc x - \cot x\)：
@@ -94,7 +93,7 @@ slugId: 不定积分
 
 ---
 
-### (18) \(\int \frac{1}{a^2 + x^2} \, dx = \frac{1}{a} \arctan \frac{x}{a} + C\)
+## (18) \(\int \frac{1}{a^2 + x^2} \, dx = \frac{1}{a} \arctan \frac{x}{a} + C\)
 
 **推导：**  
 令 \(x = a \tan \theta\)，其中 \(\theta \in (-\frac{\pi}{2}, \frac{\pi}{2})\)，则 \(dx = a \sec^2 \theta \, d\theta\)，且
@@ -112,7 +111,7 @@ a^2 + x^2 = a^2 + a^2 \tan^2 \theta = a^2 (1 + \tan^2 \theta) = a^2 \sec^2 \thet
 
 ---
 
-### (19) \(\int \frac{1}{x^2 - a^2} \, dx = \frac{1}{2a} \ln \left| \frac{x - a}{x + a} \right| + C\)
+## (19) \(\int \frac{1}{x^2 - a^2} \, dx = \frac{1}{2a} \ln \left| \frac{x - a}{x + a} \right| + C\)
 
 **推导：**  
 将分式分解为部分分式：
@@ -141,7 +140,7 @@ A + B = 0, \quad (A - B)a = 1
 
 ---
 
-### (20) \(\int \frac{1}{\sqrt{a^2 - x^2}} \, dx = \arcsin \frac{x}{a} + C\)
+## (20) \(\int \frac{1}{\sqrt{a^2 - x^2}} \, dx = \arcsin \frac{x}{a} + C\)
 
 **推导：**  
 令 \(x = a \sin \theta\)，其中 \(\theta \in [-\frac{\pi}{2}, \frac{\pi}{2}]\)，则 \(dx = a \cos \theta \, d\theta\)，且
@@ -160,7 +159,7 @@ A + B = 0, \quad (A - B)a = 1
 
 ---
 
-### (21) \(\int \frac{1}{\sqrt{x^2 + a^2}} \, dx = \ln \left( x + \sqrt{x^2 + a^2} \right) + C\)（三角换元 \(x = a \tan \theta\)）
+## (21) \(\int \frac{1}{\sqrt{x^2 + a^2}} \, dx = \ln \left( x + \sqrt{x^2 + a^2} \right) + C\)（三角换元 \(x = a \tan \theta\)）
 
 **推导：**  
 令 \(x = a \tan \theta\)，\(\theta \in (-\frac{\pi}{2}, \frac{\pi}{2})\)，则 \(dx = a \sec^2 \theta \, d\theta\)，且
@@ -188,7 +187,7 @@ A + B = 0, \quad (A - B)a = 1
 
 ---
 
-### (22) \(\int \frac{1}{\sqrt{x^2 - a^2}} \, dx = \ln \left| x + \sqrt{x^2 - a^2} \right| + C\)（三角换元 \(x = a \sec \theta\)）
+## (22) \(\int \frac{1}{\sqrt{x^2 - a^2}} \, dx = \ln \left| x + \sqrt{x^2 - a^2} \right| + C\)（三角换元 \(x = a \sec \theta\)）
 
 **推导：**  
 先考虑 \(x > a\) 的情形。令 \(x = a \sec \theta\)，\(\theta \in (0, \frac{\pi}{2})\)，则 \(dx = a \sec \theta \tan \theta \, d\theta\)，且
@@ -217,7 +216,7 @@ A + B = 0, \quad (A - B)a = 1
 
 ---
 
-### (25) \(\int \sqrt{x^2 + a^2} \, dx = \frac{a^2}{2} \ln \left( x + \sqrt{x^2 + a^2} \right) + \frac{x}{2} \sqrt{x^2 + a^2} + C\)（三角换元 \(x = a \tan \theta\)）
+## (25) \(\int \sqrt{x^2 + a^2} \, dx = \frac{a^2}{2} \ln \left( x + \sqrt{x^2 + a^2} \right) + \frac{x}{2} \sqrt{x^2 + a^2} + C\)（三角换元 \(x = a \tan \theta\)）
 
 **推导：**  
 令 \(x = a \tan \theta\)，\(\theta \in (-\frac{\pi}{2}, \frac{\pi}{2})\)，则 \(dx = a \sec^2 \theta \, d\theta\)，\(\sqrt{x^2 + a^2} = a \sec \theta\)。  
@@ -274,7 +273,7 @@ a^2 \int \sec^3 \theta \, d\theta = \frac{a^2}{2} \sec \theta \tan \theta + \fra
 
 ---
 
-### (26) \(\int \sqrt{x^2 - a^2} \, dx = \frac{a^2}{2} \ln \left| x - \sqrt{x^2 - a^2} \right| + \frac{x}{2} \sqrt{x^2 - a^2} + C\)（三角换元 \(x = a \sec \theta\)）
+## (26) \(\int \sqrt{x^2 - a^2} \, dx = \frac{a^2}{2} \ln \left| x - \sqrt{x^2 - a^2} \right| + \frac{x}{2} \sqrt{x^2 - a^2} + C\)（三角换元 \(x = a \sec \theta\)）
 
 **推导：**  
 考虑 \(x > a\)，令 \(x = a \sec \theta\)，\(\theta \in (0, \frac{\pi}{2})\)，则 \(dx = a \sec \theta \tan \theta \, d\theta\)，\(\sqrt{x^2 - a^2} = a \tan \theta\)。  
@@ -329,7 +328,7 @@ a^2 \left( \int \sec^3 \theta \, d\theta - \int \sec \theta \, d\theta \right) =
 
 ---
 
-### (27) \(\int \sqrt{a^2 - x^2} \, dx = \frac{a^2}{2} \arcsin \frac{x}{a} + \frac{x}{2} \sqrt{a^2 - x^2} + C\)
+## (27) \(\int \sqrt{a^2 - x^2} \, dx = \frac{a^2}{2} \arcsin \frac{x}{a} + \frac{x}{2} \sqrt{a^2 - x^2} + C\)
 
 **推导：**  
 令 \(x = a \sin \theta\)，\(\theta \in [-\frac{\pi}{2}, \frac{\pi}{2}]\)，则 \(dx = a \cos \theta \, d\theta\)，且 \(\sqrt{a^2 - x^2} = a \cos \theta\)（非负）。  
@@ -351,5 +350,7 @@ a^2 \int \frac{1 + \cos 2\theta}{2} \, d\theta = \frac{a^2}{2} \left( \int 1 \, 
 \]
 
 ---
+
+ ---
 
 以上推导了避免了双曲函数，因为这是考研要求，后面有空会单独出一期讲解双曲函数。
