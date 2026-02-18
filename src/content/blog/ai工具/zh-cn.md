@@ -45,10 +45,9 @@ GPT
 
 Gemini
 
-需要梯子，多模态能力非常强，拥有非常好的前端审美，就是写后端能力不行，注册需要谷歌邮箱（国外软件通信证）。[国外站]（https://gemini.google.com/app  
-）
+需要梯子，多模态能力非常强，拥有非常好的前端审美，就是写后端能力不行，注册需要谷歌邮箱（国外软件通信证）。[国外站]（https://gemini.google.com/app）。
 
-如果因为地区原因无法使用，建议转到 [国外站]（https://aistudio.google.com/prompts/new_cha  t），但还是要梯子。
+如果因为地区原因无法使用，建议转到 [国外站]（https://aistudio.google.com/prompts/new_chat）
 
 Claude
 
