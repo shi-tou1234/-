@@ -26,11 +26,12 @@ let imageLoad;
 if (isLocal) {
     const images = import.meta.glob<ImageMetadata>("../../**/*", {import: "default" });
     let imagePath = path.normalize(path.join("../../", "/", src)).replace(/\\/g, "/");
-    const image = images[imagePath];
-    if(!image) {
+    const imageImporter = images[imagePath];
+    if(!imageImporter) {
         console.error(`\n[ERROR] Image file not found: ${imagePath.replace('../../', 'src/')}`);
+    } else {
+        imageLoad = await imageImporter()
     }
-    imageLoad = await image()
 }
 ---
 <!-- <div class={className}> -->
