@@ -47,7 +47,7 @@ slugId: ai工具
 
 如果因为地区原因无法使用，建议转到 [Google ai studio](https://aistudio.google.com/prompts/new_chat)
 
-[Claude](https://claude.com /)
+[Claude](https://claude.com/)
 
 需要梯子，非常严格的地区限制，我真的服了。代码能力非常强，写文章也不错，价格很贵 
 
