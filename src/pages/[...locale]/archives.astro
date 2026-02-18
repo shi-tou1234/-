@@ -40,7 +40,6 @@ const getMonthKey = (date: Date) => monthKeyFormatter.format(date);
 const getDayKey = (date: Date) => dayKeyFormatter.format(date);
 
 const monthTitleFormatter = new Intl.DateTimeFormat(currentLang, {
-    year: 'numeric',
     month: 'long',
     timeZone: archiveTimeZone,
 });
