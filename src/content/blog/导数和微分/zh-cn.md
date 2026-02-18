@@ -3,7 +3,7 @@ title: 导数和微分
 pubDate: 2026-02-17T14:24:00.000Z
 draft: false
 description: 
-category: 高数笔记
+category: 数学笔记
 slugId: 导数和微分
 ---
 
