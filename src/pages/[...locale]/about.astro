@@ -2,6 +2,7 @@
 import MainPageLayout from '@layouts/MainPageLayout.astro'
 import Markdown from '@components/misc/Markdown.astro'
 import Cover from '@components/Cover.astro'
+import PageParticles from '@components/misc/PageParticles.astro'
 
 import { getBlogEntrySort, getSpec } from '@utils/content-utils'
 import aboutProfile from '@/data/about-profile'
@@ -142,8 +143,8 @@ function getIntensityLevel(count: number, maxCount: number): number {
 const pageTitle = t("header.about") + " - " + siteConfig.title;
 ---
 <MainPageLayout title={pageTitle} lang={currentLang}>
-        <div class="relative mx-auto w-full max-w-[var(--page-width)]">
-                <div id="about-particles" class="pointer-events-none fixed inset-0 -z-10"></div>
+        <PageParticles id="about-particles" />
+        <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
 
                 <Cover title={t("cover.title.about")} subTitle={t("cover.subTitle.about")}/>
 
@@ -273,103 +274,3 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                 </section>
     </div>
 </MainPageLayout>
-
-<script>
-    import { tsParticles } from "@tsparticles/engine";
-    import { loadSlim } from "@tsparticles/slim";
-
-    const containerId = "about-particles";
-
-    function isAboutPage() {
-        return Boolean(document.getElementById(containerId));
-    }
-
-    function getParticleColor() {
-        const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
-                return currentTheme === "dark" ? "#ffffff" : "#0284c7";
-    }
-
-    async function mountParticles() {
-        if (!isAboutPage()) return;
-
-        await loadSlim(tsParticles);
-
-        const mounted = tsParticles.dom().find((item) => item.id === containerId);
-        if (mounted) {
-            await mounted.destroy();
-        }
-
-        const color = getParticleColor();
-
-        await tsParticles.load({
-            id: containerId,
-            options: {
-                                fullScreen: { enable: true, zIndex: -1 },
-                background: { color: "transparent" },
-                fpsLimit: 60,
-                detectRetina: true,
-                particles: {
-                                        number: { value: 160, density: { enable: true, area: 700 } },
-                    color: { value: color },
-                                        opacity: { value: { min: 0.35, max: 0.95 } },
-                                        size: { value: { min: 1.2, max: 3.8 } },
-                    move: {
-                        enable: true,
-                                                speed: 3.2,
-                        direction: "none",
-                                                random: true,
-                        straight: false,
-                        outModes: { default: "bounce" },
-                    },
-                    links: {
-                                                enable: false,
-                                                distance: 135,
-                        color,
-                                                opacity: 0.32,
-                        width: 1,
-                    },
-                },
-                interactivity: {
-                    detectsOn: "canvas",
-                    events: {
-                                                onHover: { enable: true, mode: ["repulse"] },
-                        onClick: { enable: true, mode: "repulse" },
-                        resize: { enable: true },
-                    },
-                    modes: {
-                                                repulse: { distance: 130, duration: 0.6 },
-                    },
-                },
-                                pauseOnBlur: false,
-                                pauseOnOutsideViewport: false,
-            },
-        });
-    }
-
-    function setupThemeWatcher() {
-        if (!isAboutPage()) return;
-
-        const oldObserver = window.__aboutParticleThemeObserver;
-        if (oldObserver) oldObserver.disconnect();
-
-        const observer = new MutationObserver(() => {
-            mountParticles();
-        });
-
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ["data-theme"],
-        });
-
-        window.__aboutParticleThemeObserver = observer;
-    }
-
-    function initAboutEnhancements() {
-        if (!isAboutPage()) return;
-        mountParticles();
-        setupThemeWatcher();
-    }
-
-    document.addEventListener("astro:page-load", initAboutEnhancements);
-    document.addEventListener("astro:after-swap", initAboutEnhancements);
-</script>

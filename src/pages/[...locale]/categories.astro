@@ -1,6 +1,7 @@
 ---
 import MainPageLayout from '@layouts/MainPageLayout.astro'
 import Cover from '@components/Cover.astro'
+import PageParticles from '@components/misc/PageParticles.astro'
 
 import { siteConfig } from '@/config'
 import { getBlogEntrySort } from '@utils/content-utils'
@@ -51,7 +52,8 @@ const pageTitle = t("header.categories") + " - " + siteConfig.title;
 ---
 
 <MainPageLayout title={pageTitle} lang={currentLang}>
-  <div class="mx-auto w-full max-w-[var(--page-width)]">
+  <PageParticles id="categories-particles" />
+  <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
     <Cover title={t("cover.title.categories")} subTitle={t("cover.subTitle.categories", {count: categories.length})} />
 
     <div class="py-6 text-[var(--text-color)] grid grid-cols-1 sm:grid-cols-2 gap-3">

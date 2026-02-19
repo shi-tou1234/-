@@ -1,6 +1,7 @@
 ---
 import MainPageLayout from '@layouts/MainPageLayout.astro'
 import Cover from '@components/Cover.astro'
+import PageParticles from '@components/misc/PageParticles.astro'
 
 import { siteConfig } from '@/config'
 import { getBlogEntrySort } from '@utils/content-utils'
@@ -96,7 +97,8 @@ const categoriesRoot = getRelativeLocaleUrl(currentLang, '/categories/');
 ---
 
 <MainPageLayout title={pageTitle} lang={currentLang}>
-  <div class="mx-auto w-full max-w-[var(--page-width)]">
+  <PageParticles id="category-detail-particles" />
+  <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
     <Cover title={currentCategory} subTitle={t("cover.subTitle.archive", {count: categoryPosts.length})} />
 
     <div class="py-6 text-[var(--text-color)] space-y-2">

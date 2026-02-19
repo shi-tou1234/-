@@ -1,6 +1,7 @@
 ---
 import MainPageLayout from '@layouts/MainPageLayout.astro'
 import Cover from '@components/Cover.astro'
+import PageParticles from '@components/misc/PageParticles.astro'
 
 import { siteConfig } from '@/config'
 import { getBlogEntrySort } from '@utils/content-utils'
@@ -79,7 +80,8 @@ const indexPage = getRelativeLocaleUrl(currentLang, "");
 ---
 
 <MainPageLayout title={pageTitle} lang={currentLang}>
-    <div class="archives mx-auto w-full max-w-[var(--page-width)]">
+    <PageParticles id="archives-particles" />
+    <div class="archives relative z-10 mx-auto w-full max-w-[var(--page-width)]">
         <Cover title={t("cover.title.archive")} subTitle={t("cover.subTitle.archive", {count: postNumber})}/>
         
         <div class="py-6 mx-auto text-[var(--text-color)]">

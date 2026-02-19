@@ -2,6 +2,7 @@
 import MainPageLayout from '@layouts/MainPageLayout.astro'
 import { siteConfig, friendLinkConfig } from '@/config'
 import Cover from '@components/Cover.astro';
+import PageParticles from '@components/misc/PageParticles.astro'
 
 import i18nit from '@i18n/translation';
 
@@ -18,7 +19,8 @@ const pageTitle = t("header.friends") + " - " + siteConfig.title;
 ---
 
 <MainPageLayout title={pageTitle} lang={currentLang}>
-    <div class="mx-auto w-full max-w-[var(--page-width)]">
+    <PageParticles id="friends-particles" />
+    <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
         <Cover title={t("cover.title.friends")} subTitle={t("cover.subTitle.friends")} />
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-[var(--text-color)]">
