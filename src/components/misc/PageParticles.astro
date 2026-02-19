@@ -6,26 +6,15 @@ interface Props {
 const { id } = Astro.props;
 ---
 
-<div id={id} class="pointer-events-none fixed inset-0 z-0"></div>
+<div id={id} data-page-particles="1" class="pointer-events-none fixed inset-0 z-0"></div>
 
-<script define:vars={{ containerId: id }}>
+<script>
   import { tsParticles } from "@tsparticles/engine";
   import { loadSlim } from "@tsparticles/slim";
 
-  function hasTarget() {
-    return Boolean(document.getElementById(containerId));
-  }
-
-  function getParticleColor() {
-    const computed = getComputedStyle(document.documentElement);
-    const linkColor = computed.getPropertyValue("--link-color").trim();
-    if (linkColor) return linkColor;
-    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
-    return currentTheme === "dark" ? "#cbd5e1" : "#0ea5e9";
-  }
-
-  async function mountParticles() {
-    if (!hasTarget()) return;
+  async function mountParticlesById(containerId) {
+    const target = document.getElementById(containerId);
+    if (!target) return;
 
     await loadSlim(tsParticles);
 
@@ -34,7 +23,11 @@ const { id } = Astro.props;
       await mounted.destroy();
     }
 
-    const color = getParticleColor();
+    const computed = getComputedStyle(document.documentElement);
+    const linkColor = computed.getPropertyValue("--link-color").trim();
+    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+    const fallbackColor = currentTheme === "dark" ? "#cbd5e1" : "#0ea5e9";
+    const color = linkColor || fallbackColor;
 
     await tsParticles.load({
       id: containerId,
@@ -84,15 +77,26 @@ const { id } = Astro.props;
     });
   }
 
-  function setupThemeWatcher() {
-    if (!hasTarget()) return;
+  function getParticleTargets() {
+    return Array.from(document.querySelectorAll("[data-page-particles='1']"));
+  }
 
-    const observerKey = `__particleObserver_${containerId}`;
+  function mountAllParticles() {
+    const targets = getParticleTargets();
+    targets.forEach((target) => {
+      const id = target.getAttribute("id");
+      if (!id) return;
+      mountParticlesById(id);
+    });
+  }
+
+  function setupThemeWatcher() {
+    const observerKey = "__pageParticlesThemeObserver";
     const oldObserver = window[observerKey];
     if (oldObserver) oldObserver.disconnect();
 
     const observer = new MutationObserver(() => {
-      mountParticles();
+      mountAllParticles();
     });
 
     observer.observe(document.documentElement, {
@@ -104,11 +108,12 @@ const { id } = Astro.props;
   }
 
   function initParticles() {
-    if (!hasTarget()) return;
-    mountParticles();
+    mountAllParticles();
     setupThemeWatcher();
   }
 
+  initParticles();
+  document.addEventListener("DOMContentLoaded", initParticles);
   document.addEventListener("astro:page-load", initParticles);
   document.addEventListener("astro:after-swap", initParticles);
 </script>
