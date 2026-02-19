@@ -6,10 +6,10 @@ export type AboutProfile = {
 }
 
 const aboutProfile: AboutProfile = {
-  mbti: "INTP",
-  major: "电子信息工程",
-  recentDoing: "持续优化博客后台与前端交互体验",
-  recentReading: "《代码整洁之道》",
+  "mbti": "INTJ",
+  "major": "电子信息工程",
+  "recentDoing": "持续优化博客后台与前端交互体验",
+  "recentReading": "局外人"
 }
 
 export default aboutProfile
