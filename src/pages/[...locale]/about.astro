@@ -81,11 +81,11 @@ const maxCodeCount = Math.max(...daySeries.map((item) => item.codeCount), 1);
 const leadingPadCount = startDate.getDay();
 
 const heatmapCells = [
-    ...Array.from({ length: leadingPadCount }, () => null),
-    ...daySeries,
-] as Array<{ key: string; date: Date; count: number } | null>;
+        ...Array.from({ length: leadingPadCount }, () => null),
+        ...daySeries,
+] as Array<{ key: string; date: Date; blogCount: number; codeCount: number } | null>;
 
-const heatmapWeeks = [] as Array<Array<{ key: string; date: Date; count: number } | null>>;
+const heatmapWeeks = [] as Array<Array<{ key: string; date: Date; blogCount: number; codeCount: number } | null>>;
 for (let index = 0; index < heatmapCells.length; index += 7) {
     const week = heatmapCells.slice(index, index + 7);
     while (week.length < 7) week.push(null);
@@ -143,7 +143,7 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
 ---
 <MainPageLayout title={pageTitle} lang={currentLang}>
         <div class="relative mx-auto w-full max-w-[var(--page-width)]">
-                <div id="about-particles" class="pointer-events-none absolute inset-0 -z-10 rounded-xl"></div>
+                <div id="about-particles" class="pointer-events-none fixed inset-0 -z-10"></div>
 
                 <Cover title={t("cover.title.about")} subTitle={t("cover.subTitle.about")}/>
 
@@ -233,24 +233,24 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                                                                                 <div class="flex h-10 w-6 flex-col gap-[2px]">
                                                                                         <span
                                                                                                 title={`${cell.key} · ${profileLabels.heatmapBlog}: ${cell.blogCount}`}
-                                                                                                class="flex h-[19px] w-6 items-center justify-center rounded-sm border border-[var(--button-border-color)] text-[9px] text-[var(--text-color)]/75"
+                                                                                                class="h-[19px] w-6 rounded-sm border border-[var(--button-border-color)]"
                                                                                                 style={(() => {
                                                                                                         const level = getIntensityLevel(cell.blogCount, maxBlogCount);
                                                                                                         return level === 0
                                                                                                             ? 'background: var(--button-hover-color);'
                                                                                                             : `background: color-mix(in srgb, var(--link-color) ${20 + level * 18}%, var(--button-hover-color));`;
                                                                                                 })()}
-                                                                                        >{cell.blogCount > 0 ? cell.blogCount : ''}</span>
+                                                                                        ></span>
                                                                                         <span
                                                                                                 title={`${cell.key} · ${profileLabels.heatmapCode}: ${cell.codeCount}`}
-                                                                                                class="flex h-[19px] w-6 items-center justify-center rounded-sm border border-[var(--button-border-color)] text-[9px] text-[var(--text-color)]/75"
+                                                                                                class="h-[19px] w-6 rounded-sm border border-[var(--button-border-color)]"
                                                                                                 style={(() => {
                                                                                                         const level = getIntensityLevel(cell.codeCount, maxCodeCount);
                                                                                                         return level === 0
                                                                                                             ? 'background: var(--button-hover-color);'
                                                                                                             : `background: color-mix(in srgb, var(--link-color) ${20 + level * 18}%, var(--button-hover-color));`;
                                                                                                 })()}
-                                                                                        >{cell.codeCount > 0 ? cell.codeCount : ''}</span>
+                                                                                        ></span>
                                                                                 </div>
                                                                         ) : (
                                                                                 <span class="h-10 w-6 rounded-sm bg-transparent"></span>
@@ -286,7 +286,7 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
 
     function getParticleColor() {
         const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
-        return currentTheme === "dark" ? "#ffffff" : "#7dd3fc";
+                return currentTheme === "dark" ? "#ffffff" : "#0284c7";
     }
 
     async function mountParticles() {
@@ -304,25 +304,25 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
         await tsParticles.load({
             id: containerId,
             options: {
-                fullScreen: { enable: false },
+                                fullScreen: { enable: true, zIndex: -1 },
                 background: { color: "transparent" },
                 fpsLimit: 60,
                 detectRetina: true,
                 particles: {
-                                        number: { value: 130, density: { enable: true, area: 700 } },
+                                        number: { value: 160, density: { enable: true, area: 700 } },
                     color: { value: color },
-                                        opacity: { value: { min: 0.25, max: 0.9 } },
-                                        size: { value: { min: 1, max: 3.5 } },
+                                        opacity: { value: { min: 0.35, max: 0.95 } },
+                                        size: { value: { min: 1.2, max: 3.8 } },
                     move: {
                         enable: true,
-                                                speed: 2.8,
+                                                speed: 3.2,
                         direction: "none",
                                                 random: true,
                         straight: false,
                         outModes: { default: "bounce" },
                     },
                     links: {
-                        enable: true,
+                                                enable: false,
                                                 distance: 135,
                         color,
                                                 opacity: 0.32,
@@ -332,14 +332,12 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                 interactivity: {
                     detectsOn: "canvas",
                     events: {
-                        onHover: { enable: true, mode: ["grab", "attract"] },
+                                                onHover: { enable: true, mode: ["repulse"] },
                         onClick: { enable: true, mode: "repulse" },
                         resize: { enable: true },
                     },
                     modes: {
-                        grab: { distance: 150, links: { opacity: 0.35 } },
-                        attract: { distance: 180, duration: 0.35, factor: 2 },
-                        repulse: { distance: 120, duration: 0.55 },
+                                                repulse: { distance: 130, duration: 0.6 },
                     },
                 },
                                 pauseOnBlur: false,

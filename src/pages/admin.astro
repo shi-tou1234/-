@@ -166,7 +166,9 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input id="about-mbti" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="MBTI，例如：INTP" />
+              <input id="about-mbti-link" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="MBTI 介绍链接，例如：https://www.16personalities.com/ch/intj-%E4%BA%BA%E6%A0%BC" />
               <input id="about-major" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="所学专业，例如：电子信息工程" />
+              <input id="about-major-link" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="专业百科链接，例如：https://baike.baidu.com/item/%E7%94%B5%E5%AD%90%E4%BF%A1%E6%81%AF%E5%B7%A5%E7%A8%8B/87638" />
               <input id="about-recent-doing" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2 md:col-span-2" placeholder="最近在做" />
               <input id="about-recent-reading" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2 md:col-span-2" placeholder="最近读书" />
             </div>
@@ -859,7 +861,9 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const profile = parseAboutProfileFromTs(content);
 
       document.getElementById("about-mbti").value = profile.mbti || "";
+      document.getElementById("about-mbti-link").value = profile.mbtiLink || "";
       document.getElementById("about-major").value = profile.major || "";
+      document.getElementById("about-major-link").value = profile.majorLink || "";
       document.getElementById("about-recent-doing").value = profile.recentDoing || "";
       document.getElementById("about-recent-reading").value = profile.recentReading || "";
       setMsg(msgEl, "关于特质加载成功");
@@ -876,16 +880,20 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       if (!token) throw new Error("请先填写 GitHub Token");
 
       const mbti = (document.getElementById("about-mbti")?.value || "").trim();
+      const mbtiLink = (document.getElementById("about-mbti-link")?.value || "").trim();
       const major = (document.getElementById("about-major")?.value || "").trim();
+      const majorLink = (document.getElementById("about-major-link")?.value || "").trim();
       const recentDoing = (document.getElementById("about-recent-doing")?.value || "").trim();
       const recentReading = (document.getElementById("about-recent-reading")?.value || "").trim();
 
       if (!mbti) throw new Error("请填写 MBTI");
+      if (!mbtiLink) throw new Error("请填写 MBTI 介绍链接");
       if (!major) throw new Error("请填写所学专业");
+      if (!majorLink) throw new Error("请填写专业百科链接");
       if (!recentDoing) throw new Error("请填写最近在做");
       if (!recentReading) throw new Error("请填写最近读书");
 
-      const content = buildAboutProfileTs({ mbti, major, recentDoing, recentReading });
+      const content = buildAboutProfileTs({ mbti, mbtiLink, major, majorLink, recentDoing, recentReading });
       await upsertFile(ABOUT_PROFILE_PATH, content, "about: update profile", token, branch);
       setMsg(msgEl, "关于特质保存成功");
     } catch (error) {

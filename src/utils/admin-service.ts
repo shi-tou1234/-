@@ -99,11 +99,13 @@ export function parseAboutProfileFromTs(content: string) {
 
 export function buildAboutProfileTs(profile: {
   mbti: string;
+  mbtiLink: string;
   major: string;
+  majorLink: string;
   recentDoing: string;
   recentReading: string;
 }) {
-  return `export type AboutProfile = {\n  mbti: string\n  major: string\n  recentDoing: string\n  recentReading: string\n}\n\nconst aboutProfile: AboutProfile = ${JSON.stringify(profile, null, 2)}\n\nexport default aboutProfile\n`;
+  return `export type AboutProfile = {\n  mbti: string\n  mbtiLink: string\n  major: string\n  majorLink: string\n  recentDoing: string\n  recentReading: string\n}\n\nconst aboutProfile: AboutProfile = ${JSON.stringify(profile, null, 2)}\n\nexport default aboutProfile\n`;
 }
 
 export function normalizeSlug(input: string): string {
