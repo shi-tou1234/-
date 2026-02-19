@@ -9,6 +9,7 @@ import aboutProfile from '@/data/about-profile'
 import { siteConfig } from '@/config'
 import i18nit from '@i18n/translation'
 import { render } from 'astro:content'
+import { execSync } from 'node:child_process'
 import { i18n } from "astro:config/client";
 
 export async function getStaticPaths() {
@@ -32,7 +33,8 @@ today.setHours(0, 0, 0, 0);
 const startDate = new Date(today);
 startDate.setDate(today.getDate() - HEATMAP_DAYS + 1);
 
-const updateCountMap = new Map<string, number>();
+const blogUpdateCountMap = new Map<string, number>();
+const codeUpdateCountMap = new Map<string, number>();
 const blogEntries = await getBlogEntrySort(currentLang);
 
 for (const entry of blogEntries) {
@@ -40,19 +42,42 @@ for (const entry of blogEntries) {
     date.setHours(0, 0, 0, 0);
     if (date < startDate || date > today) continue;
     const key = date.toISOString().slice(0, 10);
-    updateCountMap.set(key, (updateCountMap.get(key) || 0) + 1);
+        blogUpdateCountMap.set(key, (blogUpdateCountMap.get(key) || 0) + 1);
 }
 
-const daySeries = [] as Array<{ key: string; date: Date; count: number }>;
+try {
+        const since = startDate.toISOString().slice(0, 10);
+        const until = today.toISOString().slice(0, 10);
+        const output = execSync(
+                `git log --since="${since}" --until="${until} 23:59:59" --date=short --pretty=format:%ad -- src public script astro.config.mjs svelte.config.js tsconfig.json package.json pnpm-lock.yaml`,
+                { encoding: 'utf-8' }
+        );
+
+        for (const rawLine of output.split('\n')) {
+                const key = rawLine.trim();
+                if (!key) continue;
+                codeUpdateCountMap.set(key, (codeUpdateCountMap.get(key) || 0) + 1);
+        }
+} catch {
+}
+
+const daySeries = [] as Array<{ key: string; date: Date; blogCount: number; codeCount: number }>;
 for (let index = 0; index < HEATMAP_DAYS; index += 1) {
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + index);
     const key = date.toISOString().slice(0, 10);
-    daySeries.push({ key, date, count: updateCountMap.get(key) || 0 });
+        daySeries.push({
+                key,
+                date,
+                blogCount: blogUpdateCountMap.get(key) || 0,
+                codeCount: codeUpdateCountMap.get(key) || 0,
+        });
 }
 
-const totalUpdates = daySeries.reduce((sum, item) => sum + item.count, 0);
-const maxCount = Math.max(...daySeries.map((item) => item.count), 1);
+const totalBlogUpdates = daySeries.reduce((sum, item) => sum + item.blogCount, 0);
+const totalCodeUpdates = daySeries.reduce((sum, item) => sum + item.codeCount, 0);
+const maxBlogCount = Math.max(...daySeries.map((item) => item.blogCount), 1);
+const maxCodeCount = Math.max(...daySeries.map((item) => item.codeCount), 1);
 const leadingPadCount = startDate.getDay();
 
 const heatmapCells = [
@@ -76,10 +101,14 @@ const profileLabels = currentLang === 'zh-cn'
             traitTitle: '关于我的特质',
             mbti: 'MBTI',
             major: '所学专业',
+                        mbtiIntro: '查看 MBTI 介绍',
+                        majorIntro: '查看专业百科',
             recentDoing: '最近在做',
             recentReading: '最近读书',
-            heatmapTitle: '最近博客更新频率',
-            heatmapSubtitle: `过去 ${HEATMAP_DAYS} 天共更新 ${totalUpdates} 次`,
+                        heatmapTitle: '博客与网站代码更新频率',
+                        heatmapSubtitle: `过去 ${HEATMAP_DAYS} 天 · 博客 ${totalBlogUpdates} 次 · 代码 ${totalCodeUpdates} 次`,
+                        heatmapBlog: '博客',
+                        heatmapCode: '代码',
             legendLow: '低',
             legendHigh: '高',
             noUpdate: '暂无更新',
@@ -88,16 +117,20 @@ const profileLabels = currentLang === 'zh-cn'
             traitTitle: 'My Traits',
             mbti: 'MBTI',
             major: 'Major',
+                        mbtiIntro: 'View MBTI intro',
+                        majorIntro: 'View major wiki',
             recentDoing: 'Recent Focus',
             recentReading: 'Recent Reading',
-            heatmapTitle: 'Recent Blog Activity',
-            heatmapSubtitle: `${totalUpdates} updates in the last ${HEATMAP_DAYS} days`,
+                        heatmapTitle: 'Blog & Site Code Activity',
+                        heatmapSubtitle: `Last ${HEATMAP_DAYS} days · Blog ${totalBlogUpdates} · Code ${totalCodeUpdates}`,
+                        heatmapBlog: 'Blog',
+                        heatmapCode: 'Code',
             legendLow: 'Low',
             legendHigh: 'High',
             noUpdate: 'No updates',
         };
 
-function getIntensityLevel(count: number): number {
+function getIntensityLevel(count: number, maxCount: number): number {
     if (count <= 0) return 0;
     const ratio = count / maxCount;
     if (ratio < 0.25) return 1;
@@ -115,36 +148,60 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                 <Cover title={t("cover.title.about")} subTitle={t("cover.subTitle.about")}/>
 
                 <section class="mb-6 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
-                        <h2 class="mb-4 text-lg font-semibold text-[var(--text-color)]">{profileLabels.traitTitle}</h2>
-                        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-                                <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
-                                        <p class="text-xs text-[var(--text-color)]/60">{profileLabels.mbti}</p>
-                                        <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.mbti}</p>
-                                </div>
-                                <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
-                                        <p class="text-xs text-[var(--text-color)]/60">{profileLabels.major}</p>
-                                        <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.major}</p>
-                                </div>
-                                <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3 md:col-span-2">
-                                        <p class="text-xs text-[var(--text-color)]/60">{profileLabels.recentDoing}</p>
-                                        <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.recentDoing}</p>
-                                </div>
-                                <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3 md:col-span-2">
-                                        <p class="text-xs text-[var(--text-color)]/60">{profileLabels.recentReading}</p>
-                                        <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.recentReading}</p>
+                        <Markdown class="markdown-content onload-animation">
+                                <Content />
+                        </Markdown>
+
+                        <div class="mt-5 border-t border-[var(--button-border-color)]/70 pt-4">
+                                <h2 class="mb-4 text-lg font-semibold text-[var(--text-color)]">{profileLabels.traitTitle}</h2>
+                                <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                                        <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
+                                                <p class="text-xs text-[var(--text-color)]/60">{profileLabels.mbti}</p>
+                                                <a
+                                                        href={aboutProfile.mbtiLink}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        class="mt-1 flex items-center gap-2 text-base font-semibold text-[var(--link-color)] hover:underline"
+                                                >
+                                                        <span aria-hidden="true" class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--button-hover-color)] text-[13px]">🧠</span>
+                                                        <span>{aboutProfile.mbti}</span>
+                                                        <span class="text-xs text-[var(--text-color)]/60">({profileLabels.mbtiIntro})</span>
+                                                </a>
+                                        </div>
+                                        <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
+                                                <p class="text-xs text-[var(--text-color)]/60">{profileLabels.major}</p>
+                                                <a
+                                                        href={aboutProfile.majorLink}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        class="mt-1 flex items-center gap-2 text-base font-semibold text-[var(--link-color)] hover:underline"
+                                                >
+                                                        <span aria-hidden="true" class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--button-hover-color)] text-[13px]">🎓</span>
+                                                        <span>{aboutProfile.major}</span>
+                                                        <span class="text-xs text-[var(--text-color)]/60">({profileLabels.majorIntro})</span>
+                                                </a>
+                                        </div>
+                                        <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3 md:col-span-2">
+                                                <p class="text-xs text-[var(--text-color)]/60">{profileLabels.recentDoing}</p>
+                                                <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.recentDoing}</p>
+                                        </div>
+                                        <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3 md:col-span-2">
+                                                <p class="text-xs text-[var(--text-color)]/60">{profileLabels.recentReading}</p>
+                                                <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.recentReading}</p>
+                                        </div>
                                 </div>
                         </div>
                 </section>
-
-                <Markdown class="mb-6 markdown-content onload-animation">
-                        <Content />
-                </Markdown>
 
                 <section class="mb-8 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
                         <div class="mb-4 flex flex-wrap items-end justify-between gap-2">
                                 <div>
                                         <h2 class="text-lg font-semibold text-[var(--text-color)]">{profileLabels.heatmapTitle}</h2>
                                         <p class="text-sm text-[var(--text-color)]/65">{profileLabels.heatmapSubtitle}</p>
+                                        <p class="mt-1 flex items-center gap-3 text-xs text-[var(--text-color)]/60">
+                                                <span>{profileLabels.heatmapBlog}: {totalBlogUpdates}</span>
+                                                <span>{profileLabels.heatmapCode}: {totalCodeUpdates}</span>
+                                        </p>
                                 </div>
                                 <div class="flex items-center gap-2 text-xs text-[var(--text-color)]/65">
                                         <span>{profileLabels.legendLow}</span>
@@ -164,7 +221,7 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                                 <div class="inline-flex gap-2 min-w-full">
                                         <div class="grid grid-rows-7 gap-1 pt-5 text-[10px] text-[var(--text-color)]/55">
                                                 {weekdayLabels.map((label, index) => (
-                                                        <span class={index % 2 === 0 ? '' : 'opacity-0'}>{label}</span>
+                                                        <span class={`flex h-10 items-center ${index % 2 === 0 ? '' : 'opacity-0'}`}>{label}</span>
                                                 ))}
                                         </div>
 
@@ -173,18 +230,30 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                                                         <div class="grid grid-rows-7 gap-1">
                                                                 {week.map((cell) => (
                                                                         cell ? (
-                                                                                <span
-                                                                                        title={`${cell.key} · ${cell.count}`}
-                                                                                        class="h-3.5 w-3.5 rounded-sm border border-[var(--button-border-color)]"
-                                                                                        style={(() => {
-                                                                                                const level = getIntensityLevel(cell.count);
-                                                                                                return level === 0
-                                                                                                    ? 'background: var(--button-hover-color);'
-                                                                                                    : `background: color-mix(in srgb, var(--link-color) ${20 + level * 18}%, var(--button-hover-color));`;
-                                                                                        })()}
-                                                                                ></span>
+                                                                                <div class="flex h-10 w-6 flex-col gap-[2px]">
+                                                                                        <span
+                                                                                                title={`${cell.key} · ${profileLabels.heatmapBlog}: ${cell.blogCount}`}
+                                                                                                class="flex h-[19px] w-6 items-center justify-center rounded-sm border border-[var(--button-border-color)] text-[9px] text-[var(--text-color)]/75"
+                                                                                                style={(() => {
+                                                                                                        const level = getIntensityLevel(cell.blogCount, maxBlogCount);
+                                                                                                        return level === 0
+                                                                                                            ? 'background: var(--button-hover-color);'
+                                                                                                            : `background: color-mix(in srgb, var(--link-color) ${20 + level * 18}%, var(--button-hover-color));`;
+                                                                                                })()}
+                                                                                        >{cell.blogCount > 0 ? cell.blogCount : ''}</span>
+                                                                                        <span
+                                                                                                title={`${cell.key} · ${profileLabels.heatmapCode}: ${cell.codeCount}`}
+                                                                                                class="flex h-[19px] w-6 items-center justify-center rounded-sm border border-[var(--button-border-color)] text-[9px] text-[var(--text-color)]/75"
+                                                                                                style={(() => {
+                                                                                                        const level = getIntensityLevel(cell.codeCount, maxCodeCount);
+                                                                                                        return level === 0
+                                                                                                            ? 'background: var(--button-hover-color);'
+                                                                                                            : `background: color-mix(in srgb, var(--link-color) ${20 + level * 18}%, var(--button-hover-color));`;
+                                                                                                })()}
+                                                                                        >{cell.codeCount > 0 ? cell.codeCount : ''}</span>
+                                                                                </div>
                                                                         ) : (
-                                                                                <span class="h-3.5 w-3.5 rounded-sm bg-transparent"></span>
+                                                                                <span class="h-10 w-6 rounded-sm bg-transparent"></span>
                                                                         )
                                                                 ))}
                                                         </div>
@@ -193,7 +262,12 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                                 </div>
                         </div>
 
-                        {totalUpdates === 0 && (
+                        <div class="mt-3 flex items-center gap-4 text-xs text-[var(--text-color)]/65">
+                                <span class="font-medium">{profileLabels.heatmapBlog}</span>
+                                <span class="font-medium">{profileLabels.heatmapCode}</span>
+                        </div>
+
+                        {totalBlogUpdates + totalCodeUpdates === 0 && (
                                 <p class="mt-3 text-sm text-[var(--text-color)]/65">{profileLabels.noUpdate}</p>
                         )}
                 </section>
@@ -235,24 +309,23 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                 fpsLimit: 60,
                 detectRetina: true,
                 particles: {
-                    number: { value: 70, density: { enable: true, area: 900 } },
+                                        number: { value: 130, density: { enable: true, area: 700 } },
                     color: { value: color },
-                    opacity: { value: { min: 0.2, max: 0.75 } },
-                    size: { value: { min: 1, max: 3 } },
+                                        opacity: { value: { min: 0.25, max: 0.9 } },
+                                        size: { value: { min: 1, max: 3.5 } },
                     move: {
                         enable: true,
-                        speed: 1.2,
+                                                speed: 2.8,
                         direction: "none",
-                        random: false,
+                                                random: true,
                         straight: false,
                         outModes: { default: "bounce" },
-                        decay: 0.02,
                     },
                     links: {
                         enable: true,
-                        distance: 120,
+                                                distance: 135,
                         color,
-                        opacity: 0.22,
+                                                opacity: 0.32,
                         width: 1,
                     },
                 },
@@ -269,8 +342,8 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                         repulse: { distance: 120, duration: 0.55 },
                     },
                 },
-                pauseOnBlur: true,
-                pauseOnOutsideViewport: true,
+                                pauseOnBlur: false,
+                                pauseOnOutsideViewport: false,
             },
         });
     }
