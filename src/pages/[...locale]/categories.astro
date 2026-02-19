@@ -1,7 +1,6 @@
 ---
 import MainPageLayout from '@layouts/MainPageLayout.astro'
 import Cover from '@components/Cover.astro'
-import PageParticles from '@components/misc/PageParticles.astro'
 
 import { siteConfig } from '@/config'
 import { getBlogEntrySort } from '@utils/content-utils'
@@ -52,7 +51,7 @@ const pageTitle = t("header.categories") + " - " + siteConfig.title;
 ---
 
 <MainPageLayout title={pageTitle} lang={currentLang}>
-  <PageParticles id="categories-particles" />
+  <div id="categories-particles" class="pointer-events-none fixed inset-0 -z-10"></div>
   <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
     <Cover title={t("cover.title.categories")} subTitle={t("cover.subTitle.categories", {count: categories.length})} />
 
@@ -69,3 +68,100 @@ const pageTitle = t("header.categories") + " - " + siteConfig.title;
     </div>
   </div>
 </MainPageLayout>
+
+<script>
+  import { tsParticles } from "@tsparticles/engine";
+  import { loadSlim } from "@tsparticles/slim";
+
+  const containerId = "categories-particles";
+
+  function isActivePage() {
+    return Boolean(document.getElementById(containerId));
+  }
+
+  function getParticleColor() {
+    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+    return currentTheme === "dark" ? "#ffffff" : "#0284c7";
+  }
+
+  async function mountParticles() {
+    if (!isActivePage()) return;
+
+    await loadSlim(tsParticles);
+
+    const mounted = tsParticles.dom().find((item) => item.id === containerId);
+    if (mounted) {
+      await mounted.destroy();
+    }
+
+    const color = getParticleColor();
+
+    await tsParticles.load({
+      id: containerId,
+      options: {
+        fullScreen: { enable: true, zIndex: -1 },
+        background: { color: "transparent" },
+        fpsLimit: 60,
+        detectRetina: true,
+        particles: {
+          number: { value: 160, density: { enable: true, area: 700 } },
+          color: { value: color },
+          opacity: { value: { min: 0.35, max: 0.95 } },
+          size: { value: { min: 1.2, max: 3.8 } },
+          move: {
+            enable: true,
+            speed: 3.2,
+            direction: "none",
+            random: true,
+            straight: false,
+            outModes: { default: "bounce" },
+          },
+          links: {
+            enable: false,
+          },
+        },
+        interactivity: {
+          detectsOn: "canvas",
+          events: {
+            onHover: { enable: true, mode: ["repulse"] },
+            onClick: { enable: true, mode: "repulse" },
+            resize: { enable: true },
+          },
+          modes: {
+            repulse: { distance: 130, duration: 0.6 },
+          },
+        },
+        pauseOnBlur: false,
+        pauseOnOutsideViewport: false,
+      },
+    });
+  }
+
+  function setupThemeWatcher() {
+    if (!isActivePage()) return;
+
+    const oldObserver = window.__categoriesParticleThemeObserver;
+    if (oldObserver) oldObserver.disconnect();
+
+    const observer = new MutationObserver(() => {
+      mountParticles();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    window.__categoriesParticleThemeObserver = observer;
+  }
+
+  function initEnhancements() {
+    if (!isActivePage()) return;
+    mountParticles();
+    setupThemeWatcher();
+  }
+
+  initEnhancements();
+  document.addEventListener("astro:page-load", initEnhancements);
+  document.addEventListener("astro:after-swap", initEnhancements);
+</script>
