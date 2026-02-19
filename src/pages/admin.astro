@@ -158,6 +158,23 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
           <div class="rounded border border-[var(--button-border-color)] p-4">
             <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <div class="text-sm font-semibold">关于特质模块</div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button id="load-about-profile-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
+                <button id="save-about-profile-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input id="about-mbti" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="MBTI，例如：INTP" />
+              <input id="about-major" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="所学专业，例如：电子信息工程" />
+              <input id="about-recent-doing" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2 md:col-span-2" placeholder="最近在做" />
+              <input id="about-recent-reading" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2 md:col-span-2" placeholder="最近读书" />
+            </div>
+            <p id="about-profile-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
+          </div>
+
+          <div class="rounded border border-[var(--button-border-color)] p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
               <div class="text-sm font-semibold">友链（JSON）</div>
               <div class="flex flex-wrap items-center gap-2">
                 <button id="load-friends-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
@@ -191,12 +208,14 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 <script>
   import {
     AdminService,
+    buildAboutProfileTs,
     buildFriendLinksTs,
     buildHeaderContactTs,
     buildPostMarkdown,
     decodeFileContent,
     getNowDateTimeLocal,
     normalizeSlug,
+    parseAboutProfileFromTs,
     parseFriendLinksFromTs,
     parseHeaderContactFromTs,
     toIsoDateTime
@@ -210,6 +229,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   const ADMIN_SECURITY_PATH = "public/admin-security.json";
   const ADMIN_SECURITY_URL = `${window.location.origin}/-/admin-security.json`;
   const HEADER_CONTACT_PATH = "src/data/header-contact.ts";
+  const ABOUT_PROFILE_PATH = "src/data/about-profile.ts";
 
   const loginSection = document.getElementById("login-section");
   const adminPanel = document.getElementById("admin-panel");
@@ -822,6 +842,52 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const path = `src/content/spec/about/${lang}.md`;
       await upsertFile(path, content, `about: update ${lang}`, token, branch);
       setMsg(msgEl, "保存成功");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("load-about-profile-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("about-profile-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const meta = await getFileMeta(ABOUT_PROFILE_PATH, token, branch);
+      const content = decodeFileContent(meta?.content || "");
+      const profile = parseAboutProfileFromTs(content);
+
+      document.getElementById("about-mbti").value = profile.mbti || "";
+      document.getElementById("about-major").value = profile.major || "";
+      document.getElementById("about-recent-doing").value = profile.recentDoing || "";
+      document.getElementById("about-recent-reading").value = profile.recentReading || "";
+      setMsg(msgEl, "关于特质加载成功");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("save-about-profile-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("about-profile-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const mbti = (document.getElementById("about-mbti")?.value || "").trim();
+      const major = (document.getElementById("about-major")?.value || "").trim();
+      const recentDoing = (document.getElementById("about-recent-doing")?.value || "").trim();
+      const recentReading = (document.getElementById("about-recent-reading")?.value || "").trim();
+
+      if (!mbti) throw new Error("请填写 MBTI");
+      if (!major) throw new Error("请填写所学专业");
+      if (!recentDoing) throw new Error("请填写最近在做");
+      if (!recentReading) throw new Error("请填写最近读书");
+
+      const content = buildAboutProfileTs({ mbti, major, recentDoing, recentReading });
+      await upsertFile(ABOUT_PROFILE_PATH, content, "about: update profile", token, branch);
+      setMsg(msgEl, "关于特质保存成功");
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }

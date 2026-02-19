@@ -3,11 +3,12 @@ import MainPageLayout from '@layouts/MainPageLayout.astro'
 import Markdown from '@components/misc/Markdown.astro'
 import Cover from '@components/Cover.astro'
 
-import { getSpec } from '@utils/content-utils'
+import { getBlogEntrySort, getSpec } from '@utils/content-utils'
+import aboutProfile from '@/data/about-profile'
 
 import { siteConfig } from '@/config'
 import i18nit from '@i18n/translation'
-import { getEntry, render } from 'astro:content'
+import { render } from 'astro:content'
 import { i18n } from "astro:config/client";
 
 export async function getStaticPaths() {
@@ -24,13 +25,280 @@ if (!aboutPost) {
 }
 const { Content } = await render(aboutPost);
 
+const HEATMAP_DAYS = 140;
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+const startDate = new Date(today);
+startDate.setDate(today.getDate() - HEATMAP_DAYS + 1);
+
+const updateCountMap = new Map<string, number>();
+const blogEntries = await getBlogEntrySort(currentLang);
+
+for (const entry of blogEntries) {
+    const date = new Date(entry.data.pubDate);
+    date.setHours(0, 0, 0, 0);
+    if (date < startDate || date > today) continue;
+    const key = date.toISOString().slice(0, 10);
+    updateCountMap.set(key, (updateCountMap.get(key) || 0) + 1);
+}
+
+const daySeries = [] as Array<{ key: string; date: Date; count: number }>;
+for (let index = 0; index < HEATMAP_DAYS; index += 1) {
+    const date = new Date(startDate);
+    date.setDate(startDate.getDate() + index);
+    const key = date.toISOString().slice(0, 10);
+    daySeries.push({ key, date, count: updateCountMap.get(key) || 0 });
+}
+
+const totalUpdates = daySeries.reduce((sum, item) => sum + item.count, 0);
+const maxCount = Math.max(...daySeries.map((item) => item.count), 1);
+const leadingPadCount = startDate.getDay();
+
+const heatmapCells = [
+    ...Array.from({ length: leadingPadCount }, () => null),
+    ...daySeries,
+] as Array<{ key: string; date: Date; count: number } | null>;
+
+const heatmapWeeks = [] as Array<Array<{ key: string; date: Date; count: number } | null>>;
+for (let index = 0; index < heatmapCells.length; index += 7) {
+    const week = heatmapCells.slice(index, index + 7);
+    while (week.length < 7) week.push(null);
+    heatmapWeeks.push(week);
+}
+
+const weekdayLabels = currentLang === 'zh-cn'
+    ? ['日', '一', '二', '三', '四', '五', '六']
+    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+const profileLabels = currentLang === 'zh-cn'
+    ? {
+            traitTitle: '关于我的特质',
+            mbti: 'MBTI',
+            major: '所学专业',
+            recentDoing: '最近在做',
+            recentReading: '最近读书',
+            heatmapTitle: '最近博客更新频率',
+            heatmapSubtitle: `过去 ${HEATMAP_DAYS} 天共更新 ${totalUpdates} 次`,
+            legendLow: '低',
+            legendHigh: '高',
+            noUpdate: '暂无更新',
+        }
+    : {
+            traitTitle: 'My Traits',
+            mbti: 'MBTI',
+            major: 'Major',
+            recentDoing: 'Recent Focus',
+            recentReading: 'Recent Reading',
+            heatmapTitle: 'Recent Blog Activity',
+            heatmapSubtitle: `${totalUpdates} updates in the last ${HEATMAP_DAYS} days`,
+            legendLow: 'Low',
+            legendHigh: 'High',
+            noUpdate: 'No updates',
+        };
+
+function getIntensityLevel(count: number): number {
+    if (count <= 0) return 0;
+    const ratio = count / maxCount;
+    if (ratio < 0.25) return 1;
+    if (ratio < 0.5) return 2;
+    if (ratio < 0.75) return 3;
+    return 4;
+}
+
 const pageTitle = t("header.about") + " - " + siteConfig.title;
 ---
 <MainPageLayout title={pageTitle} lang={currentLang}>
-    <div class="mx-auto w-full max-w-[var(--page-width)]">
-        <Cover title={t("cover.title.about")} subTitle={t("cover.subTitle.about")}/>
-        <Markdown class="mb-6 markdown-content onload-animation">
-            <Content />
-        </Markdown>
+        <div class="relative mx-auto w-full max-w-[var(--page-width)]">
+                <div id="about-particles" class="pointer-events-none absolute inset-0 -z-10 rounded-xl"></div>
+
+                <Cover title={t("cover.title.about")} subTitle={t("cover.subTitle.about")}/>
+
+                <section class="mb-6 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
+                        <h2 class="mb-4 text-lg font-semibold text-[var(--text-color)]">{profileLabels.traitTitle}</h2>
+                        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                                <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
+                                        <p class="text-xs text-[var(--text-color)]/60">{profileLabels.mbti}</p>
+                                        <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.mbti}</p>
+                                </div>
+                                <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
+                                        <p class="text-xs text-[var(--text-color)]/60">{profileLabels.major}</p>
+                                        <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.major}</p>
+                                </div>
+                                <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3 md:col-span-2">
+                                        <p class="text-xs text-[var(--text-color)]/60">{profileLabels.recentDoing}</p>
+                                        <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.recentDoing}</p>
+                                </div>
+                                <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3 md:col-span-2">
+                                        <p class="text-xs text-[var(--text-color)]/60">{profileLabels.recentReading}</p>
+                                        <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.recentReading}</p>
+                                </div>
+                        </div>
+                </section>
+
+                <Markdown class="mb-6 markdown-content onload-animation">
+                        <Content />
+                </Markdown>
+
+                <section class="mb-8 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
+                        <div class="mb-4 flex flex-wrap items-end justify-between gap-2">
+                                <div>
+                                        <h2 class="text-lg font-semibold text-[var(--text-color)]">{profileLabels.heatmapTitle}</h2>
+                                        <p class="text-sm text-[var(--text-color)]/65">{profileLabels.heatmapSubtitle}</p>
+                                </div>
+                                <div class="flex items-center gap-2 text-xs text-[var(--text-color)]/65">
+                                        <span>{profileLabels.legendLow}</span>
+                                        {[0, 1, 2, 3, 4].map((level) => (
+                                                <span
+                                                        class="h-3.5 w-3.5 rounded-sm border border-[var(--button-border-color)]"
+                                                        style={level === 0
+                                                                ? 'background: var(--button-hover-color);'
+                                                                : `background: color-mix(in srgb, var(--link-color) ${20 + level * 18}%, var(--button-hover-color));`}
+                                                ></span>
+                                        ))}
+                                        <span>{profileLabels.legendHigh}</span>
+                                </div>
+                        </div>
+
+                        <div class="about-heatmap-wrap overflow-x-auto">
+                                <div class="inline-flex gap-2 min-w-full">
+                                        <div class="grid grid-rows-7 gap-1 pt-5 text-[10px] text-[var(--text-color)]/55">
+                                                {weekdayLabels.map((label, index) => (
+                                                        <span class={index % 2 === 0 ? '' : 'opacity-0'}>{label}</span>
+                                                ))}
+                                        </div>
+
+                                        <div class="flex gap-1">
+                                                {heatmapWeeks.map((week) => (
+                                                        <div class="grid grid-rows-7 gap-1">
+                                                                {week.map((cell) => (
+                                                                        cell ? (
+                                                                                <span
+                                                                                        title={`${cell.key} · ${cell.count}`}
+                                                                                        class="h-3.5 w-3.5 rounded-sm border border-[var(--button-border-color)]"
+                                                                                        style={(() => {
+                                                                                                const level = getIntensityLevel(cell.count);
+                                                                                                return level === 0
+                                                                                                    ? 'background: var(--button-hover-color);'
+                                                                                                    : `background: color-mix(in srgb, var(--link-color) ${20 + level * 18}%, var(--button-hover-color));`;
+                                                                                        })()}
+                                                                                ></span>
+                                                                        ) : (
+                                                                                <span class="h-3.5 w-3.5 rounded-sm bg-transparent"></span>
+                                                                        )
+                                                                ))}
+                                                        </div>
+                                                ))}
+                                        </div>
+                                </div>
+                        </div>
+
+                        {totalUpdates === 0 && (
+                                <p class="mt-3 text-sm text-[var(--text-color)]/65">{profileLabels.noUpdate}</p>
+                        )}
+                </section>
     </div>
 </MainPageLayout>
+
+<script>
+    import { tsParticles } from "@tsparticles/engine";
+    import { loadSlim } from "@tsparticles/slim";
+
+    const containerId = "about-particles";
+
+    function isAboutPage() {
+        return Boolean(document.getElementById(containerId));
+    }
+
+    function getParticleColor() {
+        const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+        return currentTheme === "dark" ? "#ffffff" : "#7dd3fc";
+    }
+
+    async function mountParticles() {
+        if (!isAboutPage()) return;
+
+        await loadSlim(tsParticles);
+
+        const mounted = tsParticles.dom().find((item) => item.id === containerId);
+        if (mounted) {
+            await mounted.destroy();
+        }
+
+        const color = getParticleColor();
+
+        await tsParticles.load({
+            id: containerId,
+            options: {
+                fullScreen: { enable: false },
+                background: { color: "transparent" },
+                fpsLimit: 60,
+                detectRetina: true,
+                particles: {
+                    number: { value: 70, density: { enable: true, area: 900 } },
+                    color: { value: color },
+                    opacity: { value: { min: 0.2, max: 0.75 } },
+                    size: { value: { min: 1, max: 3 } },
+                    move: {
+                        enable: true,
+                        speed: 1.2,
+                        direction: "none",
+                        random: false,
+                        straight: false,
+                        outModes: { default: "bounce" },
+                        decay: 0.02,
+                    },
+                    links: {
+                        enable: true,
+                        distance: 120,
+                        color,
+                        opacity: 0.22,
+                        width: 1,
+                    },
+                },
+                interactivity: {
+                    detectsOn: "canvas",
+                    events: {
+                        onHover: { enable: true, mode: ["grab", "attract"] },
+                        onClick: { enable: true, mode: "repulse" },
+                        resize: { enable: true },
+                    },
+                    modes: {
+                        grab: { distance: 150, links: { opacity: 0.35 } },
+                        attract: { distance: 180, duration: 0.35, factor: 2 },
+                        repulse: { distance: 120, duration: 0.55 },
+                    },
+                },
+                pauseOnBlur: true,
+                pauseOnOutsideViewport: true,
+            },
+        });
+    }
+
+    function setupThemeWatcher() {
+        if (!isAboutPage()) return;
+
+        const oldObserver = window.__aboutParticleThemeObserver;
+        if (oldObserver) oldObserver.disconnect();
+
+        const observer = new MutationObserver(() => {
+            mountParticles();
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["data-theme"],
+        });
+
+        window.__aboutParticleThemeObserver = observer;
+    }
+
+    function initAboutEnhancements() {
+        if (!isAboutPage()) return;
+        mountParticles();
+        setupThemeWatcher();
+    }
+
+    document.addEventListener("astro:page-load", initAboutEnhancements);
+    document.addEventListener("astro:after-swap", initAboutEnhancements);
+</script>

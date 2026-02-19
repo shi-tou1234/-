@@ -91,6 +91,21 @@ export function buildHeaderContactTs(contact: { githubUrl: string; email: string
   return `export type HeaderContact = {\n  githubUrl: string\n  email: string\n}\n\nconst headerContact: HeaderContact = ${JSON.stringify(contact, null, 2)}\n\nexport default headerContact\n`;
 }
 
+export function parseAboutProfileFromTs(content: string) {
+  const matched = content.match(/const\s+aboutProfile:\s*AboutProfile\s*=\s*(\{[\s\S]*?\})\s*\n\s*export\s+default\s+aboutProfile/);
+  if (!matched?.[1]) throw new Error("无法解析关于特质文件");
+  return JSON.parse(matched[1]);
+}
+
+export function buildAboutProfileTs(profile: {
+  mbti: string;
+  major: string;
+  recentDoing: string;
+  recentReading: string;
+}) {
+  return `export type AboutProfile = {\n  mbti: string\n  major: string\n  recentDoing: string\n  recentReading: string\n}\n\nconst aboutProfile: AboutProfile = ${JSON.stringify(profile, null, 2)}\n\nexport default aboutProfile\n`;
+}
+
 export function normalizeSlug(input: string): string {
   return input
     .trim()
