@@ -4,7 +4,7 @@ pubDate: 2026-02-20T12:00:00.000Z
 draft: false
 description: 一篇覆盖标题、文本强调、引用、代码、列表、链接、图片、表格、任务清单等常见 Markdown 语法的快速参考。
 category: Markdown
-slugId: markdown-basic-syntax
+slugId: 简单的markdown语法
 ---
 
 这篇文章整理了常用 Markdown 语法，适合作为写作时的速查手册。
@@ -146,4 +146,4 @@ $$
 
 ---
 
-如果你在后台编辑器中写作，可以直接使用“Markdown 快捷语法 + 插入语法”按钮快速生成这些模板。
+
