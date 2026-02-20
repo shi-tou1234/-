@@ -51,7 +51,7 @@ const pageTitle = t("header.categories") + " - " + siteConfig.title;
 ---
 
 <MainPageLayout title={pageTitle} lang={currentLang}>
-  <div id="categories-particles" class="pointer-events-none fixed inset-0 -z-10"></div>
+  <div id="categories-particles" class="pointer-events-none fixed inset-0 z-0"></div>
   <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
     <Cover title={t("cover.title.categories")} subTitle={t("cover.subTitle.categories", {count: categories.length})} />
 
@@ -80,8 +80,11 @@ const pageTitle = t("header.categories") + " - " + siteConfig.title;
   }
 
   function getParticleColor() {
+    const computed = getComputedStyle(document.documentElement);
+    const linkColor = computed.getPropertyValue("--link-color").trim();
+    if (linkColor) return linkColor;
     const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
-    return currentTheme === "dark" ? "#ffffff" : "#0284c7";
+    return currentTheme === "dark" ? "#93c5fd" : "#1d4ed8";
   }
 
   async function mountParticles() {
@@ -99,18 +102,18 @@ const pageTitle = t("header.categories") + " - " + siteConfig.title;
     await tsParticles.load({
       id: containerId,
       options: {
-        fullScreen: { enable: true, zIndex: -1 },
+        fullScreen: { enable: false },
         background: { color: "transparent" },
         fpsLimit: 60,
         detectRetina: true,
         particles: {
-          number: { value: 160, density: { enable: true, area: 700 } },
+          number: { value: 90, density: { enable: true, area: 1000 } },
           color: { value: color },
-          opacity: { value: { min: 0.35, max: 0.95 } },
-          size: { value: { min: 1.2, max: 3.8 } },
+          opacity: { value: { min: 0.14, max: 0.45 } },
+          size: { value: { min: 1, max: 2.6 } },
           move: {
             enable: true,
-            speed: 3.2,
+            speed: 1.8,
             direction: "none",
             random: true,
             straight: false,
@@ -128,7 +131,7 @@ const pageTitle = t("header.categories") + " - " + siteConfig.title;
             resize: { enable: true },
           },
           modes: {
-            repulse: { distance: 130, duration: 0.6 },
+            repulse: { distance: 90, duration: 0.45 },
           },
         },
         pauseOnBlur: false,
