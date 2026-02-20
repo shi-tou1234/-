@@ -134,9 +134,9 @@ const categoriesRoot = getRelativeLocaleUrl(currentLang, '/categories/');
   function getParticleColor() {
     const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
     if (currentTheme === "dark") {
-      return ["#93c5fd", "#c4b5fd", "#f0abfc", "#a5b4fc"];
+      return ["#38bdf8", "#818cf8", "#a78bfa", "#22d3ee"];
     }
-    return ["#60a5fa", "#c084fc", "#f9a8d4", "#93c5fd"];
+    return ["#2563eb", "#a855f7", "#ec4899", "#06b6d4"];
   }
 
   async function mountParticles() {
@@ -159,19 +159,19 @@ const categoriesRoot = getRelativeLocaleUrl(currentLang, '/categories/');
         fpsLimit: 60,
         detectRetina: true,
         particles: {
-          number: { value: 130, density: { enable: true, area: 900 } },
+          number: { value: 145, density: { enable: true, area: 860 } },
           color: { value: color },
           opacity: {
-            value: { min: 0.2, max: 0.62 },
+            value: { min: 0.28, max: 0.78 },
             animation: { enable: true, speed: 0.9, sync: false },
           },
           size: {
-            value: { min: 1, max: 3.6 },
+            value: { min: 1.1, max: 3.9 },
             animation: { enable: true, speed: 1.4, sync: false },
           },
           move: {
             enable: true,
-            speed: 1.35,
+            speed: 2.05,
             direction: "none",
             random: true,
             straight: false,
