@@ -117,6 +117,25 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
                 </select>
                 <button id="insert-md-snippet-btn" type="button" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">插入语法</button>
               </div>
+              <details class="mt-2 rounded border border-[var(--button-border-color)] p-3 text-sm">
+                <summary class="cursor-pointer font-medium">Markdown 快捷帮助文档（参考）</summary>
+                <div class="mt-3 space-y-2 text-[var(--text-color)]/80">
+                  <p><strong>标题：</strong><code># 一级标题</code> / <code>## 二级标题</code></p>
+                  <p><strong>强调：</strong><code>**粗体**</code>、<code>*斜体*</code>、<code>~~删除线~~</code></p>
+                  <p><strong>引用：</strong><code>&gt; 块引用内容</code></p>
+                  <p><strong>列表：</strong><code>- 无序</code>、<code>1. 有序</code>、<code>- [ ] 任务项</code></p>
+                  <p><strong>链接：</strong><code>[链接文字](https://example.com)</code></p>
+                  <p><strong>代码：</strong><code>`行内代码`</code>、<code>```ts ... ```</code></p>
+                  <p><strong>公式：</strong><code>$a^2+b^2=c^2$</code>、<code>$$ \int_a^b f(x)dx $$</code></p>
+                  <p><strong>表格：</strong><code>| 列1 | 列2 |</code> + 下一行分隔符</p>
+                  <p><strong>提示卡片：</strong><code>:::tip ... :::</code></p>
+                  <p><strong>分割线：</strong><code>---</code></p>
+                  <p>
+                    完整参考：
+                    <a href="https://note.motues.top/docs/Markdown/use" target="_blank" rel="noopener noreferrer" class="text-[var(--link-color)] underline">简单的 Markdown 语法</a>
+                  </p>
+                </div>
+              </details>
             </div>
 
             <details class="rounded border border-[var(--button-border-color)] p-3">
