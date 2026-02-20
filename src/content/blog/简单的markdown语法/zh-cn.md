@@ -3,7 +3,7 @@ title: 简单的 Markdown 语法（速查）
 pubDate: 2026-02-20T12:00:00.000Z
 draft: false
 description: 一篇覆盖标题、文本强调、引用、代码、列表、链接、图片、表格、任务清单等常见 Markdown 语法的快速参考。
-category: Markdown
+category: 工具使用
 slugId: 简单的markdown语法
 ---
 
