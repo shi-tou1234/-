@@ -93,6 +93,30 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
             <div>
               <label class="block text-sm mb-1">正文 Markdown</label>
               <textarea id="post-content" class="w-full min-h-[280px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="在这里写文章内容"></textarea>
+              <div class="mt-2 flex flex-wrap items-center gap-2">
+                <select id="post-md-snippet" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-1.5 text-sm">
+                  <option value="">选择 Markdown 快捷语法</option>
+                  <option value="app">应用（下载/访问）</option>
+                  <option value="link">链接</option>
+                  <option value="table">表格</option>
+                  <option value="tip">提示卡片（tip）</option>
+                  <option value="formula-inline">行内公式</option>
+                  <option value="formula-block">块级公式</option>
+                  <option value="code-inline">行内代码</option>
+                  <option value="code-block">代码块</option>
+                  <option value="bold">粗体</option>
+                  <option value="italic">斜体</option>
+                  <option value="heading-2">标题（H2）</option>
+                  <option value="heading-3">标题（H3）</option>
+                  <option value="blockquote">块引用</option>
+                  <option value="ul">无序列表</option>
+                  <option value="ol">有序列表</option>
+                  <option value="task">任务列表</option>
+                  <option value="strike">删除线</option>
+                  <option value="hr">水平线</option>
+                </select>
+                <button id="insert-md-snippet-btn" type="button" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">插入语法</button>
+              </div>
             </div>
 
             <details class="rounded border border-[var(--button-border-color)] p-3">
@@ -643,6 +667,56 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     const textarea = document.getElementById("post-content");
     const iframeTpl = `\n<iframe src=\"https://www.youtube.com/embed/VIDEO_ID\" title=\"Video\" frameborder=\"0\" allowfullscreen></iframe>\n`;
     textarea.value = `${textarea.value || ""}${iframeTpl}`;
+  });
+
+  function insertAtCursor(textarea, beforeText, afterText = "", fallbackSelection = "") {
+    if (!textarea) return;
+
+    const start = textarea.selectionStart ?? textarea.value.length;
+    const end = textarea.selectionEnd ?? textarea.value.length;
+    const selected = textarea.value.slice(start, end);
+    const inner = selected || fallbackSelection;
+    const insertion = `${beforeText}${inner}${afterText}`;
+
+    textarea.setRangeText(insertion, start, end, "end");
+    textarea.focus();
+  }
+
+  function insertMarkdownSnippet(type) {
+    const textarea = document.getElementById("post-content");
+    if (!textarea || !type) return;
+
+    const snippets = {
+      app: () => insertAtCursor(textarea, "[📱 应用名称](https://example.com)\n\n> 简介：一句话说明这个应用适合做什么。\n"),
+      link: () => insertAtCursor(textarea, "[链接标题](https://example.com)"),
+      table: () => insertAtCursor(textarea, "| 列1 | 列2 | 列3 |\n| --- | --- | --- |\n| 内容1 | 内容2 | 内容3 |\n"),
+      tip: () => insertAtCursor(textarea, ":::tip\n这里填写提示内容\n:::\n"),
+      "formula-inline": () => insertAtCursor(textarea, "$", "$", "a^2+b^2=c^2"),
+      "formula-block": () => insertAtCursor(textarea, "$$\n", "\n$$\n", "\\int_a^b f(x)\\,dx"),
+      "code-inline": () => insertAtCursor(textarea, "`", "`", "code"),
+      "code-block": () => insertAtCursor(textarea, "```ts\n", "\n```\n", "console.log('hello')"),
+      bold: () => insertAtCursor(textarea, "**", "**", "加粗文本"),
+      italic: () => insertAtCursor(textarea, "*", "*", "斜体文本"),
+      "heading-2": () => insertAtCursor(textarea, "## 二级标题\n"),
+      "heading-3": () => insertAtCursor(textarea, "### 三级标题\n"),
+      blockquote: () => insertAtCursor(textarea, "> 这是一段引用\n"),
+      ul: () => insertAtCursor(textarea, "- 列表项 1\n- 列表项 2\n"),
+      ol: () => insertAtCursor(textarea, "1. 列表项 1\n2. 列表项 2\n"),
+      task: () => insertAtCursor(textarea, "- [ ] 待办事项\n- [x] 已完成事项\n"),
+      strike: () => insertAtCursor(textarea, "~~", "~~", "删除线文本"),
+      hr: () => insertAtCursor(textarea, "\n---\n"),
+    };
+
+    const handler = snippets[type];
+    if (!handler) return;
+    handler();
+  }
+
+  document.getElementById("insert-md-snippet-btn")?.addEventListener("click", () => {
+    const selectEl = document.getElementById("post-md-snippet");
+    const type = (selectEl?.value || "").trim();
+    if (!type) return;
+    insertMarkdownSnippet(type);
   });
 
   document.getElementById("upload-files-btn")?.addEventListener("click", async () => {
