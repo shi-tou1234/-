@@ -43,6 +43,49 @@ const { title, lang } = Astro.props;
     return /\/blog\/.+/.test(window.location.pathname);
   }
 
+  function isBlogListPage() {
+    const path = window.location.pathname;
+    if (/\/(archives|categories)(\/|$)/.test(path)) return true;
+    if (/^\/(zh-cn|en)\/?$/.test(path)) return true;
+    return path === "/";
+  }
+
+  function getParticleProfile() {
+    if (isBlogDetailPage()) {
+      return {
+        number: 70,
+        area: 1100,
+        opacity: { min: 0.1, max: 0.28 },
+        size: { min: 0.7, max: 1.9 },
+        speed: 0.95,
+        bubble: { distance: 80, size: 2.2, duration: 0.9, opacity: 0.35 },
+        push: 1,
+      };
+    }
+
+    if (isBlogListPage()) {
+      return {
+        number: 110,
+        area: 980,
+        opacity: { min: 0.16, max: 0.45 },
+        size: { min: 0.9, max: 2.8 },
+        speed: 1.45,
+        bubble: { distance: 105, size: 3.1, duration: 1.2, opacity: 0.6 },
+        push: 1,
+      };
+    }
+
+    return {
+      number: 145,
+      area: 860,
+      opacity: { min: 0.28, max: 0.78 },
+      size: { min: 1.1, max: 3.9 },
+      speed: 2.05,
+      bubble: { distance: 130, size: 4.2, duration: 1.8, opacity: 0.82 },
+      push: 2,
+    };
+  }
+
   function getParticleColor() {
     const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
     if (currentTheme === "dark") {
@@ -61,7 +104,7 @@ const { title, lang } = Astro.props;
       await mounted.destroy();
     }
 
-    const isBlogPage = isBlogDetailPage();
+    const profile = getParticleProfile();
     const color = getParticleColor();
 
     await tsParticles.load({
@@ -72,19 +115,19 @@ const { title, lang } = Astro.props;
         fpsLimit: 60,
         detectRetina: true,
         particles: {
-          number: { value: isBlogPage ? 95 : 145, density: { enable: true, area: isBlogPage ? 980 : 860 } },
+          number: { value: profile.number, density: { enable: true, area: profile.area } },
           color: { value: color },
           opacity: {
-            value: isBlogPage ? { min: 0.14, max: 0.4 } : { min: 0.28, max: 0.78 },
+            value: profile.opacity,
             animation: { enable: true, speed: 0.9, sync: false },
           },
           size: {
-            value: isBlogPage ? { min: 0.8, max: 2.4 } : { min: 1.1, max: 3.9 },
+            value: profile.size,
             animation: { enable: true, speed: 1.4, sync: false },
           },
           move: {
             enable: true,
-            speed: isBlogPage ? 1.3 : 2.05,
+            speed: profile.speed,
             direction: "none",
             random: true,
             straight: false,
@@ -102,10 +145,8 @@ const { title, lang } = Astro.props;
             resize: { enable: true },
           },
           modes: {
-            bubble: isBlogPage
-              ? { distance: 95, size: 2.8, duration: 1.1, opacity: 0.55 }
-              : { distance: 130, size: 4.2, duration: 1.8, opacity: 0.82 },
-            push: { quantity: isBlogPage ? 1 : 2 },
+            bubble: profile.bubble,
+            push: { quantity: profile.push },
           },
         },
         pauseOnBlur: false,
