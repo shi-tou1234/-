@@ -232,7 +232,16 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                         <div class="mb-4 flex flex-wrap items-end justify-between gap-2">
                                 <div>
                                         <h2 class="text-lg font-semibold text-[var(--text-color)]">{profileLabels.heatmapTitle}</h2>
-                                        <p class="text-sm text-[var(--text-color)]/65">{profileLabels.heatmapSubtitle}</p>
+                                        <p
+                                                id="about-heatmap-subtitle"
+                                                data-days={HEATMAP_DAYS}
+                                                data-blog-total={totalBlogUpdates}
+                                                data-code-total={totalCodeUpdates}
+                                                data-blog-label={profileLabels.heatmapBlog}
+                                                data-code-label={profileLabels.heatmapCode}
+                                                data-lang={currentLang}
+                                                class="text-sm text-[var(--text-color)]/65"
+                                        >{profileLabels.heatmapSubtitle}</p>
                                         <p class="mt-1 flex items-center gap-3 text-xs text-[var(--text-color)]/60">
                                                 <span>{profileLabels.heatmapBlog}: {totalBlogUpdates}</span>
                                                 <span id="about-code-total" data-label={profileLabels.heatmapCode} data-value={totalCodeUpdates}>{profileLabels.heatmapCode}: {totalCodeUpdates}</span>
@@ -322,11 +331,11 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
         }
 
         function getParticleColor() {
-                const computed = getComputedStyle(document.documentElement);
-                const linkColor = computed.getPropertyValue("--link-color").trim();
-                if (linkColor) return linkColor;
                 const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
-                return currentTheme === "dark" ? "#93c5fd" : "#1d4ed8";
+                if (currentTheme === "dark") {
+                        return ["#93c5fd", "#c4b5fd", "#f0abfc", "#a5b4fc"];
+                }
+                return ["#60a5fa", "#c084fc", "#f9a8d4", "#93c5fd"];
         }
 
         async function mountParticles() {
@@ -349,13 +358,19 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                                 fpsLimit: 60,
                                 detectRetina: true,
                                 particles: {
-                                        number: { value: 90, density: { enable: true, area: 1000 } },
+                                        number: { value: 130, density: { enable: true, area: 900 } },
                                         color: { value: color },
-                                        opacity: { value: { min: 0.14, max: 0.45 } },
-                                        size: { value: { min: 1, max: 2.6 } },
+                                        opacity: {
+                                                value: { min: 0.2, max: 0.62 },
+                                                animation: { enable: true, speed: 0.9, sync: false },
+                                        },
+                                        size: {
+                                                value: { min: 1, max: 3.6 },
+                                                animation: { enable: true, speed: 1.4, sync: false },
+                                        },
                                         move: {
                                                 enable: true,
-                                                speed: 1.8,
+                                                speed: 1.35,
                                                 direction: "none",
                                                 random: true,
                                                 straight: false,
@@ -368,12 +383,13 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                                 interactivity: {
                                         detectsOn: "canvas",
                                         events: {
-                                                onHover: { enable: true, mode: ["repulse"] },
-                                                onClick: { enable: true, mode: "repulse" },
+                                                onHover: { enable: true, mode: ["bubble"] },
+                                                onClick: { enable: true, mode: "push" },
                                                 resize: { enable: true },
                                         },
                                         modes: {
-                                                repulse: { distance: 90, duration: 0.45 },
+                                                bubble: { distance: 130, size: 4.2, duration: 1.8, opacity: 0.82 },
+                                                push: { quantity: 2 },
                                         },
                                 },
                                 pauseOnBlur: false,
@@ -404,7 +420,23 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                 if (!isActivePage()) return;
                 mountParticles();
                 setupThemeWatcher();
+                renderHeatmapSubtitle();
                 refreshCodeHeatmapFromGithub();
+        }
+
+        function renderHeatmapSubtitle() {
+                const subtitleEl = document.getElementById('about-heatmap-subtitle');
+                if (!subtitleEl) return;
+                const days = Number(subtitleEl.getAttribute('data-days') || '140');
+                const blogTotal = Number(subtitleEl.getAttribute('data-blog-total') || '0');
+                const codeTotal = Number(subtitleEl.getAttribute('data-code-total') || '0');
+                const blogLabel = subtitleEl.getAttribute('data-blog-label') || 'Blog';
+                const codeLabel = subtitleEl.getAttribute('data-code-label') || 'Code';
+                const lang = subtitleEl.getAttribute('data-lang') || 'en';
+
+                subtitleEl.textContent = lang === 'zh-cn'
+                        ? `过去 ${days} 天 · ${blogLabel} ${blogTotal} 次 · ${codeLabel} ${codeTotal} 次`
+                        : `Last ${days} days · ${blogLabel} ${blogTotal} · ${codeLabel} ${codeTotal}`;
         }
 
         function getCodeCellStyle(level) {
@@ -472,6 +504,12 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                                 const label = totalEl.getAttribute('data-label') || 'Code';
                                 totalEl.textContent = `${label}: ${totalCodeUpdates}`;
                                 totalEl.setAttribute('data-value', String(totalCodeUpdates));
+                        }
+
+                        const subtitleEl = document.getElementById('about-heatmap-subtitle');
+                        if (subtitleEl) {
+                                subtitleEl.setAttribute('data-code-total', String(totalCodeUpdates));
+                                renderHeatmapSubtitle();
                         }
                 } catch {
                 }

@@ -80,11 +80,11 @@ const pageTitle = t("header.categories") + " - " + siteConfig.title;
   }
 
   function getParticleColor() {
-    const computed = getComputedStyle(document.documentElement);
-    const linkColor = computed.getPropertyValue("--link-color").trim();
-    if (linkColor) return linkColor;
     const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
-    return currentTheme === "dark" ? "#93c5fd" : "#1d4ed8";
+    if (currentTheme === "dark") {
+      return ["#93c5fd", "#c4b5fd", "#f0abfc", "#a5b4fc"];
+    }
+    return ["#60a5fa", "#c084fc", "#f9a8d4", "#93c5fd"];
   }
 
   async function mountParticles() {
@@ -107,13 +107,19 @@ const pageTitle = t("header.categories") + " - " + siteConfig.title;
         fpsLimit: 60,
         detectRetina: true,
         particles: {
-          number: { value: 90, density: { enable: true, area: 1000 } },
+          number: { value: 130, density: { enable: true, area: 900 } },
           color: { value: color },
-          opacity: { value: { min: 0.14, max: 0.45 } },
-          size: { value: { min: 1, max: 2.6 } },
+          opacity: {
+            value: { min: 0.2, max: 0.62 },
+            animation: { enable: true, speed: 0.9, sync: false },
+          },
+          size: {
+            value: { min: 1, max: 3.6 },
+            animation: { enable: true, speed: 1.4, sync: false },
+          },
           move: {
             enable: true,
-            speed: 1.8,
+            speed: 1.35,
             direction: "none",
             random: true,
             straight: false,
@@ -126,12 +132,13 @@ const pageTitle = t("header.categories") + " - " + siteConfig.title;
         interactivity: {
           detectsOn: "canvas",
           events: {
-            onHover: { enable: true, mode: ["repulse"] },
-            onClick: { enable: true, mode: "repulse" },
+            onHover: { enable: true, mode: ["bubble"] },
+            onClick: { enable: true, mode: "push" },
             resize: { enable: true },
           },
           modes: {
-            repulse: { distance: 90, duration: 0.45 },
+            bubble: { distance: 130, size: 4.2, duration: 1.8, opacity: 0.82 },
+            push: { quantity: 2 },
           },
         },
         pauseOnBlur: false,
