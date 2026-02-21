@@ -1,4 +1,4 @@
-# 📝 Momo Blog (cmchen 的博客)
+# 📝 My Blog (cmchen 的博客)
 感谢开源仓库https://github.com/motues/Momo
 
 [![Astro](https://img.shields.io/badge/Astro-5.x-BC52EE?logo=astro)](https://astro.build)
@@ -6,7 +6,7 @@
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.x-06B6D4?logo=tailwindcss)](https://tailwindcss.com)
 [![License](https://img.shields.io/github/license/shi-tou1234/-)](./LICENSE)
 
-这是一个基于 [Astro](https://astro.build/) 框架构建的现代化个人博客系统，部署于 GitHub Pages。项目代号 **Momo**，深度集成了 Svelte 5 与多种自定义 Markdown 插件，支持全方位的后台管理。
+这是一个基于 [Astro](https://astro.build/) 框架构建的现代化个人博客系统，部署于 GitHub Pages。深度集成了 Svelte 5 与多种自定义 Markdown 插件，支持全方位的后台管理。
 
 🔗 **访问站点**: [shi-tou1234.github.io/-](https://shi-tou1234.github.io/-/)
 
