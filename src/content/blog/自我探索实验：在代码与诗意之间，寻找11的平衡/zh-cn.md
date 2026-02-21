@@ -1,6 +1,6 @@
 ---
 title: 自我探索实验：在代码与诗意之间，寻找1:1的平衡
-pubDate: 2026-02-21T07:58:00.000Z
+pubDate: 2026-02-22T07:58:00.000Z
 draft: false
 description: 
 category: 随笔
