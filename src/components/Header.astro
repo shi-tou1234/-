@@ -45,7 +45,7 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
           <Icon name="simple-icons:github" class="w-4 h-4" />
         </a>
         <!-- Email Copy -->
-        <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" class="hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+        <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" class="copy-email-action hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
           <Icon name="fa6-solid:envelope" class="w-4 h-4" />
         </button>
         <!-- RSS -->
@@ -80,6 +80,13 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
           </button>
               <!-- Mobile Menu -->
               <div id="mobile-menu" class="hidden fixed right-2 top-16 w-36 bg-[var(--bg-color)]/95 backdrop-blur border border-[var(--button-border-color)] rounded-lg shadow-[0_8px_24px_var(--shadow-color)] z-[1200] text-[var(--text-color)]">
+                <div class="tiny-only px-2 py-2 border-b border-[var(--button-border-color)]">
+                  <div class="grid grid-cols-3 gap-2">
+                    <button id="mobile-search-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">搜索</button>
+                    <a href={headerContact.githubUrl} target="_blank" rel="noopener noreferrer" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">GitHub</a>
+                    <button class="copy-email-action px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]" data-email={headerContact.email}>邮箱</button>
+                  </div>
+                </div>
                 <div class="flex flex-col py-1">
                   <a href={ indexPage } class={`mx-2 my-1 p-2 text-sm rounded ${
                     Astro.url.pathname === indexPage 
@@ -172,6 +179,28 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
   font-family: "EB Garamond", cursive;
   letter-spacing: 1px;
 }
+.tiny-only {
+  display: none;
+}
+
+@media (max-width: 379px) {
+  #mobile-menu.is-tiny-screen {
+    top: 0;
+    right: 0;
+    width: min(84vw, 300px);
+    height: 100vh;
+    border-radius: 0;
+    border-top: 0;
+    border-right: 0;
+    padding-top: 3.8rem;
+    overflow-y: auto;
+  }
+
+  #mobile-menu.is-tiny-screen .tiny-only {
+    display: block;
+  }
+}
+
   /* 移动端 (小于 776px) 的毛玻璃和阴影 */
   @media (max-width: 775px) {
     #main-header {
@@ -193,6 +222,8 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 function initMobileNav() {
   const menuButton = document.getElementById('mobile-menu-button');
   const mobileMenu = document.getElementById('mobile-menu');
+  const searchButton = document.getElementById('search-button');
+  const mobileSearchButton = document.getElementById('mobile-search-btn');
   const languageMenu = document.getElementById('language-menu');
   const navBar = document.getElementById('nav-bar');
   const navBarList = document.getElementById('nav-bar-list');
@@ -204,6 +235,27 @@ function initMobileNav() {
     languageMenu?.classList.add('hidden');
     mobileMenu?.classList.toggle('hidden');
   };
+
+  if (mobileSearchButton && searchButton && mobileSearchButton.dataset.bound !== 'true') {
+    mobileSearchButton.dataset.bound = 'true';
+    mobileSearchButton.addEventListener('click', () => {
+      searchButton.click();
+      mobileMenu?.classList.add('hidden');
+    });
+  }
+
+  const tinyMedia = window.matchMedia('(max-width: 379px)');
+  const applyTinyScreenMode = () => {
+    mobileMenu?.classList.toggle('is-tiny-screen', tinyMedia.matches);
+  };
+  applyTinyScreenMode();
+
+  const oldTinyScreenHandler = window.__headerTinyScreenHandler;
+  if (oldTinyScreenHandler) {
+    tinyMedia.removeEventListener('change', oldTinyScreenHandler);
+  }
+  tinyMedia.addEventListener('change', applyTinyScreenMode);
+  window.__headerTinyScreenHandler = applyTinyScreenMode;
 
   const oldDocClickHandler = window.__headerMobileOutsideClickHandler;
   if (oldDocClickHandler) {
@@ -326,23 +378,26 @@ function showCopyToast(message) {
 }
 
 function initHeaderContactCopy() {
-  const copyEmailBtn = document.getElementById('copy-email-btn');
-  if (!copyEmailBtn || copyEmailBtn.dataset.bound === 'true') return;
-  copyEmailBtn.dataset.bound = 'true';
+  const copyButtons = Array.from(document.querySelectorAll('[data-email].copy-email-action, #copy-email-btn'));
 
-  copyEmailBtn.addEventListener('click', async () => {
-    const email = copyEmailBtn.getAttribute('data-email') || '';
-    if (!email) return;
-    try {
-      await navigator.clipboard.writeText(email);
-      copyEmailBtn.setAttribute('title', '已复制邮箱');
-      showCopyToast('邮箱已复制');
-      setTimeout(() => copyEmailBtn.setAttribute('title', '复制邮箱'), 1500);
-    } catch (_error) {
-      copyEmailBtn.setAttribute('title', '复制失败');
-      showCopyToast('复制失败，请手动复制');
-      setTimeout(() => copyEmailBtn.setAttribute('title', '复制邮箱'), 1500);
-    }
+  copyButtons.forEach((button) => {
+    if (button.dataset.bound === 'true') return;
+    button.dataset.bound = 'true';
+
+    button.addEventListener('click', async () => {
+      const email = button.getAttribute('data-email') || '';
+      if (!email) return;
+      try {
+        await navigator.clipboard.writeText(email);
+        button.setAttribute('title', '已复制邮箱');
+        showCopyToast('邮箱已复制');
+        setTimeout(() => button.setAttribute('title', '复制邮箱'), 1500);
+      } catch (_error) {
+        button.setAttribute('title', '复制失败');
+        showCopyToast('复制失败，请手动复制');
+        setTimeout(() => button.setAttribute('title', '复制邮箱'), 1500);
+      }
+    });
   });
 }
 
