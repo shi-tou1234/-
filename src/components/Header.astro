@@ -23,7 +23,7 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 ---
 
 <!-- header -->
-<div id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out md:relative md:translate-y-0">
+<div id="main-header" class="fixed top-0 left-0 right-0 z-50 overflow-visible transition-transform duration-300 ease-in-out md:relative md:translate-y-0">
 <div class="flex items-center pt-2 md:py-4 text-[var(--text-color)] max-w-[var(--header-width)] mx-auto">
     <!-- logo -->
     <div class="pr-4 py-2 z-30 header-logo">
@@ -33,19 +33,19 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
     </div>
     
     <!-- tools -->
-    <div class="ml-auto flex gap-2 pl-4 py-2 justify-end z-30">
+    <div class="ml-auto flex flex-nowrap gap-2 pl-4 py-2 justify-end z-30">
         <!-- Search -->
-        <button id="search-button" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+        <button id="search-button" class="hidden min-[380px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
             <Icon name="fa6-solid:magnifying-glass" class="w-4 h-4" />
         </button>
         <!-- Dark Mode -->
         <ThemeIcon class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] rounded-lg hover:text-current active:scale-90 border border-[var(--button-border-color)] transition-all duration-300"/>
         <!-- GitHub -->
-        <a href={headerContact.githubUrl} target="_blank" rel="noopener noreferrer" title="GitHub" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+        <a href={headerContact.githubUrl} target="_blank" rel="noopener noreferrer" title="GitHub" class="hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
           <Icon name="simple-icons:github" class="w-4 h-4" />
         </a>
         <!-- Email Copy -->
-        <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+        <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" class="hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
           <Icon name="fa6-solid:envelope" class="w-4 h-4" />
         </button>
         <!-- RSS -->
@@ -73,13 +73,13 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
           </div>
         </div>
         )}
-        <div class="relative md:hidden">
+        <div class="relative md:hidden shrink-0">
           <!-- Mobile Menu -->
           <button id="mobile-menu-button" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
               <Icon name="fa6-solid:align-justify" class="w-5 h-5" />
           </button>
               <!-- Mobile Menu -->
-              <div id="mobile-menu" class="hidden absolute right-0 mt-2 w-32 bg-[var(--bg-color)] border border-[var(--button-border-color)] rounded-lg shadow-lg z-50 text-[var(--text-color)]">
+              <div id="mobile-menu" class="hidden fixed right-2 top-16 w-36 bg-[var(--bg-color)]/95 backdrop-blur border border-[var(--button-border-color)] rounded-lg shadow-[0_8px_24px_var(--shadow-color)] z-[1200] text-[var(--text-color)]">
                 <div class="flex flex-col py-1">
                   <a href={ indexPage } class={`mx-2 my-1 p-2 text-sm rounded ${
                     Astro.url.pathname === indexPage 
