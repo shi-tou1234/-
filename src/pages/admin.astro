@@ -222,6 +222,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
             <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
               <div class="text-sm font-semibold">友链（JSON）</div>
               <div class="flex flex-wrap items-center gap-2">
+                <button id="insert-friend-template-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">一键插入格式</button>
                 <button id="load-friends-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
                 <button id="save-friends-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
               </div>
@@ -427,6 +428,54 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
   async function listBlogMarkdownEntries(token, branch) {
     return adminService.listBlogMarkdownEntries(token, branch);
+  }
+
+  async function translateTextToEnglish(text) {
+    const endpoint = "https://translate.googleapis.com/translate_a/single";
+    const query = new URLSearchParams({
+      client: "gtx",
+      sl: "zh-CN",
+      tl: "en",
+      dt: "t",
+      q: text
+    });
+
+    const response = await fetch(`${endpoint}?${query.toString()}`);
+    if (!response.ok) {
+      throw new Error(`自动翻译失败：${response.status}`);
+    }
+
+    const payload = await response.json();
+    const chunks = Array.isArray(payload?.[0]) ? payload[0] : [];
+    const translated = chunks.map((item) => item?.[0] || "").join("");
+    if (!translated) throw new Error("自动翻译失败：返回内容为空");
+    return translated;
+  }
+
+  async function translateAboutMarkdownToEnglish(markdown) {
+    const lines = (markdown || "").split("\n");
+    const translatedLines = [];
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || /^(```|~~~|---|\*\*\*|___)$/.test(trimmed)) {
+        translatedLines.push(line);
+        continue;
+      }
+
+      const matched = line.match(/^(\s*(?:#{1,6}\s|[-*+]\s|\d+\.\s|>\s)?)(.*)$/);
+      const prefix = matched?.[1] || "";
+      const body = matched?.[2] || line;
+      if (!body.trim()) {
+        translatedLines.push(line);
+        continue;
+      }
+
+      const translatedBody = await translateTextToEnglish(body);
+      translatedLines.push(`${prefix}${translatedBody}`);
+    }
+
+    return translatedLines.join("\n");
   }
 
   if (sessionStorage.getItem(SESSION_KEY) === "1") {
@@ -935,8 +984,40 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       if (!token) throw new Error("请先填写 GitHub Token");
 
       const path = `src/content/spec/about/${lang}.md`;
-      await upsertFile(path, content, `about: update ${lang}`, token, branch);
-      setMsg(msgEl, "保存成功");
+      if (lang === "zh-cn") {
+        setMsg(msgEl, "正在保存中文并自动生成英文...");
+        const enContent = await translateAboutMarkdownToEnglish(content);
+        await upsertFile(path, content, "about: update zh-cn", token, branch);
+        await upsertFile("src/content/spec/about/en.md", enContent, "about: auto update en from zh-cn", token, branch);
+        setMsg(msgEl, "保存成功：已同步更新 zh-cn 与自动生成的 en");
+      } else {
+        await upsertFile(path, content, `about: update ${lang}`, token, branch);
+        setMsg(msgEl, "保存成功");
+      }
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("insert-friend-template-btn")?.addEventListener("click", () => {
+    const msgEl = document.getElementById("friends-msg");
+    try {
+      const textarea = document.getElementById("friends-content");
+      const raw = (textarea?.value || "[]").trim();
+      const links = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(links)) throw new Error("友链内容必须是 JSON 数组");
+
+      links.push({
+        name: "示例站点名称",
+        avatar: "https://example.com/avatar.png",
+        url: "https://example.com",
+        description: "请填写一句话站点描述"
+      });
+
+      if (textarea) {
+        textarea.value = JSON.stringify(links, null, 2);
+      }
+      setMsg(msgEl, "已插入友链模板，请修改后点击保存");
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }
