@@ -430,9 +430,13 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     return adminService.listBlogMarkdownEntries(token, branch);
   }
 
+  function wait(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   async function translateTextToEnglish(text) {
     const endpoint = "https://translate.googleapis.com/translate_a/single";
-    const query = new URLSearchParams({
+    const body = new URLSearchParams({
       client: "gtx",
       sl: "zh-CN",
       tl: "en",
@@ -440,21 +444,41 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       q: text
     });
 
-    const response = await fetch(`${endpoint}?${query.toString()}`);
-    if (!response.ok) {
-      throw new Error(`自动翻译失败：${response.status}`);
+    let lastError = null;
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+          },
+          body: body.toString()
+        });
+        if (!response.ok) {
+          throw new Error(`自动翻译失败：${response.status}`);
+        }
+
+        const payload = await response.json();
+        const chunks = Array.isArray(payload?.[0]) ? payload[0] : [];
+        const translated = chunks.map((item) => item?.[0] || "").join("");
+        if (!translated) throw new Error("自动翻译失败：返回内容为空");
+        return translated;
+      } catch (error) {
+        lastError = error;
+        if (attempt < 3) {
+          await wait(300 * attempt);
+          continue;
+        }
+      }
     }
 
-    const payload = await response.json();
-    const chunks = Array.isArray(payload?.[0]) ? payload[0] : [];
-    const translated = chunks.map((item) => item?.[0] || "").join("");
-    if (!translated) throw new Error("自动翻译失败：返回内容为空");
-    return translated;
+    throw lastError || new Error("自动翻译失败");
   }
 
   async function translateAboutMarkdownToEnglish(markdown) {
     const lines = (markdown || "").split("\n");
     const translatedLines = [];
+    let fallbackCount = 0;
 
     for (const line of lines) {
       const trimmed = line.trim();
@@ -471,11 +495,19 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         continue;
       }
 
-      const translatedBody = await translateTextToEnglish(body);
-      translatedLines.push(`${prefix}${translatedBody}`);
+      try {
+        const translatedBody = await translateTextToEnglish(body);
+        translatedLines.push(`${prefix}${translatedBody}`);
+      } catch {
+        fallbackCount += 1;
+        translatedLines.push(`${prefix}${body}`);
+      }
     }
 
-    return translatedLines.join("\n");
+    return {
+      content: translatedLines.join("\n"),
+      fallbackCount
+    };
   }
 
   if (sessionStorage.getItem(SESSION_KEY) === "1") {
@@ -986,10 +1018,14 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const path = `src/content/spec/about/${lang}.md`;
       if (lang === "zh-cn") {
         setMsg(msgEl, "正在保存中文并自动生成英文...");
-        const enContent = await translateAboutMarkdownToEnglish(content);
         await upsertFile(path, content, "about: update zh-cn", token, branch);
-        await upsertFile("src/content/spec/about/en.md", enContent, "about: auto update en from zh-cn", token, branch);
-        setMsg(msgEl, "保存成功：已同步更新 zh-cn 与自动生成的 en");
+        const translated = await translateAboutMarkdownToEnglish(content);
+        await upsertFile("src/content/spec/about/en.md", translated.content, "about: auto update en from zh-cn", token, branch);
+        if (translated.fallbackCount > 0) {
+          setMsg(msgEl, `保存成功：zh-cn 已更新，en 已同步（${translated.fallbackCount} 行翻译失败已回退原文）`);
+        } else {
+          setMsg(msgEl, "保存成功：已同步更新 zh-cn 与自动生成的 en");
+        }
       } else {
         await upsertFile(path, content, `about: update ${lang}`, token, branch);
         setMsg(msgEl, "保存成功");
