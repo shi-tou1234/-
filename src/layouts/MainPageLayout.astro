@@ -226,6 +226,18 @@ const isZh = lang === 'zh-cn';
   const guideHideDuration = 260;
   let guideHideTimer = null;
 
+  function setPageScrollLocked(locked) {
+    if (locked) {
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+    } else {
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    }
+  }
+
   function shouldEnableGuide() {
     return !window.location.pathname.includes("/admin");
   }
@@ -245,6 +257,7 @@ const isZh = lang === 'zh-cn';
       requestAnimationFrame(() => {
         modal.classList.add("is-open");
       });
+      setPageScrollLocked(true);
       openBtn.classList.add("hidden");
     } else {
       modal.classList.remove("is-open");
@@ -253,6 +266,7 @@ const isZh = lang === 'zh-cn';
           modal.classList.add("hidden");
         }
       }, guideHideDuration);
+      setPageScrollLocked(false);
       openBtn.classList.remove("hidden");
     }
   }
@@ -267,6 +281,7 @@ const isZh = lang === 'zh-cn';
     if (!shouldEnableGuide()) {
       modal.classList.add("hidden");
       openBtn.classList.add("hidden");
+      setPageScrollLocked(false);
       return;
     }
 
