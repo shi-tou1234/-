@@ -53,6 +53,10 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
         <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" class="copy-email-action hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
           <Icon name="fa6-solid:envelope" class="w-4 h-4" />
         </button>
+        <!-- Blog Guide -->
+        <button id="blog-guide-open-btn" type="button" title="博客功能说明" aria-label="博客功能说明" class="hidden items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+          <Icon name="fa6-solid:circle-question" class="w-4 h-4" />
+        </button>
         <!-- RSS -->
         <!-- <a href="/rss.xml" target="_blank" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
             <Icon name="simple-icons:rss" class="w-4 h-4" />
