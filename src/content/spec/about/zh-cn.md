@@ -21,7 +21,7 @@
 
 ## 🌐 网站记录
 
-- **2026.2.12** 使用 claude和gpt开始开发
+- **2026.2.12** 使用 claude opus 4.6开发最初框架和gpt 5.3 codex后续debug和完善开发
 - **2026.2.14** 参考 [https://github.com/motues/Momo](https://github.com/motues/Momo) 提供的开源页面模仿设计
 - **2026.2.15** 部署到github pages
 - **2026.2.17** 增加分类功能，优化响应速度
