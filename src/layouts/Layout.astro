@@ -41,6 +41,9 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, max-image-preview:none">
+    <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, max-image-preview:none">
+    <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
     <link rel="alternate" type="application/rss+xml" title={siteConfig.title} href={new URL("rss.xml", Astro.site)} >
     <link rel="icon" href={siteConfig.favicon} type="image/x-icon">
     <link rel="stylesheet" href="https://fonts.font.im/css2?family=Noto+Serif+SC:wght@400;700&display=swap">
@@ -83,19 +86,75 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
             if (overlay) overlay.style.display = 'none';
         });
 
-        // 全局防爬虫：禁止右键和F12等开发者工具快捷键
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        });
-        document.addEventListener('keydown', function(e) {
+        // 全局防爬虫：禁止右键、复制、常见调试快捷键和自动化访问
+        if (!window.__antiCrawlerGuardInstalled) {
+          window.__antiCrawlerGuardInstalled = true;
+
+          const shouldBlockAutomation = () => {
+            const ua = navigator.userAgent.toLowerCase();
+            const botSignals = [
+              'headless',
+              'selenium',
+              'puppeteer',
+              'playwright',
+              'phantomjs',
+              'spider',
+              'crawler',
+              'scrapy',
+              'curl',
+              'wget'
+            ];
+
+            return navigator.webdriver || botSignals.some((signal) => ua.includes(signal));
+          };
+
+          const blockPage = () => {
+            document.documentElement.innerHTML = '';
+          };
+
+          if (shouldBlockAutomation()) {
+            blockPage();
+          }
+
+          document.addEventListener('contextmenu', (e) => e.preventDefault(), { capture: true });
+          document.addEventListener('copy', (e) => e.preventDefault(), { capture: true });
+          document.addEventListener('cut', (e) => e.preventDefault(), { capture: true });
+          document.addEventListener('dragstart', (e) => e.preventDefault(), { capture: true });
+          document.addEventListener('selectstart', (e) => e.preventDefault(), { capture: true });
+
+          document.addEventListener('keydown', (e) => {
             if (
-                e.key === 'F12' || 
-                ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c'].includes(e.key)) ||
-                ((e.ctrlKey || e.metaKey) && ['U', 'u'].includes(e.key))
+              e.key === 'F12' ||
+              ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'J', 'C', 'K'].includes(e.key.toUpperCase())) ||
+              ((e.ctrlKey || e.metaKey) && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
             ) {
-                e.preventDefault();
+              e.preventDefault();
+              e.stopPropagation();
             }
-        });
+          }, { capture: true });
+
+          const devToolsOpen = () => {
+            const threshold = 160;
+            const widthGap = window.outerWidth - window.innerWidth > threshold;
+            const heightGap = window.outerHeight - window.innerHeight > threshold;
+            return widthGap || heightGap;
+          };
+
+          const timerStart = performance.now();
+          debugger;
+          const timerCost = performance.now() - timerStart;
+          if (timerCost > 120) {
+            blockPage();
+          }
+
+          if (!window.__antiCrawlerGuardInterval) {
+            window.__antiCrawlerGuardInterval = window.setInterval(() => {
+              if (devToolsOpen()) {
+                blockPage();
+              }
+            }, 1000);
+          }
+        }
         </script>
 </body>
 </html>
