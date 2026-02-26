@@ -12,6 +12,8 @@ import { getRelativeLocaleUrl } from '@utils/url-utils';
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
+const runtimeLabel = currentLang === 'en' ? 'Running' : '已运行';
+const runtimeSuffix = currentLang === 'en' ? 'days' : '天';
 const locales = (i18n?.locales || []).map(locale => String(locale));
 const showLanguageSwitcher = locales.length > 1;
 
@@ -30,6 +32,9 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
         <a href={ indexPage } >
             <span class="text-3xl font-bold hover:opacity-60 transition-opacity">{ siteConfig.title }</span>
         </a>
+      <p id="header-running-days" class="text-xs text-[var(--text-color)]/65 mt-1" data-running-since="2026-02-12" data-runtime-label={runtimeLabel} data-runtime-suffix={runtimeSuffix}>
+        {runtimeLabel} 1 {runtimeSuffix}
+      </p>
     </div>
     
     <!-- tools -->
@@ -404,6 +409,36 @@ function initHeaderContactCopy() {
 document.addEventListener('DOMContentLoaded', initHeaderContactCopy);
 document.addEventListener('astro:page-load', initHeaderContactCopy);
 document.addEventListener('astro:after-swap', initHeaderContactCopy);
+</script>
+
+<script>
+function updateHeaderRunningDays() {
+  const node = document.getElementById('header-running-days');
+  if (!node) return;
+
+  const startRaw = node.getAttribute('data-running-since');
+  const label = node.getAttribute('data-runtime-label') || '已运行';
+  const suffix = node.getAttribute('data-runtime-suffix') || '天';
+  if (!startRaw) return;
+
+  const startDate = new Date(`${startRaw}T00:00:00`);
+  const now = new Date();
+  if (Number.isNaN(startDate.getTime())) return;
+
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const startUtc = Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  const nowUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const days = Math.max(1, Math.floor((nowUtc - startUtc) / msPerDay) + 1);
+
+  node.textContent = `${label} ${days} ${suffix}`;
+}
+
+document.addEventListener('DOMContentLoaded', updateHeaderRunningDays);
+document.addEventListener('astro:page-load', updateHeaderRunningDays);
+document.addEventListener('astro:after-swap', updateHeaderRunningDays);
+if (document.readyState !== 'loading') {
+  updateHeaderRunningDays();
+}
 </script>
 
 <script>

@@ -27,28 +27,29 @@ const isZh = lang === 'zh-cn';
     <button
       id="blog-guide-open-btn"
       type="button"
-      class="hidden fixed right-4 top-4 z-[70] rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/95 px-3 py-1.5 text-sm text-[var(--text-color)] shadow backdrop-blur hover:bg-[var(--button-hover-color)]"
+      class="hidden fixed right-4 top-4 z-[70] rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/80 px-3 py-1.5 text-xs text-[var(--text-color)]/85 backdrop-blur hover:bg-[var(--button-hover-color)] hover:text-[var(--text-color)]"
       aria-haspopup="dialog"
       aria-controls="blog-guide-modal"
     >
-      {isZh ? '博客指南' : 'Guide'}
+      {isZh ? '功能说明' : 'Guide'}
     </button>
 
     <div id="blog-guide-modal" class="hidden fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-labelledby="blog-guide-title">
-      <div id="blog-guide-mask" class="absolute inset-0 bg-black/45"></div>
-      <div class="relative z-10 mx-auto mt-24 w-[min(92vw,720px)] rounded-xl border border-[var(--button-border-color)] bg-[var(--bg-color)] p-5 text-[var(--text-color)] shadow-xl">
+      <div id="blog-guide-mask" class="absolute inset-0 bg-black/32 backdrop-blur-[1px]"></div>
+      <div class="relative z-10 mx-auto mt-22 w-[min(92vw,680px)] rounded-xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/96 p-5 text-[var(--text-color)] shadow-[0_8px_24px_var(--shadow-color)]">
         <div class="flex items-start justify-between gap-3">
-          <h2 id="blog-guide-title" class="text-xl font-bold">{isZh ? '欢迎来到 cmchen 的博客' : 'Welcome to cmchen Blog'}</h2>
-          <button id="blog-guide-close-btn" type="button" class="rounded border border-[var(--button-border-color)] px-2 py-1 text-sm hover:bg-[var(--button-hover-color)]">{isZh ? '关闭' : 'Close'}</button>
+          <h2 id="blog-guide-title" class="text-lg font-bold">{isZh ? '博客功能简介' : 'Blog Quick Guide'}</h2>
+          <button id="blog-guide-close-btn" type="button" class="rounded border border-[var(--button-border-color)] px-2 py-1 text-xs hover:bg-[var(--button-hover-color)]">{isZh ? '关闭' : 'Close'}</button>
         </div>
 
-        <div class="mt-4 space-y-2 text-sm leading-7 text-[var(--text-color)]/85">
+        <div class="mt-3 space-y-2 text-sm leading-7 text-[var(--text-color)]/80">
           {isZh ? (
             <>
               <p>• 顶部导航：可快速进入首页、归档、分类、关于、友链等页面。</p>
               <p>• 搜索按钮：可按标题/正文关键词快速定位文章内容。</p>
               <p>• 主题按钮：可切换亮色/暗色主题，阅读更舒适。</p>
               <p>• 文章卡片：点击进入详情，查看正文、时间、分类与相关文章。</p>
+              <p>• 正文里带下划线且鼠标靠近会高亮的文字，表示可点击跳转链接。</p>
               <p>• 分类与归档：按主题或时间线浏览历史内容。</p>
               <p>• 友链页面：查看常用站点与朋友博客入口。</p>
               <p>• 右下角返回顶部：长文阅读后可一键回到页面顶部。</p>
@@ -59,6 +60,7 @@ const isZh = lang === 'zh-cn';
               <p>• Search button: quickly find posts by title or content keywords.</p>
               <p>• Theme button: switch light/dark mode for comfortable reading.</p>
               <p>• Post cards: open details with content, date, category, and related info.</p>
+              <p>• Underlined text that highlights on hover in post content is a clickable link.</p>
               <p>• Categories and archives: browse posts by topic or timeline.</p>
               <p>• Friends page: quick access to useful sites and partner blogs.</p>
               <p>• Back-to-top button: return to the top instantly on long pages.</p>
