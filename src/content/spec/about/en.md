@@ -1,4 +1,4 @@
-# Hello 👋
+# Hello 👋，Here are some moments of life collected by cmchen.
 
 Sometimes, I suddenly pause.
 
