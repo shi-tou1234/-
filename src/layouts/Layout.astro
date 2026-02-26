@@ -82,6 +82,20 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
             const overlay = document.getElementById('loading-overlay');
             if (overlay) overlay.style.display = 'none';
         });
+
+        // 全局防爬虫：禁止右键和F12等开发者工具快捷键
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (
+                e.key === 'F12' || 
+                ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c'].includes(e.key)) ||
+                ((e.ctrlKey || e.metaKey) && ['U', 'u'].includes(e.key))
+            ) {
+                e.preventDefault();
+            }
+        });
         </script>
 </body>
 </html>
