@@ -28,7 +28,7 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 <div id="main-header" class="fixed top-0 left-0 right-0 z-50 overflow-visible transition-transform duration-300 ease-in-out md:relative md:translate-y-0">
 <div class="flex items-center pt-2 md:py-4 text-[var(--text-color)] max-w-[var(--header-width)] mx-auto">
     <!-- logo -->
-    <div class="pr-4 py-2 z-30 header-logo">
+    <div class="pr-3 md:pr-5 py-2 z-30 shrink-0">
         <a href={ indexPage } >
             <span class="text-3xl font-bold hover:opacity-60 transition-opacity">{ siteConfig.title }</span>
         </a>
@@ -38,37 +38,37 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
     </div>
 
     <!-- nav_bar (desktop) -->
-    <div id="nav-bar" class="hidden md:flex flex-1 min-w-0 items-center justify-start text-lg font-bold z-20">
-      <div id="nav-bar-list" class="transition relative z-10 flex max-w-full items-center justify-start rounded-outer p-2 backdrop-blur rounded-xl bg-[color:var(--bg-color)]/20 overflow-x-auto">
-        <a href={ indexPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current shrink-0 ${
+    <div id="nav-bar" class="hidden md:flex min-w-0 items-center justify-start text-base lg:text-lg font-bold z-20 ml-2">
+      <div id="nav-bar-list" class="transition relative z-10 flex items-center justify-start rounded-outer p-2 backdrop-blur rounded-xl bg-[color:var(--bg-color)]/20 overflow-x-auto whitespace-nowrap max-w-[min(56vw,780px)]">
+        <a href={ indexPage } class={`transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === indexPage
                 ? 'bg-[var(--button-hover-color)]'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
             {t("header.home")}
         </a>
-        <a href={ archivesPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current shrink-0 ${
+        <a href={ archivesPage } class={`transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === archivesPage
                 ? 'bg-[var(--button-hover-color)]'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
             {t("header.archive")}
         </a>
-        <a href={ categoriesPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current shrink-0 ${
+        <a href={ categoriesPage } class={`transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === categoriesPage
               ? 'bg-[var(--button-hover-color)]'
               : 'hover:bg-[var(--button-hover-color)]'
             }`}>
             {t("header.categories")}
         </a>
-        <a href={ aboutPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current shrink-0 ${
+        <a href={ aboutPage } class={`transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === aboutPage
                 ? 'bg-[var(--button-hover-color)]'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
             {t("header.about")}
         </a>
-        <a href={ friendsPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current shrink-0 ${
+        <a href={ friendsPage } class={`transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === friendsPage
                 ? 'bg-[var(--button-hover-color)]'
                 : 'hover:bg-[var(--button-hover-color)]'
@@ -79,7 +79,7 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
     </div>
     
     <!-- tools -->
-    <div class="ml-auto flex flex-nowrap gap-2 pl-4 py-2 justify-end z-30">
+    <div class="ml-auto shrink-0 flex flex-nowrap gap-2 pl-2 md:pl-3 py-2 justify-end z-30">
         <!-- Search -->
         <button id="search-button" class="hidden min-[380px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
             <Icon name="fa6-solid:magnifying-glass" class="w-4 h-4" />
