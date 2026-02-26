@@ -33,7 +33,7 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
     <!-- logo -->
     <div class="pr-3 md:pr-5 py-2 z-30 shrink-0 header-logo">
         <a href={ indexPage } >
-            <span class="text-3xl font-bold hover:opacity-60 transition-opacity">{ siteConfig.title }</span>
+            <span class="header-slice-text text-3xl font-bold" data-text={siteConfig.title}>{ siteConfig.title }</span>
         </a>
       <p id="header-running-days" class="text-sm text-[var(--text-color)]/65 mt-1" data-running-since="2026-02-12" data-runtime-label={runtimeLabel} data-runtime-suffix={runtimeSuffix}>
         {runtimeLabel} 1 {runtimeSuffix}
@@ -186,6 +186,44 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 .header-logo {
   font-family: "EB Garamond", cursive;
   letter-spacing: 1px;
+}
+
+.header-slice-text {
+  position: relative;
+  display: inline-block;
+  color: var(--text-color);
+  cursor: pointer;
+  user-select: none;
+}
+
+.header-slice-text::before,
+.header-slice-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: none;
+}
+
+.header-slice-text::before {
+  clip-path: polygon(0 0, 100% 0, 100% 48%, 0 55%);
+}
+
+.header-slice-text::after {
+  clip-path: polygon(0 55%, 100% 48%, 100% 100%, 0 100%);
+}
+
+.header-slice-text:hover::before {
+  transform: translate(-10px, -3px);
+}
+
+.header-slice-text:hover::after {
+  transform: translate(10px, 3px);
 }
 .tiny-only {
   display: none;
