@@ -88,17 +88,17 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
             <Icon name="fa6-solid:magnifying-glass" class="w-4 h-4" />
         </button>
         <!-- Dark Mode -->
-        <ThemeIcon class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] rounded-lg hover:text-current active:scale-90 border border-[var(--button-border-color)] transition-all duration-300"/>
+        <ThemeIcon class="hide-on-tiny flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] rounded-lg hover:text-current active:scale-90 border border-[var(--button-border-color)] transition-all duration-300"/>
         <!-- GitHub -->
-        <a href={headerContact.githubUrl} target="_blank" rel="noopener noreferrer" title="GitHub" class="hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+        <a href={headerContact.githubUrl} target="_blank" rel="noopener noreferrer" title="GitHub" class="hide-on-tiny hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
           <Icon name="simple-icons:github" class="w-4 h-4" />
         </a>
         <!-- Email Copy -->
-        <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" class="copy-email-action hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+        <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" class="hide-on-tiny copy-email-action hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
           <Icon name="fa6-solid:envelope" class="w-4 h-4" />
         </button>
         <!-- Blog Guide -->
-        <button id="blog-guide-open-btn" type="button" title="博客功能说明" aria-label="博客功能说明" class="hidden items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+        <button id="blog-guide-open-btn" type="button" title="博客功能说明" aria-label="博客功能说明" class="hide-on-tiny hidden items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
           <Icon name="fa6-solid:circle-question" class="w-4 h-4" />
         </button>
         <!-- RSS -->
@@ -107,7 +107,7 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
         </a> -->
         <!-- Language Switcher -->
         {showLanguageSwitcher && (
-        <div class="relative">
+        <div class="relative hide-on-tiny">
             <button id="language-button" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
                 <Icon name="fa6-solid:globe" class="w-4 h-4" />
             </button>
@@ -133,11 +133,16 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
           </button>
               <!-- Mobile Menu -->
               <div id="mobile-menu" class="hidden fixed right-2 top-16 w-36 bg-[var(--bg-color)]/95 backdrop-blur border border-[var(--button-border-color)] rounded-lg shadow-[0_8px_24px_var(--shadow-color)] z-[1200] text-[var(--text-color)]">
-                <div class="tiny-only px-2 py-2 border-b border-[var(--button-border-color)]">
+                <div class="tiny-only px-2 py-2 border-b border-[var(--button-border-color)] space-y-2">
+                  <p class="text-[11px] leading-4 text-[var(--text-color)]/75 px-1">建议使用浏览器或电脑打开，以获得最佳显示效果。</p>
                   <div class="grid grid-cols-3 gap-2">
                     <button id="mobile-search-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">搜索</button>
+                    <button id="mobile-theme-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">主题</button>
+                    <button id="mobile-guide-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">指南</button>
                     <a href={headerContact.githubUrl} target="_blank" rel="noopener noreferrer" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">GitHub</a>
                     <button class="copy-email-action px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]" data-email={headerContact.email}>邮箱</button>
+                    <a href={getRelativeLocaleUrl("zh-cn", "/")} class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">中文</a>
+                    <a href={getRelativeLocaleUrl("en", "/")} class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">EN</a>
                   </div>
                 </div>
                 <div class="flex flex-col py-1">
@@ -187,6 +192,10 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 }
 
 @media (max-width: 379px) {
+  #main-header .hide-on-tiny {
+    display: none !important;
+  }
+
   #mobile-menu.is-tiny-screen {
     top: 0;
     right: 0;
@@ -227,6 +236,10 @@ function initMobileNav() {
   const mobileMenu = document.getElementById('mobile-menu');
   const searchButton = document.getElementById('search-button');
   const mobileSearchButton = document.getElementById('mobile-search-btn');
+  const mobileThemeButton = document.getElementById('mobile-theme-btn');
+  const mobileGuideButton = document.getElementById('mobile-guide-btn');
+  const themeToggleButton = document.getElementById('themeToggle');
+  const guideOpenButton = document.getElementById('blog-guide-open-btn');
   const languageMenu = document.getElementById('language-menu');
 
   if (!menuButton) return;
@@ -241,6 +254,22 @@ function initMobileNav() {
     mobileSearchButton.dataset.bound = 'true';
     mobileSearchButton.addEventListener('click', () => {
       searchButton.click();
+      mobileMenu?.classList.add('hidden');
+    });
+  }
+
+  if (mobileThemeButton && themeToggleButton && mobileThemeButton.dataset.bound !== 'true') {
+    mobileThemeButton.dataset.bound = 'true';
+    mobileThemeButton.addEventListener('click', () => {
+      themeToggleButton.click();
+      mobileMenu?.classList.add('hidden');
+    });
+  }
+
+  if (mobileGuideButton && guideOpenButton && mobileGuideButton.dataset.bound !== 'true') {
+    mobileGuideButton.dataset.bound = 'true';
+    mobileGuideButton.addEventListener('click', () => {
+      guideOpenButton.click();
       mobileMenu?.classList.add('hidden');
     });
   }
