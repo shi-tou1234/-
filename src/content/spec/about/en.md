@@ -8,7 +8,7 @@ These moments, fragmented, tiny, nothing extraordinary. But they slip through th
 
 I've thought for a long time about why I wanted to start this blog.
 
-No breathtaking scenery to show off, no grand stories to tell.
+No breathtaking scenery to show off, no  profound wisdom to share.
 
 I just want to find a place to collect these rays of light that slip through the cracks.
 
