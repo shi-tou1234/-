@@ -3,6 +3,7 @@ import Layout from '@layouts/Layout.astro';
 import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
 import Search from '@components/misc/Search.astro';
+import { Icon } from 'astro-icon/components';
 
 
 interface Props {
@@ -27,43 +28,48 @@ const isZh = lang === 'zh-cn';
     <button
       id="blog-guide-open-btn"
       type="button"
-      class="hidden fixed right-4 top-4 z-[70] rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/80 px-3 py-1.5 text-xs text-[var(--text-color)]/85 backdrop-blur hover:bg-[var(--button-hover-color)] hover:text-[var(--text-color)]"
+      class="hidden fixed right-3 top-3 z-[70] items-center justify-center w-10 h-10 rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/85 text-[var(--text-color)]/85 backdrop-blur hover:bg-[var(--button-hover-color)] hover:text-[var(--text-color)]"
       aria-haspopup="dialog"
       aria-controls="blog-guide-modal"
+      title={isZh ? '查看博客功能说明' : 'Open blog guide'}
+      aria-label={isZh ? '查看博客功能说明' : 'Open blog guide'}
     >
-      {isZh ? '功能说明' : 'Guide'}
+      <Icon name="fa6-solid:circle-question" class="w-4 h-4" />
     </button>
 
     <div id="blog-guide-modal" class="hidden fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-labelledby="blog-guide-title">
-      <div id="blog-guide-mask" class="absolute inset-0 bg-black/32 backdrop-blur-[1px]"></div>
-      <div class="relative z-10 mx-auto mt-22 w-[min(92vw,680px)] rounded-xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/96 p-5 text-[var(--text-color)] shadow-[0_8px_24px_var(--shadow-color)]">
+      <div id="blog-guide-mask" class="absolute inset-0 bg-black/25 backdrop-blur-[2px]"></div>
+      <div class="blog-guide-panel relative z-10 mx-auto mt-14 w-[min(94vw,920px)] max-h-[82vh] overflow-y-auto rounded-xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/95 p-6 text-[var(--text-color)] shadow-[0_8px_24px_var(--shadow-color)]">
         <div class="flex items-start justify-between gap-3">
-          <h2 id="blog-guide-title" class="text-lg font-bold">{isZh ? '博客功能简介' : 'Blog Quick Guide'}</h2>
-          <button id="blog-guide-close-btn" type="button" class="rounded border border-[var(--button-border-color)] px-2 py-1 text-xs hover:bg-[var(--button-hover-color)]">{isZh ? '关闭' : 'Close'}</button>
+          <div>
+            <h2 id="blog-guide-title" class="text-2xl font-bold">{isZh ? '博客功能简介' : 'Blog Quick Guide'}</h2>
+            <p class="text-sm text-[var(--text-color)]/65 mt-1">{isZh ? '首次访问会自动弹出，关闭后可用右上角问号按钮再次打开。' : 'Shown on first visit. Reopen anytime with the top-right question button.'}</p>
+          </div>
+          <button id="blog-guide-close-btn" type="button" class="rounded-lg border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">{isZh ? '关闭' : 'Close'}</button>
         </div>
 
-        <div class="mt-3 space-y-2 text-sm leading-7 text-[var(--text-color)]/80">
+        <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm leading-7 text-[var(--text-color)]/82">
           {isZh ? (
             <>
-              <p>• 顶部导航：可快速进入首页、归档、分类、关于、友链等页面。</p>
-              <p>• 搜索按钮：可按标题/正文关键词快速定位文章内容。</p>
-              <p>• 主题按钮：可切换亮色/暗色主题，阅读更舒适。</p>
-              <p>• 文章卡片：点击进入详情，查看正文、时间、分类与相关文章。</p>
-              <p>• 正文里带下划线且鼠标靠近会高亮的文字，表示可点击跳转链接。</p>
-              <p>• 分类与归档：按主题或时间线浏览历史内容。</p>
-              <p>• 友链页面：查看常用站点与朋友博客入口。</p>
-              <p>• 右下角返回顶部：长文阅读后可一键回到页面顶部。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• 顶部导航：可快速进入首页、归档、分类、关于、友链等页面。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• 搜索按钮：可按标题/正文关键词快速定位文章内容。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• 主题按钮：可切换亮色/暗色主题，阅读更舒适。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• 文章卡片：点击进入详情，查看正文、时间、分类与相关文章。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• 正文里带下划线且鼠标靠近会高亮的文字，表示可点击跳转链接。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• 分类与归档：按主题或时间线浏览历史内容。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• 友链页面：查看常用站点与朋友博客入口。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• 右下角返回顶部：长文阅读后可一键回到页面顶部。</p>
             </>
           ) : (
             <>
-              <p>• Top navigation: jump to Home, Archives, Categories, About, and Friends.</p>
-              <p>• Search button: quickly find posts by title or content keywords.</p>
-              <p>• Theme button: switch light/dark mode for comfortable reading.</p>
-              <p>• Post cards: open details with content, date, category, and related info.</p>
-              <p>• Underlined text that highlights on hover in post content is a clickable link.</p>
-              <p>• Categories and archives: browse posts by topic or timeline.</p>
-              <p>• Friends page: quick access to useful sites and partner blogs.</p>
-              <p>• Back-to-top button: return to the top instantly on long pages.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• Top navigation: jump to Home, Archives, Categories, About, and Friends.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• Search button: quickly find posts by title or content keywords.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• Theme button: switch light/dark mode for comfortable reading.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• Post cards: open details with content, date, category, and related info.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• Underlined text that highlights on hover in post content is a clickable link.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• Categories and archives: browse posts by topic or timeline.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• Friends page: quick access to useful sites and partner blogs.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/35 px-3 py-2">• Back-to-top button: return to the top instantly on long pages.</p>
             </>
           )}
         </div>
@@ -228,6 +234,8 @@ const isZh = lang === 'zh-cn';
   }
 
   const blogGuideSeenKey = "cmchen_blog_guide_seen_v1";
+  const guideHideDuration = 260;
+  let guideHideTimer = null;
 
   function shouldEnableGuide() {
     return !window.location.pathname.includes("/admin");
@@ -238,11 +246,24 @@ const isZh = lang === 'zh-cn';
     const openBtn = document.getElementById("blog-guide-open-btn");
     if (!modal || !openBtn) return;
 
+    if (guideHideTimer) {
+      clearTimeout(guideHideTimer);
+      guideHideTimer = null;
+    }
+
     if (visible) {
       modal.classList.remove("hidden");
-      openBtn.classList.remove("hidden");
+      requestAnimationFrame(() => {
+        modal.classList.add("is-open");
+      });
+      openBtn.classList.add("hidden");
     } else {
-      modal.classList.add("hidden");
+      modal.classList.remove("is-open");
+      guideHideTimer = setTimeout(() => {
+        if (!modal.classList.contains("is-open")) {
+          modal.classList.add("hidden");
+        }
+      }, guideHideDuration);
       openBtn.classList.remove("hidden");
     }
   }
@@ -291,3 +312,25 @@ const isZh = lang === 'zh-cn';
   document.addEventListener("astro:after-swap", initGlobalParticles);
   document.addEventListener("astro:after-swap", initBlogGuide);
 </script>
+
+<style is:global>
+#blog-guide-modal #blog-guide-mask {
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+#blog-guide-modal .blog-guide-panel {
+  opacity: 0;
+  transform: translateY(18px) scale(0.96);
+  transition: opacity 260ms cubic-bezier(0.2, 0.8, 0.2, 1), transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+#blog-guide-modal.is-open #blog-guide-mask {
+  opacity: 1;
+}
+
+#blog-guide-modal.is-open .blog-guide-panel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+</style>
