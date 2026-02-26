@@ -10,6 +10,7 @@ interface Props {
   lang: string;
 }
 const { title, lang } = Astro.props;
+const isZh = lang === 'zh-cn';
 
 ---
 
@@ -22,6 +23,51 @@ const { title, lang } = Astro.props;
     <main class="relative z-10 flex-grow">
       <slot />
     </main>
+
+    <button
+      id="blog-guide-open-btn"
+      type="button"
+      class="hidden fixed right-4 top-4 z-[70] rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/95 px-3 py-1.5 text-sm text-[var(--text-color)] shadow backdrop-blur hover:bg-[var(--button-hover-color)]"
+      aria-haspopup="dialog"
+      aria-controls="blog-guide-modal"
+    >
+      {isZh ? '博客指南' : 'Guide'}
+    </button>
+
+    <div id="blog-guide-modal" class="hidden fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-labelledby="blog-guide-title">
+      <div id="blog-guide-mask" class="absolute inset-0 bg-black/45"></div>
+      <div class="relative z-10 mx-auto mt-24 w-[min(92vw,720px)] rounded-xl border border-[var(--button-border-color)] bg-[var(--bg-color)] p-5 text-[var(--text-color)] shadow-xl">
+        <div class="flex items-start justify-between gap-3">
+          <h2 id="blog-guide-title" class="text-xl font-bold">{isZh ? '欢迎来到 cmchen 的博客' : 'Welcome to cmchen Blog'}</h2>
+          <button id="blog-guide-close-btn" type="button" class="rounded border border-[var(--button-border-color)] px-2 py-1 text-sm hover:bg-[var(--button-hover-color)]">{isZh ? '关闭' : 'Close'}</button>
+        </div>
+
+        <div class="mt-4 space-y-2 text-sm leading-7 text-[var(--text-color)]/85">
+          {isZh ? (
+            <>
+              <p>• 顶部导航：可快速进入首页、归档、分类、关于、友链等页面。</p>
+              <p>• 搜索按钮：可按标题/正文关键词快速定位文章内容。</p>
+              <p>• 主题按钮：可切换亮色/暗色主题，阅读更舒适。</p>
+              <p>• 文章卡片：点击进入详情，查看正文、时间、分类与相关文章。</p>
+              <p>• 分类与归档：按主题或时间线浏览历史内容。</p>
+              <p>• 友链页面：查看常用站点与朋友博客入口。</p>
+              <p>• 右下角返回顶部：长文阅读后可一键回到页面顶部。</p>
+            </>
+          ) : (
+            <>
+              <p>• Top navigation: jump to Home, Archives, Categories, About, and Friends.</p>
+              <p>• Search button: quickly find posts by title or content keywords.</p>
+              <p>• Theme button: switch light/dark mode for comfortable reading.</p>
+              <p>• Post cards: open details with content, date, category, and related info.</p>
+              <p>• Categories and archives: browse posts by topic or timeline.</p>
+              <p>• Friends page: quick access to useful sites and partner blogs.</p>
+              <p>• Back-to-top button: return to the top instantly on long pages.</p>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+
     <Footer />
     <Search />
   </div>
@@ -179,7 +225,67 @@ const { title, lang } = Astro.props;
     setupThemeWatcher();
   }
 
+  const blogGuideSeenKey = "cmchen_blog_guide_seen_v1";
+
+  function shouldEnableGuide() {
+    return !window.location.pathname.includes("/admin");
+  }
+
+  function setGuideVisible(visible) {
+    const modal = document.getElementById("blog-guide-modal");
+    const openBtn = document.getElementById("blog-guide-open-btn");
+    if (!modal || !openBtn) return;
+
+    if (visible) {
+      modal.classList.remove("hidden");
+      openBtn.classList.remove("hidden");
+    } else {
+      modal.classList.add("hidden");
+      openBtn.classList.remove("hidden");
+    }
+  }
+
+  function initBlogGuide() {
+    const modal = document.getElementById("blog-guide-modal");
+    const openBtn = document.getElementById("blog-guide-open-btn");
+    const closeBtn = document.getElementById("blog-guide-close-btn");
+    const mask = document.getElementById("blog-guide-mask");
+    if (!modal || !openBtn || !closeBtn || !mask) return;
+
+    if (!shouldEnableGuide()) {
+      modal.classList.add("hidden");
+      openBtn.classList.add("hidden");
+      return;
+    }
+
+    const seen = localStorage.getItem(blogGuideSeenKey) === "1";
+    setGuideVisible(!seen);
+
+    if (!openBtn.dataset.bound) {
+      openBtn.addEventListener("click", () => setGuideVisible(true));
+      openBtn.dataset.bound = "1";
+    }
+
+    const closeGuide = () => {
+      localStorage.setItem(blogGuideSeenKey, "1");
+      setGuideVisible(false);
+    };
+
+    if (!closeBtn.dataset.bound) {
+      closeBtn.addEventListener("click", closeGuide);
+      closeBtn.dataset.bound = "1";
+    }
+
+    if (!mask.dataset.bound) {
+      mask.addEventListener("click", closeGuide);
+      mask.dataset.bound = "1";
+    }
+  }
+
   initGlobalParticles();
+  initBlogGuide();
   document.addEventListener("astro:page-load", initGlobalParticles);
+  document.addEventListener("astro:page-load", initBlogGuide);
   document.addEventListener("astro:after-swap", initGlobalParticles);
+  document.addEventListener("astro:after-swap", initBlogGuide);
 </script>

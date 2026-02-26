@@ -4,13 +4,51 @@ import "@styles/global.css"
 interface Props {
     title?: string;
     subTitle?: string;
+        runningSince?: string;
+        lang?: string;
 }
 
-const { title, subTitle } = Astro.props;
+const { title, subTitle, runningSince, lang = 'zh-cn' } = Astro.props;
+const runtimeLabel = lang === 'en' ? 'This blog has been running for' : '博客已运行';
+const runtimeSuffix = lang === 'en' ? 'days' : '天';
 ---
 
 <!-- Cover -->
 <div class="text-center pt-5 pb-10 max-w-[var(--page-width)] mx-auto md:mt-0 mt-28">
     { title && <p class="text-[var(--text-color)] text-3xl py-5 font-bold">{ title }</p> }
+        { runningSince && (
+                <p class="text-sm text-[var(--text-color)]/70 -mt-2 mb-3" data-running-days data-running-since={runningSince} data-runtime-label={runtimeLabel} data-runtime-suffix={runtimeSuffix}>
+                        {runtimeLabel} 1 {runtimeSuffix}
+                </p>
+        ) }
     { subTitle && <p class="text-[var(--cover-subtitle-color)]">{ subTitle }</p> }
 </div>
+
+{runningSince && (
+    <script is:inline>
+        function updateRunningDays() {
+            const nodes = document.querySelectorAll('[data-running-days]');
+            nodes.forEach((node) => {
+                const startRaw = node.getAttribute('data-running-since');
+                const label = node.getAttribute('data-runtime-label') || '博客已运行';
+                const suffix = node.getAttribute('data-runtime-suffix') || '天';
+                if (!startRaw) return;
+
+                const startDate = new Date(`${startRaw}T00:00:00`);
+                const now = new Date();
+                if (Number.isNaN(startDate.getTime())) return;
+
+                const msPerDay = 24 * 60 * 60 * 1000;
+                const startUtc = Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+                const nowUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+                const days = Math.max(1, Math.floor((nowUtc - startUtc) / msPerDay) + 1);
+
+                node.textContent = `${label} ${days} ${suffix}`;
+            });
+        }
+
+        updateRunningDays();
+        document.addEventListener('astro:page-load', updateRunningDays);
+        document.addEventListener('astro:after-swap', updateRunningDays);
+    </script>
+)}
