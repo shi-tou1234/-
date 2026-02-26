@@ -1,7 +1,28 @@
-# Hello, I'm cmchen 👋
+# Hello 👋
 
-Welcome to my blog!
+Sometimes, I suddenly pause.
 
+Like when I finish soldering the last wire at dusk, look up and see the maple tree outside the window, its leaves having turned deep red without me noticing. Or when I scroll through my phone album, stumble upon a casual shot of the sky, can't recall why I took it that day, but remember the breeze was so gentle.
+
+These moments, fragmented, tiny, nothing extraordinary. But they slip through the cracks of my day-to-day life like rays of light.
+
+I've thought for a long time about why I wanted to start this blog.
+
+No breathtaking scenery to show off, no grand stories to tell.
+
+I just want to find a place to collect these rays of light that slip through the cracks.
+
+The paths I've walked alone, the breezes I've shared with friends, the nights I dragged my tired body back to the dorm, the dusks when I ran laps on the track while wrestling with tough problems, those sudden memories of old days that have grown a little fuzzy.
+
+They are fragments of my memories. Pieced together, they roughly form who I am today.
+
+So this place will be quiet. Updates might be slow, and the writings might lack any particular structure. But every post is genuine, grown out of real life.
+
+If you happen to pass by and find a fragment that feels familiar, that's wonderful.
+
+I'm cmchen, still learning to coexist with problems, and learning to carve out cracks in the repetitive routine of daily life.
+
+Welcome to my cracks.
 ---
 
 ## 📝 About Me
