@@ -1,12 +1,13 @@
 # 📝 My Blog (cmchen 的博客)
-感谢开源仓库 [motues/Momo](https://github.com/motues/Momo)
+
+> 记录技术探索与生活瞬间的现代化个人博客系统。
 
 [![Astro](https://img.shields.io/badge/Astro-5.x-BC52EE?logo=astro)](https://astro.build)
 [![Svelte](https://img.shields.io/badge/Svelte-5.x-FF3E00?logo=svelte)](https://svelte.dev)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.x-06B6D4?logo=tailwindcss)](https://tailwindcss.com)
 [![License](https://img.shields.io/github/license/shi-tou1234/-)](./LICENSE)
 
-这是一个基于 [Astro](https://astro.build/) 框架构建的现代化个人博客系统，部署于 GitHub Pages。系统深度集成了 Svelte 5 与多种自定义 Markdown 插件，不仅具备极致的加载速度，更拥有梦幻的动态视觉效果与完善的内容管理体验。
+这是一个基于 **Astro 5** 与 **Svelte 5** 构建的高性能静态博客，融合了极致的加载速度与梦幻的动态交互体验。本项目深受 [motues/Momo](https://github.com/motues/Momo) 启发，并在此基础上进行了深度自定义与功能扩展。
 
 🔗 **访问站点**: [shi-tou1234.github.io/-](https://shi-tou1234.github.io/-/)
 
@@ -14,77 +15,65 @@
 
 ## ✨ 核心特性
 
-- **🚀 极致性能**: 利用 Astro 的群岛架构（Islands Architecture），实现极速的静态页面加载体验。
-- **🎨 沉浸式视觉体验**:
-    - **动态粒子背景**: 内置双主题自适应的动态粒子效果，支持在阅读、列表等不同模式下的独立视觉表现。
-    - **活跃度热力图**: 集成了类似 GitHub 的 Activity Heatmap，直观展示创作与代码更新轨迹。
-- **📝 强大的创作与管理中心**:
-    - **内置后台编辑器 : 自带 Markdown 快捷插入菜单与实时语法帮助面板，让写作如丝般顺滑。
-    - **丰富的渲染能力**: 支持 KaTeX 与 Typst (`remark-typst`) 数学公式，内置丰富的组件（GitHub 卡片、音乐卡片、自定义引用及多种 Admonitions 提示框）。
-- **🌐 国际化与检索**:
-    - **多语言支持 (i18n)**: 完整支持中英文切换，完美适配国际化阅读。
-    - **全检索**: 集成 [Pagefind](https://pagefind.app/) 实现静态站点的极速全文搜索。
+### 🎨 沉浸式动态交互 (New!)
+- **标题视觉特效**: 站点标题集成 **Hover Slice 动态切片效果**，带来独特的品牌感。
+- **动态粒子背景**: 全局自适应交互粒子背景，支持阅读模式下的视觉降噪。
+- **博客介绍弹窗**: 新增站点信息弹窗，快速了解博客使命与当前状态。
+- **实时运行显示**: 记录并显示博客的精准运行时间，见证成长的每一秒。
+
+### 📝 深度 Markdown 渲染能力
+- **Typst 数学公式**: 通过 `remark-typst` 完美支持 Typst 语法，渲染比传统 LaTeX 更精美的数学文档。
+- **增强富文本**:
+    - `{文字}(拼音)`: 原生注音符号 (Ruby) 支持。
+    - `!!剧透!!`: 模糊遮盖效果 (Spoiler)。
+    - `==彩虹==`: 绚丽的渐变文本 (Rainbow Text)。
+- **丰富组件库**: 集成 GitHub 卡片、音乐播放器卡片、自定义引用块 (Admonitions)。
+
+### 🚀 高效创作后台
+- **集成编辑器**: 内置 Markdown 快捷插入菜单（支持一键插入公式、卡片、友链结构等）。
+- **极速检索**: 基于 [Pagefind](https://pagefind.app/) 的本地全文检索，毫秒级响应。
+- **自动化流**: 提供 `pnpm newpost` 脚本快速生成规范的文章模板。
 
 ## 🛠️ 技术栈
 
-- **核心框架**: Astro 5 + Svelte 5
-- **样式与动画**: Tailwind CSS 4 + AOS (滚动动画) + 动态 Particles 渲染
-- **字体排版**: LXGW WenKai Bright (霞鹜文楷) + JetBrains Mono
-- **搜索服务**: Pagefind
-- **内容体系**: Markdown / MDX + Typst + remark/rehype 插件体系
-
-## 📂 目录结构
-
-```text
-├── src/
-│   ├── content/
-│   │   ├── blog/          # 博客文章 (Markdown/Mdx)
-│   │   └── spec/          # 特殊页面 (About, 个人特质 Profile 等)
-│   ├── data/              # 友链、头部联系方式配置
-│   ├── pages/             # 路由页面 (含 /admin 编辑器后台)
-│   ├── plugins/           # 自定义 remark/rehype 渲染插件
-│   └── components/        # Svelte/Astro 组件 (热力图、粒子动效、UI 卡片)
-├── public/                # 静态资源及安全配置
-└── script/                # 工具脚本 (如 newpost.js)
-```
-
-## 🚀 快速开始
-
-### 本地开发
-
-确保已安装 [pnpm](https://pnpm.io/)：
-
-```bash
-# 安装依赖
-pnpm install
-
-# 启动开发服务器
-pnpm dev
-```
-本地访问：`http://localhost:4321/-/`
-
-### 文章创作
-
-除了在 `/admin` 后台进行可视化编写，你也可以使用内置脚本快速通过终端创建新文章：
-```bash
-pnpm newpost
-```
-
-### 构建与预览
-
-```bash
-# 构建项目 (自动包含全文检索索引生成)
-pnpm build
-
-# 预览构建产物
-pnpm preview
-```
-
-## 🚀 部署
-
-本项目通过 **GitHub Actions** 自动化部署。
-- 只要向 `main` 分支提交代码，系统会自动完成构建并推送至 `gh-pages` 分支，更新线上博客。
+| 类别 | 技术方案 |
+| :--- | :--- |
+| **核心框架** | Astro 5.x (Island Architecture) + Svelte 5 (Runes) |
+| **样式方案** | TailwindCSS 4.x + Vite |
+| **内容处理** | Remark / Rehype 插件链 + KaTeX + Typst |
+| **部署环境** | GitHub Pages + GitHub Actions |
 
 ---
 
-Copyright © 2026 [cmchen](https://github.com/shi-tou1234)
+## 🌐 进化轨迹 (Site Log)
+
+- **2026.02.26**: 🚀 增加博客介绍弹窗、运行时间显示、以及右上角标题 Hover 动画。
+- **2026.02.25**: 🛠️ 优化 UI 响应速度与流畅性，新增后端一键插入友链结构。
+- **2026.02.21**: 📱 完成窄屏适配优化，栏目导航动态侧滑显示。
+- **2026.02.19**: ✨ 引入交互式背景粒子系统。
+- **2026.02.12**: 🌱 项目立项，探索 Vibe Coding 开发模式。
+
+---
+
+## 🏗️ 快速开始
+
+1. **克隆仓库**:
+   ```bash
+   git clone https://github.com/shi-tou1234/-.git
+   ```
+2. **安装依赖**:
+   ```bash
+   pnpm install
+   ```
+3. **本地开发**:
+   ```bash
+   pnpm dev
+   ```
+4. **撰写新文**:
+   ```bash
+   pnpm newpost
+   ```
+
+---
+
+如果你喜欢这个项目，欢迎点击右上角的 **Star** ⭐！
