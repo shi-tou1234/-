@@ -36,6 +36,47 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
         {runtimeLabel} 1 {runtimeSuffix}
       </p>
     </div>
+
+    <!-- nav_bar (desktop) -->
+    <div id="nav-bar" class="hidden md:flex flex-1 min-w-0 items-center justify-start text-lg font-bold z-20">
+      <div id="nav-bar-list" class="transition relative z-10 flex max-w-full items-center justify-start rounded-outer p-2 backdrop-blur rounded-xl bg-[color:var(--bg-color)]/20 overflow-x-auto">
+        <a href={ indexPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current shrink-0 ${
+            Astro.url.pathname === indexPage
+                ? 'bg-[var(--button-hover-color)]'
+                : 'hover:bg-[var(--button-hover-color)]'
+            }`}>
+            {t("header.home")}
+        </a>
+        <a href={ archivesPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current shrink-0 ${
+            Astro.url.pathname === archivesPage
+                ? 'bg-[var(--button-hover-color)]'
+                : 'hover:bg-[var(--button-hover-color)]'
+            }`}>
+            {t("header.archive")}
+        </a>
+        <a href={ categoriesPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current shrink-0 ${
+            Astro.url.pathname === categoriesPage
+              ? 'bg-[var(--button-hover-color)]'
+              : 'hover:bg-[var(--button-hover-color)]'
+            }`}>
+            {t("header.categories")}
+        </a>
+        <a href={ aboutPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current shrink-0 ${
+            Astro.url.pathname === aboutPage
+                ? 'bg-[var(--button-hover-color)]'
+                : 'hover:bg-[var(--button-hover-color)]'
+            }`}>
+            {t("header.about")}
+        </a>
+        <a href={ friendsPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current shrink-0 ${
+            Astro.url.pathname === friendsPage
+                ? 'bg-[var(--button-hover-color)]'
+                : 'hover:bg-[var(--button-hover-color)]'
+            }`}>
+            {t("header.friends")}
+        </a>
+      </div>
+    </div>
     
     <!-- tools -->
     <div class="ml-auto flex flex-nowrap gap-2 pl-4 py-2 justify-end z-30">
@@ -133,56 +174,6 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 </div>
 </div>
 
-    <!-- nav_bar -->
-    <div id="nav-bar" class="hidden md:flex absolute left-1/2 top-0 transform -translate-x-1/2  justify-center items-center text-lg font-bold my-5 z-20">
-        <div id="nav-bar-list" class="transition relative z-10 flex max-w-max flex-1 items-center justify-center rounded-outer p-2 backdrop-blur rounded-xl bg-[color:var(--bg-color)]/20">
-          <!-- 首页链接 -->
-          <a href={ indexPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current ${
-              Astro.url.pathname === indexPage 
-                  ? 'bg-[var(--button-hover-color)]' 
-                  : 'hover:bg-[var(--button-hover-color)]'
-              }`}>
-              {t("header.home")}
-          </a>
-          <!-- 归档链接 -->
-          <a href={ archivesPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current ${
-              Astro.url.pathname === archivesPage 
-                  ? 'bg-[var(--button-hover-color)]' 
-                  : 'hover:bg-[var(--button-hover-color)]'
-              }`}>
-              {t("header.archive")}
-          </a>
-            <!-- 分类链接 -->
-            <a href={ categoriesPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current ${
-              Astro.url.pathname === categoriesPage 
-                ? 'bg-[var(--button-hover-color)]' 
-                : 'hover:bg-[var(--button-hover-color)]'
-              }`}>
-              {t("header.categories")}
-            </a>
-          <!-- 关于链接 -->
-          <a href={ aboutPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current ${
-              Astro.url.pathname === aboutPage 
-                  ? 'bg-[var(--button-hover-color)]' 
-                  : 'hover:bg-[var(--button-hover-color)]'
-              }`}>
-              {t("header.about")}
-          </a>
-          <!-- 友链链接 -->
-          <a href={ friendsPage } class={`transition-colors rounded-lg px-3 py-1 mx-1 hover:text-current ${
-              Astro.url.pathname === friendsPage 
-                  ? 'bg-[var(--button-hover-color)]' 
-                  : 'hover:bg-[var(--button-hover-color)]'
-              }`}>
-              {t("header.friends")}
-          </a>
-            <!-- <a href={ indexPage } class="transition-colors hover:bg-[var(--button-hover-color)] rounded-lg px-3 py-1 mx-1 hover:text-current">{t("header.home")}</a>
-            <a href={ archivesPage } class="transition-colors hover:bg-[var(--button-hover-color)] rounded-lg px-3 py-1 mx-1 hover:text-current">{t("header.archive")}</a>
-            <a href={ aboutPage } class="transition-colors hover:bg-[var(--button-hover-color)] rounded-lg px-3 py-1 mx-1 hover:text-current">{t("header.about")}</a>
-            <a href={ friendsPage } class="transition-colors hover:bg-[var(--button-hover-color)] rounded-lg px-3 py-1 mx-1 hover:text-current">{t("header.friends")}</a> -->
-        </div>
-    </div>
-
 <style is:global>
 .header-logo {
   font-family: "EB Garamond", cursive;
@@ -234,8 +225,6 @@ function initMobileNav() {
   const searchButton = document.getElementById('search-button');
   const mobileSearchButton = document.getElementById('mobile-search-btn');
   const languageMenu = document.getElementById('language-menu');
-  const navBar = document.getElementById('nav-bar');
-  const navBarList = document.getElementById('nav-bar-list');
 
   if (!menuButton) return;
 
@@ -283,35 +272,6 @@ function initMobileNav() {
   document.addEventListener('click', handleDocClick);
   window.__headerMobileOutsideClickHandler = handleDocClick;
 
-  let isFixed = false;
-  const oldNavScrollHandler = window.__headerNavScrollHandler;
-  if (oldNavScrollHandler) {
-    window.removeEventListener('scroll', oldNavScrollHandler);
-  }
-
-  const handleNavScroll = () => {
-    if (window.scrollY > 0 && !isFixed && navBar && navBarList) {
-      navBar.classList.add('fixed');
-      navBarList.classList.add(
-        'border',
-        'border-[var(--button-border-color)]',
-        'shadow-[0_4px_12px_var(--shadow-color)]'
-      );
-      isFixed = true;
-    } else if (window.scrollY === 0 && isFixed && navBar && navBarList) {
-      navBar.classList.remove('fixed');
-      navBarList.classList.remove(
-        'border',
-        'border-[var(--button-border-color)]',
-        'shadow-[0_4px_12px_var(--shadow-color)]'
-      );
-      isFixed = false;
-    }
-  };
-
-  window.addEventListener('scroll', handleNavScroll, { passive: true });
-  window.__headerNavScrollHandler = handleNavScroll;
-  handleNavScroll();
 }
 
 document.addEventListener('DOMContentLoaded', initMobileNav);
