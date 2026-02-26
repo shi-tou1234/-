@@ -1,32 +1,36 @@
-# 你好，我是 cmchen 👋
+# Hello, I'm cmchen 👋
 
-欢迎来到我的博客！
-
----
-
-## 📝 关于我的一些事情
-
-- **🌍 旅行**  
-  尝试用我的足迹去探索这个世界的美丽
-
-- **🎵 音乐**  
-  我蛋永远的神！喜欢 R&B、电子、K-pop 路人选手
-
-- **💻 Vibe Coding学习中**  
-  我在 GitHub 上已经开源了一些自己做的小玩意，点击右上小猫即可访问，喜欢的话，可以给我 star 吗？
-
-  有任何问题可以点击右上邮箱按钮联系我哦！
+Welcome to my blog!
 
 ---
 
-## 🌐 网站记录
+## 📝 About Me
 
-- **2026.2.12** 使用 claude和gpt开始开发
-- **2026.2.14** 参考 [https://github.com/motues/Momo](https://github.com/motues/Momo) 提供的开源页面模仿设计
-- **2026.2.15** 部署到github pages
-- **2026.2.17** 增加分类功能，优化响应速度
-- **2026.2.19** 增加背景粒子交互效果
-- **2026.2.20** 后台预制markdown语法插入，方便写文
-- **2026.2.21** 增加自动识别移动端后，栏目按钮改为侧面显示
+cmchen, a strange name, isn't it? Why this seemingly odd name? It originated from a pun back in high school. I won't go into the details, but I just found it fun, so I stuck with it!
 
-目前正在不断优化中... 🚀
+- **🌍 Travel**  
+  Trying to explore the beauty of this world with my footsteps
+
+- **🎵 Music**  
+  My dan is forever GOAT! A casual fan of R&B, Electronic, and K-pop
+
+- **💻 Trying Vibe Coding**  
+  I've open-sourced some small projects I've made on GitHub. Click the kitty cat in the top right to visit. If you like them, could you give me a star? If you can't access it due to network issues, click the Gitee repository in the friend links to see my mirrored repo.
+
+  If you have any questions, feel free to contact me by clicking the email button in the top right!
+
+---
+
+## 🌐 Website Log
+
+- **2026.2.12** Developed the initial framework using Claude Opus 4.6, with GPT-5.3 Codex for debugging and subsequent development
+- **2026.2.14** Referenced the open-source page design from [https://github.com/motues/Momo  ](https://github.com/motues/Momo  ) for inspiration
+- **2026.2.15** Deployed to GitHub Pages
+- **2026.2.17** Added category functionality, optimized response speed
+- **2026.2.19** Added interactive particle background effects
+- **2026.2.20** Added pre-built Markdown syntax insertion in the backend for easier writing
+- **2026.2.21** Added auto-detection for narrow screens; sidebar buttons switch to side display
+- **2026.2.25** Added one-click friend link structure insertion in backend; optimized UI response speed and smoothness
+- **2026.2.26** Added blog introduction modal and its button; added blog uptime display; added animated cmchen effect in the top right corner
+
+Currently under continuous optimization... 🚀
