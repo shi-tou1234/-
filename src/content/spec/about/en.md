@@ -23,6 +23,7 @@ If you happen to pass by and find a fragment that feels familiar, that's wonderf
 I'm cmchen, still learning to coexist with problems, and learning to carve out cracks in the repetitive routine of daily life.
 
 Welcome to my cracks.
+
 ---
 
 ## 📝 About Me
