@@ -57,7 +57,7 @@ trae
 
 [国内版](https://www.trae.cn/)免费使用，可以使用大多数国内模型。
 
-[国外版](https://www.trae.ai/)也有免费额度，一个月可以使用 10 次超级模型，1000 次快速模型（我用 gemini 3 flash) 比较多。
+[国外版](https://www.trae.ai/)也有免费额度，本来额度挺多的，但是自从计算方式从此时变成token的时候，就直接劝退我了，价格直接涨了10倍............
 
 github codespace
 
