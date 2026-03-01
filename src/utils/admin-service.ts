@@ -202,11 +202,19 @@ export class AdminService {
     return `/repos/${this.encodedRepoOwner}/${this.encodedRepoName}${normalized}`;
   }
 
-  private getApiBaseCandidates() {
-    const primary = this.apiBaseUrl;
-    const fallback = "https://github.com/api/v3";
-    if (primary === fallback) return [primary];
-    return [primary, fallback];
+  private async probeApiReachability() {
+    const endpoint = `${this.apiBaseUrl}/rate_limit`;
+    try {
+      const response = await fetch(endpoint, {
+        method: "GET",
+        headers: {
+          Accept: "application/vnd.github+json",
+        },
+      });
+      return response.ok || response.status === 403 || response.status === 429;
+    } catch {
+      return false;
+    }
   }
 
   private encodeRepoPath(repoPath: string) {
@@ -279,10 +287,9 @@ export class AdminService {
   }
 
   async githubRequest<T = unknown>(path: string, token: string, options: RequestInit = {}): Promise<T> {
-    let res: Response | null = null;
-    let lastNetworkError: unknown = null;
-    let lastTriedApiUrl = "";
+    let res: Response;
     const apiPath = this.buildApiPath(path);
+    const apiUrl = `${this.apiBaseUrl}${apiPath}`;
     const headers = new Headers(options.headers || {});
     headers.set("Accept", "application/vnd.github+json");
     if (token) {
@@ -292,25 +299,19 @@ export class AdminService {
       headers.set("Content-Type", "application/json");
     }
 
-    for (const baseUrl of this.getApiBaseCandidates()) {
-      const apiUrl = `${baseUrl}${apiPath}`;
-      lastTriedApiUrl = apiUrl;
-      try {
-        res = await fetch(apiUrl, {
-          ...options,
-          headers,
-        });
-        break;
-      } catch (error) {
-        lastNetworkError = error;
-        continue;
-      }
-    }
-
-    if (!res) {
-      const message = lastNetworkError instanceof Error ? lastNetworkError.message : String(lastNetworkError);
+    try {
+      res = await fetch(apiUrl, {
+        ...options,
+        headers,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      const reachable = await this.probeApiReachability();
+      const diagnosis = reachable
+        ? "API 基础连通正常，可能是浏览器插件/隐私模式/代理策略拦截了带 Authorization 的请求；这通常不是 Token 权限错误。"
+        : "当前环境无法访问 GitHub API；这属于网络连通问题，不是 Token 权限错误。";
       throw new Error(
-        `网络请求失败（GitHub API）：${message}。请确认可访问 ${this.apiBaseUrl} 或 https://github.com/api/v3`
+        `网络请求失败（GitHub API）：${message}。请确认可访问 ${this.apiBaseUrl}。${diagnosis}`
       );
     }
 
@@ -323,7 +324,7 @@ export class AdminService {
       } catch {
         detail = text;
       }
-      throw new GitHubApiError(res.status, this.formatGitHubErrorMessage(res.status, detail, lastTriedApiUrl || path));
+      throw new GitHubApiError(res.status, this.formatGitHubErrorMessage(res.status, detail, apiUrl));
     }
 
     return (res.status === 204 ? null : await res.json()) as T;
