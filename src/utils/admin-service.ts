@@ -285,7 +285,6 @@ export class AdminService {
     const apiPath = this.buildApiPath(path);
     const headers = new Headers(options.headers || {});
     headers.set("Accept", "application/vnd.github+json");
-    headers.set("X-GitHub-Api-Version", "2022-11-28");
     if (token) {
       headers.set("Authorization", token.startsWith("Bearer ") ? token : `token ${token}`);
     }
