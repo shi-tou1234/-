@@ -274,12 +274,54 @@ export class AdminService {
   }
 
   async listFilesByPrefix(prefix: string, token: string, branch: string) {
-    const tree = await this.githubRequest(`/repos/${this.repoOwner}/${this.repoName}/git/trees/${encodeURIComponent(branch)}?recursive=1`, token);
-    const items = Array.isArray(tree?.tree) ? tree.tree : [];
+    try {
+      const tree = await this.githubRequest(`/repos/${this.repoOwner}/${this.repoName}/git/trees/${encodeURIComponent(branch)}?recursive=1`, token);
+      const items = Array.isArray(tree?.tree) ? tree.tree : [];
+      const matched = items
+        .filter((item: { type?: string; path?: string }) => item?.type === "blob" && typeof item?.path === "string" && item.path.startsWith(prefix))
+        .map((item: { path: string }) => item.path);
 
-    return items
-      .filter((item: { type?: string; path?: string }) => item?.type === "blob" && typeof item?.path === "string" && item.path.startsWith(prefix))
-      .map((item: { path: string }) => item.path);
+      if (matched.length > 0) return matched;
+    } catch {
+      // ignore and fallback to contents API
+    }
+
+    return this.listFilesByPrefixUsingContents(prefix, token, branch);
+  }
+
+  private async listFilesByPrefixUsingContents(prefix: string, token: string, branch: string): Promise<string[]> {
+    const normalizedPrefix = prefix.replace(/\/+$/, "");
+    const queue = [normalizedPrefix];
+    const files: string[] = [];
+
+    while (queue.length > 0) {
+      const currentPath = queue.shift();
+      if (!currentPath) continue;
+
+      const content = await this.githubRequest(
+        `/repos/${this.repoOwner}/${this.repoName}/contents/${encodeURIComponent(currentPath).replace(/%2F/g, "/")}?ref=${encodeURIComponent(branch)}`,
+        token,
+      );
+
+      if (!Array.isArray(content)) continue;
+
+      for (const item of content) {
+        if (!item || typeof item !== "object") continue;
+        const itemType = (item as { type?: string }).type;
+        const itemPath = (item as { path?: string }).path;
+        if (!itemType || !itemPath) continue;
+
+        if (itemType === "file" && itemPath.startsWith(prefix)) {
+          files.push(itemPath);
+        }
+
+        if (itemType === "dir") {
+          queue.push(itemPath);
+        }
+      }
+    }
+
+    return files;
   }
 
   async listBlogMarkdownEntries(token: string, branch: string): Promise<BlogEntry[]> {
