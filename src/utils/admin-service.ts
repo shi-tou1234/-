@@ -217,6 +217,76 @@ export class AdminService {
     }
   }
 
+  private async requestWithXhr(apiUrl: string, options: RequestInit, headers: Headers): Promise<Response> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open((options.method || "GET").toUpperCase(), apiUrl, true);
+
+      headers.forEach((value, key) => {
+        xhr.setRequestHeader(key, value);
+      });
+
+      xhr.onload = () => {
+        const rawHeaders = xhr.getAllResponseHeaders();
+        const responseHeaders = new Headers();
+        rawHeaders
+          .trim()
+          .split(/\r?\n/)
+          .forEach((line) => {
+            const index = line.indexOf(":");
+            if (index <= 0) return;
+            const key = line.slice(0, index).trim();
+            const value = line.slice(index + 1).trim();
+            if (!key) return;
+            responseHeaders.append(key, value);
+          });
+
+        resolve(new Response(xhr.responseText, {
+          status: xhr.status,
+          statusText: xhr.statusText,
+          headers: responseHeaders,
+        }));
+      };
+
+      xhr.onerror = () => {
+        reject(new Error("XMLHttpRequest failed"));
+      };
+
+      xhr.ontimeout = () => {
+        reject(new Error("XMLHttpRequest timeout"));
+      };
+
+      xhr.timeout = 20000;
+      xhr.send(typeof options.body === "string" ? options.body : null);
+    });
+  }
+
+  private async performRequestWithRetry(apiUrl: string, options: RequestInit, headers: Headers): Promise<Response> {
+    const maxAttempts = 3;
+    let lastError: unknown = null;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      try {
+        return await fetch(apiUrl, {
+          ...options,
+          headers,
+        });
+      } catch (error) {
+        lastError = error;
+        if (attempt < maxAttempts) {
+          await new Promise((resolve) => setTimeout(resolve, 250 * attempt));
+          continue;
+        }
+      }
+    }
+
+    try {
+      return await this.requestWithXhr(apiUrl, options, headers);
+    } catch (xhrError) {
+      throw lastError || xhrError;
+    }
+  }
+
   private encodeRepoPath(repoPath: string) {
     return encodeURIComponent(repoPath).replace(/%2F/g, "/");
   }
@@ -300,10 +370,7 @@ export class AdminService {
     }
 
     try {
-      res = await fetch(apiUrl, {
-        ...options,
-        headers,
-      });
+      res = await this.performRequestWithRetry(apiUrl, options, headers);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       const reachable = await this.probeApiReachability();

@@ -2,6 +2,7 @@
 import MainPageLayout from '@layouts/MainPageLayout.astro'
 import { siteConfig, friendLinkConfig } from '@/config'
 import Cover from '@components/Cover.astro';
+import { Icon } from "astro-icon/components";
 
 import i18nit from '@i18n/translation';
 
@@ -24,6 +25,22 @@ const pageTitle = t("header.friends") + " - " + siteConfig.title;
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-[var(--text-color)]">
             {
                 friendLinkConfig.map((friend) => {
+                    let platform = '';
+                    let iconName = '';
+                    try {
+                        const friendUrl = new URL(friend.url);
+                        if (/(^|\.)github\.com$/i.test(friendUrl.hostname)) {
+                            platform = 'GitHub';
+                            iconName = 'fa6-brands:github';
+                        } else if (/(^|\.)gitee\.com$/i.test(friendUrl.hostname)) {
+                            platform = 'Gitee';
+                            iconName = 'simple-icons:gitee';
+                        }
+                    } catch {
+                        platform = '';
+                        iconName = '';
+                    }
+
                     return (
                         <a 
                             href={friend.url} 
@@ -39,7 +56,9 @@ const pageTitle = t("header.friends") + " - " + siteConfig.title;
                             />
                             <div class="flex-1 min-w-0">
                                 <h2 class="font-bold text-lg truncate flex items-center gap-2">
+                                                                    {iconName && <Icon name={iconName} class="w-4 h-4 shrink-0" />}
                                   <span class="truncate">{friend.name}</span>
+                                                                    {platform && <span class="text-xs text-[var(--text-color)]/55">{platform}</span>}
                                 </h2>
                                 <p class="text-[var(--text-color)]/60 text-sm">{friend.description}</p>
                             </div>
