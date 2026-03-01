@@ -202,6 +202,13 @@ export class AdminService {
     return `/repos/${this.encodedRepoOwner}/${this.encodedRepoName}${normalized}`;
   }
 
+  private getApiBaseCandidates() {
+    const primary = this.apiBaseUrl;
+    const fallback = "https://github.com/api/v3";
+    if (primary === fallback) return [primary];
+    return [primary, fallback];
+  }
+
   private encodeRepoPath(repoPath: string) {
     return encodeURIComponent(repoPath).replace(/%2F/g, "/");
   }
@@ -272,8 +279,10 @@ export class AdminService {
   }
 
   async githubRequest<T = unknown>(path: string, token: string, options: RequestInit = {}): Promise<T> {
-    let res: Response;
-    const apiUrl = `${this.apiBaseUrl}${this.buildApiPath(path)}`;
+    let res: Response | null = null;
+    let lastNetworkError: unknown = null;
+    let lastTriedApiUrl = "";
+    const apiPath = this.buildApiPath(path);
     const headers = new Headers(options.headers || {});
     headers.set("Accept", "application/vnd.github+json");
     headers.set("X-GitHub-Api-Version", "2022-11-28");
@@ -284,14 +293,26 @@ export class AdminService {
       headers.set("Content-Type", "application/json");
     }
 
-    try {
-      res = await fetch(apiUrl, {
-        ...options,
-        headers,
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new Error(`网络请求失败（GitHub API）：${message}。请确认可访问 ${this.apiBaseUrl}`);
+    for (const baseUrl of this.getApiBaseCandidates()) {
+      const apiUrl = `${baseUrl}${apiPath}`;
+      lastTriedApiUrl = apiUrl;
+      try {
+        res = await fetch(apiUrl, {
+          ...options,
+          headers,
+        });
+        break;
+      } catch (error) {
+        lastNetworkError = error;
+        continue;
+      }
+    }
+
+    if (!res) {
+      const message = lastNetworkError instanceof Error ? lastNetworkError.message : String(lastNetworkError);
+      throw new Error(
+        `网络请求失败（GitHub API）：${message}。请确认可访问 ${this.apiBaseUrl} 或 https://github.com/api/v3`
+      );
     }
 
     if (!res.ok) {
@@ -303,7 +324,7 @@ export class AdminService {
       } catch {
         detail = text;
       }
-      throw new GitHubApiError(res.status, this.formatGitHubErrorMessage(res.status, detail, path));
+      throw new GitHubApiError(res.status, this.formatGitHubErrorMessage(res.status, detail, lastTriedApiUrl || path));
     }
 
     return (res.status === 204 ? null : await res.json()) as T;
