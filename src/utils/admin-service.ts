@@ -239,6 +239,16 @@ export class AdminService {
     this.security = this.fallbackSecurity;
   }
 
+  /** 动态切换 API 基础 URL（用于代理切换） */
+  setApiBase(url: string): void {
+    this.apiBase = url.replace(/\/+$/, "");
+  }
+
+  /** 获取当前 API 基础 URL */
+  getApiBase(): string {
+    return this.apiBase;
+  }
+
   // ---- URL Helpers ----
 
   /**
