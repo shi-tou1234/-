@@ -23,6 +23,7 @@ type ServiceOptions = {
   repoName: string;
   securityPath: string;
   securityUrl: string;
+  apiBaseUrl?: string;
   fallbackSecurityConfig?: SecurityConfig;
 };
 
@@ -151,6 +152,7 @@ export class AdminService {
   private repoName: string;
   private securityPath: string;
   private securityUrl: string;
+  private apiBaseUrl: string;
   private fallbackSecurityConfig: SecurityConfig;
   private securityConfig: SecurityConfig;
 
@@ -159,8 +161,26 @@ export class AdminService {
     this.repoName = options.repoName;
     this.securityPath = options.securityPath;
     this.securityUrl = options.securityUrl;
+    this.apiBaseUrl = (options.apiBaseUrl || "https://api.github.com").replace(/\/+$/, "");
     this.fallbackSecurityConfig = options.fallbackSecurityConfig || defaultFallbackSecurityConfig;
     this.securityConfig = this.fallbackSecurityConfig;
+  }
+
+  private get encodedRepoOwner() {
+    return encodeURIComponent(this.repoOwner);
+  }
+
+  private get encodedRepoName() {
+    return encodeURIComponent(this.repoName);
+  }
+
+  private buildApiPath(path: string) {
+    return path.startsWith("/") ? path : `/${path}`;
+  }
+
+  private buildRepoApiPath(path: string) {
+    const normalized = path.startsWith("/") ? path : `/${path}`;
+    return `/repos/${this.encodedRepoOwner}/${this.encodedRepoName}${normalized}`;
   }
 
   async loadSecurityConfig() {
@@ -207,8 +227,9 @@ export class AdminService {
 
   async githubRequest(path: string, token: string, options: RequestInit = {}) {
     let res: Response;
+    const apiUrl = `${this.apiBaseUrl}${this.buildApiPath(path)}`;
     try {
-      res = await fetch(`https://api.github.com${path}`, {
+      res = await fetch(apiUrl, {
         ...options,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -218,7 +239,7 @@ export class AdminService {
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      throw new Error(`网络请求失败（GitHub API）：${message}。请先确认当前浏览器可访问 https://api.github.com`);
+      throw new Error(`网络请求失败（GitHub API）：${message}。请确认可访问 ${this.apiBaseUrl}`);
     }
 
     if (!res.ok) {
@@ -239,7 +260,7 @@ export class AdminService {
   async getFileMeta(repoPath: string, token: string, branch: string) {
     try {
       return await this.githubRequest(
-        `/repos/${this.repoOwner}/${this.repoName}/contents/${encodeURIComponent(repoPath).replace(/%2F/g, "/")}?ref=${encodeURIComponent(branch)}`,
+        `${this.buildRepoApiPath("/contents/")}${encodeURIComponent(repoPath).replace(/%2F/g, "/")}?ref=${encodeURIComponent(branch)}`,
         token,
       );
     } catch (error) {
@@ -266,7 +287,7 @@ export class AdminService {
       ...(meta?.sha ? { sha: meta.sha } : {}),
     };
 
-    await this.githubRequest(`/repos/${this.repoOwner}/${this.repoName}/contents/${encodeURIComponent(repoPath).replace(/%2F/g, "/")}`, token, {
+    await this.githubRequest(`${this.buildRepoApiPath("/contents/")}${encodeURIComponent(repoPath).replace(/%2F/g, "/")}`, token, {
       method: "PUT",
       body: JSON.stringify(body),
     });
@@ -276,7 +297,7 @@ export class AdminService {
     const meta = await this.getFileMeta(repoPath, token, branch);
     if (!meta?.sha) return false;
 
-    await this.githubRequest(`/repos/${this.repoOwner}/${this.repoName}/contents/${encodeURIComponent(repoPath).replace(/%2F/g, "/")}`, token, {
+    await this.githubRequest(`${this.buildRepoApiPath("/contents/")}${encodeURIComponent(repoPath).replace(/%2F/g, "/")}`, token, {
       method: "DELETE",
       body: JSON.stringify({
         message,
@@ -290,7 +311,7 @@ export class AdminService {
 
   async listFilesByPrefix(prefix: string, token: string, branch: string) {
     try {
-      const tree = await this.githubRequest(`/repos/${this.repoOwner}/${this.repoName}/git/trees/${encodeURIComponent(branch)}?recursive=1`, token);
+      const tree = await this.githubRequest(`${this.buildRepoApiPath("/git/trees/")}${encodeURIComponent(branch)}?recursive=1`, token);
       const items = Array.isArray(tree?.tree) ? tree.tree : [];
       const matched = items
         .filter((item: { type?: string; path?: string }) => item?.type === "blob" && typeof item?.path === "string" && item.path.startsWith(prefix))
@@ -325,16 +346,25 @@ export class AdminService {
   }
 
   private async getRawFileContentFromCdn(repoPath: string, branch: string): Promise<string | null> {
-    try {
-      const endpoint = `https://cdn.jsdelivr.net/gh/${this.repoOwner}/${this.repoName}@${encodeURIComponent(branch)}/${repoPath}`;
-      const response = await fetch(endpoint, {
-        cache: "no-store",
-      });
-      if (!response.ok) return null;
-      return await response.text();
-    } catch {
-      return null;
+    const endpoints = [
+      `https://cdn.jsdelivr.net/gh/${this.repoOwner}/${this.repoName}@${encodeURIComponent(branch)}/${repoPath}`,
+      `https://raw.githubusercontent.com/${this.repoOwner}/${this.repoName}/${encodeURIComponent(branch)}/${repoPath}`,
+      `https://cdn.statically.io/gh/${this.repoOwner}/${this.repoName}/${encodeURIComponent(branch)}/${repoPath}`,
+    ];
+
+    for (const endpoint of endpoints) {
+      try {
+        const response = await fetch(endpoint, {
+          cache: "no-store",
+        });
+        if (!response.ok) continue;
+        return await response.text();
+      } catch {
+        continue;
+      }
     }
+
+    return null;
   }
 
   private async listFilesByPrefixUsingContents(prefix: string, token: string, branch: string): Promise<string[]> {
@@ -347,7 +377,7 @@ export class AdminService {
       if (!currentPath) continue;
 
       const content = await this.githubRequest(
-        `/repos/${this.repoOwner}/${this.repoName}/contents/${encodeURIComponent(currentPath).replace(/%2F/g, "/")}?ref=${encodeURIComponent(branch)}`,
+        `${this.buildRepoApiPath("/contents/")}${encodeURIComponent(currentPath).replace(/%2F/g, "/")}?ref=${encodeURIComponent(branch)}`,
         token,
       );
 

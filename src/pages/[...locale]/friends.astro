@@ -2,6 +2,7 @@
 import MainPageLayout from '@layouts/MainPageLayout.astro'
 import { siteConfig, friendLinkConfig } from '@/config'
 import Cover from '@components/Cover.astro';
+import { Icon } from "astro-icon/components";
 
 import i18nit from '@i18n/translation';
 
@@ -23,25 +24,34 @@ const pageTitle = t("header.friends") + " - " + siteConfig.title;
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-[var(--text-color)]">
             {
-                friendLinkConfig.map((friend) => (
-                    <a 
-                        href={friend.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        class="flex items-center p-4 border border-[var(--button-border-color)] rounded-lg shadow-sm active:bg-[var(--button-hover-color)] hover:bg-[var(--button-hover-color)] transition-all duration-300 hover:scale-105"
-                    >
-                        <img 
-                            src={friend.avatar} 
-                            alt={friend.name} 
-                            class="w-16 h-16 rounded-full object-cover mr-4"
-                            onerror="this.src='https://www.gravatar.com/avatar/?d=mp'"
-                        />
-                        <div class="flex-1 min-w-0">
-                            <h2 class="font-bold text-lg truncate">{friend.name}</h2>
-                            <p class="text-[var(--text-color)]/60 text-sm">{friend.description}</p>
-                        </div>
-                    </a>
-                ))
+                friendLinkConfig.map((friend) => {
+                    const isGitHub = /(^|\.)github\.com$/i.test(new URL(friend.url).hostname);
+                    const githubUser = isGitHub ? (new URL(friend.url).pathname.split('/').filter(Boolean)[0] || '') : '';
+                    const avatarSrc = isGitHub && githubUser ? `https://github.com/${githubUser}.png` : friend.avatar;
+
+                    return (
+                        <a 
+                            href={friend.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="flex items-center p-4 border border-[var(--button-border-color)] rounded-lg shadow-sm active:bg-[var(--button-hover-color)] hover:bg-[var(--button-hover-color)] transition-all duration-300 hover:scale-105"
+                        >
+                            <img 
+                                src={avatarSrc} 
+                                alt={friend.name} 
+                                class="w-16 h-16 rounded-full object-cover mr-4"
+                                onerror="this.src='https://www.gravatar.com/avatar/?d=mp'"
+                            />
+                            <div class="flex-1 min-w-0">
+                                <h2 class="font-bold text-lg truncate flex items-center gap-2">
+                                  {isGitHub && <Icon name="simple-icons:github" class="w-4 h-4" />}
+                                  <span class="truncate">{friend.name}</span>
+                                </h2>
+                                <p class="text-[var(--text-color)]/60 text-sm">{friend.description}</p>
+                            </div>
+                        </a>
+                    )
+                })
             }
         </div>
         
