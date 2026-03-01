@@ -218,7 +218,7 @@ export class AdminService {
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      throw new Error(`网络请求失败（GitHub API）：${message}`);
+      throw new Error(`网络请求失败（GitHub API）：${message}。请先确认当前浏览器可访问 https://api.github.com`);
     }
 
     if (!res.ok) {
@@ -243,6 +243,15 @@ export class AdminService {
         token,
       );
     } catch (error) {
+      if (String(error).includes("网络请求失败（GitHub API）")) {
+        const rawContent = await this.getRawFileContentFromCdn(repoPath, branch);
+        if (rawContent !== null) {
+          return {
+            content: encodeUtf8ToBase64(rawContent),
+            sha: undefined,
+          };
+        }
+      }
       if (String(error).includes("404")) return null;
       throw error;
     }
@@ -292,7 +301,40 @@ export class AdminService {
       // ignore and fallback to contents API
     }
 
-    return this.listFilesByPrefixUsingContents(prefix, token, branch);
+    try {
+      return await this.listFilesByPrefixUsingContents(prefix, token, branch);
+    } catch {
+      return this.listFilesByPrefixUsingCdn(prefix, branch);
+    }
+  }
+
+  private async listFilesByPrefixUsingCdn(prefix: string, branch: string): Promise<string[]> {
+    const endpoint = `https://data.jsdelivr.com/v1/package/gh/${this.repoOwner}/${this.repoName}@${encodeURIComponent(branch)}/flat`;
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+      throw new Error(`CDN 列表读取失败：HTTP ${response.status}`);
+    }
+
+    const payload = await response.json();
+    const files = Array.isArray(payload?.files) ? payload.files : [];
+
+    return files
+      .map((item: { name?: string }) => item?.name)
+      .filter((name: string | undefined): name is string => typeof name === "string" && name.startsWith(`/${prefix}`))
+      .map((name: string) => name.slice(1));
+  }
+
+  private async getRawFileContentFromCdn(repoPath: string, branch: string): Promise<string | null> {
+    try {
+      const endpoint = `https://cdn.jsdelivr.net/gh/${this.repoOwner}/${this.repoName}@${encodeURIComponent(branch)}/${repoPath}`;
+      const response = await fetch(endpoint, {
+        cache: "no-store",
+      });
+      if (!response.ok) return null;
+      return await response.text();
+    } catch {
+      return null;
+    }
   }
 
   private async listFilesByPrefixUsingContents(prefix: string, token: string, branch: string): Promise<string[]> {
