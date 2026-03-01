@@ -59,7 +59,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
           <div class="flex flex-wrap gap-2">
             <button id="refresh-post-list-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">刷新列表</button>
             <button id="new-post-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">新建文章</button>
-            <a class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]" href="/-/" target="_blank">打开前台</a>
+            <a class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]" href={import.meta.env.BASE_URL} target="_blank">打开前台</a>
           </div>
         </div>
 
@@ -273,7 +273,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   const REPO_OWNER = "shi-tou1234";
   const REPO_NAME = "-";
   const ADMIN_SECURITY_PATH = "public/admin-security.json";
-  const ADMIN_SECURITY_URL = `${window.location.origin}/-/admin-security.json`;
+  const BASE_URL = import.meta.env.BASE_URL || "/";
+  const ADMIN_SECURITY_URL = new URL("admin-security.json", `${window.location.origin}${BASE_URL}`).toString();
   const HEADER_CONTACT_PATH = "src/data/header-contact.ts";
   const ABOUT_PROFILE_PATH = "src/data/about-profile.ts";
 

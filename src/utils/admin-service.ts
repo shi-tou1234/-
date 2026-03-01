@@ -206,14 +206,20 @@ export class AdminService {
   }
 
   async githubRequest(path: string, token: string, options: RequestInit = {}) {
-    const res = await fetch(`https://api.github.com${path}`, {
-      ...options,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github+json",
-        ...(options.headers || {}),
-      },
-    });
+    let res: Response;
+    try {
+      res = await fetch(`https://api.github.com${path}`, {
+        ...options,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github+json",
+          ...(options.headers || {}),
+        },
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`网络请求失败（GitHub API）：${message}`);
+    }
 
     if (!res.ok) {
       const text = await res.text();
