@@ -34,6 +34,16 @@ const defaultFallbackSecurityConfig: SecurityConfig = {
   hash: "Y8U44x/bJKZkj056F/Ot0JVT0fs0rZS+xIsVE7dY/6Q=",
 };
 
+class GitHubApiError extends Error {
+  status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "GitHubApiError";
+    this.status = status;
+  }
+}
+
 function toBase64(bytes: Uint8Array): string {
   let binary = "";
   bytes.forEach((byte) => {
@@ -65,11 +75,20 @@ async function hashPassword(password: string, saltBase64: string, iterations: nu
 }
 
 function encodeUtf8ToBase64(content: string): string {
-  return btoa(unescape(encodeURIComponent(content)));
+  const bytes = new TextEncoder().encode(content);
+  let binary = "";
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return btoa(binary);
 }
 
 export function decodeFileContent(raw: string): string {
-  return decodeURIComponent(escape(atob((raw || "").replace(/\n/g, ""))));
+  const normalized = (raw || "").replace(/\n/g, "").trim();
+  if (!normalized) return "";
+  const binary = atob(normalized);
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
 }
 
 export function parseFriendLinksFromTs(content: string) {
@@ -183,6 +202,33 @@ export class AdminService {
     return `/repos/${this.encodedRepoOwner}/${this.encodedRepoName}${normalized}`;
   }
 
+  private encodeRepoPath(repoPath: string) {
+    return encodeURIComponent(repoPath).replace(/%2F/g, "/");
+  }
+
+  private formatGitHubErrorMessage(status: number, detail: string, path: string) {
+    if (status === 401) return `GitHub 鉴权失败（401）：Token 无效或已过期。路径：${path}`;
+    if (status === 403) return `GitHub 权限不足（403）：请确认 Token 具备仓库 Contents 读写权限。路径：${path}`;
+    if (status === 404) return `GitHub 资源不存在（404）：${path}`;
+    return `GitHub API 错误 ${status}：${detail}`;
+  }
+
+  private isNetworkError(error: unknown): boolean {
+    return error instanceof Error && error.message.startsWith("网络请求失败（GitHub API）");
+  }
+
+  private async resolveBranchSha(token: string, branch: string): Promise<string> {
+    const branchInfo = await this.githubRequest<{ commit?: { sha?: string } }>(
+      `${this.buildRepoApiPath("/branches/")}${encodeURIComponent(branch)}`,
+      token,
+    );
+    const sha = branchInfo?.commit?.sha;
+    if (!sha) {
+      throw new Error(`无法解析分支 ${branch} 的 commit SHA`);
+    }
+    return sha;
+  }
+
   async loadSecurityConfig() {
     try {
       const response = await fetch(`${this.securityUrl}?t=${Date.now()}`);
@@ -225,17 +271,23 @@ export class AdminService {
     return nextSecurity;
   }
 
-  async githubRequest(path: string, token: string, options: RequestInit = {}) {
+  async githubRequest<T = unknown>(path: string, token: string, options: RequestInit = {}): Promise<T> {
     let res: Response;
     const apiUrl = `${this.apiBaseUrl}${this.buildApiPath(path)}`;
+    const headers = new Headers(options.headers || {});
+    headers.set("Accept", "application/vnd.github+json");
+    headers.set("X-GitHub-Api-Version", "2022-11-28");
+    if (token) {
+      headers.set("Authorization", token.startsWith("Bearer ") ? token : `token ${token}`);
+    }
+    if (options.body && !headers.has("Content-Type")) {
+      headers.set("Content-Type", "application/json");
+    }
+
     try {
       res = await fetch(apiUrl, {
         ...options,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/vnd.github+json",
-          ...(options.headers || {}),
-        },
+        headers,
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -251,20 +303,24 @@ export class AdminService {
       } catch {
         detail = text;
       }
-      throw new Error(`GitHub API 错误 ${res.status}: ${detail}`);
+      throw new GitHubApiError(res.status, this.formatGitHubErrorMessage(res.status, detail, path));
     }
 
-    return res.status === 204 ? null : res.json();
+    return (res.status === 204 ? null : await res.json()) as T;
   }
 
   async getFileMeta(repoPath: string, token: string, branch: string, allowReadonlyFallback = true) {
+    const encodedPath = this.encodeRepoPath(repoPath);
+    const contentPath = `${this.buildRepoApiPath("/contents/")}${encodedPath}?ref=${encodeURIComponent(branch)}`;
+
     try {
-      return await this.githubRequest(
-        `${this.buildRepoApiPath("/contents/")}${encodeURIComponent(repoPath).replace(/%2F/g, "/")}?ref=${encodeURIComponent(branch)}`,
-        token,
-      );
+      return await this.githubRequest(contentPath, token);
     } catch (error) {
-      if (allowReadonlyFallback && String(error).includes("网络请求失败（GitHub API）")) {
+      if (error instanceof GitHubApiError && error.status === 404) {
+        return null;
+      }
+
+      if (allowReadonlyFallback && this.isNetworkError(error)) {
         const rawContent = await this.getRawFileContentFromCdn(repoPath, branch);
         if (rawContent !== null) {
           return {
@@ -273,7 +329,7 @@ export class AdminService {
           };
         }
       }
-      if (String(error).includes("404")) return null;
+
       throw error;
     }
   }
@@ -287,7 +343,7 @@ export class AdminService {
       ...(meta?.sha ? { sha: meta.sha } : {}),
     };
 
-    await this.githubRequest(`${this.buildRepoApiPath("/contents/")}${encodeURIComponent(repoPath).replace(/%2F/g, "/")}`, token, {
+    await this.githubRequest(`${this.buildRepoApiPath("/contents/")}${this.encodeRepoPath(repoPath)}`, token, {
       method: "PUT",
       body: JSON.stringify(body),
     });
@@ -297,7 +353,7 @@ export class AdminService {
     const meta = await this.getFileMeta(repoPath, token, branch, false);
     if (!meta?.sha) return false;
 
-    await this.githubRequest(`${this.buildRepoApiPath("/contents/")}${encodeURIComponent(repoPath).replace(/%2F/g, "/")}`, token, {
+    await this.githubRequest(`${this.buildRepoApiPath("/contents/")}${this.encodeRepoPath(repoPath)}`, token, {
       method: "DELETE",
       body: JSON.stringify({
         message,
@@ -311,14 +367,21 @@ export class AdminService {
 
   async listFilesByPrefix(prefix: string, token: string, branch: string) {
     try {
-      const tree = await this.githubRequest(`${this.buildRepoApiPath("/git/trees/")}${encodeURIComponent(branch)}?recursive=1`, token);
+      const branchSha = await this.resolveBranchSha(token, branch);
+      const tree = await this.githubRequest<{ tree?: Array<{ type?: string; path?: string }> }>(
+        `${this.buildRepoApiPath("/git/trees/")}${encodeURIComponent(branchSha)}?recursive=1`,
+        token,
+      );
       const items = Array.isArray(tree?.tree) ? tree.tree : [];
       const matched = items
         .filter((item: { type?: string; path?: string }) => item?.type === "blob" && typeof item?.path === "string" && item.path.startsWith(prefix))
         .map((item: { path: string }) => item.path);
 
       if (matched.length > 0) return matched;
-    } catch {
+    } catch (error) {
+      if (error instanceof GitHubApiError && [401, 403].includes(error.status)) {
+        throw error;
+      }
       // ignore and fallback to contents API
     }
 
@@ -346,10 +409,15 @@ export class AdminService {
   }
 
   private async getRawFileContentFromCdn(repoPath: string, branch: string): Promise<string | null> {
+    const branchPath = branch
+      .split("/")
+      .map((part) => encodeURIComponent(part))
+      .join("/");
+
     const endpoints = [
       `https://cdn.jsdelivr.net/gh/${this.repoOwner}/${this.repoName}@${encodeURIComponent(branch)}/${repoPath}`,
-      `https://raw.githubusercontent.com/${this.repoOwner}/${this.repoName}/${encodeURIComponent(branch)}/${repoPath}`,
-      `https://cdn.statically.io/gh/${this.repoOwner}/${this.repoName}/${encodeURIComponent(branch)}/${repoPath}`,
+      `https://raw.githubusercontent.com/${this.repoOwner}/${this.repoName}/${branchPath}/${repoPath}`,
+      `https://cdn.statically.io/gh/${this.repoOwner}/${this.repoName}/${branchPath}/${repoPath}`,
     ];
 
     for (const endpoint of endpoints) {
@@ -376,10 +444,18 @@ export class AdminService {
       const currentPath = queue.shift();
       if (!currentPath) continue;
 
-      const content = await this.githubRequest(
-        `${this.buildRepoApiPath("/contents/")}${encodeURIComponent(currentPath).replace(/%2F/g, "/")}?ref=${encodeURIComponent(branch)}`,
-        token,
-      );
+      let content: unknown;
+      try {
+        content = await this.githubRequest(
+          `${this.buildRepoApiPath("/contents/")}${this.encodeRepoPath(currentPath)}?ref=${encodeURIComponent(branch)}`,
+          token,
+        );
+      } catch (error) {
+        if (error instanceof GitHubApiError && error.status === 404) {
+          continue;
+        }
+        throw error;
+      }
 
       if (!Array.isArray(content)) continue;
 
