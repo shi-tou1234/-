@@ -1,3 +1,10 @@
+// =====================================================================
+// Admin Service — GitHub API 后台管理服务（重写版）
+// 提供：密码验证、文件 CRUD、文章列表、友链/联系方式/关于 解析与构建
+// =====================================================================
+
+// ====== Types ======
+
 type SecurityConfig = {
   algorithm: string;
   iterations: number;
@@ -18,6 +25,12 @@ type BlogEntry = {
   lang: string;
 };
 
+type FileMeta = {
+  content: string;
+  sha: string | undefined;
+  [key: string]: unknown;
+};
+
 type ServiceOptions = {
   repoOwner: string;
   repoName: string;
@@ -27,22 +40,43 @@ type ServiceOptions = {
   fallbackSecurityConfig?: SecurityConfig;
 };
 
-const defaultFallbackSecurityConfig: SecurityConfig = {
-  algorithm: "PBKDF2-SHA256",
-  iterations: 150000,
-  salt: "sZPlZ007W2b7Jl5bq4HwKA==",
-  hash: "Y8U44x/bJKZkj056F/Ot0JVT0fs0rZS+xIsVE7dY/6Q=",
-};
+// ====== Error Class ======
 
-class GitHubApiError extends Error {
-  status: number;
+export class GitHubApiError extends Error {
+  readonly status: number;
 
   constructor(status: number, message: string) {
     super(message);
     this.name = "GitHubApiError";
     this.status = status;
   }
+
+  /** 文件/资源不存在 */
+  get isNotFound(): boolean {
+    return this.status === 404;
+  }
+
+  /** 认证失败（token 无效或无权限） */
+  get isAuth(): boolean {
+    return this.status === 401 || this.status === 403;
+  }
+
+  /** 网络不可达 */
+  get isNetwork(): boolean {
+    return this.status === 0;
+  }
 }
+
+// ====== Constants ======
+
+const DEFAULT_SECURITY: SecurityConfig = {
+  algorithm: "PBKDF2-SHA256",
+  iterations: 150000,
+  salt: "sZPlZ007W2b7Jl5bq4HwKA==",
+  hash: "Y8U44x/bJKZkj056F/Ot0JVT0fs0rZS+xIsVE7dY/6Q=",
+};
+
+// ====== Base64 & Crypto Helpers ======
 
 function toBase64(bytes: Uint8Array): string {
   let binary = "";
@@ -56,15 +90,25 @@ function fromBase64(base64: string): Uint8Array {
   return Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
 }
 
-async function hashPassword(password: string, saltBase64: string, iterations: number): Promise<string> {
+async function hashPassword(
+  password: string,
+  saltBase64: string,
+  iterations: number,
+): Promise<string> {
   const encoder = new TextEncoder();
-  const keyMaterial = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"],
+  );
 
   const bits = await crypto.subtle.deriveBits(
     {
       name: "PBKDF2",
       hash: "SHA-256",
-        salt: fromBase64(saltBase64) as unknown as BufferSource,
+      salt: fromBase64(saltBase64) as unknown as BufferSource,
       iterations,
     },
     keyMaterial,
@@ -74,25 +118,20 @@ async function hashPassword(password: string, saltBase64: string, iterations: nu
   return toBase64(new Uint8Array(bits));
 }
 
-function encodeUtf8ToBase64(content: string): string {
-  const bytes = new TextEncoder().encode(content);
-  let binary = "";
-  bytes.forEach((byte) => {
-    binary += String.fromCharCode(byte);
-  });
-  return btoa(binary);
+function utf8ToBase64(content: string): string {
+  return btoa(unescape(encodeURIComponent(content)));
 }
 
 export function decodeFileContent(raw: string): string {
-  const normalized = (raw || "").replace(/\n/g, "").trim();
-  if (!normalized) return "";
-  const binary = atob(normalized);
-  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
-  return new TextDecoder().decode(bytes);
+  return decodeURIComponent(escape(atob((raw || "").replace(/\n/g, ""))));
 }
 
+// ====== Content Parsers & Builders ======
+
 export function parseFriendLinksFromTs(content: string) {
-  const matched = content.match(/const\s+friendLinks:\s*FriendLink\[\]\s*=\s*(\[[\s\S]*?\])\s*\n\s*export\s+default\s+friendLinks/);
+  const matched = content.match(
+    /const\s+friendLinks:\s*FriendLink\[\]\s*=\s*(\[[\s\S]*?\])\s*\n\s*export\s+default\s+friendLinks/,
+  );
   if (!matched?.[1]) throw new Error("无法解析友链文件");
   return JSON.parse(matched[1]);
 }
@@ -102,17 +141,24 @@ export function buildFriendLinksTs(friendLinks: unknown[]): string {
 }
 
 export function parseHeaderContactFromTs(content: string) {
-  const matched = content.match(/const\s+headerContact:\s*HeaderContact\s*=\s*(\{[\s\S]*?\})\s*\n\s*export\s+default\s+headerContact/);
+  const matched = content.match(
+    /const\s+headerContact:\s*HeaderContact\s*=\s*(\{[\s\S]*?\})\s*\n\s*export\s+default\s+headerContact/,
+  );
   if (!matched?.[1]) throw new Error("无法解析联系方式文件");
   return JSON.parse(matched[1]);
 }
 
-export function buildHeaderContactTs(contact: { githubUrl: string; email: string }): string {
+export function buildHeaderContactTs(contact: {
+  githubUrl: string;
+  email: string;
+}): string {
   return `export type HeaderContact = {\n  githubUrl: string\n  email: string\n}\n\nconst headerContact: HeaderContact = ${JSON.stringify(contact, null, 2)}\n\nexport default headerContact\n`;
 }
 
 export function parseAboutProfileFromTs(content: string) {
-  const matched = content.match(/const\s+aboutProfile:\s*AboutProfile\s*=\s*(\{[\s\S]*?\})\s*\n\s*export\s+default\s+aboutProfile/);
+  const matched = content.match(
+    /const\s+aboutProfile:\s*AboutProfile\s*=\s*(\{[\s\S]*?\})\s*\n\s*export\s+default\s+aboutProfile/,
+  );
   if (!matched?.[1]) throw new Error("无法解析关于特质文件");
   return JSON.parse(matched[1]);
 }
@@ -127,6 +173,8 @@ export function buildAboutProfileTs(profile: {
 }) {
   return `export type AboutProfile = {\n  mbti: string\n  mbtiLink: string\n  major: string\n  majorLink: string\n  recentDoing: string\n  recentReading: string\n}\n\nconst aboutProfile: AboutProfile = ${JSON.stringify(profile, null, 2)}\n\nexport default aboutProfile\n`;
 }
+
+// ====== Slug & Date Helpers ======
 
 export function normalizeSlug(input: string): string {
   return input
@@ -166,353 +214,427 @@ export function getNowDateTimeLocal(): string {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
 }
 
+// ====== AdminService ======
+
 export class AdminService {
-  private repoOwner: string;
-  private repoName: string;
-  private securityPath: string;
-  private securityUrl: string;
-  private apiBaseUrl: string;
-  private fallbackSecurityConfig: SecurityConfig;
-  private securityConfig: SecurityConfig;
+  private readonly owner: string;
+  private readonly repo: string;
+  private readonly securityPath: string;
+  private readonly securityUrl: string;
+  private readonly apiBase: string;
+  private readonly fallbackSecurity: SecurityConfig;
+  private security: SecurityConfig;
 
-  constructor(options: ServiceOptions) {
-    this.repoOwner = options.repoOwner;
-    this.repoName = options.repoName;
-    this.securityPath = options.securityPath;
-    this.securityUrl = options.securityUrl;
-    this.apiBaseUrl = (options.apiBaseUrl || "https://api.github.com").replace(/\/+$/, "");
-    this.fallbackSecurityConfig = options.fallbackSecurityConfig || defaultFallbackSecurityConfig;
-    this.securityConfig = this.fallbackSecurityConfig;
+  constructor(opts: ServiceOptions) {
+    this.owner = opts.repoOwner;
+    this.repo = opts.repoName;
+    this.securityPath = opts.securityPath;
+    this.securityUrl = opts.securityUrl;
+    this.apiBase = (opts.apiBaseUrl || "https://api.github.com").replace(
+      /\/+$/,
+      "",
+    );
+    this.fallbackSecurity =
+      opts.fallbackSecurityConfig || DEFAULT_SECURITY;
+    this.security = this.fallbackSecurity;
   }
 
-  private get encodedRepoOwner() {
-    return encodeURIComponent(this.repoOwner);
+  // ---- URL Helpers ----
+
+  /**
+   * 将文件路径的每一段分别 encodeURIComponent，保留 /
+   * 正确处理中文文件名（如 "极限"、"导数和微分"）
+   */
+  private encodePath(filePath: string): string {
+    return filePath
+      .split("/")
+      .map((segment) => encodeURIComponent(segment))
+      .join("/");
   }
 
-  private get encodedRepoName() {
-    return encodeURIComponent(this.repoName);
+  /**
+   * 构建仓库 API 路径: /repos/{owner}/{repo}{endpoint}
+   */
+  private repoApiPath(endpoint: string): string {
+    const e = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    return `/repos/${this.owner}/${this.repo}${e}`;
   }
 
-  private buildApiPath(path: string) {
-    return path.startsWith("/") ? path : `/${path}`;
+  /**
+   * 构建仓库 Contents API 路径: /repos/{owner}/{repo}/contents/{encodedPath}
+   */
+  private contentsApiPath(filePath: string): string {
+    return `${this.repoApiPath("/contents")}/${this.encodePath(filePath)}`;
   }
 
-  private buildRepoApiPath(path: string) {
-    const normalized = path.startsWith("/") ? path : `/${path}`;
-    return `/repos/${this.encodedRepoOwner}/${this.encodedRepoName}${normalized}`;
-  }
+  // ---- Core API Request ----
 
-  private async probeApiReachability() {
-    const endpoint = `${this.apiBaseUrl}/rate_limit`;
+  /**
+   * 发起 GitHub API 请求
+   * @param path - API 路径（相对于 apiBase，如 /repos/owner/repo/contents/...）
+   * @param token - GitHub Personal Access Token
+   * @param options - fetch RequestInit
+   * @returns 解析后的 JSON 或 null (204)
+   * @throws GitHubApiError
+   */
+  async githubRequest(
+    path: string,
+    token: string,
+    options: RequestInit = {},
+  ): Promise<any> {
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+    const url = `${this.apiBase}${normalizedPath}`;
+
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+    };
+
+    if (options.body && typeof options.body === "string") {
+      headers["Content-Type"] = "application/json";
+    }
+
+    let res: Response;
     try {
-      const response = await fetch(endpoint, {
-        method: "GET",
+      res = await fetch(url, {
+        ...options,
         headers: {
-          Accept: "application/vnd.github+json",
+          ...headers,
+          ...((options.headers as Record<string, string>) || {}),
         },
       });
-      return response.ok || response.status === 403 || response.status === 429;
-    } catch {
-      return false;
+    } catch (err) {
+      const msg =
+        err instanceof Error ? err.message : String(err);
+      throw new GitHubApiError(
+        0,
+        `网络请求失败（GitHub API）：${msg}。请确认网络可访问 ${this.apiBase}`,
+      );
     }
-  }
 
-  private async requestWithXhr(apiUrl: string, options: RequestInit, headers: Headers): Promise<Response> {
-    return new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open((options.method || "GET").toUpperCase(), apiUrl, true);
+    if (res.status === 204) return null;
 
-      headers.forEach((value, key) => {
-        xhr.setRequestHeader(key, value);
-      });
-
-      xhr.onload = () => {
-        const rawHeaders = xhr.getAllResponseHeaders();
-        const responseHeaders = new Headers();
-        rawHeaders
-          .trim()
-          .split(/\r?\n/)
-          .forEach((line) => {
-            const index = line.indexOf(":");
-            if (index <= 0) return;
-            const key = line.slice(0, index).trim();
-            const value = line.slice(index + 1).trim();
-            if (!key) return;
-            responseHeaders.append(key, value);
-          });
-
-        resolve(new Response(xhr.responseText, {
-          status: xhr.status,
-          statusText: xhr.statusText,
-          headers: responseHeaders,
-        }));
-      };
-
-      xhr.onerror = () => {
-        reject(new Error("XMLHttpRequest failed"));
-      };
-
-      xhr.ontimeout = () => {
-        reject(new Error("XMLHttpRequest timeout"));
-      };
-
-      xhr.timeout = 20000;
-      xhr.send(typeof options.body === "string" ? options.body : null);
-    });
-  }
-
-  private async performRequestWithRetry(apiUrl: string, options: RequestInit, headers: Headers): Promise<Response> {
-    const maxAttempts = 3;
-    let lastError: unknown = null;
-
-    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    if (!res.ok) {
+      let detail: string;
       try {
-        return await fetch(apiUrl, {
-          ...options,
-          headers,
-        });
-      } catch (error) {
-        lastError = error;
-        if (attempt < maxAttempts) {
-          await new Promise((resolve) => setTimeout(resolve, 250 * attempt));
-          continue;
-        }
+        const json = await res.json();
+        detail = json?.message || JSON.stringify(json);
+      } catch {
+        detail = await res.text().catch(() => `HTTP ${res.status}`);
       }
+      throw new GitHubApiError(res.status, detail);
     }
 
-    try {
-      return await this.requestWithXhr(apiUrl, options, headers);
-    } catch (xhrError) {
-      throw lastError || xhrError;
-    }
+    return res.json();
   }
 
-  private encodeRepoPath(repoPath: string) {
-    return encodeURIComponent(repoPath).replace(/%2F/g, "/");
-  }
+  // ---- Security ----
 
-  private formatGitHubErrorMessage(status: number, detail: string, path: string) {
-    if (status === 401) return `GitHub 鉴权失败（401）：Token 无效或已过期。路径：${path}`;
-    if (status === 403) return `GitHub 权限不足（403）：请确认 Token 具备仓库 Contents 读写权限。路径：${path}`;
-    if (status === 404) return `GitHub 资源不存在（404）：${path}`;
-    return `GitHub API 错误 ${status}：${detail}`;
-  }
-
-  private isNetworkError(error: unknown): boolean {
-    return error instanceof Error && error.message.startsWith("网络请求失败（GitHub API）");
-  }
-
-  private async resolveBranchSha(token: string, branch: string): Promise<string> {
-    const branchInfo = await this.githubRequest<{ commit?: { sha?: string } }>(
-      `${this.buildRepoApiPath("/branches/")}${encodeURIComponent(branch)}`,
-      token,
-    );
-    const sha = branchInfo?.commit?.sha;
-    if (!sha) {
-      throw new Error(`无法解析分支 ${branch} 的 commit SHA`);
-    }
-    return sha;
-  }
-
-  async loadSecurityConfig() {
+  async loadSecurityConfig(): Promise<void> {
     try {
       const response = await fetch(`${this.securityUrl}?t=${Date.now()}`);
       if (!response.ok) throw new Error("fetch failed");
       const json = await response.json();
-      if (!json?.salt || !json?.hash || !json?.iterations) throw new Error("invalid config");
-      this.securityConfig = json;
+      if (!json?.salt || !json?.hash || !json?.iterations)
+        throw new Error("invalid config");
+      this.security = json;
     } catch {
-      this.securityConfig = this.fallbackSecurityConfig;
+      this.security = this.fallbackSecurity;
     }
   }
 
-  async verifyPassword(password: string) {
-    const hashed = await hashPassword(password, this.securityConfig.salt, this.securityConfig.iterations);
-    return hashed === this.securityConfig.hash;
+  async verifyPassword(password: string): Promise<boolean> {
+    const hashed = await hashPassword(
+      password,
+      this.security.salt,
+      this.security.iterations,
+    );
+    return hashed === this.security.hash;
   }
 
-  async changePassword(input: ChangePasswordInput) {
+  async changePassword(input: ChangePasswordInput): Promise<SecurityConfig> {
     const oldPassed = await this.verifyPassword(input.oldPassword);
-    if (!oldPassed) {
-      throw new Error("当前密码不正确");
-    }
-    if (input.newPassword.trim().length < 6) {
+    if (!oldPassed) throw new Error("当前密码不正确");
+    if (input.newPassword.trim().length < 6)
       throw new Error("新密码至少 6 位");
-    }
 
     const saltBytes = new Uint8Array(16);
     crypto.getRandomValues(saltBytes);
     const salt = toBase64(saltBytes);
-    const nextSecurity = {
+    const nextSecurity: SecurityConfig = {
       algorithm: "PBKDF2-SHA256",
       iterations: 180000,
       salt,
       hash: await hashPassword(input.newPassword.trim(), salt, 180000),
     };
 
-    await this.upsertFile(this.securityPath, `${JSON.stringify(nextSecurity, null, 2)}\n`, "admin: update password hash", input.token, input.branch);
+    await this.upsertFile(
+      this.securityPath,
+      `${JSON.stringify(nextSecurity, null, 2)}\n`,
+      "admin: update password hash",
+      input.token,
+      input.branch,
+    );
 
-    this.securityConfig = nextSecurity;
+    this.security = nextSecurity;
     return nextSecurity;
   }
 
-  async githubRequest<T = unknown>(path: string, token: string, options: RequestInit = {}): Promise<T> {
-    let res: Response;
-    const apiPath = this.buildApiPath(path);
-    const apiUrl = `${this.apiBaseUrl}${apiPath}`;
-    const headers = new Headers(options.headers || {});
-    headers.set("Accept", "application/vnd.github+json");
-    if (token) {
-      headers.set("Authorization", token.startsWith("Bearer ") ? token : `token ${token}`);
-    }
-    if (options.body && !headers.has("Content-Type")) {
-      headers.set("Content-Type", "application/json");
-    }
+  // ---- File Operations ----
 
+  /**
+   * 获取文件元信息（含 base64 内容和 SHA）
+   * @returns FileMeta 或 null（不存在时）
+   */
+  async getFileMeta(
+    filePath: string,
+    token: string,
+    branch: string,
+    allowReadonlyFallback = true,
+  ): Promise<FileMeta | null> {
+    const apiPath = `${this.contentsApiPath(filePath)}?ref=${encodeURIComponent(branch)}`;
     try {
-      res = await this.performRequestWithRetry(apiUrl, options, headers);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      const reachable = await this.probeApiReachability();
-      const diagnosis = reachable
-        ? "API 基础连通正常，可能是浏览器插件/隐私模式/代理策略拦截了带 Authorization 的请求；这通常不是 Token 权限错误。"
-        : "当前环境无法访问 GitHub API；这属于网络连通问题，不是 Token 权限错误。";
-      throw new Error(
-        `网络请求失败（GitHub API）：${message}。请确认可访问 ${this.apiBaseUrl}。${diagnosis}`
-      );
-    }
+      return await this.githubRequest(apiPath, token);
+    } catch (err) {
+      if (err instanceof GitHubApiError) {
+        if (err.isNotFound) return null;
 
-    if (!res.ok) {
-      const text = await res.text();
-      let detail = text;
-      try {
-        const parsed = JSON.parse(text);
-        detail = parsed?.message || text;
-      } catch {
-        detail = text;
-      }
-      throw new GitHubApiError(res.status, this.formatGitHubErrorMessage(res.status, detail, apiUrl));
-    }
-
-    return (res.status === 204 ? null : await res.json()) as T;
-  }
-
-  async getFileMeta(repoPath: string, token: string, branch: string, allowReadonlyFallback = true) {
-    const encodedPath = this.encodeRepoPath(repoPath);
-    const contentPath = `${this.buildRepoApiPath("/contents/")}${encodedPath}?ref=${encodeURIComponent(branch)}`;
-
-    try {
-      return await this.githubRequest(contentPath, token);
-    } catch (error) {
-      if (error instanceof GitHubApiError && error.status === 404) {
-        return null;
-      }
-
-      if (allowReadonlyFallback && this.isNetworkError(error)) {
-        const rawContent = await this.getRawFileContentFromCdn(repoPath, branch);
-        if (rawContent !== null) {
-          return {
-            content: encodeUtf8ToBase64(rawContent),
-            sha: undefined,
-          };
+        // 网络不可达时尝试 CDN 只读回退
+        if (allowReadonlyFallback && err.isNetwork) {
+          const rawContent = await this.fetchRawContent(filePath, branch);
+          if (rawContent !== null) {
+            return { content: utf8ToBase64(rawContent), sha: undefined };
+          }
         }
       }
-
-      throw error;
+      throw err;
     }
   }
 
-  async upsertFile(repoPath: string, content: string, message: string, token: string, branch: string) {
-    const meta = await this.getFileMeta(repoPath, token, branch, false);
-    const body = {
-      message,
-      content: encodeUtf8ToBase64(content),
-      branch,
-      ...(meta?.sha ? { sha: meta.sha } : {}),
-    };
+  /**
+   * 创建或更新文本文件
+   */
+  async upsertFile(
+    filePath: string,
+    content: string,
+    message: string,
+    token: string,
+    branch: string,
+  ): Promise<void> {
+    const sha = await this.getFileSha(filePath, token, branch);
+    const apiPath = this.contentsApiPath(filePath);
 
-    await this.githubRequest(`${this.buildRepoApiPath("/contents/")}${this.encodeRepoPath(repoPath)}`, token, {
+    await this.githubRequest(apiPath, token, {
       method: "PUT",
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        message,
+        content: utf8ToBase64(content),
+        branch,
+        ...(sha ? { sha } : {}),
+      }),
     });
   }
 
-  async deleteFile(repoPath: string, message: string, token: string, branch: string) {
-    const meta = await this.getFileMeta(repoPath, token, branch, false);
-    if (!meta?.sha) return false;
+  /**
+   * 上传二进制文件（content 已是 base64 编码）
+   */
+  async uploadFile(
+    filePath: string,
+    base64Content: string,
+    message: string,
+    token: string,
+    branch: string,
+  ): Promise<void> {
+    const sha = await this.getFileSha(filePath, token, branch);
+    const apiPath = this.contentsApiPath(filePath);
 
-    await this.githubRequest(`${this.buildRepoApiPath("/contents/")}${this.encodeRepoPath(repoPath)}`, token, {
-      method: "DELETE",
+    await this.githubRequest(apiPath, token, {
+      method: "PUT",
       body: JSON.stringify({
         message,
-        sha: meta.sha,
+        content: base64Content,
         branch,
+        ...(sha ? { sha } : {}),
       }),
+    });
+  }
+
+  /**
+   * 删除文件
+   * @returns true 已删除；false 文件不存在
+   */
+  async deleteFile(
+    filePath: string,
+    message: string,
+    token: string,
+    branch: string,
+  ): Promise<boolean> {
+    const sha = await this.getFileSha(filePath, token, branch);
+    if (!sha) return false;
+
+    const apiPath = this.contentsApiPath(filePath);
+    await this.githubRequest(apiPath, token, {
+      method: "DELETE",
+      body: JSON.stringify({ message, sha, branch }),
     });
 
     return true;
   }
 
-  async listFilesByPrefix(prefix: string, token: string, branch: string) {
+  /**
+   * 获取指定文件的 SHA（用于更新/删除）
+   * @returns SHA 字符串，文件不存在时返回 undefined
+   */
+  private async getFileSha(
+    filePath: string,
+    token: string,
+    branch: string,
+  ): Promise<string | undefined> {
+    const apiPath = `${this.contentsApiPath(filePath)}?ref=${encodeURIComponent(branch)}`;
     try {
-      const branchSha = await this.resolveBranchSha(token, branch);
-      const tree = await this.githubRequest<{ tree?: Array<{ type?: string; path?: string }> }>(
-        `${this.buildRepoApiPath("/git/trees/")}${encodeURIComponent(branchSha)}?recursive=1`,
-        token,
-      );
-      const items = Array.isArray(tree?.tree) ? tree.tree : [];
-      const matched = items
-        .filter((item: { type?: string; path?: string }) => item?.type === "blob" && typeof item?.path === "string" && item.path.startsWith(prefix))
-        .map((item: { path: string }) => item.path);
-
-      if (matched.length > 0) return matched;
-    } catch (error) {
-      if (error instanceof GitHubApiError && [401, 403].includes(error.status)) {
-        throw error;
-      }
-      // ignore and fallback to contents API
+      const meta = await this.githubRequest(apiPath, token);
+      return meta?.sha;
+    } catch (err) {
+      if (err instanceof GitHubApiError && err.isNotFound) return undefined;
+      throw err;
     }
+  }
 
+  // ---- File Listing ----
+
+  /**
+   * 列出指定前缀下的所有文件路径，多级回退：
+   * 1. Git Trees API（最快，单次请求）
+   * 2. Contents API（递归目录遍历）
+   * 3. CDN flat API（无需认证，可能有缓存延迟）
+   */
+  async listFilesByPrefix(
+    prefix: string,
+    token: string,
+    branch: string,
+  ): Promise<string[]> {
+    // 策略 1: Git Trees API
     try {
-      return await this.listFilesByPrefixUsingContents(prefix, token, branch);
+      const files = await this.listByTreeApi(prefix, token, branch);
+      if (files.length > 0) return files;
     } catch {
-      return this.listFilesByPrefixUsingCdn(prefix, branch);
+      /* fallthrough */
+    }
+
+    // 策略 2: Contents API
+    try {
+      const files = await this.listByContentsApi(prefix, token, branch);
+      if (files.length > 0) return files;
+    } catch {
+      /* fallthrough */
+    }
+
+    // 策略 3: CDN
+    return this.listByCdn(prefix, branch);
+  }
+
+  /** Git Trees API 列文件（单次请求获取整棵树） */
+  private async listByTreeApi(
+    prefix: string,
+    token: string,
+    branch: string,
+  ): Promise<string[]> {
+    const apiPath = this.repoApiPath(
+      `/git/trees/${encodeURIComponent(branch)}?recursive=1`,
+    );
+    const tree = await this.githubRequest(apiPath, token);
+    const items = Array.isArray(tree?.tree) ? tree.tree : [];
+
+    return items
+      .filter(
+        (item: { type?: string; path?: string }) =>
+          item?.type === "blob" &&
+          typeof item?.path === "string" &&
+          item.path.startsWith(prefix),
+      )
+      .map((item: { path: string }) => item.path);
+  }
+
+  /** Contents API 递归遍历目录列文件 */
+  private async listByContentsApi(
+    prefix: string,
+    token: string,
+    branch: string,
+  ): Promise<string[]> {
+    const normalizedPrefix = prefix.replace(/\/+$/, "");
+    const queue = [normalizedPrefix];
+    const files: string[] = [];
+
+    while (queue.length > 0) {
+      const currentPath = queue.shift();
+      if (!currentPath) continue;
+
+      try {
+        const apiPath = `${this.contentsApiPath(currentPath)}?ref=${encodeURIComponent(branch)}`;
+        const content = await this.githubRequest(apiPath, token);
+        if (!Array.isArray(content)) continue;
+
+        for (const item of content) {
+          if (!item || typeof item !== "object") continue;
+          const itemType = (item as { type?: string }).type;
+          const itemPath = (item as { path?: string }).path;
+          if (!itemType || !itemPath) continue;
+
+          if (itemType === "file" && itemPath.startsWith(prefix)) {
+            files.push(itemPath);
+          }
+          if (itemType === "dir") {
+            queue.push(itemPath);
+          }
+        }
+      } catch {
+        continue;
+      }
+    }
+
+    return files;
+  }
+
+  /** jsDelivr CDN flat API 列文件（无需 token） */
+  private async listByCdn(
+    prefix: string,
+    branch: string,
+  ): Promise<string[]> {
+    const endpoint = `https://data.jsdelivr.com/v1/package/gh/${encodeURIComponent(this.owner)}/${encodeURIComponent(this.repo)}@${encodeURIComponent(branch)}/flat`;
+    try {
+      const response = await fetch(endpoint);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const payload = await response.json();
+      const files = Array.isArray(payload?.files) ? payload.files : [];
+
+      return files
+        .map((item: { name?: string }) => item?.name)
+        .filter(
+          (name: string | undefined): name is string =>
+            typeof name === "string" && name.startsWith(`/${prefix}`),
+        )
+        .map((name: string) => name.slice(1));
+    } catch {
+      return [];
     }
   }
 
-  private async listFilesByPrefixUsingCdn(prefix: string, branch: string): Promise<string[]> {
-    const endpoint = `https://data.jsdelivr.com/v1/package/gh/${this.repoOwner}/${this.repoName}@${encodeURIComponent(branch)}/flat`;
-    const response = await fetch(endpoint);
-    if (!response.ok) {
-      throw new Error(`CDN 列表读取失败：HTTP ${response.status}`);
-    }
+  // ---- CDN Raw Content Fallback ----
 
-    const payload = await response.json();
-    const files = Array.isArray(payload?.files) ? payload.files : [];
-
-    return files
-      .map((item: { name?: string }) => item?.name)
-      .filter((name: string | undefined): name is string => typeof name === "string" && name.startsWith(`/${prefix}`))
-      .map((name: string) => name.slice(1));
-  }
-
-  private async getRawFileContentFromCdn(repoPath: string, branch: string): Promise<string | null> {
-    const branchPath = branch
-      .split("/")
-      .map((part) => encodeURIComponent(part))
-      .join("/");
-
+  /** 通过 CDN / raw URL 获取文件原始内容（无需认证，只读） */
+  private async fetchRawContent(
+    filePath: string,
+    branch: string,
+  ): Promise<string | null> {
     const endpoints = [
-      `https://cdn.jsdelivr.net/gh/${this.repoOwner}/${this.repoName}@${encodeURIComponent(branch)}/${repoPath}`,
-      `https://raw.githubusercontent.com/${this.repoOwner}/${this.repoName}/${branchPath}/${repoPath}`,
-      `https://cdn.statically.io/gh/${this.repoOwner}/${this.repoName}/${branchPath}/${repoPath}`,
+      `https://raw.githubusercontent.com/${this.owner}/${this.repo}/${encodeURIComponent(branch)}/${filePath}`,
+      `https://cdn.jsdelivr.net/gh/${encodeURIComponent(this.owner)}/${encodeURIComponent(this.repo)}@${encodeURIComponent(branch)}/${filePath}`,
     ];
 
     for (const endpoint of endpoints) {
       try {
-        const response = await fetch(endpoint, {
-          cache: "no-store",
-        });
+        const response = await fetch(endpoint, { cache: "no-store" });
         if (!response.ok) continue;
         return await response.text();
       } catch {
@@ -523,64 +645,89 @@ export class AdminService {
     return null;
   }
 
-  private async listFilesByPrefixUsingContents(prefix: string, token: string, branch: string): Promise<string[]> {
-    const normalizedPrefix = prefix.replace(/\/+$/, "");
-    const queue = [normalizedPrefix];
-    const files: string[] = [];
+  // ---- Blog ----
 
-    while (queue.length > 0) {
-      const currentPath = queue.shift();
-      if (!currentPath) continue;
+  /** 列出所有博客 Markdown 条目 */
+  async listBlogMarkdownEntries(
+    token: string,
+    branch: string,
+  ): Promise<BlogEntry[]> {
+    const files = await this.listFilesByPrefix(
+      "src/content/blog/",
+      token,
+      branch,
+    );
 
-      let content: unknown;
-      try {
-        content = await this.githubRequest(
-          `${this.buildRepoApiPath("/contents/")}${this.encodeRepoPath(currentPath)}?ref=${encodeURIComponent(branch)}`,
-          token,
+    return files
+      .map((path: string) => {
+        const matched = path.match(
+          /^src\/content\/blog\/(.+)\/(zh-cn|en)\.md$/,
         );
-      } catch (error) {
-        if (error instanceof GitHubApiError && error.status === 404) {
-          continue;
-        }
-        throw error;
-      }
-
-      if (!Array.isArray(content)) continue;
-
-      for (const item of content) {
-        if (!item || typeof item !== "object") continue;
-        const itemType = (item as { type?: string }).type;
-        const itemPath = (item as { path?: string }).path;
-        if (!itemType || !itemPath) continue;
-
-        if (itemType === "file" && itemPath.startsWith(prefix)) {
-          files.push(itemPath);
-        }
-
-        if (itemType === "dir") {
-          queue.push(itemPath);
-        }
-      }
-    }
-
-    return files;
+        if (!matched) return null;
+        return { path, slug: matched[1], lang: matched[2] } as BlogEntry;
+      })
+      .filter((entry): entry is BlogEntry => Boolean(entry))
+      .sort((a, b) =>
+        `${a.slug}/${a.lang}`.localeCompare(`${b.slug}/${b.lang}`),
+      );
   }
 
-  async listBlogMarkdownEntries(token: string, branch: string): Promise<BlogEntry[]> {
-    const files = await this.listFilesByPrefix("src/content/blog/", token, branch);
-    const entries = files
-      .map((path: string) => {
-        const matched = path.match(/^src\/content\/blog\/(.+)\/(zh-cn|en)\.md$/);
-        if (!matched) return null;
-        return {
-          path,
-          slug: matched[1],
-          lang: matched[2],
-        };
-      })
-      .filter((entry: BlogEntry | null): entry is BlogEntry => Boolean(entry))
-      .sort((a: BlogEntry, b: BlogEntry) => `${a.slug}/${a.lang}`.localeCompare(`${b.slug}/${b.lang}`));
+  // ---- Connection Test ----
 
-    return entries;
+  /**
+   * 测试 GitHub Token 是否有效且有仓库权限
+   * @returns { ok: boolean; message: string }
+   */
+  async testConnection(
+    token: string,
+  ): Promise<{ ok: boolean; message: string }> {
+    if (!token) {
+      return { ok: false, message: "请输入 GitHub Token" };
+    }
+
+    try {
+      const user = await this.githubRequest("/user", token);
+      const login = user?.login || "未知";
+
+      // 验证仓库访问权限
+      try {
+        await this.githubRequest(this.repoApiPath(""), token);
+        return {
+          ok: true,
+          message: `连接成功！用户：${login}，仓库 ${this.owner}/${this.repo} 可访问`,
+        };
+      } catch (repoErr) {
+        if (repoErr instanceof GitHubApiError && repoErr.isNotFound) {
+          return {
+            ok: false,
+            message: `用户 ${login} 无权访问仓库 ${this.owner}/${this.repo}（404）`,
+          };
+        }
+        if (repoErr instanceof GitHubApiError && repoErr.isAuth) {
+          return {
+            ok: false,
+            message: `用户 ${login} 无权访问仓库 ${this.owner}/${this.repo}（请确认 Token 有 repo 权限）`,
+          };
+        }
+        throw repoErr;
+      }
+    } catch (err) {
+      if (err instanceof GitHubApiError) {
+        if (err.isAuth) {
+          return { ok: false, message: "Token 无效或已过期，请检查后重试" };
+        }
+        if (err.isNetwork) {
+          return {
+            ok: false,
+            message: `无法连接 GitHub API：${err.message}`,
+          };
+        }
+        return { ok: false, message: `API 错误 ${err.status}: ${err.message}` };
+      }
+      return {
+        ok: false,
+        message: `未知错误：${err instanceof Error ? err.message : String(err)}`,
+      };
+    }
   }
 }
