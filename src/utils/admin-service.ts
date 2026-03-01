@@ -257,14 +257,14 @@ export class AdminService {
     return res.status === 204 ? null : res.json();
   }
 
-  async getFileMeta(repoPath: string, token: string, branch: string) {
+  async getFileMeta(repoPath: string, token: string, branch: string, allowReadonlyFallback = true) {
     try {
       return await this.githubRequest(
         `${this.buildRepoApiPath("/contents/")}${encodeURIComponent(repoPath).replace(/%2F/g, "/")}?ref=${encodeURIComponent(branch)}`,
         token,
       );
     } catch (error) {
-      if (String(error).includes("网络请求失败（GitHub API）")) {
+      if (allowReadonlyFallback && String(error).includes("网络请求失败（GitHub API）")) {
         const rawContent = await this.getRawFileContentFromCdn(repoPath, branch);
         if (rawContent !== null) {
           return {
@@ -279,7 +279,7 @@ export class AdminService {
   }
 
   async upsertFile(repoPath: string, content: string, message: string, token: string, branch: string) {
-    const meta = await this.getFileMeta(repoPath, token, branch);
+    const meta = await this.getFileMeta(repoPath, token, branch, false);
     const body = {
       message,
       content: encodeUtf8ToBase64(content),
@@ -294,7 +294,7 @@ export class AdminService {
   }
 
   async deleteFile(repoPath: string, message: string, token: string, branch: string) {
-    const meta = await this.getFileMeta(repoPath, token, branch);
+    const meta = await this.getFileMeta(repoPath, token, branch, false);
     if (!meta?.sha) return false;
 
     await this.githubRequest(`${this.buildRepoApiPath("/contents/")}${encodeURIComponent(repoPath).replace(/%2F/g, "/")}`, token, {

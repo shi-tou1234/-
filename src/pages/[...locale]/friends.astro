@@ -25,8 +25,16 @@ const pageTitle = t("header.friends") + " - " + siteConfig.title;
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-[var(--text-color)]">
             {
                 friendLinkConfig.map((friend) => {
-                    const isGitHub = /(^|\.)github\.com$/i.test(new URL(friend.url).hostname);
-                    const githubUser = isGitHub ? (new URL(friend.url).pathname.split('/').filter(Boolean)[0] || '') : '';
+                    let isGitHub = false;
+                    let githubUser = '';
+                    try {
+                        const friendUrl = new URL(friend.url);
+                        isGitHub = /(^|\.)github\.com$/i.test(friendUrl.hostname);
+                        githubUser = isGitHub ? (friendUrl.pathname.split('/').filter(Boolean)[0] || '') : '';
+                    } catch {
+                        isGitHub = false;
+                        githubUser = '';
+                    }
                     const avatarSrc = isGitHub && githubUser ? `https://github.com/${githubUser}.png` : friend.avatar;
 
                     return (
@@ -44,7 +52,7 @@ const pageTitle = t("header.friends") + " - " + siteConfig.title;
                             />
                             <div class="flex-1 min-w-0">
                                 <h2 class="font-bold text-lg truncate flex items-center gap-2">
-                                  {isGitHub && <Icon name="simple-icons:github" class="w-4 h-4" />}
+                                                                    {isGitHub && <Icon name="fa6-brands:github" class="w-4 h-4" />}
                                   <span class="truncate">{friend.name}</span>
                                 </h2>
                                 <p class="text-[var(--text-color)]/60 text-sm">{friend.description}</p>

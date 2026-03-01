@@ -86,8 +86,9 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
             if (overlay) overlay.style.display = 'none';
         });
 
-        // 全局防爬虫：禁止右键、复制、常见调试快捷键和自动化访问
-        if (!window.__antiCrawlerGuardInstalled) {
+        // 全局防爬虫：后台页面不启用，避免影响管理操作
+        const isAdminPath = window.location.pathname.includes('/admin');
+        if (!isAdminPath && !window.__antiCrawlerGuardInstalled) {
           window.__antiCrawlerGuardInstalled = true;
 
           const shouldBlockAutomation = () => {
