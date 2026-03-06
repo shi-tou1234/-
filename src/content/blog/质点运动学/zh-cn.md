@@ -88,8 +88,8 @@ $t=3\,\mathrm{s}$ 时 $\vec{v}=1.0\vec{i}+1.5\vec{j}$，大小 $v=\sqrt{1.0^2+1.
 建立坐标系，A 沿 x 轴，B 沿 y 轴。  
 $x^2 + y^2 = l^2$ 两边对时间求导：  
 $2x\frac{dx}{dt}+2y\frac{dy}{dt}=0 \Rightarrow \frac{dy}{dt} = -\frac{x}{y}\frac{dx}{dt}$  
-已知 $\frac{dx}{dt}=-v$，且 $\frac{x}{y}=\cot\alpha$，故 $\frac{dy}{dt}=v\cot\alpha$  
-$\alpha=60^\circ$ 时 $\cot60^\circ = 1/\sqrt{3}$，所以 $v_B = v\cot60^\circ \approx 1.73v$，方向沿 y 轴正向。
+已知 $\frac{dx}{dt}=-v$，且 $\frac{x}{y}=\tan\alpha$，故 $\frac{dy}{dt}=v\tan\alpha$  
+$\alpha=60^\circ$ 时 $\tan60^\circ = 1/\sqrt{3}$，所以 $v_B = v\tan60^\circ \approx 1.73v$，方向沿 y 轴正向。
 
 #### 例3
 小球在液体中竖直下落，初速度 $\vec{v}_0 = 10\vec{j}\,\mathrm{m/s}$，加速度 $\vec{a} = -1.0\,\vec{v}\,\vec{j}$。求 (1) 停止所需时间；(2) 停止前经历路程。
