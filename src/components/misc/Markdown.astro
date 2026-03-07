@@ -13,6 +13,8 @@ const className = Astro.props.class
 </div>
 
 <script>
+  const LIGHTBOX_ID = 'markdown-image-lightbox';
+
   function bindImageSkeleton(img) {
     const markLoaded = () => {
       img.classList.remove('markdown-image-loading');
@@ -30,7 +32,99 @@ const className = Astro.props.class
     img.addEventListener('error', markLoaded, { once: true });
   }
 
+  function ensureImageLightbox() {
+    let lightbox = document.getElementById(LIGHTBOX_ID);
+    if (lightbox) return lightbox;
+
+    lightbox = document.createElement('div');
+    lightbox.id = LIGHTBOX_ID;
+    lightbox.className = 'markdown-image-lightbox';
+    lightbox.setAttribute('aria-hidden', 'true');
+    lightbox.innerHTML = `
+      <div class="markdown-image-lightbox__backdrop" data-lightbox-close></div>
+      <div class="markdown-image-lightbox__dialog" role="dialog" aria-modal="true" aria-label="图片预览">
+        <button type="button" class="markdown-image-lightbox__close" aria-label="关闭预览" data-lightbox-close>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+        </button>
+        <div class="markdown-image-lightbox__hint">点击空白处或按 Esc 关闭</div>
+        <div class="markdown-image-lightbox__content">
+          <img class="markdown-image-lightbox__image" alt="" />
+        </div>
+        <p class="markdown-image-lightbox__caption"></p>
+      </div>
+    `;
+
+    const closeLightbox = () => {
+      lightbox.classList.remove('is-open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.documentElement.classList.remove('markdown-lightbox-open');
+    };
+
+    lightbox.addEventListener('click', (event) => {
+      const target = event.target;
+      if (target instanceof HTMLElement && target.closest('[data-lightbox-close]')) {
+        closeLightbox();
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && lightbox.classList.contains('is-open')) {
+        closeLightbox();
+      }
+    });
+
+    document.body.appendChild(lightbox);
+    return lightbox;
+  }
+
+  function getImageCaption(img) {
+    const figure = img.closest('figure');
+    const figcaption = figure?.querySelector('figcaption');
+    return figcaption?.textContent?.trim() || img.getAttribute('alt') || img.getAttribute('title') || '';
+  }
+
+  function openImageLightbox(img) {
+    const lightbox = ensureImageLightbox();
+    const preview = lightbox.querySelector('.markdown-image-lightbox__image');
+    const caption = lightbox.querySelector('.markdown-image-lightbox__caption');
+
+    if (!(preview instanceof HTMLImageElement) || !(caption instanceof HTMLElement)) {
+      return;
+    }
+
+    preview.src = img.currentSrc || img.src;
+    preview.alt = img.getAttribute('alt') || '';
+    caption.textContent = getImageCaption(img);
+    lightbox.classList.add('is-open');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.documentElement.classList.add('markdown-lightbox-open');
+  }
+
+  function bindImagePreview(img) {
+    if (img.dataset.previewBound === 'true') return;
+
+    img.dataset.previewBound = 'true';
+    img.classList.add('markdown-image-previewable');
+    img.setAttribute('tabindex', '0');
+    img.setAttribute('role', 'button');
+    img.setAttribute('aria-label', `${img.getAttribute('alt') || '图片'}，点击放大查看`);
+
+    const handleOpen = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      openImageLightbox(img);
+    };
+
+    img.addEventListener('click', handleOpen);
+    img.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        handleOpen(event);
+      }
+    });
+  }
+
   function stabilizeMarkdownImages() {
+    ensureImageLightbox();
     const images = document.querySelectorAll('.markdown-content img');
     images.forEach((img) => {
       img.setAttribute('loading', 'eager');
@@ -38,6 +132,7 @@ const className = Astro.props.class
       img.setAttribute('fetchpriority', 'high');
       img.style.imageRendering = 'auto';
       bindImageSkeleton(img);
+      bindImagePreview(img);
     });
   }
 
@@ -88,6 +183,127 @@ const className = Astro.props.class
 <style is:global>
   .markdown-content img {
     transition: opacity .25s ease;
+  }
+
+  .markdown-content img.markdown-image-previewable {
+    cursor: zoom-in;
+  }
+
+  html.markdown-lightbox-open,
+  html.markdown-lightbox-open body {
+    overflow: hidden;
+  }
+
+  .markdown-image-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .markdown-image-lightbox.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .markdown-image-lightbox__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(8px);
+  }
+
+  .markdown-image-lightbox__dialog {
+    position: relative;
+    z-index: 1;
+    width: min(92vw, 1400px);
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .markdown-image-lightbox__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-height: calc(92vh - 5rem);
+  }
+
+  .markdown-image-lightbox__image {
+    display: block;
+    max-width: 100%;
+    max-height: calc(92vh - 7rem);
+    width: auto;
+    height: auto;
+    border-radius: 0.75rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .markdown-image-lightbox__caption,
+  .markdown-image-lightbox__hint {
+    color: rgba(255, 255, 255, 0.88);
+    text-align: center;
+  }
+
+  .markdown-image-lightbox__caption {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .markdown-image-lightbox__hint {
+    font-size: 0.8rem;
+    opacity: 0.82;
+  }
+
+  .markdown-image-lightbox__caption:empty {
+    display: none;
+  }
+
+  .markdown-image-lightbox__close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    background: rgba(17, 17, 17, 0.52);
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .markdown-image-lightbox__close:hover {
+    transform: scale(1.06);
+    background: rgba(17, 17, 17, 0.75);
+  }
+
+  @media (max-width: 768px) {
+    .markdown-image-lightbox {
+      padding: 1rem;
+    }
+
+    .markdown-image-lightbox__dialog {
+      width: 100%;
+    }
+
+    .markdown-image-lightbox__image {
+      max-height: calc(100vh - 8rem);
+    }
   }
 
   .markdown-content img.markdown-image-loading {
