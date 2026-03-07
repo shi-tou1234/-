@@ -723,13 +723,14 @@ const className = Astro.props.class
   }
 
   .markdown-image-lightbox__content {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
     max-height: calc(92vh - 5rem);
     overflow: hidden;
-    gap: 0.75rem;
+    padding: 0 4.5rem;
   }
 
   .markdown-image-lightbox__content.is-zoomed {
@@ -737,7 +738,9 @@ const className = Astro.props.class
   }
 
   .markdown-image-lightbox__nav {
-    flex: 0 0 auto;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
     width: 3rem;
     height: 3rem;
     border-radius: 999px;
@@ -745,7 +748,17 @@ const className = Astro.props.class
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 2;
+    z-index: 12;
+    pointer-events: auto;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.32);
+  }
+
+  .markdown-image-lightbox__nav--prev {
+    left: 1rem;
+  }
+
+  .markdown-image-lightbox__nav--next {
+    right: 1rem;
   }
 
   .markdown-image-lightbox__nav:disabled,
@@ -755,9 +768,15 @@ const className = Astro.props.class
     transform: none;
   }
 
+  .markdown-image-lightbox__nav:disabled {
+    transform: translateY(-50%);
+  }
+
   .markdown-image-lightbox__image {
+    position: relative;
+    z-index: 1;
     display: block;
-    max-width: 100%;
+    max-width: min(100%, calc(100vw - 12rem));
     max-height: calc(92vh - 7rem);
     width: auto;
     height: auto;
@@ -817,8 +836,13 @@ const className = Astro.props.class
   .markdown-image-lightbox__close:hover,
   .markdown-image-lightbox__action-btn:hover:not(:disabled),
   .markdown-image-lightbox__nav:hover:not(:disabled) {
-    transform: scale(1.06);
+    transform: translateY(-50%) scale(1.06);
     background: rgba(17, 17, 17, 0.75);
+  }
+
+  .markdown-image-lightbox__action-btn:hover:not(:disabled),
+  .markdown-image-lightbox__close:hover {
+    transform: scale(1.06);
   }
 
   @media (max-width: 768px) {
@@ -845,7 +869,7 @@ const className = Astro.props.class
     }
 
     .markdown-image-lightbox__content {
-      gap: 0.35rem;
+      padding: 0 3.2rem;
     }
 
     .markdown-image-lightbox__nav {
@@ -853,7 +877,16 @@ const className = Astro.props.class
       height: 2.6rem;
     }
 
+    .markdown-image-lightbox__nav--prev {
+      left: 0.2rem;
+    }
+
+    .markdown-image-lightbox__nav--next {
+      right: 0.2rem;
+    }
+
     .markdown-image-lightbox__image {
+      max-width: min(100%, calc(100vw - 7rem));
       max-height: calc(100vh - 8rem);
     }
   }
