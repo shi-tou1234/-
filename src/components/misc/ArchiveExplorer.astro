@@ -63,7 +63,7 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
             return (
               <a
                 href={getRelativeLocaleUrl(language, `/blog/${post.id}`)}
-                class="archive-explorer__post group block rounded-xl px-3 py-3 text-[var(--text-color)] transition-all duration-200 hover:bg-[var(--button-hover-color)]/55"
+                class="archive-explorer__post group block rounded-xl px-3 py-3 text-[var(--text-color)] transition-all duration-200 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)]"
                 data-archive-post
                 data-categories={postCategories.map((category) => category.toLowerCase()).join('||')}
               >
@@ -74,7 +74,7 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
 
                   <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-2">
-                      <h3 class="truncate text-2xl font-medium tracking-[0.01em] transition-colors duration-200 group-hover:text-[var(--link-color)]">{post.data.title}</h3>
+                      <h3 class="archive-explorer__post-title truncate text-2xl font-medium tracking-[0.01em]">{post.data.title}</h3>
                       {post.isFallback && (
                         <span class="rounded border border-[var(--button-border-color)] bg-[var(--button-hover-color)] px-1.5 py-0.5 text-xs text-[var(--text-color)]/70">fallback</span>
                       )}
@@ -213,11 +213,22 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
 
   .archive-explorer__post-tag {
     color: color-mix(in srgb, var(--text-color) 72%, transparent);
-    transition: color 0.2s ease;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .archive-explorer__post-title {
+    transition: color 0.2s ease, transform 0.2s ease, padding-left 0.2s ease, font-weight 0.2s ease;
+  }
+
+  .archive-explorer__post:hover .archive-explorer__post-title {
+    color: var(--link-color);
+    padding-left: 0.5rem;
+    font-weight: 700;
   }
 
   .archive-explorer__post:hover .archive-explorer__post-tag {
     color: var(--link-color);
+    transform: translateX(-0.15rem);
   }
 
   .archive-explorer__post[hidden],
