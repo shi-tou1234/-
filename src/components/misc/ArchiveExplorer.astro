@@ -1,0 +1,229 @@
+---
+import { getRelativeLocaleUrl } from '@utils/url-utils';
+import type { BlogEntryWithLocaleStatus } from '@utils/content-utils';
+import { buildCategoriesMap, getPostCategories } from '@utils/blog-taxonomy';
+
+interface Props {
+  posts: BlogEntryWithLocaleStatus[];
+  language: string;
+  initialCategory?: string;
+}
+
+const {
+  posts,
+  language,
+  initialCategory = '',
+} = Astro.props;
+
+const visiblePosts = posts.filter((post) => post.id !== 'welcome');
+const categoriesMap = buildCategoriesMap(visiblePosts, language);
+const categories = Object.keys(categoriesMap).sort(
+  (a, b) => categoriesMap[b].length - categoriesMap[a].length || a.localeCompare(b),
+);
+
+const archiveTimeZone = language.toLowerCase().startsWith('zh') ? 'Asia/Shanghai' : 'UTC';
+const dateFormatter = new Intl.DateTimeFormat(language, {
+  month: language.toLowerCase().startsWith('zh') ? 'numeric' : 'short',
+  day: 'numeric',
+  timeZone: archiveTimeZone,
+});
+
+const yearFormatter = new Intl.DateTimeFormat('en-CA', {
+  year: 'numeric',
+  timeZone: archiveTimeZone,
+});
+
+const postsByYear = visiblePosts.reduce((acc, post) => {
+  const year = yearFormatter.format(post.data.pubDate);
+  if (!acc[year]) {
+    acc[year] = [];
+  }
+  acc[year].push(post);
+  return acc;
+}, {} as Record<string, BlogEntryWithLocaleStatus[]>);
+
+const allLabel = language.toLowerCase().startsWith('zh') ? '全部文章' : 'All posts';
+const filterTitle = language.toLowerCase().startsWith('zh') ? '标签筛选' : 'Filter by tags';
+const filterHint = language.toLowerCase().startsWith('zh') ? '点击标签可筛选对应分类文章' : 'Use tags to filter posts by category';
+const emptyLabel = language.toLowerCase().startsWith('zh') ? '当前筛选下暂无文章' : 'No posts match this filter';
+const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Category';
+---
+
+<div class="archive-explorer grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]" data-initial-category={initialCategory.toLowerCase()}>
+  <section class="min-w-0 space-y-8">
+    {Object.keys(postsByYear).sort().reverse().map((year) => (
+      <section class="space-y-4" data-archive-year>
+        <div class="sticky top-20 z-10 inline-flex rounded-full border border-[var(--button-border-color)] bg-[var(--bg-color)]/92 px-4 py-1.5 text-lg font-bold text-[var(--text-color)] shadow-sm backdrop-blur">
+          {year}
+        </div>
+
+        <div class="space-y-3">
+          {postsByYear[year].map((post) => {
+            const postCategories = getPostCategories(post, language);
+            return (
+              <a
+                href={getRelativeLocaleUrl(language, `/blog/${post.id}`)}
+                class="archive-explorer__post group block rounded-2xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/55 px-4 py-3 text-[var(--text-color)] shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--link-color)] hover:bg-[var(--button-hover-color)]"
+                data-archive-post
+                data-categories={postCategories.map((category) => category.toLowerCase()).join('||')}
+              >
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <h3 class="truncate text-lg font-semibold transition-colors duration-200 group-hover:text-[var(--link-color)]">{post.data.title}</h3>
+                      {post.isFallback && (
+                        <span class="rounded border border-[var(--button-border-color)] bg-[var(--button-hover-color)] px-1.5 py-0.5 text-xs text-[var(--text-color)]/70">fallback</span>
+                      )}
+                    </div>
+                    {post.data.description && (
+                      <p class="mt-1 line-clamp-2 text-sm text-[var(--text-color)]/68">{post.data.description}</p>
+                    )}
+                  </div>
+
+                  <div class="shrink-0 text-sm font-medium text-[var(--text-color)]/62">
+                    {dateFormatter.format(post.data.pubDate)}
+                  </div>
+                </div>
+
+                <div class="mt-3 flex flex-wrap items-center gap-2 text-xs text-[var(--text-color)]/72">
+                  <span>{categoryLabel}</span>
+                  {postCategories.map((category) => (
+                    <span class="rounded-full border border-[var(--button-border-color)] bg-[var(--bg-color)]/72 px-2 py-1 transition-colors duration-200 group-hover:border-[var(--link-color)] group-hover:text-[var(--link-color)]">
+                      {category}
+                    </span>
+                  ))}
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+    ))}
+
+    <div class="archive-explorer__empty hidden rounded-2xl border border-dashed border-[var(--button-border-color)] bg-[var(--bg-color)]/45 px-6 py-10 text-center text-[var(--text-color)]/65" data-archive-empty>
+      {emptyLabel}
+    </div>
+  </section>
+
+  <aside class="archive-explorer__sidebar lg:sticky lg:top-24 lg:self-start">
+    <div class="rounded-3xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/72 p-4 shadow-sm backdrop-blur">
+      <h2 class="text-base font-bold text-[var(--text-color)]">{filterTitle}</h2>
+      <p class="mt-1 text-sm text-[var(--text-color)]/62">{filterHint}</p>
+
+      <div class="mt-4 flex flex-wrap gap-2 lg:flex-col lg:items-stretch">
+        <button type="button" class="archive-explorer__chip" data-filter-category="">
+          <span>{allLabel}</span>
+          <span>{visiblePosts.length}</span>
+        </button>
+        {categories.map((category) => (
+          <button type="button" class="archive-explorer__chip" data-filter-category={category.toLowerCase()}>
+            <span>{category}</span>
+            <span>{categoriesMap[category].length}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+  function initArchiveExplorers() {
+    document.querySelectorAll('.archive-explorer').forEach((root) => {
+      if (!(root instanceof HTMLElement) || root.dataset.bound === 'true') return;
+      root.dataset.bound = 'true';
+
+      const buttons = [...root.querySelectorAll('[data-filter-category]')];
+      const posts = [...root.querySelectorAll('[data-archive-post]')];
+      const years = [...root.querySelectorAll('[data-archive-year]')];
+      const emptyState = root.querySelector('[data-archive-empty]');
+      const initialCategory = (root.dataset.initialCategory || '').trim();
+
+      const applyFilter = (activeCategory) => {
+        let visibleCount = 0;
+
+        buttons.forEach((button) => {
+          if (!(button instanceof HTMLElement)) return;
+          const matched = (button.dataset.filterCategory || '') === activeCategory;
+          button.dataset.active = matched ? 'true' : 'false';
+        });
+
+        posts.forEach((post) => {
+          if (!(post instanceof HTMLElement)) return;
+          const categories = (post.dataset.categories || '').split('||').filter(Boolean);
+          const matched = !activeCategory || categories.includes(activeCategory);
+          post.hidden = !matched;
+          if (matched) visibleCount += 1;
+        });
+
+        years.forEach((year) => {
+          if (!(year instanceof HTMLElement)) return;
+          const hasVisiblePost = [...year.querySelectorAll('[data-archive-post]')].some((post) => !post.hidden);
+          year.hidden = !hasVisiblePost;
+        });
+
+        if (emptyState instanceof HTMLElement) {
+          emptyState.hidden = visibleCount > 0;
+        }
+      };
+
+      buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+          if (!(button instanceof HTMLElement)) return;
+          applyFilter(button.dataset.filterCategory || '');
+        });
+      });
+
+      applyFilter(initialCategory);
+    });
+  }
+
+  initArchiveExplorers();
+  document.addEventListener('astro:page-load', initArchiveExplorers);
+</script>
+
+<style is:global>
+  .archive-explorer__chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    border: 1px solid var(--button-border-color);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--bg-color) 82%, transparent);
+    color: var(--text-color);
+    padding: 0.7rem 0.95rem;
+    text-align: left;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .archive-explorer__chip:hover,
+  .archive-explorer__chip[data-active='true'] {
+    border-color: var(--link-color);
+    background: var(--button-hover-color);
+    color: var(--link-color);
+    transform: translateY(-1px);
+  }
+
+  .archive-explorer__chip span:last-child {
+    min-width: 2rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--bg-color) 76%, transparent);
+    padding: 0.12rem 0.55rem;
+    text-align: center;
+    font-size: 0.78rem;
+  }
+
+  .archive-explorer__post[hidden],
+  [data-archive-year][hidden],
+  .archive-explorer__empty[hidden] {
+    display: none !important;
+  }
+
+  @media (max-width: 1024px) {
+    .archive-explorer__sidebar {
+      order: -1;
+    }
+  }
+</style>

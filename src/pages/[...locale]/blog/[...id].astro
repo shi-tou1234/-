@@ -16,7 +16,7 @@ import i18nit from '@i18n/translation'
 import { blogCoverUrl } from '@/utils/url-utils'
 import { formatFullDate } from '@/utils/time'
 import { getBlogEntrySort } from '@utils/content-utils'
-import { estimateReadingMinutes } from '@utils/reading-time'
+import { estimateReadingMinutes, estimateWordCount } from '@utils/reading-time'
 
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
@@ -60,6 +60,7 @@ const { Content } = await render(entry); // 获取渲染后的正文内容
 const pageTitle = entry.data.title + ' - ' + siteConfig.title;
 const image = blogCoverUrl(entry.data.image, entry.id);
 const readingMinutes = estimateReadingMinutes(entry.body || '');
+const wordCount = estimateWordCount(entry.body || '');
 
 ---
 <MainPageLayout title={pageTitle} lang={currentLang}>
@@ -67,7 +68,7 @@ const readingMinutes = estimateReadingMinutes(entry.body || '');
         <div class="mb-8 text-center">
             <h1 class="font-bold text-3xl mb-2 pt-10 text-[var(--text-color)]">{ entry.data.title }</h1>
             <div class="pt-2">
-                <ReadingTime minutes={readingMinutes} language={currentLang} />
+                <ReadingTime minutes={readingMinutes} words={wordCount} language={currentLang} />
             </div>
             <p class="font-bold text-[var(--text-color)]/60 pt-4 pb-10">{ formatFullDate(entry.data.pubDate, currentLang) }</p>
         </div>

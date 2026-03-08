@@ -1,49 +1,17 @@
 ---
 import MainPageLayout from '@layouts/MainPageLayout.astro'
 import Cover from '@components/Cover.astro'
+import ArchiveExplorer from '@components/misc/ArchiveExplorer.astro'
 
 import { siteConfig } from '@/config'
 import { getBlogEntrySort } from '@utils/content-utils'
 import i18nit from '@i18n/translation'
 
 import { i18n } from "astro:config/client";
-import { getRelativeLocaleUrl } from '@utils/url-utils';
+import { decodeCategoryParam, buildCategoriesMap } from '@utils/blog-taxonomy';
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
-
-const uncategorized = currentLang === 'zh-cn' ? '未分类' : 'Uncategorized';
-const CATEGORY_PARAM_PREFIX = 'b64-';
-
-function decodeCategoryParam(categoryParam: string): string {
-  if (!categoryParam) return '';
-
-  if (categoryParam.startsWith(CATEGORY_PARAM_PREFIX)) {
-    const encoded = categoryParam.slice(CATEGORY_PARAM_PREFIX.length);
-    if (encoded) {
-      try {
-        return Buffer.from(encoded, 'base64url').toString('utf-8');
-      } catch {
-      }
-    }
-  }
-
-  try {
-    return decodeURIComponent(categoryParam);
-  } catch {
-    return categoryParam;
-  }
-}
-
-function getPostCategories(post: any): string[] {
-  const legacyCategories = Array.isArray(post.data.categories)
-    ? post.data.categories.map((item) => String(item).trim()).filter(Boolean)
-    : [];
-  const singleCategory = String(post.data.category || '').trim();
-  const merged = [...legacyCategories, ...(singleCategory ? [singleCategory] : [])];
-  const unique = [...new Set(merged)];
-  return unique.length > 0 ? unique : [uncategorized];
-}
 
 export async function getStaticPaths() {
   const locales = i18n?.locales || [i18n?.defaultLocale];
@@ -53,22 +21,7 @@ export async function getStaticPaths() {
     const localeCode = typeof locale === 'string' ? locale : locale.path;
     const localeParam = localeCode === i18n?.defaultLocale ? undefined : localeCode;
     const posts = await getBlogEntrySort(localeCode);
-    const localeUncategorized = localeCode === 'zh-cn' ? '未分类' : 'Uncategorized';
-
-    const getLocalePostCategories = (post: (typeof posts)[number]): string[] => {
-      const legacyCategories = Array.isArray(post.data.categories)
-        ? post.data.categories.map((item) => String(item).trim()).filter(Boolean)
-        : [];
-      const singleCategory = String(post.data.category || '').trim();
-      const merged = [...legacyCategories, ...(singleCategory ? [singleCategory] : [])];
-      const unique = [...new Set(merged)];
-      return unique.length > 0 ? unique : [localeUncategorized];
-    };
-
-    const categorySet = new Set<string>();
-    posts.filter((post) => post.id !== 'welcome').forEach((post) => {
-      getLocalePostCategories(post).forEach((category) => categorySet.add(category));
-    });
+    const categorySet = new Set<string>(Object.keys(buildCategoriesMap(posts.filter((post) => post.id !== 'welcome'), localeCode)));
 
     categorySet.forEach((categoryName) => {
       paths.push({
@@ -87,35 +40,18 @@ const currentCategoryParam = Astro.params.category || '';
 const currentCategory = decodeCategoryParam(currentCategoryParam);
 
 const allBlogPosts = await getBlogEntrySort(currentLang);
-const categoryPosts = allBlogPosts
-  .filter((post) => post.id !== 'welcome')
-  .filter((post) => getPostCategories(post).some((category) => category.localeCompare(currentCategory, undefined, { sensitivity: 'base' }) === 0));
-
+const categoryCount = currentCategory
+  ? (buildCategoriesMap(allBlogPosts.filter((post) => post.id !== 'welcome'), currentLang)[currentCategory] || []).length
+  : allBlogPosts.filter((post) => post.id !== 'welcome').length;
 const pageTitle = `${currentCategory} - ${t("header.categories")} - ${siteConfig.title}`;
-const categoriesRoot = getRelativeLocaleUrl(currentLang, '/categories/');
 ---
 
 <MainPageLayout title={pageTitle} lang={currentLang}>
   <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
-    <Cover title={currentCategory} subTitle={t("cover.subTitle.archive", {count: categoryPosts.length})} />
+    <Cover title={currentCategory || t("cover.title.categories")} subTitle={t("cover.subTitle.archive", {count: categoryCount})} />
 
-    <div class="py-6 text-[var(--text-color)] space-y-2">
-      <a href={categoriesRoot} class="group inline-flex items-center gap-1.5 mb-4 rounded-full border border-[var(--button-border-color)] px-3 py-1.5 text-sm transition-all duration-200 hover:border-[var(--link-color)] hover:bg-[var(--button-hover-color)] hover:text-[var(--link-color)] active:scale-95">
-        <span class="inline-block transition-transform duration-200 group-hover:-translate-x-0.5">←</span>
-        <span>{t("header.categories")}</span>
-      </a>
-
-      {categoryPosts.map((post) => (
-        <a href={getRelativeLocaleUrl(currentLang, `/blog/${post.id}`)}
-          class="group block rounded p-2 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)] transition-colors duration-200">
-          <span class="text-lg transition-all duration-200 group-hover:pl-2 group-hover:text-[var(--link-color)] group-hover:font-bold">{post.data.title}</span>
-          {
-            post.isFallback && (
-              <span class="self-center px-1 ml-2 text-sm text-[var(--text-color)]/70 font-mono uppercase bg-[var(--button-hover-color)] rounded border border-[var(--button-border-color)]">{i18n!.defaultLocale}</span>
-            )
-          }
-        </a>
-      ))}
+    <div class="py-6 text-[var(--text-color)]">
+      <ArchiveExplorer posts={allBlogPosts} language={currentLang} initialCategory={currentCategory} />
     </div>
   </div>
 </MainPageLayout>

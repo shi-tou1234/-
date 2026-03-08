@@ -1,13 +1,13 @@
 ---
 import MainPageLayout from '@layouts/MainPageLayout.astro'
 import Cover from '@components/Cover.astro'
+import ArchiveExplorer from '@components/misc/ArchiveExplorer.astro'
 
 import { siteConfig } from '@/config'
 import { getBlogEntrySort } from '@utils/content-utils'
 import i18nit from '@i18n/translation'
 
 import { i18n } from "astro:config/client";
-import { getRelativeLocaleUrl } from '@utils/url-utils';
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
@@ -17,54 +17,16 @@ export async function getStaticPaths() {
 }
 
 const allBlogPosts = await getBlogEntrySort(currentLang);
-const uncategorized = currentLang === 'zh-cn' ? '未分类' : 'Uncategorized';
-
-function encodeCategoryParam(category: string): string {
-  return `b64-${Buffer.from(category, 'utf-8').toString('base64url')}`;
-}
-
-function getPostCategories(post: (typeof allBlogPosts)[number]): string[] {
-  const legacyCategories = Array.isArray(post.data.categories)
-    ? post.data.categories.map((item) => String(item).trim()).filter(Boolean)
-    : [];
-  const singleCategory = String(post.data.category || '').trim();
-  const merged = [...legacyCategories, ...(singleCategory ? [singleCategory] : [])];
-  const unique = [...new Set(merged)];
-  return unique.length > 0 ? unique : [uncategorized];
-}
-
-const categoriesMap = allBlogPosts
-  .filter((post) => post.id !== 'welcome')
-  .reduce((acc, post) => {
-  const categories = getPostCategories(post);
-  categories.forEach((category) => {
-    if (!acc[category]) {
-      acc[category] = [];
-    }
-    acc[category].push(post);
-  });
-  return acc;
-}, {} as Record<string, typeof allBlogPosts>);
-
-const categories = Object.keys(categoriesMap).sort((a, b) => categoriesMap[b].length - categoriesMap[a].length || a.localeCompare(b));
 const pageTitle = t("header.categories") + " - " + siteConfig.title;
+const postNumber = allBlogPosts.filter((post) => post.id !== 'welcome').length;
 ---
 
 <MainPageLayout title={pageTitle} lang={currentLang}>
   <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
-    <Cover title={t("cover.title.categories")} subTitle={t("cover.subTitle.categories", {count: categories.length})} />
+    <Cover title={t("cover.title.categories")} subTitle={t("cover.subTitle.archive", {count: postNumber})} />
 
-    <div class="py-6 text-[var(--text-color)] grid grid-cols-1 sm:grid-cols-2 gap-3">
-      {categories.map((category) => (
-        <a href={getRelativeLocaleUrl(currentLang, `/categories/${encodeCategoryParam(category)}`)}
-          class="group block rounded-lg border border-[var(--button-border-color)] p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--link-color)] hover:bg-[var(--button-hover-color)] active:translate-y-0">
-          <div class="flex items-center justify-between gap-2">
-            <span class="text-lg font-semibold transition-colors duration-200 group-hover:text-[var(--link-color)]">{category}</span>
-            <span class="rounded-full border border-[var(--button-border-color)] px-2 py-0.5 text-xs text-[var(--text-color)]/70 transition-all duration-200 group-hover:border-[var(--link-color)] group-hover:text-[var(--link-color)] group-hover:bg-[var(--bg-color)]">{categoriesMap[category].length}</span>
-          </div>
-        </a>
-      ))}
+    <div class="py-6 text-[var(--text-color)]">
+      <ArchiveExplorer posts={allBlogPosts} language={currentLang} />
     </div>
   </div>
-</MainPageLayout>
 </MainPageLayout>
