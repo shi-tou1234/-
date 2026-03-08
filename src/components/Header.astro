@@ -22,7 +22,6 @@ const showLanguageSwitcher = locales.length > 1;
 
 const indexPage = getRelativeLocaleUrl(currentLang, "/");
 const archivesPage = getRelativeLocaleUrl(currentLang, "/archives/");
-const categoriesPage = getRelativeLocaleUrl(currentLang, "/categories/");
 const friendsPage = getRelativeLocaleUrl(currentLang, "/friends/");
 const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 ---
@@ -57,13 +56,6 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
             }`}>
             {t("header.archive")}
         </a>
-      <a href={ categoriesPage } class={`transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
-            Astro.url.pathname === categoriesPage
-              ? 'bg-[var(--button-hover-color)]'
-              : 'hover:bg-[var(--button-hover-color)]'
-            }`}>
-            {t("header.categories")}
-        </a>
       <a href={ aboutPage } class={`transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === aboutPage
                 ? 'bg-[var(--button-hover-color)]'
@@ -89,10 +81,6 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
         </button>
         <!-- Dark Mode -->
         <ThemeIcon class="hide-on-tiny flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] rounded-lg hover:text-current active:scale-90 border border-[var(--button-border-color)] transition-all duration-300"/>
-        <!-- GitHub -->
-        <a href={headerContact.githubUrl} target="_blank" rel="noopener noreferrer" title="GitHub" class="hide-on-tiny hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
-          <Icon name="simple-icons:github" class="w-4 h-4" />
-        </a>
         <!-- Email Copy -->
         <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" class="hide-on-tiny copy-email-action hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
           <Icon name="fa6-solid:envelope" class="w-4 h-4" />
@@ -139,7 +127,6 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
                     <button id="mobile-search-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">搜索</button>
                     <button id="mobile-theme-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">主题</button>
                     <button id="mobile-guide-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">指南</button>
-                    <a href={headerContact.githubUrl} target="_blank" rel="noopener noreferrer" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">GitHub</a>
                     <button class="copy-email-action px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]" data-email={headerContact.email}>邮箱</button>
                     <a href={getRelativeLocaleUrl("zh-cn", "/")} class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">中文</a>
                     <a href={getRelativeLocaleUrl("en", "/")} class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">EN</a>
@@ -157,12 +144,6 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
                       ? 'bg-[var(--button-hover-color)]' 
                       : 'hover:bg-[var(--button-hover-color)]'
                   }`}>{t("header.archive")}</a>
-
-                  <a href={ categoriesPage } class={`mx-2 my-1 p-2 text-sm rounded ${
-                    Astro.url.pathname === categoriesPage 
-                      ? 'bg-[var(--button-hover-color)]' 
-                      : 'hover:bg-[var(--button-hover-color)]'
-                  }`}>{t("header.categories")}</a>
 
                   <a href={ aboutPage } class={`mx-2 my-1 p-2 text-sm rounded ${
                     Astro.url.pathname === aboutPage 

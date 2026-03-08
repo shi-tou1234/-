@@ -224,6 +224,32 @@ const className = Astro.props.class
     }
   }
 
+  function cleanupImageLightbox({ remove = false } = {}) {
+    const lightbox = document.getElementById(LIGHTBOX_ID);
+    if (!(lightbox instanceof HTMLElement)) return;
+
+    lightbox.classList.remove('is-open');
+    lightbox.setAttribute('aria-hidden', 'true');
+    lightboxState.activeImage = null;
+    lightboxState.currentImages = [];
+    lightboxState.currentIndex = -1;
+    lightboxState.scale = 1;
+    lightboxState.translateX = 0;
+    lightboxState.translateY = 0;
+    lightboxState.isDragging = false;
+    lightboxState.dragMoved = false;
+    lightboxState.pointers.clear();
+    document.documentElement.classList.remove('markdown-lightbox-open');
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.width = '';
+
+    if (remove) {
+      lightbox.remove();
+    }
+  }
+
   function updateLightboxImage(lightbox, img, { resetZoom = true } = {}) {
     const { preview, caption } = getLightboxElements(lightbox);
     if (!preview || !caption || !img) return;
@@ -615,8 +641,17 @@ const className = Astro.props.class
 
   stabilizeMarkdownImages();
   setupSpoilers();
+  cleanupImageLightbox();
   document.addEventListener('astro:page-load', stabilizeMarkdownImages);
   document.addEventListener('astro:page-load', setupSpoilers);
+  document.addEventListener('astro:before-preparation', () => cleanupImageLightbox());
+  document.addEventListener('astro:after-swap', () => {
+    if (!document.querySelector('.markdown-content img')) {
+      cleanupImageLightbox({ remove: true });
+    } else {
+      cleanupImageLightbox();
+    }
+  });
 </script>
 
 <style is:global>
