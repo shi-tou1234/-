@@ -3,6 +3,7 @@ title: 牛顿定律、动量与能量
 pubDate: 2026-03-10T09:15:00.000Z
 draft: false
 description: 
+category: 大物
 slugId: 牛顿定律、动量与能量
 ---
 
