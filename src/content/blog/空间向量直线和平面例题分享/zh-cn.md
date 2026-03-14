@@ -13,22 +13,6 @@ slugId: 空间向量直线和平面例题分享
 
 ---
 
-## 前置核心公式速览
-
-| 类型 | 核心公式 | 关键参数 |
-| :--- | :--- | :--- |
-| 平面点法式 | $A(x-x_0)+B(y-y_0)+C(z-z_0)=0$ | $(x_0,y_0,z_0)$：平面上定点；$\boldsymbol{n}=(A,B,C)$：平面法向量 |
-| 直线对称式（点向式） | $\frac{x-x_0}{l}=\frac{y-y_0}{m}=\frac{z-z_0}{n}$ | $(x_0,y_0,z_0)$：直线上定点；$\boldsymbol{s}=(l,m,n)$：直线方向向量 |
-| 直线参数式 | $x=x_0+lt,\ y=y_0+mt,\ z=z_0+nt$ | $t\in\mathbb{R}$为参数，其余同上 |
-| 两平面夹角 | $\cos\theta=\frac{|\boldsymbol{n_1}\cdot\boldsymbol{n_2}|}{|\boldsymbol{n_1}||\boldsymbol{n_2}|}$ | $\theta\in[0,\frac{\pi}{2}]$，$\boldsymbol{n_1},\boldsymbol{n_2}$为两平面法向量 |
-| 两直线夹角 | $\cos\theta=\frac{|\boldsymbol{s_1}\cdot\boldsymbol{s_2}|}{|\boldsymbol{s_1}||\boldsymbol{s_2}|}$ | $\theta\in[0,\frac{\pi}{2}]$，$\boldsymbol{s_1},\boldsymbol{s_2}$为两直线方向向量 |
-| 直线与平面夹角 | $\sin\theta=\frac{|\boldsymbol{s}\cdot\boldsymbol{n}|}{|\boldsymbol{s}||\boldsymbol{n}|}$ | $\theta\in[0,\frac{\pi}{2}]$，$\boldsymbol{s}$为直线方向向量，$\boldsymbol{n}$为平面法向量 |
-| 点到平面距离 | $d=\frac{|Ax_0+By_0+Cz_0+D|}{\sqrt{A^2+B^2+C^2}}$ | 平面一般式$Ax+By+Cz+D=0$，点$(x_0,y_0,z_0)$ |
-| 点到直线距离 | $d=\frac{|\overrightarrow{M_0M}\times\boldsymbol{s}|}{|\boldsymbol{s}|}$ | $M_0$为直线上定点，$M$为待求点，$\boldsymbol{s}$为直线方向向量 |
-| 两异面直线距离 | $d=\frac{|\overrightarrow{M_1M_2}\cdot(\boldsymbol{s_1}\times\boldsymbol{s_2})|}{|\boldsymbol{s_1}\times\boldsymbol{s_2}|}$ | $M_1,M_2$分别为两直线上定点，$\boldsymbol{s_1},\boldsymbol{s_2}$为方向向量 |
-
----
-
 ## 一、平面方程相关例题
 
 ### 题型 1：点法式求平面方程（基础）
