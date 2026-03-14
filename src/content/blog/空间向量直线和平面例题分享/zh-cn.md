@@ -56,12 +56,7 @@ slugId: 空间向量直线和平面例题分享
    $$\overrightarrow{AB}=(-2-1,-2-1,2-(-1))=(-3,-3,3)$$
    $$\overrightarrow{AC}=(1-1,-1-1,2-(-1))=(0,-2,3)$$
 3. 步骤 2：叉乘求法向量$\boldsymbol{n}=\overrightarrow{AB}\times\overrightarrow{AC}$
-   $$\boldsymbol{n}=\begin{vmatrix}
-   \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\
-   -3 & -3 & 3 \\
-   0 & -2 & 3
-   \end{vmatrix}
-   =\boldsymbol{i}(-9+6)-\boldsymbol{j}(-9-0)+\boldsymbol{k}(6-0)=(-3,9,6)$$
+   $$\boldsymbol{n}=\begin{vmatrix} \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\ -3 & -3 & 3 \\ 0 & -2 & 3 \end{vmatrix} =\boldsymbol{i}(-9+6)-\boldsymbol{j}(-9-0)+\boldsymbol{k}(6-0)=(-3,9,6)$$
    法向量可简化为$\boldsymbol{n}=(-1,3,2)$（乘以非零常数不改变法向量方向）。
 4. 步骤 3：代入点法式（选点$A(1,1,-1)$）
    $$-1(x-1)+3(y-1)+2(z+1)=0$$
@@ -96,12 +91,7 @@ slugId: 空间向量直线和平面例题分享
 2. 步骤 1：提取两个已知平面的法向量
    $$\boldsymbol{n_1}=(1,1,-1),\quad \boldsymbol{n_2}=(2,1,1)$$
 3. 步骤 2：叉乘求所求平面的法向量$\boldsymbol{n}$
-   $$\boldsymbol{n}=\boldsymbol{n_1}\times\boldsymbol{n_2}=\begin{vmatrix}
-   \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\
-   1 & 1 & -1 \\
-   2 & 1 & 1
-   \end{vmatrix}
-   =\boldsymbol{i}(1+1)-\boldsymbol{j}(1+2)+\boldsymbol{k}(1-2)=(2,-3,-1)$$
+   $$\boldsymbol{n}=\boldsymbol{n_1}\times\boldsymbol{n_2}=\begin{vmatrix} \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\ 1 & 1 & -1 \\ 2 & 1 & 1 \end{vmatrix} =\boldsymbol{i}(1+1)-\boldsymbol{j}(1+2)+\boldsymbol{k}(1-2)=(2,-3,-1)$$
 4. 步骤 3：代入点法式（定点$M(1,0,1)$）
    $$2(x-1)-3(y-0)-1(z-1)=0$$
 5. 展开化简：
@@ -140,11 +130,7 @@ slugId: 空间向量直线和平面例题分享
 2. 对称式方程：代入定点$(1,2,3)$和方向向量$(2,-1,1)$，得：
    $$\boldsymbol{\frac{x-1}{2}=\frac{y-2}{-1}=\frac{z-3}{1}}$$
 3. 参数方程：令对称式的比值为参数$t$（$t\in\mathbb{R}$），拆分得：
-   $$\boldsymbol{\begin{cases}
-   x=1+2t \\
-   y=2-t \\
-   z=3+t
-   \end{cases}} \quad t\in\mathbb{R}$$
+   $$\boldsymbol{\begin{cases} x=1+2t \\ y=2-t \\ z=3+t \end{cases}} \quad t\in\mathbb{R}$$
 
 ---
 
@@ -179,23 +165,14 @@ slugId: 空间向量直线和平面例题分享
 3. 步骤 2：求直线的方向向量$\boldsymbol{s}$
    直线是两个平面的交线，因此直线的方向向量同时垂直于两个平面的法向量，即$\boldsymbol{s}=\boldsymbol{n_1}\times\boldsymbol{n_2}$。
    两个平面的法向量：$\boldsymbol{n_1}=(2,-3,1)$，$\boldsymbol{n_2}=(3,1,-2)$。
-   $$\boldsymbol{s}=\boldsymbol{n_1}\times\boldsymbol{n_2}=\begin{vmatrix}
-   \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\
-   2 & -3 & 1 \\
-   3 & 1 & -2
-   \end{vmatrix}
-   =\boldsymbol{i}(6-1)-\boldsymbol{j}(-4-3)+\boldsymbol{k}(2+9)=(5,7,11)$$
+   $$\boldsymbol{s}=\boldsymbol{n_1}\times\boldsymbol{n_2}=\begin{vmatrix} \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\ 2 & -3 & 1 \\ 3 & 1 & -2 \end{vmatrix} =\boldsymbol{i}(6-1)-\boldsymbol{j}(-4-3)+\boldsymbol{k}(2+9)=(5,7,11)$$
 4. 步骤 3：写对称式方程
    代入定点和方向向量，得：
    $$\boldsymbol{\frac{x-\frac{17}{11}}{5}=\frac{y+\frac{7}{11}}{7}=\frac{z}{11}}$$
    （可通分整理为$\frac{11x-17}{55}=\frac{11y+7}{77}=\frac{z}{11}$，不影响正确性）
 5. 步骤 4：写参数方程
    令对称式比值为$t$，得：
-   $$\boldsymbol{\begin{cases}
-   x=\frac{17}{11}+5t \\
-   y=-\frac{7}{11}+7t \\
-   z=11t
-   \end{cases}} \quad t\in\mathbb{R}$$
+   $$\boldsymbol{\begin{cases} x=\frac{17}{11}+5t \\ y=-\frac{7}{11}+7t \\ z=11t \end{cases}} \quad t\in\mathbb{R}$$
 
 ---
 
@@ -348,11 +325,7 @@ slugId: 空间向量直线和平面例题分享
    直线$L$上定点$M_0(-1,1,0)$，方向向量$\boldsymbol{s}=(3,2,-1)$；
    向量$\overrightarrow{M_0M}=(2-(-1),1-1,3-0)=(3,0,3)$。
 3. 步骤 2：计算叉乘$\overrightarrow{M_0M}\times\boldsymbol{s}$
-   $$\overrightarrow{M_0M}\times\boldsymbol{s}=\begin{vmatrix}
-   \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\
-   3 & 0 & 3 \\
-   3 & 2 & -1
-   \end{vmatrix}=(-6,12,6)$$
+   $$\overrightarrow{M_0M}\times\boldsymbol{s}=\begin{vmatrix} \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\ 3 & 0 & 3 \\ 3 & 2 & -1 \end{vmatrix}=(-6,12,6)$$
 4. 步骤 3：计算模长与距离
    $|\overrightarrow{M_0M}\times\boldsymbol{s}|=\sqrt{(-6)^2+12^2+6^2}=6\sqrt{6}$；
    $|\boldsymbol{s}|=\sqrt{3^2+2^2+(-1)^2}=\sqrt{14}$；
@@ -371,11 +344,7 @@ slugId: 空间向量直线和平面例题分享
    $L_2$定点$M_2(0,-1,0)$，方向向量$\boldsymbol{s_2}=(2,1,1)$；
    向量$\overrightarrow{M_1M_2}=(-1,-3,-3)$。
 3. 步骤 2：计算公垂线方向向量$\boldsymbol{s_1}\times\boldsymbol{s_2}$
-   $$\boldsymbol{s_1}\times\boldsymbol{s_2}=\begin{vmatrix}
-   \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\
-   1 & 0 & -1 \\
-   2 & 1 & 1
-   \end{vmatrix}=(1,-3,1)$$
+   $$\boldsymbol{s_1}\times\boldsymbol{s_2}=\begin{vmatrix} \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\ 1 & 0 & -1 \\ 2 & 1 & 1 \end{vmatrix}=(1,-3,1)$$
    模长$|\boldsymbol{s_1}\times\boldsymbol{s_2}|=\sqrt{1+9+1}=\sqrt{11}$。
 4. 步骤 3：计算混合积与距离
    混合积$\overrightarrow{M_1M_2}\cdot(\boldsymbol{s_1}\times\boldsymbol{s_2})=(-1)\times1+(-3)\times(-3)+(-3)\times1=5$；
@@ -419,11 +388,7 @@ slugId: 空间向量直线和平面例题分享
 1. 核心思路：公垂线的方向向量为两直线方向向量的叉乘；公垂线是“过$L_1$且平行于公垂线方向的平面”与“过$L_2$且平行于公垂线方向的平面”的交线。
 2. 步骤 1：求公垂线的方向向量$\boldsymbol{s}$
    $L_1$方向向量$\boldsymbol{s_1}=(1,2,3)$，$L_2$方向向量$\boldsymbol{s_2}=(1,1,2)$，故：
-   $$\boldsymbol{s}=\boldsymbol{s_1}\times\boldsymbol{s_2}=\begin{vmatrix}
-   \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\
-   1 & 2 & 3 \\
-   1 & 1 & 2
-   \end{vmatrix}=(1,1,-1)$$
+   $$\boldsymbol{s}=\boldsymbol{s_1}\times\boldsymbol{s_2}=\begin{vmatrix} \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\ 1 & 2 & 3 \\ 1 & 1 & 2 \end{vmatrix}=(1,1,-1)$$
 3. 步骤 2：求过$L_1$且平行于$\boldsymbol{s}$的平面$\pi_1$
    $\pi_1$的法向量$\boldsymbol{n_1}=\boldsymbol{s_1}\times\boldsymbol{s}=\begin{vmatrix}\boldsymbol{i}&\boldsymbol{j}&\boldsymbol{k}\\1&2&3\\1&1&-1\end{vmatrix}=(-5,4,-1)$；
    $\pi_1$过$L_1$上定点$M_1(1,1,1)$，代入点法式得：
