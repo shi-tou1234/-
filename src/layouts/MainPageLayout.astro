@@ -17,6 +17,7 @@ const isZh = lang === 'zh-cn';
 <Layout title={title} lang={lang}>
   <div class="flex flex-col min-h-screen">
     <div id="global-page-particles" class="pointer-events-none fixed inset-0 z-0"></div>
+    <canvas id="mouseParticles" class="pointer-events-none fixed inset-0 z-20"></canvas>
     <div>
       <Header />
     </div>
@@ -222,6 +223,131 @@ const isZh = lang === 'zh-cn';
     setupThemeWatcher();
   }
 
+  function shouldEnableMouseTrail() {
+    if (window.location.pathname.includes("/admin")) return false;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+    if (window.matchMedia("(pointer: coarse)").matches) return false;
+    return true;
+  }
+
+  function initMouseTrail() {
+    const canvas = document.getElementById("mouseParticles");
+    if (!(canvas instanceof HTMLCanvasElement)) return;
+
+    if (!shouldEnableMouseTrail()) {
+      canvas.style.display = "none";
+      return;
+    }
+
+    canvas.style.display = "block";
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const oldAnim = window.__mouseTrailAnimationFrame;
+    if (typeof oldAnim === "number") {
+      cancelAnimationFrame(oldAnim);
+      window.__mouseTrailAnimationFrame = null;
+    }
+
+    const oldMouseMove = window.__mouseTrailMouseMoveHandler;
+    if (oldMouseMove) {
+      document.removeEventListener("mousemove", oldMouseMove);
+    }
+
+    const oldResize = window.__mouseTrailResizeHandler;
+    if (oldResize) {
+      window.removeEventListener("resize", oldResize);
+    }
+
+    const oldThemeObserver = window.__mouseTrailThemeObserver;
+    if (oldThemeObserver) {
+      oldThemeObserver.disconnect();
+    }
+
+    const particles = [];
+    let colorA = "#d4a853";
+    let colorB = "#4ecdc4";
+
+    const resizeCanvas = () => {
+      const dpr = Math.max(window.devicePixelRatio || 1, 1);
+      canvas.width = Math.floor(window.innerWidth * dpr);
+      canvas.height = Math.floor(window.innerHeight * dpr);
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const updateThemeColors = () => {
+      const styles = getComputedStyle(document.documentElement);
+      colorA = (styles.getPropertyValue("--mouse-particle-color-a") || "#d4a853").trim();
+      colorB = (styles.getPropertyValue("--mouse-particle-color-b") || "#4ecdc4").trim();
+    };
+
+    const onMouseMove = (e) => {
+      for (let i = 0; i < 2; i += 1) {
+        particles.push({
+          x: e.clientX + (Math.random() - 0.5) * 10,
+          y: e.clientY + (Math.random() - 0.5) * 10,
+          vx: (Math.random() - 0.5) * 2,
+          vy: (Math.random() - 0.5) * 2,
+          life: 1,
+          decay: 0.02 + Math.random() * 0.02,
+          size: 2 + Math.random() * 3,
+          color: Math.random() > 0.5 ? colorA : colorB,
+        });
+      }
+    };
+
+    const animate = () => {
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+      for (let i = particles.length - 1; i >= 0; i -= 1) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= p.decay;
+
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life * 0.6;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+
+      if (particles.length > 100) {
+        particles.splice(0, particles.length - 100);
+      }
+
+      window.__mouseTrailAnimationFrame = requestAnimationFrame(animate);
+    };
+
+    const themeObserver = new MutationObserver(() => {
+      updateThemeColors();
+    });
+
+    resizeCanvas();
+    updateThemeColors();
+    document.addEventListener("mousemove", onMouseMove, { passive: true });
+    window.addEventListener("resize", resizeCanvas);
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    animate();
+
+    window.__mouseTrailMouseMoveHandler = onMouseMove;
+    window.__mouseTrailResizeHandler = resizeCanvas;
+    window.__mouseTrailThemeObserver = themeObserver;
+  }
+
   const blogGuideSeenKey = "cmchen_blog_guide_seen_v1";
   const guideHideDuration = 260;
   let guideHideTimer = null;
@@ -312,10 +438,13 @@ const isZh = lang === 'zh-cn';
   }
 
   initGlobalParticles();
+  initMouseTrail();
   initBlogGuide();
   document.addEventListener("astro:page-load", initGlobalParticles);
+  document.addEventListener("astro:page-load", initMouseTrail);
   document.addEventListener("astro:page-load", initBlogGuide);
   document.addEventListener("astro:after-swap", initGlobalParticles);
+  document.addEventListener("astro:after-swap", initMouseTrail);
   document.addEventListener("astro:after-swap", initBlogGuide);
 </script>
 
