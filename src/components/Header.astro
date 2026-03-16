@@ -15,7 +15,6 @@ const t = i18nit(currentLang);
 const isEn = currentLang === 'en';
 const runtimeLabel = currentLang === 'en' ? 'Running' : '已运行';
 const runtimeSuffix = currentLang === 'en' ? 'days' : '天';
-const visitsLabel = currentLang === 'en' ? 'Visits' : '访问量';
 const desktopNavTextClass = isEn ? 'text-sm lg:text-base' : 'text-base lg:text-lg';
 const desktopNavLinkPxClass = isEn ? 'px-2 lg:px-2.5' : 'px-2 lg:px-3';
 const locales = (i18n?.locales || []).map(locale => String(locale));
@@ -37,9 +36,6 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
         </a>
       <p id="header-running-days" class="text-sm text-[var(--text-color)]/65 mt-1" data-running-since="2026-02-12" data-runtime-label={runtimeLabel} data-runtime-suffix={runtimeSuffix}>
         {runtimeLabel} 1 {runtimeSuffix}
-      </p>
-      <p id="header-site-visits" class="text-sm text-[var(--text-color)]/65" data-visits-label={visitsLabel}>
-        {visitsLabel} ...
       </p>
     </div>
 
@@ -459,74 +455,6 @@ if (document.readyState !== 'loading') {
   updateHeaderRunningDays();
 }
 </script>
-
-<script>
-function updateHeaderSiteVisitsFallback() {
-  const node = document.getElementById('header-site-visits');
-  if (!node) return;
-
-  const label = node.getAttribute('data-visits-label') || '访问量';
-  const visitKey = 'cmchen_site_visit_count';
-  const sessionKey = 'cmchen_site_visit_counted';
-
-  let count = Number(localStorage.getItem(visitKey) || '0');
-  if (!sessionStorage.getItem(sessionKey)) {
-    count += 1;
-    localStorage.setItem(visitKey, String(count));
-    sessionStorage.setItem(sessionKey, '1');
-  }
-
-  node.textContent = `${label} ${count}`;
-}
-
-function tryUpdateHeaderSiteVisitsFromBusuanzi() {
-  const node = document.getElementById('header-site-visits');
-  if (!node) return;
-  const label = node.getAttribute('data-visits-label') || '访问量';
-  const counter = document.getElementById('busuanzi_value_site_pv');
-  const text = (counter?.textContent || '').trim();
-  if (!text) return false;
-  node.textContent = `${label} ${text}`;
-  return true;
-}
-
-function ensureBusuanziScript() {
-  if (window.__busuanziScriptLoading || window.__busuanziLoaded) return;
-  window.__busuanziScriptLoading = true;
-
-  const script = document.createElement('script');
-  script.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
-  script.async = true;
-  script.onload = () => {
-    window.__busuanziLoaded = true;
-    window.__busuanziScriptLoading = false;
-    setTimeout(tryUpdateHeaderSiteVisitsFromBusuanzi, 260);
-    setTimeout(tryUpdateHeaderSiteVisitsFromBusuanzi, 1100);
-  };
-  script.onerror = () => {
-    window.__busuanziScriptLoading = false;
-  };
-  document.head.appendChild(script);
-}
-
-function initHeaderSiteVisits() {
-  const node = document.getElementById('header-site-visits');
-  if (!node) return;
-
-  updateHeaderSiteVisitsFallback();
-  ensureBusuanziScript();
-  tryUpdateHeaderSiteVisitsFromBusuanzi();
-}
-
-document.addEventListener('DOMContentLoaded', initHeaderSiteVisits);
-document.addEventListener('astro:page-load', initHeaderSiteVisits);
-document.addEventListener('astro:after-swap', initHeaderSiteVisits);
-if (document.readyState !== 'loading') {
-  initHeaderSiteVisits();
-}
-</script>
-
-<span id="busuanzi_value_site_pv" class="hidden" aria-hidden="true"></span>
 
 <script>
   function initHeaderScroll() {

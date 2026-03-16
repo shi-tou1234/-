@@ -17,6 +17,7 @@ interface Props {
     categories?: string[];
     preview?: string;
     readingMinutes?: number;
+    aosDelay?: number;
 }
 
 const {
@@ -29,6 +30,7 @@ const {
     categories = [],
     preview = description,
     readingMinutes = 1,
+    aosDelay = 0,
 } = Astro.props;
 
 
@@ -37,7 +39,6 @@ const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 
 const readingLabel = currentLang === 'en' ? `${readingMinutes} min read` : `${readingMinutes} 分钟阅读`;
 const previewText = String(preview || description || '').trim();
-const emojiPool = ['📘', '🧠', '🌿', '📝', '🧩', '☁️', '🪐', '🍀'];
 
 function hashString(input: string): number {
     let hash = 0;
@@ -47,14 +48,31 @@ function hashString(input: string): number {
     return Math.abs(hash);
 }
 
-const coverEmoji = emojiPool[hashString(title) % emojiPool.length];
+const decorativeSvgPool = [
+    `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="20" fill="#fde68a"/><circle cx="36" cy="36" r="18" fill="#f59e0b"/><circle cx="84" cy="82" r="24" fill="#fb7185"/></svg>')}`,
+    `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="20" fill="#a7f3d0"/><path d="M12 68C38 18 78 20 108 60" stroke="#14b8a6" stroke-width="10" fill="none"/><circle cx="88" cy="32" r="14" fill="#22d3ee"/></svg>')}`,
+    `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="20" fill="#ddd6fe"/><rect x="24" y="24" width="72" height="18" rx="9" fill="#8b5cf6"/><rect x="30" y="54" width="60" height="16" rx="8" fill="#c084fc"/><circle cx="38" cy="90" r="10" fill="#06b6d4"/></svg>')}`,
+    `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="20" fill="#bfdbfe"/><polygon points="20,90 58,20 100,90" fill="#2563eb"/><circle cx="92" cy="36" r="12" fill="#f59e0b"/></svg>')}`,
+];
+
+const placeholderDecorations = Array.from({ length: 24 }, (_, index) => {
+    const seed = hashString(`${title}-${url}-${index}`);
+    const size = 28 + (seed % 36);
+    const left = (seed * 37) % 96;
+    const top = (seed * 53) % 88;
+    const rotate = (seed * 19) % 360;
+    const opacity = 0.24 + ((seed % 40) / 100);
+    const image = decorativeSvgPool[seed % decorativeSvgPool.length];
+    return `left:${left}%;top:${top}%;width:${size}px;height:${size}px;transform:translate(-50%,-50%) rotate(${rotate}deg);opacity:${opacity};background-image:url("${image}");`;
+});
+
 const tagPalette = [
-    { bg: 'rgba(251, 191, 36, 0.18)', text: '#b45309', border: 'rgba(251, 191, 36, 0.48)' },
-    { bg: 'rgba(34, 211, 238, 0.16)', text: '#0e7490', border: 'rgba(34, 211, 238, 0.5)' },
-    { bg: 'rgba(167, 139, 250, 0.17)', text: '#6d28d9', border: 'rgba(167, 139, 250, 0.5)' },
-    { bg: 'rgba(52, 211, 153, 0.16)', text: '#0f766e', border: 'rgba(52, 211, 153, 0.48)' },
-    { bg: 'rgba(251, 113, 133, 0.16)', text: '#be123c', border: 'rgba(251, 113, 133, 0.5)' },
-    { bg: 'rgba(96, 165, 250, 0.16)', text: '#1d4ed8', border: 'rgba(96, 165, 250, 0.5)' },
+    { bg: 'rgba(251, 191, 36, 0.35)', text: '#92400e', border: 'rgba(245, 158, 11, 0.88)' },
+    { bg: 'rgba(34, 211, 238, 0.34)', text: '#0e7490', border: 'rgba(6, 182, 212, 0.86)' },
+    { bg: 'rgba(167, 139, 250, 0.34)', text: '#5b21b6', border: 'rgba(139, 92, 246, 0.86)' },
+    { bg: 'rgba(52, 211, 153, 0.34)', text: '#0f766e', border: 'rgba(16, 185, 129, 0.88)' },
+    { bg: 'rgba(251, 113, 133, 0.34)', text: '#9f1239', border: 'rgba(244, 63, 94, 0.86)' },
+    { bg: 'rgba(96, 165, 250, 0.34)', text: '#1e40af', border: 'rgba(59, 130, 246, 0.86)' },
 ];
 
 function getTagStyle(tag: string): string {
@@ -66,7 +84,7 @@ function getTagStyle(tag: string): string {
 const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
 ---
 
-<a data-aos="fade-up" href={pageUrl} class="post-card block min-w-0 w-full max-w-[var(--page-width)] mx-auto my-6 rounded-xl shadow border border-[var(--button-border-color)] overflow-hidden transition-all duration-300 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)]">
+<a data-aos="fade-up" data-aos-delay={String(aosDelay)} href={pageUrl} class="post-card block min-w-0 w-full max-w-[var(--page-width)] mx-auto my-6 rounded-xl shadow border border-[var(--button-border-color)] overflow-hidden transition-all duration-300 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)]">
     {image && (
         <div class="cover h-60 overflow-hidden">
             <ImageModule src={image} alt={title} class="post-card__image w-full h-full object-cover object-center"/>
@@ -74,10 +92,11 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     )}
 
     {!image && (
-        <div class="post-card__placeholder h-56 flex items-center justify-center">
-            <div class="text-center">
-                <div class="post-card__placeholder-emoji">{coverEmoji}</div>
-                <p class="post-card__placeholder-text">{currentLang === 'en' ? 'No cover, only stories.' : '没有封面，也有故事。'}</p>
+        <div class="post-card__placeholder h-56">
+            <div class="post-card__decor-grid" aria-hidden="true">
+                {placeholderDecorations.map((decoration) => (
+                    <span class="post-card__decor-item" style={decoration}></span>
+                ))}
             </div>
         </div>
     )}
@@ -132,22 +151,40 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     }
 
     .post-card__placeholder {
+        position: relative;
+        overflow: hidden;
         background:
             radial-gradient(circle at 20% 25%, color-mix(in srgb, var(--link-color) 24%, transparent), transparent 56%),
             radial-gradient(circle at 80% 70%, color-mix(in srgb, var(--text-color) 10%, transparent), transparent 48%),
             linear-gradient(135deg, color-mix(in srgb, var(--button-hover-color) 80%, transparent), color-mix(in srgb, var(--bg-color) 65%, transparent));
     }
 
-    .post-card__placeholder-emoji {
-        font-size: 2.4rem;
-        filter: drop-shadow(0 3px 10px color-mix(in srgb, var(--shadow-color) 70%, transparent));
+    .post-card__decor-grid {
+        position: absolute;
+        inset: 0;
     }
 
-    .post-card__placeholder-text {
-        margin-top: 0.5rem;
-        font-size: 0.84rem;
-        color: color-mix(in srgb, var(--text-color) 70%, transparent);
-        letter-spacing: 0.04em;
+    .post-card__decor-item {
+        position: absolute;
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        border-radius: 0.65rem;
+        box-shadow: 0 6px 14px color-mix(in srgb, var(--shadow-color) 72%, transparent);
+        animation: post-card-float 8s ease-in-out infinite;
+    }
+
+    .post-card__decor-item:nth-child(3n) {
+        animation-duration: 10s;
+    }
+
+    .post-card__decor-item:nth-child(4n) {
+        animation-duration: 12s;
+    }
+
+    @keyframes post-card-float {
+        0%, 100% { transform: translate(-50%, -50%) rotate(0deg) translateY(0); }
+        50% { transform: translate(-50%, -50%) rotate(4deg) translateY(-3px); }
     }
 
     .post-card__summary {
@@ -167,12 +204,14 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         font-size: 0.72rem;
         line-height: 1;
         padding: 0.3rem 0.55rem;
-        font-weight: 600;
-        transition: transform 0.2s ease, filter 0.2s ease;
+        font-weight: 700;
+        box-shadow: 0 4px 10px color-mix(in srgb, var(--post-tag-border) 35%, transparent);
+        transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
     }
 
     .post-card:hover .post-card__tag {
         transform: translateY(-1px);
         filter: saturate(1.12);
+        box-shadow: 0 7px 14px color-mix(in srgb, var(--post-tag-border) 58%, transparent);
     }
 </style>

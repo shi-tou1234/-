@@ -35,7 +35,7 @@ function generatePostPreview(description: string, body: string, lang: string): s
 ---
 
 {
-    blogEntries.map((entry) => {
+    blogEntries.map((entry, index) => {
         const categories = getPostCategories(entry, currentLang);
         const preview = generatePostPreview(entry.data.description || '', entry.body || '', currentLang);
         const readingMinutes = estimateReadingMinutes(entry.body || '');
@@ -51,6 +51,7 @@ function generatePostPreview(description: string, body: string, lang: string): s
                 categories={categories}
                 preview={preview}
                 readingMinutes={readingMinutes}
+                aosDelay={index * 80}
             />
         );
     })

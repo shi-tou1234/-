@@ -199,10 +199,11 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
 
   .archive-explorer__chip:hover,
   .archive-explorer__chip[data-active='true'] {
-    border-color: color-mix(in srgb, var(--chip-text) 60%, var(--chip-border));
-    background: var(--button-hover-color);
+    border-color: color-mix(in srgb, var(--chip-text) 74%, var(--chip-border));
+    background: color-mix(in srgb, var(--chip-bg) 88%, white 12%);
     color: var(--chip-text);
     transform: translateY(-1px);
+    box-shadow: 0 8px 16px color-mix(in srgb, var(--chip-border) 40%, transparent);
   }
 
   .archive-explorer__chip[data-filter-category=''] {
@@ -212,42 +213,45 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
   }
 
   .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(2n) {
-    --chip-bg: rgba(251, 191, 36, 0.16);
-    --chip-text: #b45309;
-    --chip-border: rgba(251, 191, 36, 0.45);
+    --chip-bg: rgba(251, 191, 36, 0.36);
+    --chip-text: #92400e;
+    --chip-border: rgba(245, 158, 11, 0.88);
   }
 
   .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(3n) {
-    --chip-bg: rgba(34, 211, 238, 0.16);
+    --chip-bg: rgba(34, 211, 238, 0.34);
     --chip-text: #0e7490;
-    --chip-border: rgba(34, 211, 238, 0.45);
+    --chip-border: rgba(6, 182, 212, 0.86);
   }
 
   .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(4n) {
-    --chip-bg: rgba(167, 139, 250, 0.16);
-    --chip-text: #6d28d9;
-    --chip-border: rgba(167, 139, 250, 0.45);
+    --chip-bg: rgba(167, 139, 250, 0.34);
+    --chip-text: #5b21b6;
+    --chip-border: rgba(139, 92, 246, 0.86);
   }
 
   .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(5n) {
-    --chip-bg: rgba(52, 211, 153, 0.16);
+    --chip-bg: rgba(52, 211, 153, 0.34);
     --chip-text: #0f766e;
-    --chip-border: rgba(52, 211, 153, 0.45);
+    --chip-border: rgba(16, 185, 129, 0.86);
   }
 
   .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(6n) {
-    --chip-bg: rgba(251, 113, 133, 0.16);
-    --chip-text: #be123c;
-    --chip-border: rgba(251, 113, 133, 0.45);
+    --chip-bg: rgba(251, 113, 133, 0.34);
+    --chip-text: #9f1239;
+    --chip-border: rgba(244, 63, 94, 0.86);
   }
 
   .archive-explorer__chip span:last-child {
     min-width: 1.7rem;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--bg-color) 76%, transparent);
+    background: color-mix(in srgb, white 75%, transparent);
+    color: color-mix(in srgb, var(--chip-text) 86%, black 14%);
+    border: 1px solid color-mix(in srgb, var(--chip-border) 55%, transparent);
     padding: 0.08rem 0.45rem;
     text-align: center;
     font-size: 0.72rem;
+    font-weight: 700;
   }
 
   .archive-explorer__post-tag {
