@@ -104,17 +104,18 @@ const backFallbackUrl = getRelativeLocaleUrl(currentLang, '/');
             siteConfig.blogNavi.enable &&
             <BlogNavi prev={prev} next={next}/>
         }
-
-                <div class="mt-6 flex justify-center">
-                        <button
-                                id="post-back-button"
-                                class="inline-flex items-center gap-2 rounded-lg border border-[var(--button-border-color)] px-4 py-2 text-sm text-[var(--text-color)] transition-all duration-200 hover:bg-[var(--button-hover-color)] active:scale-95"
-                                type="button"
-                        >
-                                {backButtonText}
-                        </button>
-                </div>
     </div>
+
+    <div class="post-back-floating">
+        <button
+            id="post-back-button"
+            class="post-back-floating__button"
+            type="button"
+        >
+            {backButtonText}
+        </button>
+    </div>
+
     <BackTop />
     <PostToc title={t('toc')} />
 </MainPageLayout>
@@ -138,3 +139,59 @@ const backFallbackUrl = getRelativeLocaleUrl(currentLang, '/');
     document.addEventListener('astro:page-load', initPostBackButton);
     document.addEventListener('astro:after-swap', initPostBackButton);
 </script>
+
+<style is:global>
+    .post-back-floating {
+        position: fixed;
+        left: var(--toc-offset-left);
+        top: 16vh;
+        z-index: 991;
+    }
+
+    .post-back-floating__button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        border: 1px solid var(--button-border-color);
+        background: color-mix(in srgb, var(--bg-color) 92%, transparent);
+        color: var(--text-color);
+        padding: 0.55rem 1rem;
+        font-size: 0.82rem;
+        line-height: 1.2;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 8px 24px var(--shadow-color);
+        backdrop-filter: blur(8px);
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .post-back-floating__button:hover {
+        background: var(--button-hover-color);
+        transform: translateX(-2px);
+    }
+
+    @media (max-width: 1400px) {
+        .post-back-floating {
+            left: auto;
+            right: 1rem;
+            top: auto;
+            bottom: 22vh;
+            z-index: 1200;
+        }
+    }
+
+    @media (max-width: 1023px) {
+        .post-back-floating {
+            right: 1rem;
+            bottom: 22vh;
+        }
+
+        .post-back-floating__button {
+            min-width: 3.4rem;
+            height: 2.25rem;
+            padding: 0 0.75rem;
+            font-size: 0.78rem;
+        }
+    }
+</style>
