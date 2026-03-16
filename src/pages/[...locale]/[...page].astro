@@ -19,6 +19,17 @@ const { locale = i18n!.defaultLocale } = Astro.params;
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
+const coverSignatures = currentLang === 'en'
+  ? [
+      'Exploring the endless possibilities of AI 🤖',
+      'Sharing study notes and practical insights ✍️',
+      'A colorful life, a lifelong learner 🌟',
+    ]
+  : [
+      '探索AI技术的无限可能 🤖',
+      '分享学习笔记与心得 ✍️',
+      '生活多彩，学无止境 🌟',
+    ];
 
 export const getStaticPaths = (async ({ paginate }) => {
 
@@ -49,7 +60,7 @@ const pageTitle = `${siteConfig.title} - ${siteConfig.subTitle}`;
 ---
 
 <MainPageLayout title={pageTitle} lang={currentLang}>
-  <Cover title={t("cover.title.home")} subTitle={t("cover.subTitle.home")} />
+  <Cover title={t("cover.title.home")} subTitle={t("cover.subTitle.home")} signatures={coverSignatures} />
     <PostPage page={page} />
     <Navi page={page} />
     <BackTop />

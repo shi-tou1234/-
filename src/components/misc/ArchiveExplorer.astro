@@ -178,15 +178,18 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
 
 <style is:global>
   .archive-explorer__chip {
+    --chip-bg: color-mix(in srgb, var(--bg-color) 82%, transparent);
+    --chip-text: var(--text-color);
+    --chip-border: var(--button-border-color);
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
     width: 100%;
-    border: 1px solid var(--button-border-color);
+    border: 1px solid var(--chip-border);
     border-radius: 999px;
-    background: color-mix(in srgb, var(--bg-color) 82%, transparent);
-    color: var(--text-color);
+    background: var(--chip-bg);
+    color: var(--chip-text);
     padding: 0.42rem 0.72rem;
     text-align: left;
     transition: all 0.2s ease;
@@ -196,10 +199,46 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
 
   .archive-explorer__chip:hover,
   .archive-explorer__chip[data-active='true'] {
-    border-color: var(--link-color);
+    border-color: color-mix(in srgb, var(--chip-text) 60%, var(--chip-border));
     background: var(--button-hover-color);
-    color: var(--link-color);
+    color: var(--chip-text);
     transform: translateY(-1px);
+  }
+
+  .archive-explorer__chip[data-filter-category=''] {
+    --chip-bg: color-mix(in srgb, var(--button-hover-color) 62%, transparent);
+    --chip-text: var(--text-color);
+    --chip-border: var(--button-border-color);
+  }
+
+  .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(2n) {
+    --chip-bg: rgba(251, 191, 36, 0.16);
+    --chip-text: #b45309;
+    --chip-border: rgba(251, 191, 36, 0.45);
+  }
+
+  .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(3n) {
+    --chip-bg: rgba(34, 211, 238, 0.16);
+    --chip-text: #0e7490;
+    --chip-border: rgba(34, 211, 238, 0.45);
+  }
+
+  .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(4n) {
+    --chip-bg: rgba(167, 139, 250, 0.16);
+    --chip-text: #6d28d9;
+    --chip-border: rgba(167, 139, 250, 0.45);
+  }
+
+  .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(5n) {
+    --chip-bg: rgba(52, 211, 153, 0.16);
+    --chip-text: #0f766e;
+    --chip-border: rgba(52, 211, 153, 0.45);
+  }
+
+  .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(6n) {
+    --chip-bg: rgba(251, 113, 133, 0.16);
+    --chip-text: #be123c;
+    --chip-border: rgba(251, 113, 133, 0.45);
   }
 
   .archive-explorer__chip span:last-child {
