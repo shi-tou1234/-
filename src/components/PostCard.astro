@@ -86,7 +86,12 @@ function getTagStyle(tag: string): string {
 const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
 ---
 
-<a data-aos="fade-up" data-aos-delay={String(aosDelay)} href={pageUrl} class="post-card block min-w-0 w-full max-w-[var(--page-width)] mx-auto my-6 rounded-xl shadow border border-[var(--button-border-color)] overflow-hidden transition-all duration-300 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)]">
+<a
+    href={pageUrl}
+    data-card-reveal
+    style={`--card-reveal-delay:${aosDelay}ms;`}
+    class="post-card block min-w-0 w-full max-w-[var(--page-width)] mx-auto my-6 rounded-xl shadow border border-[var(--button-border-color)] overflow-hidden transition-all duration-300 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)]"
+>
     {image && (
         <div class="cover h-60 overflow-hidden">
             <ImageModule src={image} alt={title} class="post-card__image w-full h-full object-cover object-center"/>
@@ -135,7 +140,18 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     .post-card {
         transform: translateY(0) scale(1);
         box-shadow: 0 8px 20px color-mix(in srgb, var(--shadow-color) 72%, transparent);
-        transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+        transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, opacity 0.42s ease;
+    }
+
+    .post-card.post-card-reveal {
+        opacity: 0;
+        transform: translateY(18px) scale(0.995);
+    }
+
+    .post-card.post-card-reveal.is-visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        transition-delay: var(--card-reveal-delay, 0ms);
     }
 
     .post-card:hover {
