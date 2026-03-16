@@ -14,7 +14,7 @@ import { getCollection, render } from 'astro:content'
 import { i18n } from "astro:config/client";
 import i18nit from '@i18n/translation'
 
-import { blogCoverUrl } from '@/utils/url-utils'
+import { blogCoverUrl, getRelativeLocaleUrl } from '@/utils/url-utils'
 import { formatFullDate } from '@/utils/time'
 import { getBlogEntrySort } from '@utils/content-utils'
 import { estimateReadingMinutes, estimateWordCount } from '@utils/reading-time'
@@ -62,6 +62,8 @@ const pageTitle = entry.data.title + ' - ' + siteConfig.title;
 const image = blogCoverUrl(entry.data.image, entry.id);
 const readingMinutes = estimateReadingMinutes(entry.body || '');
 const wordCount = estimateWordCount(entry.body || '');
+const backButtonText = currentLang === 'zh-cn' ? '返回上一页' : 'Back to previous page';
+const backFallbackUrl = getRelativeLocaleUrl(currentLang, '/');
 
 ---
 <MainPageLayout title={pageTitle} lang={currentLang}>
@@ -102,7 +104,37 @@ const wordCount = estimateWordCount(entry.body || '');
             siteConfig.blogNavi.enable &&
             <BlogNavi prev={prev} next={next}/>
         }
+
+                <div class="mt-6 flex justify-center">
+                        <button
+                                id="post-back-button"
+                                class="inline-flex items-center gap-2 rounded-lg border border-[var(--button-border-color)] px-4 py-2 text-sm text-[var(--text-color)] transition-all duration-200 hover:bg-[var(--button-hover-color)] active:scale-95"
+                                type="button"
+                        >
+                                {backButtonText}
+                        </button>
+                </div>
     </div>
     <BackTop />
     <PostToc title={t('toc')} />
 </MainPageLayout>
+
+<script define:vars={{ backFallbackUrl }}>
+    function initPostBackButton() {
+        const backButton = document.getElementById('post-back-button');
+        if (!(backButton instanceof HTMLButtonElement)) return;
+        if (backButton.dataset.bound === 'true') return;
+
+        backButton.dataset.bound = 'true';
+        backButton.addEventListener('click', () => {
+            if (window.history.length > 1) {
+                window.history.back();
+                return;
+            }
+            window.location.href = backFallbackUrl;
+        });
+    }
+
+    document.addEventListener('astro:page-load', initPostBackButton);
+    document.addEventListener('astro:after-swap', initPostBackButton);
+</script>
