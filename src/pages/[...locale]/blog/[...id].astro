@@ -5,6 +5,7 @@ import MainPageLayout from '@layouts/MainPageLayout.astro'
 import Markdown from '@components/misc/Markdown.astro'
 import ImageModule from '@components/misc/ImageModule.astro'
 import BackTop from '@components/control/BackTop.astro'
+import PostToc from '@components/control/PostToc.astro'
 import LicenseCard from '@components/misc/LicenseCard.astro'
 import BlogNavi from '@components/control/BlogNavi.astro'
 import ReadingTime from '@components/misc/ReadingTime.astro'
@@ -103,4 +104,5 @@ const wordCount = estimateWordCount(entry.body || '');
         }
     </div>
     <BackTop />
+    <PostToc title={t('toc')} />
 </MainPageLayout>

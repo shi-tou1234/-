@@ -1,0 +1,334 @@
+---
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<div id="post-toc-root" data-toc-title={title} class="post-toc-root" hidden>
+  <button id="post-toc-fab" type="button" class="post-toc-fab" aria-expanded="false" aria-controls="post-toc-panel">
+    {title}
+  </button>
+
+  <div id="post-toc-backdrop" class="post-toc-backdrop" aria-hidden="true"></div>
+
+  <aside id="post-toc-panel" class="post-toc-panel" aria-label={title}>
+    <div class="post-toc-panel__head">
+      <h2 class="post-toc-panel__title">{title}</h2>
+      <button id="post-toc-close" type="button" class="post-toc-panel__close" aria-label="close">x</button>
+    </div>
+    <ol id="post-toc-list" class="post-toc-list"></ol>
+  </aside>
+</div>
+
+<script is:inline>
+function initPostToc() {
+  const root = document.getElementById('post-toc-root');
+  if (!(root instanceof HTMLElement)) return;
+
+  const markdown = document.querySelector('.markdown-content');
+  if (!(markdown instanceof HTMLElement)) return;
+
+  const panel = document.getElementById('post-toc-panel');
+  const list = document.getElementById('post-toc-list');
+  const fab = document.getElementById('post-toc-fab');
+  const closeBtn = document.getElementById('post-toc-close');
+  const backdrop = document.getElementById('post-toc-backdrop');
+  if (!(panel instanceof HTMLElement) || !(list instanceof HTMLOListElement) || !(fab instanceof HTMLButtonElement) || !(closeBtn instanceof HTMLButtonElement) || !(backdrop instanceof HTMLElement)) {
+    return;
+  }
+
+  const slugify = (text) => {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[\s\u3000]+/g, '-')
+      .replace(/[^\w\-\u4e00-\u9fa5]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  };
+
+  const seenIds = new Set();
+  const headings = Array.from(markdown.querySelectorAll('h2, h3')).filter((heading) => {
+    const text = heading.textContent?.trim();
+    if (!text) return false;
+
+    if (!heading.id) {
+      const baseId = slugify(text) || `heading-${seenIds.size + 1}`;
+      let nextId = baseId;
+      let index = 2;
+      while (document.getElementById(nextId) || seenIds.has(nextId)) {
+        nextId = `${baseId}-${index}`;
+        index += 1;
+      }
+      heading.id = nextId;
+    }
+
+    seenIds.add(heading.id);
+    return true;
+  });
+
+  if (!headings.length) {
+    root.hidden = true;
+    return;
+  }
+
+  root.hidden = false;
+
+  list.innerHTML = headings
+    .map((heading) => {
+      const depth = heading.tagName === 'H3' ? 'sub' : 'main';
+      const text = heading.textContent?.trim() || '';
+      return `<li class="post-toc-item post-toc-item--${depth}"><a href="#${heading.id}" data-toc-target="${heading.id}">${text}</a></li>`;
+    })
+    .join('');
+
+  const links = Array.from(list.querySelectorAll('a[data-toc-target]'));
+  let activeId = '';
+
+  const setPanelOpen = (open) => {
+    panel.classList.toggle('is-open', open);
+    backdrop.classList.toggle('is-open', open);
+    fab.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.documentElement.classList.toggle('post-toc-mobile-open', open);
+  };
+
+  const updateActive = (id) => {
+    if (!id || activeId === id) return;
+    activeId = id;
+    links.forEach((link) => {
+      const isActive = link.getAttribute('data-toc-target') === id;
+      link.classList.toggle('is-active', isActive);
+    });
+  };
+
+  links.forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      const targetId = link.getAttribute('data-toc-target');
+      if (!targetId) return;
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (window.innerWidth < 1024) {
+        setPanelOpen(false);
+      }
+      updateActive(targetId);
+    });
+  });
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (visible.length > 0) {
+        updateActive(visible[0].target.id);
+      }
+    },
+    {
+      root: null,
+      rootMargin: '-22% 0px -62% 0px',
+      threshold: [0, 1],
+    },
+  );
+
+  headings.forEach((heading) => observer.observe(heading));
+  updateActive(headings[0].id);
+
+  fab.onclick = () => setPanelOpen(true);
+  closeBtn.onclick = () => setPanelOpen(false);
+  backdrop.onclick = () => setPanelOpen(false);
+
+  const oldEscHandler = window.__postTocEscHandler;
+  if (oldEscHandler) {
+    document.removeEventListener('keydown', oldEscHandler);
+  }
+
+  const escHandler = (event) => {
+    if (event.key === 'Escape' && panel.classList.contains('is-open')) {
+      setPanelOpen(false);
+    }
+  };
+
+  document.addEventListener('keydown', escHandler);
+  window.__postTocEscHandler = escHandler;
+
+  if (window.innerWidth >= 1024) {
+    setPanelOpen(false);
+  }
+}
+
+document.addEventListener('astro:page-load', initPostToc);
+document.addEventListener('astro:after-swap', initPostToc);
+</script>
+
+<style is:global>
+.post-toc-root {
+  position: fixed;
+  left: var(--toc-offset-left);
+  top: 24vh;
+  z-index: 990;
+}
+
+.post-toc-panel {
+  width: max(12rem, min(18rem, var(--toc-width)));
+  max-height: 58vh;
+  overflow: hidden;
+  border: 1px solid var(--button-border-color);
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--bg-color) 92%, transparent);
+  box-shadow: 0 8px 24px var(--shadow-color);
+  backdrop-filter: blur(8px);
+}
+
+.post-toc-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.7rem 0.8rem;
+  border-bottom: 1px solid var(--button-border-color);
+}
+
+.post-toc-panel__title {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.post-toc-panel__close {
+  display: none;
+  width: 1.8rem;
+  height: 1.8rem;
+  border: 1px solid var(--button-border-color);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.post-toc-list {
+  margin: 0;
+  padding: 0.55rem;
+  list-style: none;
+  max-height: calc(58vh - 3rem);
+  overflow-y: auto;
+}
+
+.post-toc-item a {
+  display: block;
+  color: color-mix(in srgb, var(--text-color) 84%, transparent);
+  font-size: 0.84rem;
+  line-height: 1.5;
+  text-decoration: none;
+  border-radius: 0.45rem;
+  padding: 0.32rem 0.5rem;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.post-toc-item--sub a {
+  padding-left: 1.2rem;
+  font-size: 0.8rem;
+}
+
+.post-toc-item a:hover {
+  background: var(--button-hover-color);
+  color: var(--text-color);
+  transform: translateX(2px);
+}
+
+.post-toc-item a.is-active {
+  color: var(--link-color);
+  background: var(--button-hover-color);
+  font-weight: 700;
+}
+
+.post-toc-fab,
+.post-toc-backdrop {
+  display: none;
+}
+
+@media (max-width: 1400px) {
+  .post-toc-root {
+    display: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .post-toc-root {
+    left: auto;
+    right: 1rem;
+    top: auto;
+    bottom: 16vh;
+    z-index: 1200;
+    display: block;
+  }
+
+  .post-toc-fab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3.4rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    border: 1px solid var(--button-border-color);
+    background: color-mix(in srgb, var(--bg-color) 94%, transparent);
+    color: var(--text-color);
+    box-shadow: 0 6px 18px var(--shadow-color);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .post-toc-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.24);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+    z-index: 1190;
+  }
+
+  .post-toc-backdrop.is-open {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .post-toc-panel {
+    position: fixed;
+    right: 0.8rem;
+    left: 0.8rem;
+    bottom: calc(16vh + 2.8rem);
+    width: auto;
+    max-height: 44vh;
+    transform: translateY(12px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.22s ease, opacity 0.22s ease;
+    z-index: 1200;
+  }
+
+  .post-toc-panel.is-open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .post-toc-panel__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  html.post-toc-mobile-open,
+  html.post-toc-mobile-open body {
+    overflow: hidden;
+  }
+}
+</style>
