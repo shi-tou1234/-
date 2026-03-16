@@ -195,6 +195,7 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
     transition: all 0.2s ease;
     cursor: pointer;
     font-size: 0.82rem;
+    font-weight: 650;
   }
 
   .archive-explorer__chip:hover,
@@ -252,6 +253,42 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
     text-align: center;
     font-size: 0.72rem;
     font-weight: 700;
+  }
+
+  [data-theme='dark'] .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(2n) {
+    --chip-bg: rgba(234, 179, 8, 0.34);
+    --chip-text: #fde68a;
+    --chip-border: rgba(245, 158, 11, 0.96);
+  }
+
+  [data-theme='dark'] .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(3n) {
+    --chip-bg: rgba(6, 182, 212, 0.32);
+    --chip-text: #a5f3fc;
+    --chip-border: rgba(34, 211, 238, 0.94);
+  }
+
+  [data-theme='dark'] .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(4n) {
+    --chip-bg: rgba(124, 58, 237, 0.34);
+    --chip-text: #ddd6fe;
+    --chip-border: rgba(167, 139, 250, 0.94);
+  }
+
+  [data-theme='dark'] .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(5n) {
+    --chip-bg: rgba(16, 185, 129, 0.32);
+    --chip-text: #a7f3d0;
+    --chip-border: rgba(52, 211, 153, 0.94);
+  }
+
+  [data-theme='dark'] .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(6n) {
+    --chip-bg: rgba(244, 63, 94, 0.32);
+    --chip-text: #fecdd3;
+    --chip-border: rgba(251, 113, 133, 0.94);
+  }
+
+  [data-theme='dark'] .archive-explorer__chip span:last-child {
+    background: color-mix(in srgb, var(--bg-color) 65%, white 35%);
+    color: #111827;
+    border-color: rgba(255, 255, 255, 0.48);
   }
 
   .archive-explorer__post-tag {

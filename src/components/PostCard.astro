@@ -49,21 +49,23 @@ function hashString(input: string): number {
 }
 
 const decorativeSvgPool = [
-    `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="20" fill="#fde68a"/><circle cx="36" cy="36" r="18" fill="#f59e0b"/><circle cx="84" cy="82" r="24" fill="#fb7185"/></svg>')}`,
-    `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="20" fill="#a7f3d0"/><path d="M12 68C38 18 78 20 108 60" stroke="#14b8a6" stroke-width="10" fill="none"/><circle cx="88" cy="32" r="14" fill="#22d3ee"/></svg>')}`,
-    `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="20" fill="#ddd6fe"/><rect x="24" y="24" width="72" height="18" rx="9" fill="#8b5cf6"/><rect x="30" y="54" width="60" height="16" rx="8" fill="#c084fc"/><circle cx="38" cy="90" r="10" fill="#06b6d4"/></svg>')}`,
-    `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="20" fill="#bfdbfe"/><polygon points="20,90 58,20 100,90" fill="#2563eb"/><circle cx="92" cy="36" r="12" fill="#f59e0b"/></svg>')}`,
+    `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><rect width="140" height="140" rx="24" fill="#fdf2f8"/><rect x="16" y="16" width="108" height="108" rx="18" fill="#ffffff" stroke="#f9a8d4"/><circle cx="50" cy="52" r="18" fill="#fbcfe8"/><circle cx="88" cy="88" r="14" fill="#f9a8d4"/></svg>')}`,
+    `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><rect width="140" height="140" rx="24" fill="#ecfeff"/><rect x="16" y="16" width="108" height="108" rx="18" fill="#ffffff" stroke="#67e8f9"/><path d="M26 86C50 60 80 56 114 78" stroke="#22d3ee" stroke-width="8" fill="none" stroke-linecap="round"/><circle cx="42" cy="48" r="10" fill="#a5f3fc"/></svg>')}`,
+    `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><rect width="140" height="140" rx="24" fill="#fef9c3"/><rect x="16" y="16" width="108" height="108" rx="18" fill="#ffffff" stroke="#facc15"/><rect x="34" y="42" width="72" height="14" rx="7" fill="#fde047"/><rect x="28" y="70" width="84" height="14" rx="7" fill="#fef08a"/></svg>')}`,
+    `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><rect width="140" height="140" rx="24" fill="#eef2ff"/><rect x="16" y="16" width="108" height="108" rx="18" fill="#ffffff" stroke="#a5b4fc"/><path d="M40 96L70 40L100 96Z" fill="#c7d2fe"/><circle cx="100" cy="44" r="9" fill="#93c5fd"/></svg>')}`,
+    `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><rect width="140" height="140" rx="24" fill="#ecfdf5"/><rect x="16" y="16" width="108" height="108" rx="18" fill="#ffffff" stroke="#6ee7b7"/><circle cx="54" cy="56" r="16" fill="#86efac"/><circle cx="86" cy="82" r="13" fill="#34d399"/></svg>')}`,
+    `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><rect width="140" height="140" rx="24" fill="#fff7ed"/><rect x="16" y="16" width="108" height="108" rx="18" fill="#ffffff" stroke="#fdba74"/><path d="M30 88L54 64L76 86L106 56" stroke="#fb923c" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>')}`,
 ];
 
-const placeholderDecorations = Array.from({ length: 24 }, (_, index) => {
+const placeholderDecorations = Array.from({ length: 14 }, (_, index) => {
     const seed = hashString(`${title}-${url}-${index}`);
-    const size = 28 + (seed % 36);
+    const size = 38 + (seed % 44);
     const left = (seed * 37) % 96;
     const top = (seed * 53) % 88;
-    const rotate = (seed * 19) % 360;
-    const opacity = 0.24 + ((seed % 40) / 100);
+    const rotate = ((seed * 19) % 26) - 13;
+    const opacity = 0.38 + ((seed % 24) / 100);
     const image = decorativeSvgPool[seed % decorativeSvgPool.length];
-    return `left:${left}%;top:${top}%;width:${size}px;height:${size}px;transform:translate(-50%,-50%) rotate(${rotate}deg);opacity:${opacity};background-image:url("${image}");`;
+    return `left:${left}%;top:${top}%;width:${size}px;height:${size}px;transform:translate(-50%,-50%) rotate(${rotate}deg);opacity:${opacity};background-image:url("${image}");animation-delay:${(seed % 7) * 0.35}s;`;
 });
 
 const tagPalette = [
@@ -154,9 +156,10 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         position: relative;
         overflow: hidden;
         background:
-            radial-gradient(circle at 20% 25%, color-mix(in srgb, var(--link-color) 24%, transparent), transparent 56%),
-            radial-gradient(circle at 80% 70%, color-mix(in srgb, var(--text-color) 10%, transparent), transparent 48%),
-            linear-gradient(135deg, color-mix(in srgb, var(--button-hover-color) 80%, transparent), color-mix(in srgb, var(--bg-color) 65%, transparent));
+            radial-gradient(circle at 16% 22%, rgba(255, 214, 231, 0.85), transparent 40%),
+            radial-gradient(circle at 84% 20%, rgba(182, 243, 255, 0.8), transparent 38%),
+            radial-gradient(circle at 72% 86%, rgba(210, 196, 255, 0.72), transparent 44%),
+            linear-gradient(140deg, color-mix(in srgb, var(--bg-color) 82%, #fff7fb 18%), color-mix(in srgb, var(--button-hover-color) 72%, #ecfeff 28%));
     }
 
     .post-card__decor-grid {
@@ -169,9 +172,10 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         background-position: center;
         background-size: cover;
         background-repeat: no-repeat;
-        border-radius: 0.65rem;
-        box-shadow: 0 6px 14px color-mix(in srgb, var(--shadow-color) 72%, transparent);
-        animation: post-card-float 8s ease-in-out infinite;
+        border-radius: 0.9rem;
+        border: 2px solid rgba(255, 255, 255, 0.82);
+        box-shadow: 0 8px 18px color-mix(in srgb, var(--shadow-color) 42%, transparent);
+        animation: post-card-float 9.5s ease-in-out infinite;
     }
 
     .post-card__decor-item:nth-child(3n) {
