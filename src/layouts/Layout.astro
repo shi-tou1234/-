@@ -4,6 +4,7 @@ import "@styles/global.css"
 import 'katex/dist/katex.min.css';
 import 'aos/dist/aos.css';
 import { i18n } from "astro:config/client";
+import { ClientRouter } from "astro:transitions";
 
 interface Props {
   title: string;
@@ -20,31 +21,21 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
 <head>
     <script is:inline>
         (function() {
-        let savedTheme = null;
-        try {
-          savedTheme = localStorage.getItem('theme');
-        } catch {
-          savedTheme = null;
-        }
-
+        const savedTheme = localStorage.getItem('theme');
         const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         let theme;
-        if (savedTheme === 'system') {
+        if ( savedTheme === 'system') {
           theme = systemTheme;
         } else {
           theme = savedTheme || 'light';
         }
-
-        try {
-          localStorage.setItem('theme', savedTheme || theme);
-        } catch {
-        }
-
+        localStorage.setItem('theme', savedTheme || theme);
         document.documentElement.setAttribute('data-theme', theme);
+
         if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
+            document.documentElement.classList.add('dark');
         } else {
-          document.documentElement.classList.remove('dark');
+            document.documentElement.classList.remove('dark');
         }
         })();
     </script>
@@ -59,6 +50,7 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
     <link rel="stylesheet" href="https://fonts.font.im/css2?family=EB+Garamond">
     <script defer src="https://umami.motues.top/script.js" data-website-id="6e5cc0f3-a67e-4eca-9962-8a2259cccb44" is:inline></script>
     <title>{pageTitle}</title>
+    <ClientRouter />
 </head>
 <body class="h-full bg-[var(--bg-color)]">
     
@@ -146,8 +138,12 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
             return navigator.webdriver || botSignals.some((signal) => ua.includes(signal));
           };
 
+          const blockPage = () => {
+            document.documentElement.innerHTML = '';
+          };
+
           if (shouldBlockAutomation()) {
-            console.warn('Automation-like environment detected, keeping page interactive in safe mode.');
+            blockPage();
           }
 
           document.addEventListener('contextmenu', (e) => e.preventDefault(), { capture: true });
