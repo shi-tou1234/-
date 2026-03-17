@@ -140,24 +140,31 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     .post-card {
         transform: translateY(0) scale(1);
         box-shadow: 0 8px 20px color-mix(in srgb, var(--shadow-color) 72%, transparent);
-        transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, opacity 0.42s ease;
+        transition: transform 0.58s cubic-bezier(0.18, 0.82, 0.2, 1), box-shadow 0.42s ease, border-color 0.34s ease, opacity 0.52s ease, filter 0.45s ease;
+        will-change: transform, opacity;
     }
 
     .post-card.post-card-reveal {
         opacity: 0;
-        transform: translateY(18px) scale(0.995);
+        transform: translate3d(0, 28px, 0) scale(0.985);
+        filter: blur(6px) saturate(0.92);
     }
 
     .post-card.post-card-reveal.is-visible {
         opacity: 1;
         transform: translateY(0) scale(1);
+        filter: blur(0) saturate(1);
         transition-delay: var(--card-reveal-delay, 0ms);
     }
 
     .post-card:hover {
-        transform: translateY(-4px) scale(1.01);
-        box-shadow: 0 16px 32px color-mix(in srgb, var(--shadow-color) 95%, transparent);
+        transform: translateY(-7px) scale(1.012);
+        box-shadow: 0 18px 36px color-mix(in srgb, var(--shadow-color) 100%, transparent);
         border-color: color-mix(in srgb, var(--link-color) 35%, var(--button-border-color));
+    }
+
+    .post-card:active {
+        transform: translateY(-3px) scale(1.004);
     }
 
     .post-card__image {

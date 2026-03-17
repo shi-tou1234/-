@@ -25,7 +25,7 @@ const t = i18nit(currentLang);
   <div class="prev-page w-24 md:w-28">
     {
       showPrevious ? (
-        <a href={getRelativeLocaleUrl(currentLang, previousPageUrl)} class="px-3 py-1.5 text-[var(--text-color)] hover:bg-[var(--button-hover-color)] active:scale-90 border border-[var(--button-border-color)] rounded-lg transition-all duration-200 flex items-center justify-center md:px-4 md:py-2">
+        <a href={getRelativeLocaleUrl(currentLang, previousPageUrl)} class="page-nav-btn px-3 py-1.5 text-[var(--text-color)] border border-[var(--button-border-color)] rounded-lg flex items-center justify-center md:px-4 md:py-2">
           <svg class="w-4 h-4 mr-1.5 md:w-5 md:h-5 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
           </svg>
@@ -44,7 +44,7 @@ const t = i18nit(currentLang);
   <div class="next-page w-24 md:w-28">
     {
       showNext ? (
-        <a href={getRelativeLocaleUrl(currentLang, nextPageUrl)} class="px-3 py-1.5 text-[var(--text-color)] hover:bg-[var(--button-hover-color)] active:scale-90 border border-[var(--button-border-color)] rounded-lg transition-all duration-200 flex items-center justify-center md:px-4 md:py-2">
+        <a href={getRelativeLocaleUrl(currentLang, nextPageUrl)} class="page-nav-btn px-3 py-1.5 text-[var(--text-color)] border border-[var(--button-border-color)] rounded-lg flex items-center justify-center md:px-4 md:py-2">
           {t("pageNavigation.next")}
           <svg class="w-4 h-4 ml-1.5 md:w-5 md:h-5 md:ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -56,3 +56,24 @@ const t = i18nit(currentLang);
     }
   </div>
 </nav>
+
+<style is:global>
+  .page-nav-btn {
+    background: color-mix(in srgb, var(--bg-color) 88%, transparent);
+    box-shadow: 0 3px 10px color-mix(in srgb, var(--shadow-color) 26%, transparent);
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease, color 0.22s ease;
+  }
+
+  .page-nav-btn:hover {
+    background: var(--button-hover-color);
+    border-color: color-mix(in srgb, var(--link-color) 45%, var(--button-border-color));
+    color: var(--link-color);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--shadow-color) 42%, transparent);
+  }
+
+  .page-nav-btn:active {
+    transform: translateY(0) scale(0.97);
+    box-shadow: 0 3px 9px color-mix(in srgb, var(--shadow-color) 26%, transparent);
+  }
+</style>

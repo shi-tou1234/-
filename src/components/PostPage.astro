@@ -34,30 +34,68 @@ function generatePostPreview(description: string, body: string, lang: string): s
 
 ---
 
-{
-    blogEntries.map((entry, index) => {
-        const categories = getPostCategories(entry, currentLang);
-        const preview = generatePostPreview(entry.data.description || '', entry.body || '', currentLang);
-        const readingMinutes = estimateReadingMinutes(entry.body || '');
+<section data-post-list class="post-list-shell relative">
+    <div data-post-list-skeleton class="post-list-skeleton" aria-hidden="true">
+        {Array.from({ length: 3 }).map(() => (
+            <div class="post-list-skeleton__item">
+                <div class="post-list-skeleton__cover"></div>
+                <div class="post-list-skeleton__content">
+                    <div class="post-list-skeleton__line post-list-skeleton__line--short"></div>
+                    <div class="post-list-skeleton__line"></div>
+                    <div class="post-list-skeleton__line"></div>
+                    <div class="post-list-skeleton__line post-list-skeleton__line--mini"></div>
+                </div>
+            </div>
+        ))}
+    </div>
 
-        return (
-            <PostCard
-                title={entry.data.title}
-                description={entry.data.description}
-                image={blogCoverUrl(entry.data.image, entry.id)}
-                pubDate={entry.data.pubDate}
-                url={entry.id}
-                fallback={entry.isFallback}
-                categories={categories}
-                preview={preview}
-                readingMinutes={readingMinutes}
-                aosDelay={index * 80}
-            />
-        );
-    })
-}
+    <div data-post-list-content class="post-list-content">
+        {
+            blogEntries.map((entry, index) => {
+                const categories = getPostCategories(entry, currentLang);
+                const preview = generatePostPreview(entry.data.description || '', entry.body || '', currentLang);
+                const readingMinutes = estimateReadingMinutes(entry.body || '');
+
+                return (
+                    <PostCard
+                        title={entry.data.title}
+                        description={entry.data.description}
+                        image={blogCoverUrl(entry.data.image, entry.id)}
+                        pubDate={entry.data.pubDate}
+                        url={entry.id}
+                        fallback={entry.isFallback}
+                        categories={categories}
+                        preview={preview}
+                        readingMinutes={readingMinutes}
+                        aosDelay={index * 95}
+                    />
+                );
+            })
+        }
+    </div>
+</section>
 
 <script is:inline>
+    function initPostListLoading() {
+        const shell = document.querySelector('[data-post-list]');
+        const skeleton = document.querySelector('[data-post-list-skeleton]');
+        const content = document.querySelector('[data-post-list-content]');
+        if (!(shell instanceof HTMLElement) || !(skeleton instanceof HTMLElement) || !(content instanceof HTMLElement)) return;
+
+        const oldTimer = window.__postListLoadingTimer;
+        if (typeof oldTimer === 'number') {
+            window.clearTimeout(oldTimer);
+        }
+
+        shell.classList.add('is-loading');
+        content.classList.remove('is-ready');
+
+        window.__postListLoadingTimer = window.setTimeout(() => {
+            shell.classList.remove('is-loading');
+            content.classList.add('is-ready');
+        }, 340);
+    }
+
     function initPostCardReveal() {
         const cards = Array.from(document.querySelectorAll('[data-card-reveal]'));
         if (cards.length === 0) return;
@@ -96,8 +134,8 @@ function generatePostPreview(description: string, body: string, lang: string): s
             },
             {
                 root: null,
-                rootMargin: '0px 0px -10% 0px',
-                threshold: 0.12,
+                rootMargin: '0px 0px -12% 0px',
+                threshold: 0.08,
             },
         );
 
@@ -105,7 +143,98 @@ function generatePostPreview(description: string, body: string, lang: string): s
         window.__postCardRevealObserver = observer;
     }
 
+    initPostListLoading();
     initPostCardReveal();
+    document.addEventListener('astro:page-load', initPostListLoading);
+    document.addEventListener('astro:after-swap', initPostListLoading);
     document.addEventListener('astro:page-load', initPostCardReveal);
     document.addEventListener('astro:after-swap', initPostCardReveal);
 </script>
+
+<style is:global>
+    .post-list-shell {
+        position: relative;
+    }
+
+    .post-list-content {
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .post-list-content.is-ready {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .post-list-skeleton {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        gap: 1rem;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.26s ease;
+    }
+
+    .post-list-shell.is-loading .post-list-skeleton {
+        opacity: 1;
+    }
+
+    .post-list-shell.is-loading .post-list-content {
+        opacity: 0;
+    }
+
+    .post-list-skeleton__item {
+        border: 1px solid var(--button-border-color);
+        border-radius: 0.9rem;
+        overflow: hidden;
+        background: color-mix(in srgb, var(--bg-color) 90%, var(--button-hover-color));
+    }
+
+    .post-list-skeleton__cover {
+        height: 10rem;
+        background: linear-gradient(100deg, color-mix(in srgb, var(--button-hover-color) 76%, transparent), color-mix(in srgb, var(--bg-color) 86%, transparent), color-mix(in srgb, var(--button-hover-color) 76%, transparent));
+        background-size: 220% 100%;
+        animation: post-list-skeleton-wave 1.5s linear infinite;
+    }
+
+    .post-list-skeleton__content {
+        padding: 1rem;
+        display: grid;
+        gap: 0.5rem;
+    }
+
+    .post-list-skeleton__line {
+        height: 0.78rem;
+        border-radius: 999px;
+        background: linear-gradient(100deg, color-mix(in srgb, var(--button-hover-color) 70%, transparent), color-mix(in srgb, var(--bg-color) 90%, transparent), color-mix(in srgb, var(--button-hover-color) 70%, transparent));
+        background-size: 220% 100%;
+        animation: post-list-skeleton-wave 1.5s linear infinite;
+    }
+
+    .post-list-skeleton__line--short {
+        width: 36%;
+    }
+
+    .post-list-skeleton__line--mini {
+        width: 22%;
+    }
+
+    @keyframes post-list-skeleton-wave {
+        0% { background-position: 100% 0; }
+        100% { background-position: -100% 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .post-list-skeleton,
+        .post-list-content {
+            transition: none !important;
+        }
+
+        .post-list-skeleton__cover,
+        .post-list-skeleton__line {
+            animation: none !important;
+        }
+    }
+</style>

@@ -164,6 +164,18 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 </div>
 
 <style is:global>
+#main-header {
+  transition: transform 0.3s ease, background-color 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease, backdrop-filter 0.28s ease;
+}
+
+#main-header.header-scrolled {
+  background-color: color-mix(in srgb, var(--bg-color) 72%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid color-mix(in srgb, var(--button-border-color) 70%, transparent);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--shadow-color) 35%, transparent);
+}
+
 .header-logo {
   font-family: "EB Garamond", cursive;
   letter-spacing: 1px;
@@ -234,12 +246,9 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 
   /* 移动端 (小于 776px) 的毛玻璃和阴影 */
   @media (max-width: 775px) {
-    #main-header {
-      /* 背景使用带透明度的变量颜色，配合 blur */
-      background-color: rgba(var(--bg-color, 255, 255, 255), 0.7); 
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(var(--button-border-color, 0, 0, 0), 0.1);
+    #main-header.header-scrolled {
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
     }
   }
 
@@ -467,6 +476,7 @@ if (document.readyState !== 'loading') {
     function updateHeader() {
       const currentScrollY = window.scrollY;
       const scrollDelta = currentScrollY - lastScrollY;
+      header.classList.toggle('header-scrolled', currentScrollY > 8);
 
       if (window.innerWidth < 776) {
         if (currentScrollY <= 50) {
@@ -502,6 +512,7 @@ if (document.readyState !== 'loading') {
   }
 
   document.addEventListener('astro:page-load', initHeaderScroll);
+  document.addEventListener('astro:after-swap', initHeaderScroll);
 </script>
 
 
