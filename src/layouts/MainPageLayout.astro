@@ -79,7 +79,14 @@ const isZh = lang === 'zh-cn';
   function shouldMountParticles() {
     const hasContainer = Boolean(document.getElementById(containerId));
     if (!hasContainer) return false;
-    return !window.location.pathname.includes("/admin");
+    if (window.location.pathname.includes("/admin")) return false;
+
+    // 移动端/弱网/省电偏好下禁用重粒子效果，优先保证可用性
+    if (window.matchMedia("(max-width: 900px)").matches) return false;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+    if (navigator.connection?.saveData) return false;
+
+    return true;
   }
 
   function isBlogDetailPage() {
@@ -217,7 +224,13 @@ const isZh = lang === 'zh-cn';
   }
 
   function initGlobalParticles() {
-    if (!shouldMountParticles()) return;
+    if (!shouldMountParticles()) {
+      const mounted = tsParticles.dom().find((item) => item.id === containerId);
+      if (mounted) {
+        mounted.destroy();
+      }
+      return;
+    }
     mountParticles();
     setupThemeWatcher();
   }
