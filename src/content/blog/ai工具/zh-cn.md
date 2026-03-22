@@ -19,7 +19,7 @@ slugId: ai工具
 
 [deepseek](https://chat.deepseek.com/)
 
-2025 问世的时候震惊全球，我也使用过一段时间，后来因为不支持多模态才转到 qwen 去了。数学推理能力没得说，现在更新后，支持 1M 上下文，思考和生成速度有了很大的提升，ocr2 开源后非常好用。
+2025 问世的时候震惊全球，我也使用过一段时间，后来因为不支持多模态才转到 qwen 去了。数学推理能力没得说，现在更新后，支持 1M 上下文，思考和生成速度有了很大的提升。
 
 [GLM](https://chat.z.ai/)
 
@@ -27,7 +27,7 @@ slugId: ai工具
 
 [Minimax](https://agent.minimaxi.com/)
 
-有点笨但 agent 速度是真的快。
+有点笨但 agent 速度是真的快，另外价格便宜。
 
 [Kimi](https://www.kimi.com/)
 
@@ -35,7 +35,7 @@ slugId: ai工具
 
 [豆包](https://www.doubao.com/chat/)
 
-有点笨，多模态。代码不行，生图水平 T0 级别，毋庸置疑。
+豆包2.0pro应该是目前国内最聪明的了，识图能力超过qwen3.5 plus，多模态。除了代码不行以外其他都无限接近gpt5.2pro和gemini 3pro了，就是思考速度有点慢，但是准确率有了很明显的进步，生图水平 T0 级别，毋庸置疑。
 
 [GPT](https://chatgpt.com/)
 
@@ -61,4 +61,4 @@ trae
 
 github codespace
 
-需要学生认证，要注册教育邮箱和上传相关申请材料，通过后获得 github pro 会员 2 年，可以免费在虚拟机上使用 gpt claude gemini 最新的模型，非常香。
+需要学生认证，要注册教育邮箱和上传相关申请材料，通过后获得 github pro 会员 2 年，可以免费在虚拟机上使用 gpt gemini 最新的模型，非常香。微软缩紧了教育账号的模型使用权限gpt5.4和claude不让用了，可恶！
