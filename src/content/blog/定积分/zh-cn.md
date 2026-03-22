@@ -3,7 +3,7 @@ title: 定积分
 pubDate: 2026-02-18T04:56:00.000Z
 draft: false
 description: 
-category: 数学笔记
+category: 高数
 slugId: 定积分
 ---
 
