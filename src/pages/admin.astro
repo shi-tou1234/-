@@ -174,6 +174,12 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
                   <label class="block text-sm mb-1">分类</label>
                   <input id="post-category" list="post-category-options" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="可选择已有分类，也可直接输入新分类" />
                   <datalist id="post-category-options"></datalist>
+                  <div class="mt-2 flex items-center gap-2">
+                    <label class="text-xs text-[var(--text-color)]/70">已有分类：</label>
+                    <select id="post-category-select" class="min-w-[10rem] rounded border border-[var(--button-border-color)] bg-transparent px-2 py-1.5 text-sm">
+                      <option value="">手动输入新分类</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             </details>
@@ -304,6 +310,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   const adminPanel = document.getElementById("admin-panel");
   const loginMsg = document.getElementById("login-msg");
   const categoryDatalist = document.getElementById("post-category-options");
+  const categorySelect = document.getElementById("post-category-select");
 
   const savedApiUrl = localStorage.getItem(ADMIN_GH_API_URL_KEY) || GITHUB_API_DEFAULT;
 
@@ -748,6 +755,26 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       option.value = category;
       categoryDatalist.appendChild(option);
     });
+
+    if (categorySelect instanceof HTMLSelectElement) {
+      categorySelect.innerHTML = "";
+
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = "手动输入新分类";
+      categorySelect.appendChild(placeholder);
+
+      unique.forEach((category) => {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+      });
+    }
+  }
+
+  function sanitizeMarkdownImageAlt(content) {
+    return String(content || "").replace(/!\[[^\]]*\]\(([^)]+)\)/g, (_matched, url) => `![](${url})`);
   }
 
   async function loadCategoryOptions() {
@@ -791,6 +818,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     if (descInput) descInput.value = "";
     if (coverInput) coverInput.value = "";
     if (categoryInput) categoryInput.value = "";
+    if (categorySelect instanceof HTMLSelectElement) categorySelect.value = "";
     if (contentInput) contentInput.value = "";
   }
 
@@ -912,7 +940,14 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     if (coverInput) coverInput.value = frontmatter.image || "";
     if (categoryInput) {
       const parsedCategories = extractCategoriesFromMarkdown(rawMarkdown);
-      categoryInput.value = frontmatter.category || parsedCategories[0] || "";
+      const currentCategory = frontmatter.category || parsedCategories[0] || "";
+      categoryInput.value = currentCategory;
+      if (categorySelect instanceof HTMLSelectElement) {
+        categorySelect.value = currentCategory;
+        if (categorySelect.value !== currentCategory) {
+          categorySelect.value = "";
+        }
+      }
     }
     if (contentInput) contentInput.value = (content || "").trim();
 
@@ -929,6 +964,19 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   });
 
   document.getElementById("refresh-post-list-btn")?.addEventListener("click", loadPostList);
+  categorySelect?.addEventListener("change", () => {
+    const picked = (categorySelect.value || "").trim();
+    const inputEl = document.getElementById("post-category");
+    if (inputEl && picked) inputEl.value = picked;
+  });
+  document.getElementById("post-category")?.addEventListener("input", () => {
+    if (!(categorySelect instanceof HTMLSelectElement)) return;
+    const value = (document.getElementById("post-category")?.value || "").trim();
+    categorySelect.value = value;
+    if (categorySelect.value !== value) {
+      categorySelect.value = "";
+    }
+  });
   document.getElementById("load-selected-post-btn")?.addEventListener("click", async () => {
     const msgEl = document.getElementById("post-msg");
     try {
@@ -1080,7 +1128,9 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const description = (document.getElementById("post-desc")?.value || "").trim();
       const image = (document.getElementById("post-cover")?.value || "").trim();
       const category = (document.getElementById("post-category")?.value || "").trim();
-      const content = document.getElementById("post-content")?.value || "";
+      const contentInput = document.getElementById("post-content");
+      const content = sanitizeMarkdownImageAlt(contentInput?.value || "");
+      if (contentInput) contentInput.value = content;
       const inputSlug = ensurePostSlug();
       const fallbackSlug = normalizeSlug(title);
       const slug = inputSlug || fallbackSlug || `post-${Date.now()}`;
