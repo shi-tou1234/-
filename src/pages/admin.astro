@@ -172,7 +172,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
                 </div>
                 <div>
                   <label class="block text-sm mb-1">分类</label>
-                  <input id="post-category" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="例如：技术" />
+                  <input id="post-category" list="post-category-options" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="可选择已有分类，也可直接输入新分类" />
+                  <datalist id="post-category-options"></datalist>
                 </div>
               </div>
             </details>
@@ -297,10 +298,12 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   const ADMIN_SECURITY_URL = new URL("admin-security.json", `${window.location.origin}${BASE_URL}`).toString();
   const HEADER_CONTACT_PATH = "src/data/header-contact.ts";
   const ABOUT_PROFILE_PATH = "src/data/about-profile.ts";
+  const CATEGORY_OPTIONS_LIMIT = 120;
 
   const loginSection = document.getElementById("login-section");
   const adminPanel = document.getElementById("admin-panel");
   const loginMsg = document.getElementById("login-msg");
+  const categoryDatalist = document.getElementById("post-category-options");
 
   const savedApiUrl = localStorage.getItem(ADMIN_GH_API_URL_KEY) || GITHUB_API_DEFAULT;
 
@@ -397,8 +400,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     await adminService.loadSecurityConfig();
   }
 
-  async function getFileMeta(repoPath, token, branch) {
-    return adminService.getFileMeta(repoPath, token, branch);
+  async function getFileMeta(repoPath, token, branch, allowReadonlyFallback = true) {
+    return adminService.getFileMeta(repoPath, token, branch, allowReadonlyFallback);
   }
 
   async function upsertFile(repoPath, content, message, token, branch) {
@@ -698,6 +701,79 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     return { frontmatter, content: bodyContent };
   }
 
+  function extractCategoriesFromMarkdown(markdown) {
+    const matched = String(markdown || "").match(/^---\n([\s\S]*?)\n---/);
+    if (!matched?.[1]) return [];
+
+    const frontmatter = matched[1];
+    const values = [];
+
+    const singleCategory = frontmatter.match(/^category:\s*(.+)$/m)?.[1];
+    if (singleCategory) {
+      values.push(singleCategory.trim().replace(/^['"]|['"]$/g, ""));
+    }
+
+    const inlineCategories = frontmatter.match(/^categories:\s*\[(.+)\]\s*$/m)?.[1];
+    if (inlineCategories) {
+      inlineCategories
+        .split(",")
+        .map((item) => item.trim().replace(/^['"]|['"]$/g, ""))
+        .filter(Boolean)
+        .forEach((item) => values.push(item));
+    }
+
+    const blockCategories = frontmatter.match(/^categories:\s*\n((?:\s*-\s*.+\n?)*)/m)?.[1] || "";
+    if (blockCategories) {
+      blockCategories
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => /^-\s+/.test(line))
+        .map((line) => line.replace(/^-\s+/, "").trim().replace(/^['"]|['"]$/g, ""))
+        .filter(Boolean)
+        .forEach((item) => values.push(item));
+    }
+
+    return [...new Set(values.filter(Boolean))];
+  }
+
+  function renderCategoryOptions(categories) {
+    if (!(categoryDatalist instanceof HTMLDataListElement)) return;
+    const unique = [...new Set(categories.map((item) => String(item).trim()).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, "zh-Hans-CN", { sensitivity: "base" }))
+      .slice(0, CATEGORY_OPTIONS_LIMIT);
+
+    categoryDatalist.innerHTML = "";
+    unique.forEach((category) => {
+      const option = document.createElement("option");
+      option.value = category;
+      categoryDatalist.appendChild(option);
+    });
+  }
+
+  async function loadCategoryOptions() {
+    const token = getToken();
+    const branch = getBranch();
+    if (!token) {
+      renderCategoryOptions([]);
+      return;
+    }
+
+    const entries = await listBlogMarkdownEntries(token, branch);
+    const sampleEntries = entries.slice(0, CATEGORY_OPTIONS_LIMIT);
+    const categorySet = new Set();
+
+    for (const entry of sampleEntries) {
+      try {
+        const meta = await getFileMeta(entry.path, token, branch, false);
+        const markdown = decodeFileContent(meta?.content || "");
+        extractCategoriesFromMarkdown(markdown).forEach((category) => categorySet.add(category));
+      } catch {
+      }
+    }
+
+    renderCategoryOptions(Array.from(categorySet));
+  }
+
   function clearPostEditor() {
     const titleInput = document.getElementById("post-title");
     const slugInput = document.getElementById("post-slug");
@@ -791,10 +867,12 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
     if (usedFallback) {
       setMsg(msgEl, `已加载 ${entries.length} 篇文章（回退模式：GitHub API 不可达）`);
+      await loadCategoryOptions().catch(() => {});
       return;
     }
 
     setMsg(msgEl, `已加载 ${entries.length} 篇文章`);
+    await loadCategoryOptions().catch(() => {});
   }
 
   async function loadSelectedPostToEditor() {
@@ -832,7 +910,10 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     if (dateInput) dateInput.value = toDateTimeLocalValue(frontmatter.pubDate || "") || getNowDateTimeLocal();
     if (descInput) descInput.value = frontmatter.description || "";
     if (coverInput) coverInput.value = frontmatter.image || "";
-    if (categoryInput) categoryInput.value = frontmatter.category || "";
+    if (categoryInput) {
+      const parsedCategories = extractCategoriesFromMarkdown(rawMarkdown);
+      categoryInput.value = frontmatter.category || parsedCategories[0] || "";
+    }
     if (contentInput) contentInput.value = (content || "").trim();
 
     setMsg(msgEl, `已载入：${slug} (${lang})`);
@@ -964,7 +1045,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const coverNameToSkip = coverWasEmpty && firstImage ? firstImage.name : "";
 
       const snippets = uploaded.filter((f) => f.name !== coverNameToSkip).map((f) => {
-        if (f.type.startsWith("image/")) return `![${f.name}](./assets/${f.name})`;
+        if (f.type.startsWith("image/")) return `![](./assets/${f.name})`;
         if (f.type.startsWith("video/")) return `<video controls src=\"./assets/${f.name}\"></video>`;
         return `[${f.name}](./assets/${f.name})`;
       }).join("\n\n");
