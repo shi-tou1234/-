@@ -3,7 +3,7 @@ title: 空间曲面与曲线例题分享
 pubDate: 2026-03-16T08:04:00.000Z
 draft: false
 description: 
-category: 数学笔记
+category: 高数
 slugId: 空间曲面与曲线例题分享
 ---
 
