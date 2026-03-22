@@ -3,7 +3,7 @@ title: 空间向量直线和平面例题分享
 pubDate: 2026-03-14T11:37:00.000Z
 draft: false
 description: 
-category: 数学笔记
+category: 高数
 slugId: 空间向量直线和平面例题分享
 ---
 
