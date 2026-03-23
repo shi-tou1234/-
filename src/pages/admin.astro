@@ -170,13 +170,13 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
                   <label class="block text-sm mb-1">封面路径</label>
                   <input id="post-cover" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="例如：./assets/cover.jpg" />
                 </div>
-                <div>
+                <div class="min-w-0">
                   <label class="block text-sm mb-1">分类</label>
                   <input id="post-category" list="post-category-options" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="可选择已有分类，也可直接输入新分类" />
                   <datalist id="post-category-options"></datalist>
-                  <div class="mt-2 flex flex-col items-stretch gap-1 sm:flex-row sm:items-center">
+                  <div class="mt-2 flex flex-col items-stretch gap-1 sm:flex-row sm:items-center sm:min-w-0">
                     <label class="text-xs text-[var(--text-color)]/70 sm:shrink-0 sm:whitespace-nowrap">已有分类：</label>
-                    <select id="post-category-select" class="w-full min-w-0 rounded border border-[var(--button-border-color)] bg-[var(--bg-color)] px-2 py-1.5 text-sm text-[var(--text-color)] sm:w-auto sm:min-w-[10rem]">
+                    <select id="post-category-select" class="w-full min-w-0 flex-1 rounded border border-[var(--button-border-color)] bg-[var(--bg-color)] px-2 py-1.5 text-sm text-[var(--text-color)]">
                       <option value="">手动输入新分类</option>
                     </select>
                   </div>
