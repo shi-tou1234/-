@@ -174,9 +174,9 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
                   <label class="block text-sm mb-1">分类</label>
                   <input id="post-category" list="post-category-options" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="可选择已有分类，也可直接输入新分类" />
                   <datalist id="post-category-options"></datalist>
-                  <div class="mt-2 flex items-center gap-2">
-                    <label class="text-xs text-[var(--text-color)]/70">已有分类：</label>
-                    <select id="post-category-select" class="min-w-[10rem] rounded border border-[var(--button-border-color)] bg-transparent px-2 py-1.5 text-sm">
+                  <div class="mt-2 flex flex-col items-stretch gap-1 sm:flex-row sm:items-center">
+                    <label class="text-xs text-[var(--text-color)]/70 sm:shrink-0 sm:whitespace-nowrap">已有分类：</label>
+                    <select id="post-category-select" class="w-full min-w-0 rounded border border-[var(--button-border-color)] bg-[var(--bg-color)] px-2 py-1.5 text-sm text-[var(--text-color)] sm:w-auto sm:min-w-[10rem]">
                       <option value="">手动输入新分类</option>
                     </select>
                   </div>
@@ -1424,3 +1424,22 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     }
   });
 </script>
+
+<style is:global>
+  #post-category-select {
+    appearance: auto;
+  }
+
+  [data-theme="light"] #post-category-select {
+    color-scheme: light;
+  }
+
+  [data-theme="dark"] #post-category-select {
+    color-scheme: dark;
+  }
+
+  #post-category-select option {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+</style>
