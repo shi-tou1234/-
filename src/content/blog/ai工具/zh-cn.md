@@ -39,6 +39,10 @@ slugId: ai工具
 
 豆包2.0pro应该是目前国内最聪明的了，识图能力超过qwen3.5 plus，多模态。除了代码不行以外其他都无限接近gpt5.2pro和gemini 3pro了，就是思考速度有点慢，但是准确率有了很明显的进步，生图水平 T0 级别，毋庸置疑。
 
+[xiaomi mimo studio](https://aistudio.xiaomimimo.com/#/c)
+
+小米自研的大模型，跑分真不真实不知道，v2-flash速度这一块还是可以的，在open rounter上的调用量方面增长非常快，说明能力是不错的。pro挺适配claw的，但是识图能力和deepseek是类似的，只能识别文字，多模态识图只能转换为ommi，目前使用感觉还是不错的，期待进一步的测试
+
 [GPT](https://chatgpt.com/)
 
 需要梯子，写文章水平很高，推理能力很强，后端和程序改错能力很强，免费用户额度有限。
