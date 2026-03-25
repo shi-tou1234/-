@@ -6,6 +6,7 @@ import Markdown from '@components/misc/Markdown.astro'
 import ImageModule from '@components/misc/ImageModule.astro'
 import BackTop from '@components/control/BackTop.astro'
 import PostToc from '@components/control/PostToc.astro'
+import CategoryPostNavi from '@components/control/CategoryPostNavi.astro'
 import LicenseCard from '@components/misc/LicenseCard.astro'
 import BlogNavi from '@components/control/BlogNavi.astro'
 import ReadingTime from '@components/misc/ReadingTime.astro'
@@ -18,6 +19,7 @@ import { blogCoverUrl, getRelativeLocaleUrl } from '@/utils/url-utils'
 import { formatFullDate } from '@/utils/time'
 import { getBlogEntrySort } from '@utils/content-utils'
 import { estimateReadingMinutes, estimateWordCount } from '@utils/reading-time'
+import { getPostCategories, encodeCategoryParam } from '@utils/blog-taxonomy'
 
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
@@ -64,6 +66,15 @@ const readingMinutes = estimateReadingMinutes(entry.body || '');
 const wordCount = estimateWordCount(entry.body || '');
 const backButtonText = currentLang === 'zh-cn' ? '返回上一页' : 'Back to previous page';
 const backFallbackUrl = getRelativeLocaleUrl(currentLang, '/');
+const allBlogPosts = await getBlogEntrySort(currentLang);
+const currentCategories = getPostCategories(entry, currentLang);
+const activeCategory = currentCategories[0] || '';
+const sameCategoryPosts = activeCategory
+    ? allBlogPosts
+        .filter((post) => post.id !== entry.id && getPostCategories(post, currentLang).includes(activeCategory))
+        .slice(0, 20)
+    : [];
+const categoryPageUrl = getRelativeLocaleUrl(currentLang, `/categories/${encodeCategoryParam(activeCategory)}`);
 
 ---
 <MainPageLayout title={pageTitle} lang={currentLang}>
@@ -118,6 +129,14 @@ const backFallbackUrl = getRelativeLocaleUrl(currentLang, '/');
 
     <BackTop />
     <PostToc title={t('toc')} />
+    {sameCategoryPosts.length > 0 && activeCategory && (
+        <CategoryPostNavi
+            language={currentLang}
+            category={activeCategory}
+            posts={sameCategoryPosts}
+            categoryPageUrl={categoryPageUrl}
+        />
+    )}
 </MainPageLayout>
 
 <script define:vars={{ backFallbackUrl }}>
