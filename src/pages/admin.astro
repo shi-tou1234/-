@@ -269,6 +269,32 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
             </div>
             <p id="header-contact-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
           </div>
+
+          <div class="rounded border border-[var(--button-border-color)] p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <div class="text-sm font-semibold">博客介绍弹窗内容</div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button id="load-blog-guide-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
+                <button id="save-blog-guide-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <p class="text-xs font-semibold text-[var(--text-color)]/75">中文（zh-cn）</p>
+                <input id="blog-guide-zh-title" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="标题" />
+                <input id="blog-guide-zh-subtitle" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="副标题" />
+                <textarea id="blog-guide-zh-items" class="w-full min-h-[140px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="每行一条功能说明"></textarea>
+              </div>
+              <div class="space-y-2">
+                <p class="text-xs font-semibold text-[var(--text-color)]/75">English（en）</p>
+                <input id="blog-guide-en-title" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="Title" />
+                <input id="blog-guide-en-subtitle" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="Subtitle" />
+                <textarea id="blog-guide-en-items" class="w-full min-h-[140px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="One item per line"></textarea>
+              </div>
+            </div>
+            <p class="text-xs mt-2 text-[var(--text-color)]/65">提示：列表项按“每行一条”填写，保存后前台弹窗实时使用该内容。</p>
+            <p id="blog-guide-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
+          </div>
         </div>
       </div>
     </section>
@@ -281,6 +307,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     GitHubApiError,
     buildAboutProfileTs,
     buildFriendLinksTs,
+    buildBlogGuideContentTs,
     buildHeaderContactTs,
     buildPostMarkdown,
     decodeFileContent,
@@ -288,6 +315,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     normalizeSlug,
     parseAboutProfileFromTs,
     parseFriendLinksFromTs,
+    parseBlogGuideContentFromTs,
     parseHeaderContactFromTs,
     toIsoDateTime
   } from "@/utils/admin-service";
@@ -304,6 +332,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   const ADMIN_SECURITY_URL = new URL("admin-security.json", `${window.location.origin}${BASE_URL}`).toString();
   const HEADER_CONTACT_PATH = "src/data/header-contact.ts";
   const ABOUT_PROFILE_PATH = "src/data/about-profile.ts";
+  const BLOG_GUIDE_CONTENT_PATH = "src/data/blog-guide-content.ts";
   const CATEGORY_OPTIONS_LIMIT = 120;
 
   const loginSection = document.getElementById("login-section");
@@ -1420,6 +1449,68 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const content = buildHeaderContactTs({ githubUrl, email });
       await upsertFile(HEADER_CONTACT_PATH, content, "header: update contact links", token, branch);
       setMsg(msgEl, "联系方式保存成功");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("load-blog-guide-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("blog-guide-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const meta = await getFileMeta(BLOG_GUIDE_CONTENT_PATH, token, branch);
+      const content = decodeFileContent(meta?.content || "");
+      const guide = parseBlogGuideContentFromTs(content);
+
+      document.getElementById("blog-guide-zh-title").value = guide?.["zh-cn"]?.title || "";
+      document.getElementById("blog-guide-zh-subtitle").value = guide?.["zh-cn"]?.subtitle || "";
+      document.getElementById("blog-guide-zh-items").value = (guide?.["zh-cn"]?.items || []).join("\n");
+
+      document.getElementById("blog-guide-en-title").value = guide?.en?.title || "";
+      document.getElementById("blog-guide-en-subtitle").value = guide?.en?.subtitle || "";
+      document.getElementById("blog-guide-en-items").value = (guide?.en?.items || []).join("\n");
+      setMsg(msgEl, "博客介绍弹窗内容加载成功");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("save-blog-guide-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("blog-guide-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const zhTitle = (document.getElementById("blog-guide-zh-title")?.value || "").trim();
+      const zhSubtitle = (document.getElementById("blog-guide-zh-subtitle")?.value || "").trim();
+      const zhItems = (document.getElementById("blog-guide-zh-items")?.value || "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+
+      const enTitle = (document.getElementById("blog-guide-en-title")?.value || "").trim();
+      const enSubtitle = (document.getElementById("blog-guide-en-subtitle")?.value || "").trim();
+      const enItems = (document.getElementById("blog-guide-en-items")?.value || "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+
+      if (!zhTitle || !zhSubtitle || zhItems.length === 0) throw new Error("请完整填写中文弹窗内容");
+      if (!enTitle || !enSubtitle || enItems.length === 0) throw new Error("请完整填写英文弹窗内容");
+
+      const content = buildBlogGuideContentTs({
+        "zh-cn": {
+          title: zhTitle,
+          subtitle: zhSubtitle,
+          items: zhItems,
+        },
+        en: {
+          title: enTitle,
+          subtitle: enSubtitle,
+          items: enItems,
+        },
+      });
+
+      await upsertFile(BLOG_GUIDE_CONTENT_PATH, content, "guide: update blog guide content", token, branch);
+      setMsg(msgEl, "博客介绍弹窗内容保存成功");
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }

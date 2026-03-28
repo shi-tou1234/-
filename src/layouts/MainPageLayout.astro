@@ -3,6 +3,7 @@ import Layout from '@layouts/Layout.astro';
 import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
 import Search from '@components/misc/Search.astro';
+import blogGuideContent from '@/data/blog-guide-content';
 
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
 }
 const { title, lang, updateNotice = null } = Astro.props;
 const isZh = lang === 'zh-cn';
+const guideText = isZh ? blogGuideContent['zh-cn'] : blogGuideContent.en;
 
 ---
 
@@ -36,36 +38,16 @@ const isZh = lang === 'zh-cn';
       <div class="blog-guide-panel mx-auto w-[min(94vw,920px)] rounded-xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/97 p-6 text-[var(--text-color)] shadow-[0_8px_24px_var(--shadow-color)]">
         <div class="flex items-start justify-between gap-3">
           <div>
-            <h2 id="blog-guide-title" class="text-2xl font-bold">{isZh ? '博客功能简介' : 'Blog Quick Guide'}</h2>
-            <p class="text-sm text-[var(--text-color)]/80 mt-1">{isZh ? '首次访问会自动弹出，关闭后可用右上角问号按钮再次打开。' : 'Shown on first visit. Reopen anytime with the top-right question button.'}</p>
+            <h2 id="blog-guide-title" class="text-2xl font-bold">{guideText.title}</h2>
+            <p class="text-sm text-[var(--text-color)]/80 mt-1">{guideText.subtitle}</p>
           </div>
           <button id="blog-guide-close-btn" type="button" class="rounded-lg border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">{isZh ? '关闭' : 'Close'}</button>
         </div>
 
         <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm leading-7 text-[var(--text-color)]/95">
-          {isZh ? (
-            <>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 首页更新提示：后台更新旧文或新文后，首页会弹出一次更新通知，可直接跳转到最新文章。</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 顶部导航：快速进入首页、归档、分类、关于、友链等页面；移动端可在菜单里操作。</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 搜索功能：支持标题与正文关键词检索，快捷键 `/` 或 `Ctrl/Cmd + K` 可快速打开。</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 主题切换：支持亮色/暗色主题，系统会记住你的偏好设置。</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 文章卡片：展示分类标签、阅读时长与摘要，点击进入详情可继续阅读。</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 正文阅读：支持目录定位、公式、代码块、高亮链接与图片灯箱预览。</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 分类与归档：可按主题或时间线筛选历史内容，快速定位同类文章。</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 便捷操作：右下角返回顶部，长文阅读后可一键回到页面顶部。</p>
-            </>
-          ) : (
-            <>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Homepage update notice: after publishing new or revised posts, a one-time popup appears with direct navigation.</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Top navigation: jump to Home, Archives, Categories, About, and Friends, with mobile menu support.</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Search: find posts by title/body keywords, and open quickly with `/` or `Ctrl/Cmd + K`.</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Theme switch: toggle light/dark mode; your preference is remembered locally.</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Post cards: include category tags, reading time, and summary previews for faster scanning.</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Reading experience: supports TOC navigation, math, code blocks, enhanced links, and image lightbox.</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Categories and archives: browse historical posts by topic or timeline.</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Convenience tools: use the back-to-top button for long-form reading.</p>
-            </>
-          )}
+          {guideText.items.map((item) => (
+            <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• {item}</p>
+          ))}
         </div>
       </div>
       </div>
@@ -332,7 +314,6 @@ const isZh = lang === 'zh-cn';
         modal.classList.add("is-open");
         syncPageScrollLock();
       });
-      openBtn.classList.add("hidden");
     } else {
       modal.classList.remove("is-open");
       guideHideTimer = setTimeout(() => {
@@ -341,7 +322,6 @@ const isZh = lang === 'zh-cn';
         }
       }, guideHideDuration);
       syncPageScrollLock();
-      openBtn.classList.remove("hidden");
     }
   }
 

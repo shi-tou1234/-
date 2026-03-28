@@ -155,6 +155,25 @@ export function buildHeaderContactTs(contact: {
   return `export type HeaderContact = {\n  githubUrl: string\n  email: string\n}\n\nconst headerContact: HeaderContact = ${JSON.stringify(contact, null, 2)}\n\nexport default headerContact\n`;
 }
 
+export function parseBlogGuideContentFromTs(content: string) {
+  const matched = content.match(
+    /const\s+blogGuideContent:\s*BlogGuideContent\s*=\s*(\{[\s\S]*?\})\s*\n\s*export\s+default\s+blogGuideContent/,
+  );
+  if (!matched?.[1]) throw new Error("无法解析博客介绍弹窗内容文件");
+
+  const raw = matched[1]
+    .replace(/(\{|,)\s*(zh-cn|en)\s*:/g, '$1 "$2":')
+    .replace(/\n\s*\/\/.*$/gm, "");
+  return JSON.parse(raw);
+}
+
+export function buildBlogGuideContentTs(content: {
+  "zh-cn": { title: string; subtitle: string; items: string[] };
+  en: { title: string; subtitle: string; items: string[] };
+}) {
+  return `export type BlogGuideLocaleContent = {\n  title: string;\n  subtitle: string;\n  items: string[];\n};\n\nexport type BlogGuideContent = {\n  "zh-cn": BlogGuideLocaleContent;\n  en: BlogGuideLocaleContent;\n};\n\nconst blogGuideContent: BlogGuideContent = ${JSON.stringify(content, null, 2)};\n\nexport default blogGuideContent;\n`;
+}
+
 export function parseAboutProfileFromTs(content: string) {
   const matched = content.match(
     /const\s+aboutProfile:\s*AboutProfile\s*=\s*(\{[\s\S]*?\})\s*\n\s*export\s+default\s+aboutProfile/,
