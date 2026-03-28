@@ -24,8 +24,12 @@ export async function getBlogEntrySort(
   };
 
   const defaultSort = (a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => {
-    const timeDiff = b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+    const aTime = (a.data.updatedDate || a.data.pubDate).valueOf();
+    const bTime = (b.data.updatedDate || b.data.pubDate).valueOf();
+    const timeDiff = bTime - aTime;
     if (timeDiff !== 0) return timeDiff;
+    const pubDateDiff = b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+    if (pubDateDiff !== 0) return pubDateDiff;
     return b.id.localeCompare(a.id);
   };
 

@@ -8,8 +8,14 @@ import Search from '@components/misc/Search.astro';
 interface Props {
   title: string;
   lang: string;
+  updateNotice?: {
+    title: string;
+    url: string;
+    updatedAt: string;
+    version: string;
+  } | null;
 }
-const { title, lang } = Astro.props;
+const { title, lang, updateNotice = null } = Astro.props;
 const isZh = lang === 'zh-cn';
 
 ---
@@ -65,12 +71,45 @@ const isZh = lang === 'zh-cn';
       </div>
     </div>
 
+    {updateNotice && (
+      <div id="blog-update-modal" class="hidden fixed inset-0 z-[1400]" role="dialog" aria-modal="true" aria-labelledby="blog-update-title">
+        <div id="blog-update-mask" class="absolute inset-0 bg-black/35 backdrop-blur-[2px]"></div>
+        <div class="relative z-10 flex min-h-full items-center justify-center px-4 py-10">
+          <div class="blog-update-panel w-[min(92vw,560px)] rounded-xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/98 p-6 shadow-[0_12px_30px_var(--shadow-color)] text-[var(--text-color)]">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h2 id="blog-update-title" class="text-2xl font-bold">{isZh ? '博客有新更新' : 'Blog Updated'}</h2>
+                <p class="mt-1 text-sm text-[var(--text-color)]/78">{isZh ? '检测到你上次访问后有新内容更新。' : 'New updates were published since your last visit.'}</p>
+              </div>
+              <button id="blog-update-close-btn" type="button" class="rounded-lg border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">{isZh ? '关闭' : 'Close'}</button>
+            </div>
+
+            <div class="mt-5 rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/25 px-4 py-3">
+              <p class="text-sm text-[var(--text-color)]/70">{isZh ? '最新更新' : 'Latest update'}</p>
+              <p class="mt-1 text-base font-semibold leading-6">{updateNotice.title}</p>
+            </div>
+
+            <div class="mt-5 flex flex-wrap items-center gap-2">
+              <a
+                id="blog-update-jump-btn"
+                href={updateNotice.url}
+                class="inline-flex items-center rounded-lg border border-[var(--button-border-color)] px-4 py-2 text-sm font-semibold hover:bg-[var(--button-hover-color)]"
+              >
+                {isZh ? '前往查看更新' : 'View update'}
+              </a>
+              <button id="blog-update-ignore-btn" type="button" class="rounded-lg border border-[var(--button-border-color)] px-4 py-2 text-sm hover:bg-[var(--button-hover-color)]">{isZh ? '稍后再看' : 'Maybe later'}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
     <Footer />
     <Search />
   </div>
 </Layout>
 
-<script>
+<script define:vars={{ isZh, updateNotice }}>
   import { tsParticles } from "@tsparticles/engine";
   import { loadSlim } from "@tsparticles/slim";
 
@@ -223,8 +262,10 @@ const isZh = lang === 'zh-cn';
   }
 
   const blogGuideSeenKey = "cmchen_blog_guide_seen_v1";
+  const blogUpdateSeenVersionKey = "cmchen_blog_update_seen_version_v1";
   const guideHideDuration = 260;
   let guideHideTimer = null;
+  let updateHideTimer = null;
 
   function setPageScrollLocked(locked) {
     if (locked) {
@@ -236,6 +277,12 @@ const isZh = lang === 'zh-cn';
       document.body.style.overflow = "";
       document.body.style.touchAction = "";
     }
+  }
+
+  function syncPageScrollLock() {
+    const guideOpen = document.getElementById("blog-guide-modal")?.classList.contains("is-open");
+    const updateOpen = document.getElementById("blog-update-modal")?.classList.contains("is-open");
+    setPageScrollLocked(Boolean(guideOpen || updateOpen));
   }
 
   function shouldEnableGuide() {
@@ -256,8 +303,8 @@ const isZh = lang === 'zh-cn';
       modal.classList.remove("hidden");
       requestAnimationFrame(() => {
         modal.classList.add("is-open");
+        syncPageScrollLock();
       });
-      setPageScrollLocked(true);
       openBtn.classList.add("hidden");
     } else {
       modal.classList.remove("is-open");
@@ -266,8 +313,91 @@ const isZh = lang === 'zh-cn';
           modal.classList.add("hidden");
         }
       }, guideHideDuration);
-      setPageScrollLocked(false);
+      syncPageScrollLock();
       openBtn.classList.remove("hidden");
+    }
+  }
+
+  function shouldEnableUpdateNotice() {
+    if (!updateNotice || !updateNotice.version || !updateNotice.url) return false;
+    const path = window.location.pathname.replace(/\/+$/, "") || "/";
+    return path === "/" || path === "/zh-cn" || path === "/en";
+  }
+
+  function setUpdateNoticeVisible(visible) {
+    const modal = document.getElementById("blog-update-modal");
+    if (!modal) return;
+
+    if (updateHideTimer) {
+      clearTimeout(updateHideTimer);
+      updateHideTimer = null;
+    }
+
+    if (visible) {
+      modal.classList.remove("hidden");
+      requestAnimationFrame(() => {
+        modal.classList.add("is-open");
+        syncPageScrollLock();
+      });
+      return;
+    }
+
+    modal.classList.remove("is-open");
+    updateHideTimer = setTimeout(() => {
+      if (!modal.classList.contains("is-open")) {
+        modal.classList.add("hidden");
+      }
+    }, guideHideDuration);
+    syncPageScrollLock();
+  }
+
+  function initBlogUpdateNotice() {
+    const modal = document.getElementById("blog-update-modal");
+    const closeBtn = document.getElementById("blog-update-close-btn");
+    const ignoreBtn = document.getElementById("blog-update-ignore-btn");
+    const jumpBtn = document.getElementById("blog-update-jump-btn");
+    const mask = document.getElementById("blog-update-mask");
+    if (!modal || !closeBtn || !ignoreBtn || !jumpBtn || !mask || !updateNotice) return;
+
+    if (!shouldEnableUpdateNotice()) {
+      modal.classList.add("hidden");
+      syncPageScrollLock();
+      return;
+    }
+
+    const seenVersion = localStorage.getItem(blogUpdateSeenVersionKey) || "";
+    const shouldOpen = seenVersion !== updateNotice.version;
+    setUpdateNoticeVisible(shouldOpen);
+
+    const markSeen = () => {
+      localStorage.setItem(blogUpdateSeenVersionKey, updateNotice.version);
+    };
+
+    const closeNotice = () => {
+      markSeen();
+      setUpdateNoticeVisible(false);
+    };
+
+    if (!closeBtn.dataset.bound) {
+      closeBtn.addEventListener("click", closeNotice);
+      closeBtn.dataset.bound = "1";
+    }
+
+    if (!ignoreBtn.dataset.bound) {
+      ignoreBtn.addEventListener("click", closeNotice);
+      ignoreBtn.dataset.bound = "1";
+    }
+
+    if (!mask.dataset.bound) {
+      mask.addEventListener("click", closeNotice);
+      mask.dataset.bound = "1";
+    }
+
+    if (!jumpBtn.dataset.bound) {
+      jumpBtn.addEventListener("click", () => {
+        markSeen();
+      });
+      jumpBtn.dataset.bound = "1";
     }
   }
 
@@ -313,10 +443,13 @@ const isZh = lang === 'zh-cn';
 
   initGlobalParticles();
   initBlogGuide();
+  initBlogUpdateNotice();
   document.addEventListener("astro:page-load", initGlobalParticles);
   document.addEventListener("astro:page-load", initBlogGuide);
+  document.addEventListener("astro:page-load", initBlogUpdateNotice);
   document.addEventListener("astro:after-swap", initGlobalParticles);
   document.addEventListener("astro:after-swap", initBlogGuide);
+  document.addEventListener("astro:after-swap", initBlogUpdateNotice);
 </script>
 
 <style is:global>
@@ -336,6 +469,26 @@ const isZh = lang === 'zh-cn';
 }
 
 #blog-guide-modal.is-open .blog-guide-panel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+#blog-update-modal #blog-update-mask {
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+#blog-update-modal .blog-update-panel {
+  opacity: 0;
+  transform: translateY(16px) scale(0.97);
+  transition: opacity 260ms cubic-bezier(0.2, 0.8, 0.2, 1), transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+#blog-update-modal.is-open #blog-update-mask {
+  opacity: 1;
+}
+
+#blog-update-modal.is-open .blog-update-panel {
   opacity: 1;
   transform: translateY(0) scale(1);
 }

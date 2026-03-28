@@ -1146,6 +1146,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const markdown = buildPostMarkdown({
         title,
         date,
+        updatedDate: new Date().toISOString(),
         description,
         image,
         category,

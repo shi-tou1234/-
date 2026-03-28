@@ -39,7 +39,12 @@ export const getStaticPaths = (async ({ paginate }) => {
     const localeCode = typeof locale === 'string' ? locale : locale.path;
     const localeParam = localeCode === i18n.defaultLocale ? undefined : localeCode;
     const blogEntries = await getBlogEntrySort(localeParam);
-    const sortedBlogEntries = [...blogEntries].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+    const sortedBlogEntries = [...blogEntries].sort((a, b) => {
+      const aTime = (a.data.updatedDate || a.data.pubDate).valueOf();
+      const bTime = (b.data.updatedDate || b.data.pubDate).valueOf();
+      if (bTime !== aTime) return bTime - aTime;
+      return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+    });
     const paginatedPaths = paginate(sortedBlogEntries, { 
       pageSize: siteConfig.pageSize,
       params: { locale: localeParam }
@@ -56,10 +61,20 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 const indexPage = getRelativeLocaleUrl(locale, '/');
 const pageTitle = `${siteConfig.title} - ${siteConfig.subTitle}`;
+const latestEntry = page.data[0];
+const latestUpdateDate = latestEntry ? (latestEntry.data.updatedDate || latestEntry.data.pubDate) : null;
+const updateNotice = latestEntry && latestUpdateDate
+  ? {
+      title: latestEntry.data.title,
+      url: getRelativeLocaleUrl(locale, `/blog/${latestEntry.id}`),
+      updatedAt: latestUpdateDate.toISOString(),
+      version: `${latestEntry.id}::${latestUpdateDate.toISOString()}`,
+    }
+  : null;
 
 ---
 
-<MainPageLayout title={pageTitle} lang={currentLang}>
+<MainPageLayout title={pageTitle} lang={currentLang} updateNotice={updateNotice}>
   <Cover title={t("cover.title.home")} subTitle={t("cover.subTitle.home")} signatures={coverSignatures} />
     <PostPage page={page} />
     <Navi page={page} />

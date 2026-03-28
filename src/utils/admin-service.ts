@@ -189,6 +189,7 @@ export function normalizeSlug(input: string): string {
 export function buildPostMarkdown(data: {
   title: string;
   date: string;
+  updatedDate?: string;
   description: string;
   image: string;
   category: string;
@@ -197,7 +198,8 @@ export function buildPostMarkdown(data: {
 }): string {
   const imageLine = data.image ? `image: ${data.image}\n` : "";
   const categoryLine = data.category ? `category: ${data.category}\n` : "";
-  return `---\ntitle: ${data.title}\npubDate: ${data.date}\ndraft: false\ndescription: ${data.description}\n${imageLine}${categoryLine}slugId: ${data.slugId}\n---\n\n${data.content}\n`;
+  const updatedDateLine = data.updatedDate ? `updatedDate: ${data.updatedDate}\n` : "";
+  return `---\ntitle: ${data.title}\npubDate: ${data.date}\n${updatedDateLine}draft: false\ndescription: ${data.description}\n${imageLine}${categoryLine}slugId: ${data.slugId}\n---\n\n${data.content}\n`;
 }
 
 export function toIsoDateTime(dateTimeLocalValue: string): string {
