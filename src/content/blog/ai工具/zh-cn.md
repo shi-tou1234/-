@@ -1,6 +1,7 @@
 ---
 title: AI工具
 pubDate: 2026-02-21T06:08:00.000Z
+updatedDate: 2026-03-28T06:47:38.920Z
 draft: false
 description: 
 category: 工具使用
@@ -9,7 +10,7 @@ slugId: ai工具
 
 这篇博客来推荐一下本人用过的一些 ai 工具以及怎么使用，后面会不断更新内容：
 
-更新时间2026.3.23
+更新时间2026.3.28
 
 大模型
 
