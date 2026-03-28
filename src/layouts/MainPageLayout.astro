@@ -289,6 +289,23 @@ const isZh = lang === 'zh-cn';
     }
   }
 
+  function safeStorageGet(key) {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  }
+
+  function safeStorageSet(key, value) {
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   function syncPageScrollLock() {
     const guideOpen = document.getElementById("blog-guide-modal")?.classList.contains("is-open");
     const updateOpen = document.getElementById("blog-update-modal")?.classList.contains("is-open");
@@ -375,12 +392,12 @@ const isZh = lang === 'zh-cn';
       return;
     }
 
-    const seenVersion = localStorage.getItem(blogUpdateSeenVersionKey) || "";
+    const seenVersion = safeStorageGet(blogUpdateSeenVersionKey) || "";
     const shouldOpen = seenVersion !== updateNotice.version;
     setUpdateNoticeVisible(shouldOpen);
 
     const markSeen = () => {
-      localStorage.setItem(blogUpdateSeenVersionKey, updateNotice.version);
+      safeStorageSet(blogUpdateSeenVersionKey, updateNotice.version);
     };
 
     const closeNotice = () => {
@@ -426,8 +443,10 @@ const isZh = lang === 'zh-cn';
     }
 
     openBtn.classList.add("inline-flex");
+    openBtn.classList.remove("hidden");
+    setGuideVisible(false);
 
-    const seen = localStorage.getItem(blogGuideSeenKey) === "1";
+    const seen = safeStorageGet(blogGuideSeenKey) === "1";
     setGuideVisible(!seen);
 
     if (!openBtn.dataset.bound) {
@@ -436,7 +455,7 @@ const isZh = lang === 'zh-cn';
     }
 
     const closeGuide = () => {
-      localStorage.setItem(blogGuideSeenKey, "1");
+      safeStorageSet(blogGuideSeenKey, "1");
       setGuideVisible(false);
     };
 
