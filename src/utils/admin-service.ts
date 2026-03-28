@@ -156,15 +156,23 @@ export function buildHeaderContactTs(contact: {
 }
 
 export function parseBlogGuideContentFromTs(content: string) {
-  const matched = content.match(
-    /const\s+blogGuideContent:\s*BlogGuideContent\s*=\s*(\{[\s\S]*?\})\s*\n\s*export\s+default\s+blogGuideContent/,
-  );
-  if (!matched?.[1]) throw new Error("无法解析博客介绍弹窗内容文件");
+  const marker = "const blogGuideContent";
+  const exportMarker = "export default blogGuideContent";
+  const start = content.indexOf(marker);
+  if (start < 0) throw new Error("无法解析博客介绍弹窗内容文件");
 
-  const raw = matched[1]
+  const eq = content.indexOf("=", start);
+  if (eq < 0) throw new Error("无法解析博客介绍弹窗内容文件");
+
+  const end = content.indexOf(exportMarker, eq);
+  if (end < 0) throw new Error("无法解析博客介绍弹窗内容文件");
+
+  const rawBlock = content.slice(eq + 1, end).trim().replace(/;\s*$/, "");
+  const normalized = rawBlock
     .replace(/(\{|,)\s*(zh-cn|en)\s*:/g, '$1 "$2":')
     .replace(/\n\s*\/\/.*$/gm, "");
-  return JSON.parse(raw);
+
+  return JSON.parse(normalized);
 }
 
 export function buildBlogGuideContentTs(content: {

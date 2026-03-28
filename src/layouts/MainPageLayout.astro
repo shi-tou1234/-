@@ -434,6 +434,20 @@ const guideText = isZh ? blogGuideContent['zh-cn'] : blogGuideContent.en;
       openBtn.dataset.bound = "1";
     }
 
+    const oldDelegatedHandler = window.__blogGuideDelegatedOpenHandler;
+    if (oldDelegatedHandler) {
+      document.removeEventListener("click", oldDelegatedHandler);
+    }
+    const delegatedHandler = (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const trigger = target.closest("#blog-guide-open-btn");
+      if (!trigger) return;
+      setGuideVisible(true);
+    };
+    document.addEventListener("click", delegatedHandler);
+    window.__blogGuideDelegatedOpenHandler = delegatedHandler;
+
     const closeGuide = () => {
       safeStorageSet(blogGuideSeenKey, "1");
       setGuideVisible(false);
