@@ -171,8 +171,20 @@ export function parseBlogGuideContentFromTs(content: string) {
   const normalized = rawBlock
     .replace(/(\{|,)\s*(zh-cn|en)\s*:/g, '$1 "$2":')
     .replace(/\n\s*\/\/.*$/gm, "");
-
-  return JSON.parse(normalized);
+  try {
+    return JSON.parse(normalized);
+  } catch {
+    try {
+      const evaluator = new Function(`return (${rawBlock});`);
+      const parsed = evaluator();
+      if (!parsed || typeof parsed !== "object") {
+        throw new Error("无法解析博客介绍弹窗内容文件");
+      }
+      return parsed;
+    } catch {
+      throw new Error("无法解析博客介绍弹窗内容文件");
+    }
+  }
 }
 
 export function buildBlogGuideContentTs(content: {

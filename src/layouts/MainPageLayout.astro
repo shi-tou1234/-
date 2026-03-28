@@ -464,15 +464,39 @@ const guideText = isZh ? blogGuideContent['zh-cn'] : blogGuideContent.en;
     }
   }
 
-  initGlobalParticles();
-  initBlogGuide();
-  initBlogUpdateNotice();
-  document.addEventListener("astro:page-load", initGlobalParticles);
-  document.addEventListener("astro:page-load", initBlogGuide);
-  document.addEventListener("astro:page-load", initBlogUpdateNotice);
-  document.addEventListener("astro:after-swap", initGlobalParticles);
-  document.addEventListener("astro:after-swap", initBlogGuide);
-  document.addEventListener("astro:after-swap", initBlogUpdateNotice);
+  const safeInitParticles = () => {
+    try {
+      initGlobalParticles();
+    } catch (error) {
+      console.error("[guide] particles init failed", error);
+    }
+  };
+
+  const safeInitGuide = () => {
+    try {
+      initBlogGuide();
+    } catch (error) {
+      console.error("[guide] blog guide init failed", error);
+    }
+  };
+
+  const safeInitUpdateNotice = () => {
+    try {
+      initBlogUpdateNotice();
+    } catch (error) {
+      console.error("[guide] update notice init failed", error);
+    }
+  };
+
+  safeInitGuide();
+  safeInitUpdateNotice();
+  safeInitParticles();
+  document.addEventListener("astro:page-load", safeInitGuide);
+  document.addEventListener("astro:page-load", safeInitUpdateNotice);
+  document.addEventListener("astro:page-load", safeInitParticles);
+  document.addEventListener("astro:after-swap", safeInitGuide);
+  document.addEventListener("astro:after-swap", safeInitUpdateNotice);
+  document.addEventListener("astro:after-swap", safeInitParticles);
 </script>
 
 <style is:global>
