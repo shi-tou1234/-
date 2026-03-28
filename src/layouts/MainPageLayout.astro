@@ -19,6 +19,7 @@ interface Props {
 const { title, lang, updateNotice = null } = Astro.props;
 const isZh = lang === 'zh-cn';
 const guideText = isZh ? blogGuideContent['zh-cn'] : blogGuideContent.en;
+const baseUrl = import.meta.env.BASE_URL || '/';
 
 ---
 
@@ -91,26 +92,11 @@ const guideText = isZh ? blogGuideContent['zh-cn'] : blogGuideContent.en;
   </div>
 </Layout>
 
-<script define:vars={{ isZh, updateNotice }}>
+<script>
+  import { tsParticles } from "@tsparticles/engine";
+  import { loadSlim } from "@tsparticles/slim";
 
   const containerId = "global-page-particles";
-  let cachedTsParticles = null;
-  let cachedLoadSlim = null;
-
-  async function ensureParticleDeps() {
-    if (cachedTsParticles && cachedLoadSlim) {
-      return { tsParticles: cachedTsParticles, loadSlim: cachedLoadSlim };
-    }
-
-    const [{ tsParticles }, { loadSlim }] = await Promise.all([
-      import("@tsparticles/engine"),
-      import("@tsparticles/slim"),
-    ]);
-
-    cachedTsParticles = tsParticles;
-    cachedLoadSlim = loadSlim;
-    return { tsParticles, loadSlim };
-  }
 
   function getNormalizedPathname() {
     const rawPath = window.location.pathname.replace(/\/+$/, "") || "/";
@@ -186,8 +172,6 @@ const guideText = isZh ? blogGuideContent['zh-cn'] : blogGuideContent.en;
   async function mountParticles() {
     if (!shouldMountParticles()) return;
 
-    const { tsParticles, loadSlim } = await ensureParticleDeps();
-
     await loadSlim(tsParticles);
 
     const mounted = tsParticles.dom().find((item) => item.id === containerId);
@@ -253,7 +237,9 @@ const guideText = isZh ? blogGuideContent['zh-cn'] : blogGuideContent.en;
     if (oldObserver) oldObserver.disconnect();
 
     const observer = new MutationObserver(() => {
-      mountParticles();
+      mountParticles().catch((error) => {
+        console.error("[particle] theme remount failed", error);
+      });
     });
 
     observer.observe(document.documentElement, {
@@ -266,8 +252,27 @@ const guideText = isZh ? blogGuideContent['zh-cn'] : blogGuideContent.en;
 
   function initGlobalParticles() {
     if (!shouldMountParticles()) return;
-    mountParticles();
+    mountParticles().catch((error) => {
+      console.error("[particle] init failed", error);
+    });
     setupThemeWatcher();
+  }
+
+  initGlobalParticles();
+  document.addEventListener("astro:page-load", initGlobalParticles);
+  document.addEventListener("astro:after-swap", initGlobalParticles);
+</script>
+
+<script define:vars={{ isZh, updateNotice, baseUrl }}>
+
+  function getNormalizedPathname() {
+    const rawPath = window.location.pathname.replace(/\/+$/, "") || "/";
+    const base = (baseUrl || "/").replace(/\/+$/, "");
+    if (base && base !== "/" && rawPath.startsWith(base)) {
+      const normalized = rawPath.slice(base.length);
+      return normalized || "/";
+    }
+    return rawPath;
   }
 
   const blogGuideSeenKey = "cmchen_blog_guide_seen_v1";
@@ -481,14 +486,6 @@ const guideText = isZh ? blogGuideContent['zh-cn'] : blogGuideContent.en;
     }
   }
 
-  const safeInitParticles = () => {
-    try {
-      initGlobalParticles();
-    } catch (error) {
-      console.error("[guide] particles init failed", error);
-    }
-  };
-
   const safeInitGuide = () => {
     try {
       initBlogGuide();
@@ -507,13 +504,10 @@ const guideText = isZh ? blogGuideContent['zh-cn'] : blogGuideContent.en;
 
   safeInitGuide();
   safeInitUpdateNotice();
-  safeInitParticles();
   document.addEventListener("astro:page-load", safeInitGuide);
   document.addEventListener("astro:page-load", safeInitUpdateNotice);
-  document.addEventListener("astro:page-load", safeInitParticles);
   document.addEventListener("astro:after-swap", safeInitGuide);
   document.addEventListener("astro:after-swap", safeInitUpdateNotice);
-  document.addEventListener("astro:after-swap", safeInitParticles);
 </script>
 
 <style is:global>
