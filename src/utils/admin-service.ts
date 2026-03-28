@@ -223,7 +223,7 @@ export class AdminService {
   private readonly repo: string;
   private readonly securityPath: string;
   private readonly securityUrl: string;
-  private readonly apiBase: string;
+  private apiBase: string;
   private readonly fallbackSecurity: SecurityConfig;
   private security: SecurityConfig;
 

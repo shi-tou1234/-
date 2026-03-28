@@ -45,25 +45,25 @@ const isZh = lang === 'zh-cn';
         <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm leading-7 text-[var(--text-color)]/95">
           {isZh ? (
             <>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 顶部导航：可快速进入首页、归档、分类、关于、友链等页面。</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 搜索按钮：可按标题/正文关键词快速定位文章内容。</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 主题按钮：可切换亮色/暗色主题，阅读更舒适。</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 文章卡片：点击进入详情，查看正文、时间、分类与相关文章。</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 正文里带下划线且鼠标靠近会高亮的文字，表示可点击跳转链接。</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 分类与归档：按主题或时间线浏览历史内容。</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 友链页面：查看常用站点与朋友博客入口。</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 右下角返回顶部：长文阅读后可一键回到页面顶部。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 首页更新提示：后台更新旧文或新文后，首页会弹出一次更新通知，可直接跳转到最新文章。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 顶部导航：快速进入首页、归档、分类、关于、友链等页面；移动端可在菜单里操作。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 搜索功能：支持标题与正文关键词检索，快捷键 `/` 或 `Ctrl/Cmd + K` 可快速打开。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 主题切换：支持亮色/暗色主题，系统会记住你的偏好设置。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 文章卡片：展示分类标签、阅读时长与摘要，点击进入详情可继续阅读。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 正文阅读：支持目录定位、公式、代码块、高亮链接与图片灯箱预览。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 分类与归档：可按主题或时间线筛选历史内容，快速定位同类文章。</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• 便捷操作：右下角返回顶部，长文阅读后可一键回到页面顶部。</p>
             </>
           ) : (
             <>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Top navigation: jump to Home, Archives, Categories, About, and Friends.</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Search button: quickly find posts by title or content keywords.</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Theme button: switch light/dark mode for comfortable reading.</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Post cards: open details with content, date, category, and related info.</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Underlined text that highlights on hover in post content is a clickable link.</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Categories and archives: browse posts by topic or timeline.</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Friends page: quick access to useful sites and partner blogs.</p>
-              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Back-to-top button: return to the top instantly on long pages.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Homepage update notice: after publishing new or revised posts, a one-time popup appears with direct navigation.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Top navigation: jump to Home, Archives, Categories, About, and Friends, with mobile menu support.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Search: find posts by title/body keywords, and open quickly with `/` or `Ctrl/Cmd + K`.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Theme switch: toggle light/dark mode; your preference is remembered locally.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Post cards: include category tags, reading time, and summary previews for faster scanning.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Reading experience: supports TOC navigation, math, code blocks, enhanced links, and image lightbox.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Categories and archives: browse historical posts by topic or timeline.</p>
+              <p class="rounded-lg border border-[var(--button-border-color)]/70 bg-[var(--button-hover-color)]/30 px-3 py-2">• Convenience tools: use the back-to-top button for long-form reading.</p>
             </>
           )}
         </div>
@@ -115,6 +115,16 @@ const isZh = lang === 'zh-cn';
 
   const containerId = "global-page-particles";
 
+  function getNormalizedPathname() {
+    const rawPath = window.location.pathname.replace(/\/+$/, "") || "/";
+    const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
+    if (base && base !== "/" && rawPath.startsWith(base)) {
+      const normalized = rawPath.slice(base.length);
+      return normalized || "/";
+    }
+    return rawPath;
+  }
+
   function shouldMountParticles() {
     const hasContainer = Boolean(document.getElementById(containerId));
     if (!hasContainer) return false;
@@ -126,7 +136,7 @@ const isZh = lang === 'zh-cn';
   }
 
   function isBlogListPage() {
-    const path = window.location.pathname;
+    const path = getNormalizedPathname();
     if (/\/(archives|categories)(\/|$)/.test(path)) return true;
     if (/^\/(zh-cn|en)\/?$/.test(path)) return true;
     return path === "/";
@@ -320,7 +330,7 @@ const isZh = lang === 'zh-cn';
 
   function shouldEnableUpdateNotice() {
     if (!updateNotice || !updateNotice.version || !updateNotice.url) return false;
-    const path = window.location.pathname.replace(/\/+$/, "") || "/";
+    const path = getNormalizedPathname();
     return path === "/" || path === "/zh-cn" || path === "/en";
   }
 
