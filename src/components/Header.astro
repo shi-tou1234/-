@@ -341,6 +341,69 @@ if (document.readyState !== 'loading') {
   initMobileNav();
 }
 </script>
+
+<script>
+function initGuideModalFallback() {
+  const openButton = document.getElementById('blog-guide-open-btn');
+  const modal = document.getElementById('blog-guide-modal');
+  const closeButton = document.getElementById('blog-guide-close-btn');
+  const mask = document.getElementById('blog-guide-mask');
+
+  if (!openButton || !modal || !closeButton || !mask) return;
+
+  const lockScroll = () => {
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+  };
+
+  const unlockScroll = () => {
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+    document.body.style.touchAction = '';
+  };
+
+  const openGuide = () => {
+    modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      modal.classList.add('is-open');
+    });
+    lockScroll();
+  };
+
+  const closeGuide = () => {
+    modal.classList.remove('is-open');
+    window.setTimeout(() => {
+      if (!modal.classList.contains('is-open')) {
+        modal.classList.add('hidden');
+      }
+    }, 260);
+    unlockScroll();
+  };
+
+  if (openButton.dataset.fallbackBound !== 'true') {
+    openButton.dataset.fallbackBound = 'true';
+    openButton.addEventListener('click', openGuide);
+  }
+
+  if (closeButton.dataset.fallbackBound !== 'true') {
+    closeButton.dataset.fallbackBound = 'true';
+    closeButton.addEventListener('click', closeGuide);
+  }
+
+  if (mask.dataset.fallbackBound !== 'true') {
+    mask.dataset.fallbackBound = 'true';
+    mask.addEventListener('click', closeGuide);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', initGuideModalFallback);
+document.addEventListener('astro:page-load', initGuideModalFallback);
+document.addEventListener('astro:after-swap', initGuideModalFallback);
+if (document.readyState !== 'loading') {
+  initGuideModalFallback();
+}
+</script>
 <script>
 function initLanguageMenu() {
   const languageButton = document.getElementById('language-button');

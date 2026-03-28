@@ -168,22 +168,18 @@ export function parseBlogGuideContentFromTs(content: string) {
   if (end < 0) throw new Error("无法解析博客介绍弹窗内容文件");
 
   const rawBlock = content.slice(eq + 1, end).trim().replace(/;\s*$/, "");
+
   const normalized = rawBlock
-    .replace(/(\{|,)\s*(zh-cn|en)\s*:/g, '$1 "$2":')
-    .replace(/\n\s*\/\/.*$/gm, "");
+    .replace(/\n\s*\/\/.*$/gm, "")
+    // Quote unquoted object keys (e.g., title: -> "title":)
+    .replace(/([\{,]\s*)([A-Za-z_$][A-Za-z0-9_$-]*)(\s*:)/g, '$1"$2"$3')
+    // Remove trailing commas before } or ]
+    .replace(/,\s*([}\]])/g, "$1");
+
   try {
     return JSON.parse(normalized);
   } catch {
-    try {
-      const evaluator = new Function(`return (${rawBlock});`);
-      const parsed = evaluator();
-      if (!parsed || typeof parsed !== "object") {
-        throw new Error("无法解析博客介绍弹窗内容文件");
-      }
-      return parsed;
-    } catch {
-      throw new Error("无法解析博客介绍弹窗内容文件");
-    }
+    throw new Error("无法解析博客介绍弹窗内容文件");
   }
 }
 

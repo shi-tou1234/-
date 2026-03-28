@@ -92,10 +92,25 @@ const guideText = isZh ? blogGuideContent['zh-cn'] : blogGuideContent.en;
 </Layout>
 
 <script define:vars={{ isZh, updateNotice }}>
-  import { tsParticles } from "@tsparticles/engine";
-  import { loadSlim } from "@tsparticles/slim";
 
   const containerId = "global-page-particles";
+  let cachedTsParticles = null;
+  let cachedLoadSlim = null;
+
+  async function ensureParticleDeps() {
+    if (cachedTsParticles && cachedLoadSlim) {
+      return { tsParticles: cachedTsParticles, loadSlim: cachedLoadSlim };
+    }
+
+    const [{ tsParticles }, { loadSlim }] = await Promise.all([
+      import("@tsparticles/engine"),
+      import("@tsparticles/slim"),
+    ]);
+
+    cachedTsParticles = tsParticles;
+    cachedLoadSlim = loadSlim;
+    return { tsParticles, loadSlim };
+  }
 
   function getNormalizedPathname() {
     const rawPath = window.location.pathname.replace(/\/+$/, "") || "/";
@@ -170,6 +185,8 @@ const guideText = isZh ? blogGuideContent['zh-cn'] : blogGuideContent.en;
 
   async function mountParticles() {
     if (!shouldMountParticles()) return;
+
+    const { tsParticles, loadSlim } = await ensureParticleDeps();
 
     await loadSlim(tsParticles);
 
