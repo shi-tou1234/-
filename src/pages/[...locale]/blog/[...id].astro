@@ -78,7 +78,7 @@ const categoryPageUrl = getRelativeLocaleUrl(currentLang, `/categories/${encodeC
 
 ---
 <MainPageLayout title={pageTitle} lang={currentLang}>
-    <div class="mx-auto w-full max-w-[var(--page-width)] py-8 md:mt-0 mt-18">
+    <div id="post-reading-shell" class="mx-auto w-full max-w-[var(--page-width)] py-8 md:mt-0 mt-18">
         <div class="mb-8 text-center">
             <h1 class="font-bold text-3xl mb-2 pt-10 text-[var(--text-color)]">{ entry.data.title }</h1>
             <div class="pt-2">
@@ -155,11 +155,71 @@ const categoryPageUrl = getRelativeLocaleUrl(currentLang, `/categories/${encodeC
         });
     }
 
+    function initPostReadingFullscreen() {
+        const shell = document.getElementById('post-reading-shell');
+        if (!(shell instanceof HTMLElement)) return;
+
+        const markdown = shell.querySelector('.markdown-content');
+        if (!(markdown instanceof HTMLElement)) return;
+        if (markdown.dataset.fullscreenBound === 'true') return;
+
+        markdown.dataset.fullscreenBound = 'true';
+
+        const isInteractiveTarget = (target) => {
+            return Boolean(target.closest('a, button, input, textarea, select, label, summary, details, img, video, audio, iframe, pre, code, [role="button"], [data-lightbox-close], [data-lightbox-prev], [data-lightbox-next], [data-lightbox-zoom-in], [data-lightbox-zoom-out], [data-lightbox-zoom-reset]'));
+        };
+
+        const toggleFullscreen = async () => {
+            if (document.fullscreenElement === shell) {
+                await document.exitFullscreen();
+                return;
+            }
+
+            if (!document.fullscreenElement) {
+                await shell.requestFullscreen();
+            }
+        };
+
+        markdown.addEventListener('dblclick', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLElement)) return;
+            if (isInteractiveTarget(target)) return;
+
+            const selection = window.getSelection()?.toString().trim();
+            if (selection) return;
+
+            event.preventDefault();
+            toggleFullscreen().catch(() => {});
+        });
+    }
+
     document.addEventListener('astro:page-load', initPostBackButton);
     document.addEventListener('astro:after-swap', initPostBackButton);
+    document.addEventListener('astro:page-load', initPostReadingFullscreen);
+    document.addEventListener('astro:after-swap', initPostReadingFullscreen);
 </script>
 
 <style is:global>
+    #post-reading-shell {
+        transition: max-width 0.25s ease, padding 0.25s ease;
+    }
+
+    #post-reading-shell:fullscreen {
+        width: 100vw;
+        max-width: none;
+        height: 100vh;
+        margin: 0;
+        padding: 1.2rem clamp(0.8rem, 2.2vw, 2.2rem) 2rem;
+        overflow: auto;
+        background: var(--bg-color);
+        scrollbar-gutter: stable;
+    }
+
+    #post-reading-shell:fullscreen .markdown-content {
+        max-width: min(1120px, 96vw);
+        margin: 0 auto;
+    }
+
     .post-back-floating {
         position: fixed;
         left: var(--toc-offset-left);
