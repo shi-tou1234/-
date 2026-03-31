@@ -15,7 +15,7 @@ const className = Astro.props.class
 <script>
   const LIGHTBOX_ID = 'markdown-image-lightbox';
   const LIGHTBOX_MIN_SCALE = 1;
-  const LIGHTBOX_MAX_SCALE = 4;
+  const LIGHTBOX_MAX_SCALE = 6;
   const LIGHTBOX_ZOOM_STEP = 1;
   const lightboxState = {
     activeImage: null,
@@ -50,7 +50,8 @@ const className = Astro.props.class
   }
 
   function unlockLightboxScroll() {
-    const activeImage = lightboxState.activeImage;
+    const savedScrollY = lightboxState.scrollY;
+    const previousScrollBehavior = document.documentElement.style.scrollBehavior;
 
     document.documentElement.classList.remove('markdown-lightbox-open');
     document.body.style.position = '';
@@ -59,8 +60,11 @@ const className = Astro.props.class
     document.body.style.width = '';
 
     requestAnimationFrame(() => {
-      window.scrollTo(0, lightboxState.scrollY);
-      activeImage?.focus({ preventScroll: true });
+      document.documentElement.style.scrollBehavior = 'auto';
+      window.scrollTo(0, savedScrollY);
+      requestAnimationFrame(() => {
+        document.documentElement.style.scrollBehavior = previousScrollBehavior;
+      });
     });
   }
 
