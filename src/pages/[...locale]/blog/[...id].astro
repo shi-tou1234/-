@@ -169,21 +169,52 @@ const categoryPageUrl = getRelativeLocaleUrl(currentLang, `/categories/${encodeC
             return Boolean(target.closest('a, button, input, textarea, select, label, summary, details, img, video, audio, iframe, pre, code, [role="button"], [data-lightbox-close], [data-lightbox-prev], [data-lightbox-next], [data-lightbox-zoom-in], [data-lightbox-zoom-out], [data-lightbox-zoom-reset]'));
         };
 
+        const syncReadingFullscreenState = () => {
+            const isReadingFullscreen = document.fullscreenElement === document.documentElement;
+            document.documentElement.classList.toggle('post-reading-fullscreen', isReadingFullscreen);
+            shell.classList.toggle('is-reading-fullscreen', isReadingFullscreen);
+        };
+
         const toggleFullscreen = async () => {
-            if (document.fullscreenElement === shell) {
+            if (document.fullscreenElement) {
                 await document.exitFullscreen();
                 return;
             }
 
-            if (!document.fullscreenElement) {
-                await shell.requestFullscreen();
+            if (document.documentElement.requestFullscreen) {
+                await document.documentElement.requestFullscreen();
+            } else {
+                document.documentElement.classList.toggle('post-reading-fullscreen');
+                shell.classList.toggle('is-reading-fullscreen');
             }
+
+            // Trigger viewport-based loaders/animations after entering reading mode.
+            requestAnimationFrame(() => {
+                window.dispatchEvent(new Event('resize'));
+                window.dispatchEvent(new Event('scroll'));
+            });
         };
+
+        const oldFullscreenHandler = window.__postReadingFullscreenHandler;
+        if (oldFullscreenHandler) {
+            document.removeEventListener('fullscreenchange', oldFullscreenHandler);
+        }
+
+        const fullscreenHandler = () => {
+            syncReadingFullscreenState();
+        };
+
+        document.addEventListener('fullscreenchange', fullscreenHandler);
+        window.__postReadingFullscreenHandler = fullscreenHandler;
+        syncReadingFullscreenState();
 
         markdown.addEventListener('dblclick', (event) => {
             const target = event.target;
             if (!(target instanceof HTMLElement)) return;
             if (isInteractiveTarget(target)) return;
+
+            const lightbox = document.getElementById('markdown-image-lightbox');
+            if (lightbox?.classList.contains('is-open')) return;
 
             const selection = window.getSelection()?.toString().trim();
             if (selection) return;
@@ -204,20 +235,22 @@ const categoryPageUrl = getRelativeLocaleUrl(currentLang, `/categories/${encodeC
         transition: max-width 0.25s ease, padding 0.25s ease;
     }
 
-    #post-reading-shell:fullscreen {
-        width: 100vw;
+    html.post-reading-fullscreen #post-reading-shell,
+    #post-reading-shell.is-reading-fullscreen {
+        width: min(1120px, 96vw);
         max-width: none;
-        height: 100vh;
-        margin: 0;
-        padding: 1.2rem clamp(0.8rem, 2.2vw, 2.2rem) 2rem;
-        overflow: auto;
-        background: var(--bg-color);
-        scrollbar-gutter: stable;
+        padding-top: 1.2rem;
     }
 
-    #post-reading-shell:fullscreen .markdown-content {
-        max-width: min(1120px, 96vw);
-        margin: 0 auto;
+    html.post-reading-fullscreen #main-header,
+    html.post-reading-fullscreen .post-back-floating,
+    html.post-reading-fullscreen #post-toc-root,
+    html.post-reading-fullscreen .post-category-nav-root {
+        display: none !important;
+    }
+
+    html.post-reading-fullscreen main {
+        padding-top: 0 !important;
     }
 
     .post-back-floating {

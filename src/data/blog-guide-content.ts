@@ -11,31 +11,31 @@ export type BlogGuideContent = {
 
 const blogGuideContent: BlogGuideContent = {
   "zh-cn": {
-    title: "博客功能简介",
-    subtitle: "首次访问会自动弹出，关闭后可用右上角问号按钮再次打开。",
+    title: "博客使用指南",
+    subtitle: "首次访问自动弹出；你可以随时通过右上角问号按钮重新打开。",
     items: [
-      "首页更新提示：后台更新旧文或新文后，首页会弹出一次更新通知，可直接跳转到最新文章。",
-      "顶部导航：快速进入首页、归档、分类、关于、友链等页面；移动端可在菜单里操作。",
-      "搜索功能：支持标题与正文关键词检索，快捷键 / 或 Ctrl/Cmd + K 可快速打开。",
-      "主题切换：支持亮色/暗色主题，系统会记住你的偏好设置。",
-      "文章卡片：展示分类标签、阅读时长与摘要，点击进入详情可继续阅读。",
-      "正文阅读：支持目录定位、公式、代码块、高亮链接与图片灯箱预览。",
-      "分类与归档：可按主题或时间线筛选历史内容，快速定位同类文章。",
-      "便捷操作：右下角返回顶部，长文阅读后可一键回到页面顶部。"
+      "首页更新提示：发布新内容或更新旧文后，首页会弹出一次更新通知，可直达最新文章。",
+      "顶部导航：快速进入首页、归档、分类、关于、友链，移动端可通过菜单操作。",
+      "全站搜索：支持标题与正文关键词检索，快捷键 / 或 Ctrl/Cmd + K 可快速唤起。",
+      "主题与偏好：支持亮色/暗色主题切换，本地自动记忆你的选择。",
+      "正文阅读：支持双击正文进入全屏阅读，再次双击退出；适合沉浸式长文阅读。",
+      "图片预览：点击图片可全屏查看，支持手势/滚轮缩放、拖拽查看和多图切换。",
+      "目录与同类文章：支持目录定位和同分类推荐，快速跳转到感兴趣段落与内容。",
+      "便捷操作：右侧提供返回顶部等工具，减少长文来回滚动成本。"
     ]
   },
   en: {
-    title: "Blog Quick Guide",
-    subtitle: "Shown on first visit. Reopen anytime with the top-right question button.",
+    title: "Blog User Guide",
+    subtitle: "Shown automatically on first visit. Reopen anytime with the top-right help button.",
     items: [
-      "Homepage update notice: after publishing new or revised posts, a one-time popup appears with direct navigation.",
-      "Top navigation: jump to Home, Archives, Categories, About, and Friends, with mobile menu support.",
-      "Search: find posts by title/body keywords, and open quickly with / or Ctrl/Cmd + K.",
-      "Theme switch: toggle light/dark mode; your preference is remembered locally.",
-      "Post cards: include category tags, reading time, and summary previews for faster scanning.",
-      "Reading experience: supports TOC navigation, math, code blocks, enhanced links, and image lightbox.",
-      "Categories and archives: browse historical posts by topic or timeline.",
-      "Convenience tools: use the back-to-top button for long-form reading."
+      "Homepage update notice: after new posts or revisions, a one-time popup helps you jump to the latest update.",
+      "Top navigation: quickly access Home, Archives, Categories, About, and Friends, with mobile menu support.",
+      "Global search: find content by title or body keywords, and open instantly with / or Ctrl/Cmd + K.",
+      "Theme and preferences: switch between light/dark themes; your preference is stored locally.",
+      "Article reading: double-click the main text to enter fullscreen reading, and double-click again to exit.",
+      "Image preview: click images for fullscreen viewing with wheel/pinch zoom, drag panning, and gallery navigation.",
+      "TOC and related posts: use outline navigation and same-category recommendations for faster exploration.",
+      "Convenience tools: floating actions like back-to-top reduce scrolling effort in long reads."
     ]
   }
 };
