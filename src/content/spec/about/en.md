@@ -45,7 +45,7 @@ cmchen, a strange name, isn't it? Why this seemingly odd name? It originated fro
 
 ## 🌐 Website Changelog
 
-- **2026.2.12** Initial framework developed using Claude Opus 4.6, with GPT-5.3 Codex for debugging and subsequent development
+- **2026.2.12** Initial framework developed
 - **2026.2.14** Referenced open-source page design from [https://github.com/motues/Momo](https://github.com/motues/Momo)
 - **2026.2.15** Deployed to GitHub Pages
 - **2026.2.17** Added category functionality, optimized response speed
@@ -54,7 +54,7 @@ cmchen, a strange name, isn't it? Why this seemingly odd name? It originated fro
 - **2026.2.21** Added auto-detection for narrow screens; sidebar menu button switches to side display
 - **2026.2.25** Added one-click friend link structure insertion in backend; optimized UI response speed and smoothness
 - **2026.2.26** Added blog intro popup and buttons; added blog runtime display; added animated cmchen effect in top-right corner
-- **2026.3.7** Added clickable image zoom and left/right navigation for image viewing (using GPT-5.4)
+- **2026.3.7** Added clickable image zoom and left/right navigation for image viewing 
 - **2026.3.8** Merged categories and archives; simplified page layout; added word count statistics
 - **2026.3.14** Fixed white-screen bug caused by page zoom in/out，Added table of contents functionality
 - **2026.3.16** Added "back to previous page" button.Added dynamic typewriter effect on homepage with rotating personalized signatures. Added gradient placeholder background when posts have no cover image. Added article excerpt preview. Added colorful tag system.Added category tags + excerpt + reading time display on article cards.Optimized animations
