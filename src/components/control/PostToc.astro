@@ -110,10 +110,21 @@ function initPostToc() {
       if (!targetId) return;
       const target = document.getElementById(targetId);
       if (!target) return;
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      const jumpToTarget = () => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (window.location.hash !== `#${targetId}`) {
+          history.replaceState(null, '', `#${targetId}`);
+        }
+      };
+
       if (window.innerWidth < 1024) {
         setPanelOpen(false);
+        requestAnimationFrame(jumpToTarget);
+      } else {
+        jumpToTarget();
       }
+
       updateActive(targetId);
     });
   });
