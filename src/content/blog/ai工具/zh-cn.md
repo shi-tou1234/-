@@ -1,7 +1,7 @@
 ---
 title: AI工具
 pubDate: 2026-02-21T06:08:00.000Z
-updatedDate: 2026-03-28T06:47:38.920Z
+updatedDate: 2026-04-01T07:23:30.104Z
 draft: false
 description: 
 category: 工具使用
@@ -10,7 +10,7 @@ slugId: ai工具
 
 这篇博客来推荐一下本人用过的一些 ai 工具以及怎么使用，后面会不断更新内容：
 
-更新时间2026.3.28
+更新时间2026.4.1
 
 大模型
 
@@ -42,7 +42,7 @@ slugId: ai工具
 
 [xiaomi mimo studio](https://aistudio.xiaomimimo.com/#/c)
 
-小米自研的大模型，跑分真不真实不知道，v2-flash速度这一块还是可以的，在open rounter上的调用量方面增长非常快，说明能力是不错的。pro挺适配claw的，但是识图能力和deepseek是类似的，只能识别文字，多模态识图只能转换为ommi，目前使用感觉还是不错的，期待进一步的测试
+小米自研的大模型，跑分真不真实不知道，v2-flash速度这一块还是可以的，在open rounter上的调用量方面增长非常快，说明能力是不错的。pro挺适配claw的，但是识图能力和deepseek是类似的，只能识别文字，多模态识图只能转换为ommi，但是不知道为什么，经常整个网站卡死，然后不太聪明，容易陷入死循环
 
 [GPT](https://chatgpt.com/)
 
