@@ -53,7 +53,7 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
   <section class="min-w-0 space-y-8">
     {Object.keys(postsByYear).sort().reverse().map((year) => (
       <section class="space-y-4" data-archive-year>
-        <div class="sticky top-20 z-10 inline-flex border-l-4 border-[var(--link-color)] pl-3 text-2xl font-bold text-[var(--text-color)] backdrop-blur">
+        <div class="archive-explorer__year-title sticky top-20 z-10 inline-flex border-l-4 border-[var(--link-color)] pl-3 text-2xl font-bold text-[var(--text-color)] backdrop-blur">
           {year}
         </div>
 
@@ -141,6 +141,7 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
       const filterIndicator = root.querySelector('[data-filter-indicator]');
       const initialCategory = (root.dataset.initialCategory || '').trim();
       const postTimers = new WeakMap();
+      const yearTimers = new WeakMap();
       let filterRunToken = 0;
 
       const schedulePost = (post, callback, timeout) => {
@@ -167,11 +168,66 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
         post.style.animationDelay = '';
       };
 
-      const syncYearVisibility = () => {
+      const clearYearAnimation = (year) => {
+        if (!(year instanceof HTMLElement)) return;
+        const oldTimer = yearTimers.get(year);
+        if (oldTimer) {
+          clearTimeout(oldTimer);
+          yearTimers.delete(year);
+        }
+        year.dataset.motion = '';
+      };
+
+      const scheduleYear = (year, callback, timeout) => {
+        if (!(year instanceof HTMLElement)) return;
+        const oldTimer = yearTimers.get(year);
+        if (oldTimer) {
+          clearTimeout(oldTimer);
+        }
+        const timerId = window.setTimeout(() => {
+          yearTimers.delete(year);
+          callback();
+        }, timeout);
+        yearTimers.set(year, timerId);
+      };
+
+      const syncYearVisibility = (animate = false, currentRunToken = filterRunToken) => {
+        let enterIndex = 0;
+        let exitIndex = 0;
+
         years.forEach((year) => {
           if (!(year instanceof HTMLElement)) return;
+          clearYearAnimation(year);
+
           const hasVisiblePost = [...year.querySelectorAll('[data-archive-post]')].some((post) => !post.hidden);
-          year.hidden = !hasVisiblePost;
+
+          if (!animate) {
+            year.hidden = !hasVisiblePost;
+            return;
+          }
+
+          if (hasVisiblePost && year.hidden) {
+            year.hidden = false;
+            year.dataset.motion = 'in';
+            const totalDelay = Math.min(6, enterIndex) * 28 + 300;
+            scheduleYear(year, () => {
+              if (filterRunToken !== currentRunToken) return;
+              year.dataset.motion = '';
+            }, totalDelay);
+            enterIndex += 1;
+            return;
+          }
+
+          if (!hasVisiblePost && !year.hidden) {
+            year.dataset.motion = 'out';
+            const totalDelay = Math.min(6, exitIndex) * 16 + 210;
+            scheduleYear(year, () => {
+              if (filterRunToken !== currentRunToken) return;
+              year.hidden = true;
+              year.dataset.motion = '';
+            }, totalDelay);
+            exitIndex += 1;
+          }
         });
       };
 
@@ -249,7 +305,7 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
               post.hidden = true;
               post.dataset.motion = '';
               post.style.animationDelay = '';
-              syncYearVisibility();
+              syncYearVisibility(true, currentRunToken);
             }, totalDelay);
             exitIndex += 1;
           }
@@ -257,7 +313,7 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
           if (matched) visibleCount += 1;
         });
 
-        syncYearVisibility();
+        syncYearVisibility(animate, currentRunToken);
 
         if (emptyState instanceof HTMLElement) {
           emptyState.hidden = visibleCount > 0;
@@ -454,6 +510,20 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
     pointer-events: none;
   }
 
+  [data-archive-year][data-motion='in'] {
+    animation: archive-year-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-archive-year][data-motion='out'] {
+    animation: archive-year-out 0.21s ease both;
+    pointer-events: none;
+  }
+
+  [data-archive-year][data-motion='in'] .archive-explorer__year-title,
+  [data-archive-year][data-motion='out'] .archive-explorer__year-title {
+    will-change: transform, opacity;
+  }
+
   @keyframes archive-post-in {
     from {
       opacity: 0;
@@ -477,6 +547,28 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
       opacity: 0;
       transform: translateY(-8px) scale(0.985);
       filter: blur(0.8px);
+    }
+  }
+
+  @keyframes archive-year-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes archive-year-out {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-8px);
     }
   }
 
@@ -505,7 +597,9 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
 
   @media (prefers-reduced-motion: reduce) {
     .archive-explorer__post[data-motion='in'],
-    .archive-explorer__post[data-motion='out'] {
+    .archive-explorer__post[data-motion='out'],
+    [data-archive-year][data-motion='in'],
+    [data-archive-year][data-motion='out'] {
       animation: none !important;
     }
   }
