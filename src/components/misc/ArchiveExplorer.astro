@@ -105,8 +105,7 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
     <div class="rounded-3xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/72 p-4 shadow-sm backdrop-blur">
       <h2 class="text-xl font-bold text-[var(--text-color)]"># {filterTitle.replace(/^标签筛选$|^Filter by tags$/,'分类')}</h2>
 
-      <div class="archive-explorer__chips mt-4 flex flex-wrap gap-2 lg:flex-col lg:items-stretch" data-filter-track>
-        <div class="archive-explorer__chip-indicator" data-filter-indicator aria-hidden="true"></div>
+      <div class="archive-explorer__chips mt-4 flex flex-wrap gap-2 lg:flex-col lg:items-stretch">
         <button type="button" class="archive-explorer__chip" data-filter-category="">
           <span>{allLabel}</span>
           <span>{visiblePosts.length}</span>
@@ -140,9 +139,32 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
       const posts = [...root.querySelectorAll('[data-archive-post]')];
       const years = [...root.querySelectorAll('[data-archive-year]')];
       const emptyState = root.querySelector('[data-archive-empty]');
-      const filterTrack = root.querySelector('[data-filter-track]');
-      const filterIndicator = root.querySelector('[data-filter-indicator]');
-      const initialCategory = (root.dataset.initialCategory || '').trim();
+      const initialCategories = (root.dataset.initialCategory || '')
+        .split(',')
+        .map((value) => value.trim().toLowerCase())
+        .filter(Boolean);
+      const selectedCategories = new Set();
+
+      const parseUrlCategories = () => {
+        const params = new URLSearchParams(window.location.search);
+        const categoryParam = params.get('category');
+        if (!categoryParam || categoryParam === 'null') return [];
+
+        return categoryParam
+          .split(',')
+          .map((value) => value.trim().toLowerCase())
+          .filter(Boolean);
+      };
+
+      const syncUrlCategories = () => {
+        const url = new URL(window.location.href);
+        if (selectedCategories.size > 0) {
+          url.searchParams.set('category', [...selectedCategories].join(','));
+        } else {
+          url.searchParams.delete('category');
+        }
+        window.history.replaceState({}, '', url);
+      };
 
       const removeGhosts = () => {
         document.querySelectorAll(`.archive-explorer__ghost[data-owner='${ownerId}']`).forEach((ghost) => {
@@ -254,38 +276,9 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
         });
       };
 
-      const moveIndicator = (activeButton, immediate = false) => {
-        if (!(filterTrack instanceof HTMLElement) || !(filterIndicator instanceof HTMLElement) || !(activeButton instanceof HTMLElement)) return;
-
-        const trackRect = filterTrack.getBoundingClientRect();
-        const buttonRect = activeButton.getBoundingClientRect();
-        const x = buttonRect.left - trackRect.left + filterTrack.scrollLeft;
-        const y = buttonRect.top - trackRect.top + filterTrack.scrollTop;
-
-        if (immediate) {
-          filterIndicator.style.transition = 'none';
-        }
-
-        filterIndicator.style.width = `${buttonRect.width}px`;
-        filterIndicator.style.height = `${buttonRect.height}px`;
-        filterIndicator.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-        filterIndicator.style.opacity = '1';
-
-        const buttonStyle = window.getComputedStyle(activeButton);
-        filterIndicator.style.backgroundColor = buttonStyle.getPropertyValue('--chip-bg').trim();
-        filterIndicator.style.borderColor = buttonStyle.getPropertyValue('--chip-border').trim();
-        filterIndicator.style.boxShadow = `0 10px 20px ${buttonStyle.getPropertyValue('--chip-border').trim()}4d`;
-
-        if (immediate) {
-          requestAnimationFrame(() => {
-            filterIndicator.style.transition = '';
-          });
-        }
-      };
-
-      const applyFilter = (activeCategory, animate = true) => {
+      const applyFilter = (activeCategories, animate = true) => {
         let visibleCount = 0;
-        let activeButton = null;
+        const activeSet = new Set(activeCategories);
 
         const firstRects = captureRects([
           ...years.filter((year) => year instanceof HTMLElement && !year.hidden),
@@ -301,17 +294,21 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
 
         buttons.forEach((button) => {
           if (!(button instanceof HTMLElement)) return;
-          const matched = (button.dataset.filterCategory || '') === activeCategory;
+          const buttonCategory = (button.dataset.filterCategory || '').trim().toLowerCase();
+          const matched = buttonCategory ? activeSet.has(buttonCategory) : activeSet.size === 0;
           button.dataset.active = matched ? 'true' : 'false';
-          if (matched) activeButton = button;
+          button.setAttribute('aria-pressed', matched ? 'true' : 'false');
         });
 
         posts.forEach((post) => {
           if (!(post instanceof HTMLElement)) return;
           stopAnimations(post);
 
-          const categories = (post.dataset.categories || '').split('||').filter(Boolean);
-          const matched = !activeCategory || categories.includes(activeCategory);
+          const categories = (post.dataset.categories || '')
+            .split('||')
+            .map((value) => value.trim().toLowerCase())
+            .filter(Boolean);
+          const matched = activeSet.size === 0 || categories.some((category) => activeSet.has(category));
           nextPostVisibility.set(post, matched);
           if (matched && post.hidden) enteringPosts.push(post);
           if (!matched && !post.hidden) exitingPosts.push(post);
@@ -374,32 +371,57 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
             animateEnter(post, index, 10);
           });
         }
+      };
 
-        moveIndicator(activeButton, !filterIndicator?.dataset.ready);
-        if (filterIndicator instanceof HTMLElement && !filterIndicator.dataset.ready) {
-          filterIndicator.dataset.ready = 'true';
+      const setSelectedCategories = (nextCategories, animate = true, syncUrl = true) => {
+        selectedCategories.clear();
+        nextCategories.forEach((category) => {
+          const normalized = String(category || '').trim().toLowerCase();
+          if (normalized) {
+            selectedCategories.add(normalized);
+          }
+        });
+
+        applyFilter([...selectedCategories], animate);
+        if (syncUrl) {
+          syncUrlCategories();
         }
+      };
+
+      const toggleCategory = (category) => {
+        const normalized = String(category || '').trim().toLowerCase();
+
+        if (!normalized) {
+          selectedCategories.clear();
+        } else if (selectedCategories.has(normalized)) {
+          selectedCategories.delete(normalized);
+        } else {
+          selectedCategories.add(normalized);
+        }
+
+        applyFilter([...selectedCategories], true);
+        syncUrlCategories();
       };
 
       buttons.forEach((button) => {
         button.addEventListener('click', () => {
           if (!(button instanceof HTMLElement)) return;
-          applyFilter(button.dataset.filterCategory || '', true);
+          toggleCategory(button.dataset.filterCategory || '');
         });
       });
 
-      applyFilter(initialCategory, false);
-
-      if (filterTrack instanceof HTMLElement) {
-        const refreshIndicator = () => {
-          const currentButton = buttons.find(
-            (button) => button instanceof HTMLElement && button.dataset.active === 'true',
-          );
-          moveIndicator(currentButton);
-        };
-
-        window.addEventListener('resize', refreshIndicator);
+      const urlCategories = parseUrlCategories();
+      if (urlCategories.length > 0) {
+        setSelectedCategories(urlCategories, false, false);
+      } else {
+        setSelectedCategories(initialCategories, false, false);
       }
+
+      const handlePopState = () => {
+        setSelectedCategories(parseUrlCategories(), false, false);
+      };
+
+      window.addEventListener('popstate', handlePopState);
     });
   }
 
@@ -410,25 +432,10 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
 <style is:global>
   .archive-explorer__chips {
     position: relative;
-    isolation: isolate;
-  }
-
-  .archive-explorer__chip-indicator {
-    position: absolute;
-    left: 0;
-    top: 0;
-    border-radius: 999px;
-    border: 1px solid transparent;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 0;
-    transform: translate3d(0, 0, 0);
-    transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), width 0.32s ease, height 0.32s ease, opacity 0.2s ease, background-color 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
-    will-change: transform, width, height;
   }
 
   .archive-explorer__chip {
-    --chip-bg: color-mix(in srgb, var(--bg-color) 82%, transparent);
+    --chip-bg: color-mix(in srgb, var(--bg-color) 86%, transparent);
     --chip-text: var(--text-color);
     --chip-border: var(--button-border-color);
     display: inline-flex;
@@ -442,110 +449,41 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
     color: var(--chip-text);
     padding: 0.42rem 0.72rem;
     text-align: left;
-    transition: all 0.2s ease;
+    transition: border-color 0.22s ease, background-color 0.22s ease, color 0.22s ease, transform 0.22s ease;
     cursor: pointer;
     font-size: 0.82rem;
     font-weight: 650;
-    position: relative;
-    z-index: 1;
   }
 
   .archive-explorer__chip:hover {
-    border-color: color-mix(in srgb, var(--chip-text) 74%, var(--chip-border));
-    background: color-mix(in srgb, var(--chip-bg) 88%, white 12%);
-    color: var(--chip-text);
+    border-color: var(--link-color);
+    background: color-mix(in srgb, var(--button-hover-color) 72%, transparent);
     transform: translateX(2px);
   }
 
   .archive-explorer__chip[data-active='true'] {
-    border-color: color-mix(in srgb, var(--chip-text) 74%, var(--chip-border));
-    color: color-mix(in srgb, var(--chip-text) 95%, black 5%);
-    transform: none;
-    box-shadow: none;
+    border-color: var(--link-color);
+    background: var(--link-color);
+    color: #ffffff;
+    transform: translateX(0);
   }
 
-  .archive-explorer__chip[data-filter-category=''] {
-    --chip-bg: color-mix(in srgb, var(--button-hover-color) 62%, transparent);
-    --chip-text: var(--text-color);
-    --chip-border: var(--button-border-color);
-  }
-
-  .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(2n) {
-    --chip-bg: rgba(251, 191, 36, 0.36);
-    --chip-text: #92400e;
-    --chip-border: rgba(245, 158, 11, 0.88);
-  }
-
-  .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(3n) {
-    --chip-bg: rgba(34, 211, 238, 0.34);
-    --chip-text: #0e7490;
-    --chip-border: rgba(6, 182, 212, 0.86);
-  }
-
-  .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(4n) {
-    --chip-bg: rgba(167, 139, 250, 0.34);
-    --chip-text: #5b21b6;
-    --chip-border: rgba(139, 92, 246, 0.86);
-  }
-
-  .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(5n) {
-    --chip-bg: rgba(52, 211, 153, 0.34);
-    --chip-text: #0f766e;
-    --chip-border: rgba(16, 185, 129, 0.86);
-  }
-
-  .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(6n) {
-    --chip-bg: rgba(251, 113, 133, 0.34);
-    --chip-text: #9f1239;
-    --chip-border: rgba(244, 63, 94, 0.86);
+  .archive-explorer__chip[data-active='true'] span:last-child {
+    background: color-mix(in srgb, #ffffff 24%, transparent);
+    color: #ffffff;
+    border-color: color-mix(in srgb, #ffffff 34%, transparent);
   }
 
   .archive-explorer__chip span:last-child {
     min-width: 1.7rem;
     border-radius: 999px;
-    background: color-mix(in srgb, white 75%, transparent);
-    color: color-mix(in srgb, var(--chip-text) 86%, black 14%);
+    background: color-mix(in srgb, white 72%, transparent);
+    color: color-mix(in srgb, var(--text-color) 84%, black 16%);
     border: 1px solid color-mix(in srgb, var(--chip-border) 55%, transparent);
     padding: 0.08rem 0.45rem;
     text-align: center;
     font-size: 0.72rem;
     font-weight: 700;
-  }
-
-  [data-theme='dark'] .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(2n) {
-    --chip-bg: rgba(234, 179, 8, 0.34);
-    --chip-text: #fde68a;
-    --chip-border: rgba(245, 158, 11, 0.96);
-  }
-
-  [data-theme='dark'] .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(3n) {
-    --chip-bg: rgba(6, 182, 212, 0.32);
-    --chip-text: #a5f3fc;
-    --chip-border: rgba(34, 211, 238, 0.94);
-  }
-
-  [data-theme='dark'] .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(4n) {
-    --chip-bg: rgba(124, 58, 237, 0.34);
-    --chip-text: #ddd6fe;
-    --chip-border: rgba(167, 139, 250, 0.94);
-  }
-
-  [data-theme='dark'] .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(5n) {
-    --chip-bg: rgba(16, 185, 129, 0.32);
-    --chip-text: #a7f3d0;
-    --chip-border: rgba(52, 211, 153, 0.94);
-  }
-
-  [data-theme='dark'] .archive-explorer__chip[data-filter-category]:not([data-filter-category='']):nth-child(6n) {
-    --chip-bg: rgba(244, 63, 94, 0.32);
-    --chip-text: #fecdd3;
-    --chip-border: rgba(251, 113, 133, 0.94);
-  }
-
-  [data-theme='dark'] .archive-explorer__chip span:last-child {
-    background: color-mix(in srgb, var(--bg-color) 65%, white 35%);
-    color: #111827;
-    border-color: rgba(255, 255, 255, 0.48);
   }
 
   .archive-explorer__post-tag {
@@ -591,7 +529,6 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
 
   @media (prefers-reduced-motion: reduce) {
     .archive-explorer__chip,
-    .archive-explorer__chip-indicator,
     .archive-explorer__post,
     .archive-explorer__year-title {
       transition: none !important;
