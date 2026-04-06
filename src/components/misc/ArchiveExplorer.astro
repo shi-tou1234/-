@@ -105,7 +105,8 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
     <div class="rounded-3xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/72 p-4 shadow-sm backdrop-blur">
       <h2 class="text-xl font-bold text-[var(--text-color)]"># {filterTitle.replace(/^标签筛选$|^Filter by tags$/,'分类')}</h2>
 
-      <div class="mt-4 flex flex-wrap gap-2 lg:flex-col lg:items-stretch">
+      <div class="archive-explorer__chips mt-4 flex flex-wrap gap-2 lg:flex-col lg:items-stretch" data-filter-track>
+        <div class="archive-explorer__chip-indicator" data-filter-indicator aria-hidden="true"></div>
         <button type="button" class="archive-explorer__chip" data-filter-category="">
           <span>{allLabel}</span>
           <span>{visiblePosts.length}</span>
@@ -131,15 +132,48 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
       const posts = [...root.querySelectorAll('[data-archive-post]')];
       const years = [...root.querySelectorAll('[data-archive-year]')];
       const emptyState = root.querySelector('[data-archive-empty]');
+      const filterTrack = root.querySelector('[data-filter-track]');
+      const filterIndicator = root.querySelector('[data-filter-indicator]');
       const initialCategory = (root.dataset.initialCategory || '').trim();
+
+      const moveIndicator = (activeButton, immediate = false) => {
+        if (!(filterTrack instanceof HTMLElement) || !(filterIndicator instanceof HTMLElement) || !(activeButton instanceof HTMLElement)) return;
+
+        const trackRect = filterTrack.getBoundingClientRect();
+        const buttonRect = activeButton.getBoundingClientRect();
+        const x = buttonRect.left - trackRect.left + filterTrack.scrollLeft;
+        const y = buttonRect.top - trackRect.top + filterTrack.scrollTop;
+
+        if (immediate) {
+          filterIndicator.style.transition = 'none';
+        }
+
+        filterIndicator.style.width = `${buttonRect.width}px`;
+        filterIndicator.style.height = `${buttonRect.height}px`;
+        filterIndicator.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        filterIndicator.style.opacity = '1';
+
+        const buttonStyle = window.getComputedStyle(activeButton);
+        filterIndicator.style.backgroundColor = buttonStyle.getPropertyValue('--chip-bg').trim();
+        filterIndicator.style.borderColor = buttonStyle.getPropertyValue('--chip-border').trim();
+        filterIndicator.style.boxShadow = `0 10px 20px ${buttonStyle.getPropertyValue('--chip-border').trim()}4d`;
+
+        if (immediate) {
+          requestAnimationFrame(() => {
+            filterIndicator.style.transition = '';
+          });
+        }
+      };
 
       const applyFilter = (activeCategory) => {
         let visibleCount = 0;
+        let activeButton = null;
 
         buttons.forEach((button) => {
           if (!(button instanceof HTMLElement)) return;
           const matched = (button.dataset.filterCategory || '') === activeCategory;
           button.dataset.active = matched ? 'true' : 'false';
+          if (matched) activeButton = button;
         });
 
         posts.forEach((post) => {
@@ -159,6 +193,11 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
         if (emptyState instanceof HTMLElement) {
           emptyState.hidden = visibleCount > 0;
         }
+
+        moveIndicator(activeButton, !filterIndicator?.dataset.ready);
+        if (filterIndicator instanceof HTMLElement && !filterIndicator.dataset.ready) {
+          filterIndicator.dataset.ready = 'true';
+        }
       };
 
       buttons.forEach((button) => {
@@ -169,6 +208,17 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
       });
 
       applyFilter(initialCategory);
+
+      if (filterTrack instanceof HTMLElement) {
+        const refreshIndicator = () => {
+          const currentButton = buttons.find(
+            (button) => button instanceof HTMLElement && button.dataset.active === 'true',
+          );
+          moveIndicator(currentButton);
+        };
+
+        window.addEventListener('resize', refreshIndicator);
+      }
     });
   }
 
@@ -177,6 +227,25 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
 </script>
 
 <style is:global>
+  .archive-explorer__chips {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .archive-explorer__chip-indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+    transform: translate3d(0, 0, 0);
+    transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), width 0.32s ease, height 0.32s ease, opacity 0.2s ease, background-color 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+    will-change: transform, width, height;
+  }
+
   .archive-explorer__chip {
     --chip-bg: color-mix(in srgb, var(--bg-color) 82%, transparent);
     --chip-text: var(--text-color);
@@ -196,15 +265,22 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
     cursor: pointer;
     font-size: 0.82rem;
     font-weight: 650;
+    position: relative;
+    z-index: 1;
   }
 
-  .archive-explorer__chip:hover,
-  .archive-explorer__chip[data-active='true'] {
+  .archive-explorer__chip:hover {
     border-color: color-mix(in srgb, var(--chip-text) 74%, var(--chip-border));
     background: color-mix(in srgb, var(--chip-bg) 88%, white 12%);
     color: var(--chip-text);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 16px color-mix(in srgb, var(--chip-border) 40%, transparent);
+    transform: translateX(2px);
+  }
+
+  .archive-explorer__chip[data-active='true'] {
+    border-color: color-mix(in srgb, var(--chip-text) 74%, var(--chip-border));
+    color: color-mix(in srgb, var(--chip-text) 95%, black 5%);
+    transform: none;
+    box-shadow: none;
   }
 
   .archive-explorer__chip[data-filter-category=''] {
