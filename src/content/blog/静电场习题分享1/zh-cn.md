@@ -1,7 +1,7 @@
 ---
 title: 静电场习题分享1
 pubDate: 2026-04-06T07:51:00.000Z
-updatedDate: 2026-04-06T08:32:50.175Z
+updatedDate: 2026-04-06T08:39:49.897Z
 draft: false
 description: 
 category: 大物
@@ -125,24 +125,43 @@ $$
   \boldsymbol{1 = \sin\theta \cdot \frac{\partial r}{\partial y} + r\cos\theta \cdot \frac{\partial \theta}{\partial y}} \tag{4}
   $$
 
-##### 步骤2：消元求 $\frac{\partial r}{\partial y}$
-- 方程(3)乘 $\cos\theta$：$0 = \cos^2\theta \cdot \frac{\partial r}{\partial y} - r\sin\theta\cos\theta \cdot \frac{\partial \theta}{\partial y} \tag{3a}$
-- 方程(4)乘 $\sin\theta$：$\sin\theta = \sin^2\theta \cdot \frac{\partial r}{\partial y} + r\sin\theta\cos\theta \cdot \frac{\partial \theta}{\partial y} \tag{4a}$
+### 步骤2：消元求 $\frac{\partial r}{\partial y}$
+
+- 方程(3)乘 $\cos\theta$：
+  $$
+  0 = \cos^2\theta \cdot \frac{\partial r}{\partial y} - r\sin\theta\cos\theta \cdot \frac{\partial \theta}{\partial y} \tag{3a}
+  $$
+
+- 方程(4)乘 $\sin\theta$：
+  $$
+  \sin\theta = \sin^2\theta \cdot \frac{\partial r}{\partial y} + r\sin\theta\cos\theta \cdot \frac{\partial \theta}{\partial y} \tag{4a}
+  $$
 
 (3a)+(4a)抵消 $\frac{\partial \theta}{\partial y}$，直接得到：
+
 $$
-\boldsymbol{\frac{\partial r}{\partial y} = \sin\theta = \frac{y}{\sqrt{x^2+y^2}}}
+\frac{\partial r}{\partial y} = \sin\theta = \frac{y}{\sqrt{x^2+y^2}}
 $$
 
-##### 步骤3：消元求 $\frac{\partial \theta}{\partial y}$
-- 方程(3)乘 $\sin\theta$：$0 = \sin\theta\cos\theta \cdot \frac{\partial r}{\partial y} - r\sin^2\theta \cdot \frac{\partial \theta}{\partial y} \tag{3b}$
-- 方程(4)乘 $\cos\theta$：$\cos\theta = \sin\theta\cos\theta \cdot \frac{\partial r}{\partial y} + r\cos^2\theta \cdot \frac{\partial \theta}{\partial y} \tag{4b}$
+---
+
+### 步骤3：消元求 $\frac{\partial \theta}{\partial y}$
+
+- 方程(3)乘 $\sin\theta$：
+  $$
+  0 = \sin\theta\cos\theta \cdot \frac{\partial r}{\partial y} - r\sin^2\theta \cdot \frac{\partial \theta}{\partial y} \tag{3b}
+  $$
+
+- 方程(4)乘 $\cos\theta$：
+  $$
+  \cos\theta = \sin\theta\cos\theta \cdot \frac{\partial r}{\partial y} + r\cos^2\theta \cdot \frac{\partial \theta}{\partial y} \tag{4b}
+  $$
 
 (4b)-(3b)抵消 $\frac{\partial r}{\partial y}$，化简得：
-$$
-\boldsymbol{\frac{\partial \theta}{\partial y} = \frac{\cos\theta}{r} = \frac{x}{x^2+y^2}}
-$$
 
+$$
+\frac{\partial \theta}{\partial y} = \frac{\cos\theta}{r} = \frac{x}{x^2+y^2}
+$$
 ---
 
 ### 常见卡点答疑
