@@ -1,7 +1,7 @@
 ---
 title: 静电场习题分享1
 pubDate: 2026-04-06T07:51:00.000Z
-updatedDate: 2026-04-06T07:53:18.256Z
+updatedDate: 2026-04-06T08:32:50.175Z
 draft: false
 description: 
 category: 大物
@@ -36,7 +36,7 @@ $$
 
 ### 分步详解（零跳步）
 
-#### 1. 求 $\boldsymbol{\frac{\partial r}{\partial x}}$ 和 $\boldsymbol{\frac{\partial \theta}{\partial x}}$
+#### 1. 求 $\frac{\partial r}{\partial x}$ 和 $\frac{\partial \theta}{\partial x}$
 
 ##### 步骤1：对两个方程两边同时对 $x$ 求偏导
 我们把 $r、\theta$ 都当成随 $x$ 变化的函数，$y$ 是固定常数。
@@ -65,7 +65,7 @@ $$
   \boldsymbol{0 = \sin\theta \cdot \frac{\partial r}{\partial x} + r\cos\theta \cdot \frac{\partial \theta}{\partial x}} \tag{2}
   $$
 
-##### 步骤2：加减消元求 $\boldsymbol{\frac{\partial r}{\partial x}}$
+##### 步骤2：加减消元求 $\frac{\partial r}{\partial x}$
 我们的目标是消去 $\frac{\partial \theta}{\partial x}$，只保留 $\frac{\partial r}{\partial x}$：
 - 把方程(1)两边同时乘以 $\cos\theta$，让含 $\frac{\partial \theta}{\partial x}$ 的项系数和方程(2)匹配：
   $$
@@ -86,7 +86,7 @@ $$
 $$
 （直角坐标转换：$r=\sqrt{x^2+y^2}$，$\cos\theta=\frac{x}{r}$）
 
-##### 步骤3：加减消元求 $\boldsymbol{\frac{\partial \theta}{\partial x}}$
+##### 步骤3：加减消元求 $\frac{\partial \theta}{\partial x}$
 这次消去 $\frac{\partial r}{\partial x}$，只保留 $\frac{\partial \theta}{\partial x}$：
 - 把方程(1)两边同时乘以 $\sin\theta$：
   $$
@@ -112,7 +112,7 @@ $$
 
 ---
 
-#### 2. 求 $\boldsymbol{\frac{\partial r}{\partial y}}$ 和 $\boldsymbol{\frac{\partial \theta}{\partial y}}$
+#### 2. 求 $\frac{\partial r}{\partial y}$ 和 $\frac{\partial \theta}{\partial y}$
 和上面的逻辑完全一致，这次对 $y$ 求偏导，把 $x$ 当成固定常数。
 
 ##### 步骤1：对两个方程两边同时对 $y$ 求偏导
@@ -125,7 +125,7 @@ $$
   \boldsymbol{1 = \sin\theta \cdot \frac{\partial r}{\partial y} + r\cos\theta \cdot \frac{\partial \theta}{\partial y}} \tag{4}
   $$
 
-##### 步骤2：消元求 $\boldsymbol{\frac{\partial r}{\partial y}}$
+##### 步骤2：消元求 $\frac{\partial r}{\partial y}$
 - 方程(3)乘 $\cos\theta$：$0 = \cos^2\theta \cdot \frac{\partial r}{\partial y} - r\sin\theta\cos\theta \cdot \frac{\partial \theta}{\partial y} \tag{3a}$
 - 方程(4)乘 $\sin\theta$：$\sin\theta = \sin^2\theta \cdot \frac{\partial r}{\partial y} + r\sin\theta\cos\theta \cdot \frac{\partial \theta}{\partial y} \tag{4a}$
 
@@ -134,7 +134,7 @@ $$
 \boldsymbol{\frac{\partial r}{\partial y} = \sin\theta = \frac{y}{\sqrt{x^2+y^2}}}
 $$
 
-##### 步骤3：消元求 $\boldsymbol{\frac{\partial \theta}{\partial y}}$
+##### 步骤3：消元求 $\frac{\partial \theta}{\partial y}$
 - 方程(3)乘 $\sin\theta$：$0 = \sin\theta\cos\theta \cdot \frac{\partial r}{\partial y} - r\sin^2\theta \cdot \frac{\partial \theta}{\partial y} \tag{3b}$
 - 方程(4)乘 $\cos\theta$：$\cos\theta = \sin\theta\cos\theta \cdot \frac{\partial r}{\partial y} + r\cos^2\theta \cdot \frac{\partial \theta}{\partial y} \tag{4b}$
 
