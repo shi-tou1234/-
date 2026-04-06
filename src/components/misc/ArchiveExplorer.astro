@@ -469,9 +469,9 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
   }
 
   .archive-explorer__chip[data-active='true'] span:last-child {
-    background: color-mix(in srgb, #ffffff 24%, transparent);
-    color: #ffffff;
-    border-color: color-mix(in srgb, #ffffff 34%, transparent);
+    background: #ffffff;
+    color: color-mix(in srgb, var(--link-color) 72%, black 28%);
+    border-color: color-mix(in srgb, #ffffff 78%, transparent);
   }
 
   .archive-explorer__chip span:last-child {
@@ -484,6 +484,18 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
     text-align: center;
     font-size: 0.72rem;
     font-weight: 700;
+  }
+
+  [data-theme='dark'] .archive-explorer__chip span:last-child {
+    background: rgba(255, 255, 255, 0.94);
+    color: #111827;
+    border-color: rgba(255, 255, 255, 0.58);
+  }
+
+  [data-theme='dark'] .archive-explorer__chip[data-active='true'] span:last-child {
+    background: #ffffff;
+    color: color-mix(in srgb, var(--link-color) 78%, black 22%);
+    border-color: rgba(255, 255, 255, 0.72);
   }
 
   .archive-explorer__post-tag {
