@@ -1,9 +1,10 @@
 ---
 title: 电场强度通量与高斯定理
 pubDate: 2026-04-08T11:17:00.000Z
-updatedDate: 2026-04-08T11:18:46.963Z
+updatedDate: 2026-04-08T11:28:27.285Z
 draft: false
 description: 
+category: 大物
 slugId: 电场强度通量与高斯定理
 ---
 
