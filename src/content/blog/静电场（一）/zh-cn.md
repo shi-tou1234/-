@@ -1,7 +1,7 @@
 ---
-title: 静电场（一）
+title: 电荷与电场
 pubDate: 2026-04-01T08:46:00.000Z
-updatedDate: 2026-04-01T08:47:41.203Z
+updatedDate: 2026-04-08T11:19:23.289Z
 draft: false
 description: 
 category: 大物
@@ -135,4 +135,3 @@ $$ \vec{E} \approx -\frac{1}{4\pi\varepsilon_0} \frac{\vec{p}}{y^3} $$
 *   $x \gg R$ (远场)：$E \approx \frac{1}{4\pi\varepsilon_0} \frac{q}{x^2}$ (近似为点电荷，其中 $q = \sigma \pi R^2$)。
 
 ---
-
