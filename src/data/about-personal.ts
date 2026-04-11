@@ -93,6 +93,10 @@ const aboutPersonal: AboutPersonal = {
     {
       "date": "2026.3.31",
       "content": "增加双击全屏阅读功能"
+    },
+    {
+      "date": "2026.4.6",
+      "content": "修改归档分类按钮逻辑，优化过渡动画"
     }
   ],
   "musicTracks": [],
