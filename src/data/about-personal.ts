@@ -99,7 +99,13 @@ const aboutPersonal: AboutPersonal = {
       "content": "修改归档分类按钮逻辑，优化过渡动画"
     }
   ],
-  "musicTracks": [],
+  "musicTracks": [
+    {
+      "title": "Lauv---Paris-in-the-Rain",
+      "artist": "Unknown Artist",
+      "url": "/-/music/Lauv---Paris-in-the-Rain.mp3"
+    }
+  ],
   "travelCities": [
     {
       "city": "北京",
