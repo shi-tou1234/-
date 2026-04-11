@@ -95,7 +95,13 @@ const aboutPersonal: AboutPersonal = {
       "content": "增加双击全屏阅读功能"
     }
   ],
-  "musicTracks": [],
+  "musicTracks": [
+    {
+      "title": "Paris-in-the-Rain",
+      "artist": "Lauv",
+      "url": "/-/music/Lauv---Paris-in-the-Rain.mp3"
+    }
+  ],
   "travelCities": []
 };
 
