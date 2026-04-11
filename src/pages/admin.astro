@@ -899,6 +899,71 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     if (cityVisitedEl) cityVisitedEl.checked = false;
   }
 
+  async function requestJsonWithTimeout(url, timeoutMs = 9000, headers = {}) {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(url, {
+        headers,
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return await response.json();
+    } finally {
+      window.clearTimeout(timer);
+    }
+  }
+
+  async function geocodeByOpenMeteo(cityName) {
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=zh&format=json`;
+    const data = await requestJsonWithTimeout(url, 9000, { Accept: "application/json" });
+    const first = Array.isArray(data?.results) ? data.results[0] : null;
+    if (!first || !Number.isFinite(Number(first.latitude)) || !Number.isFinite(Number(first.longitude))) {
+      throw new Error("OPEN_METEO_EMPTY");
+    }
+    return {
+      lat: Number(first.latitude),
+      lng: Number(first.longitude),
+      source: "Open-Meteo",
+    };
+  }
+
+  async function geocodeByNominatim(cityName) {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=zh-CN&q=${encodeURIComponent(cityName)}`;
+    const data = await requestJsonWithTimeout(url, 9000, {
+      Accept: "application/json",
+    });
+    const first = Array.isArray(data) ? data[0] : null;
+    if (!first || !Number.isFinite(Number(first.lat)) || !Number.isFinite(Number(first.lon))) {
+      throw new Error("NOMINATIM_EMPTY");
+    }
+    return {
+      lat: Number(first.lat),
+      lng: Number(first.lon),
+      source: "Nominatim",
+    };
+  }
+
+  async function resolveCityCoordinates(cityName) {
+    const providers = [
+      geocodeByOpenMeteo,
+      geocodeByNominatim,
+    ];
+
+    const errors = [];
+    for (const provider of providers) {
+      try {
+        return await provider(cityName);
+      } catch (error) {
+        errors.push(String(error));
+      }
+    }
+
+    throw new Error(`未查到坐标（已尝试多地图服务）。可手动填写经纬度后追加。${errors.length ? ` 详情：${errors[0]}` : ""}`);
+  }
+
   function extractCategoriesFromMarkdown(markdown) {
     const matched = String(markdown || "").match(/^---\n([\s\S]*?)\n---/);
     if (!matched?.[1]) return [];
@@ -1591,24 +1656,14 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const cityName = (document.getElementById("about-travel-city-name")?.value || "").trim();
       if (!cityName) throw new Error("请先输入城市名");
 
-      setMsg(msgEl, "正在通过地图 API 查询坐标...");
-      const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(cityName)}`;
-      const response = await fetch(url, {
-        headers: {
-          Accept: "application/json"
-        }
-      });
-      if (!response.ok) throw new Error(`查询失败：HTTP ${response.status}`);
-
-      const data = await response.json();
-      const first = Array.isArray(data) ? data[0] : null;
-      if (!first?.lat || !first?.lon) throw new Error("未查到坐标，请手动填写");
+      setMsg(msgEl, "正在查询坐标（多线路回退）...");
+      const result = await resolveCityCoordinates(cityName);
 
       const latEl = document.getElementById("about-travel-city-lat");
       const lngEl = document.getElementById("about-travel-city-lng");
-      if (latEl) latEl.value = Number(first.lat).toFixed(6);
-      if (lngEl) lngEl.value = Number(first.lon).toFixed(6);
-      setMsg(msgEl, "坐标查询成功，可点击“追加到列表”保存到文本框");
+      if (latEl) latEl.value = Number(result.lat).toFixed(6);
+      if (lngEl) lngEl.value = Number(result.lng).toFixed(6);
+      setMsg(msgEl, `坐标查询成功（来源：${result.source}），可点击“追加到列表”保存到文本框`);
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }
