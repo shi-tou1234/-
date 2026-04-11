@@ -9,18 +9,19 @@ export type MusicTrack = {
   url: string;
 };
 
-export type TravelCity = {
-  city: string;
+export type TravelProvince = {
+  province: string;
   lat: number;
   lng: number;
   visited: boolean;
+  city?: string;
 };
 
 export type AboutPersonal = {
   intro: string;
   siteTimeline: SiteTimelineItem[];
   musicTracks: MusicTrack[];
-  travelCities: TravelCity[];
+  travelCities: TravelProvince[];
 };
 
 const aboutPersonal: AboutPersonal = {
@@ -106,32 +107,7 @@ const aboutPersonal: AboutPersonal = {
       "url": "/-/music/Lauv---Paris-in-the-Rain.mp3"
     }
   ],
-  "travelCities": [
-    {
-      "city": "宁波",
-      "lat": 29.87819,
-      "lng": 121.54945,
-      "visited": true
-    },
-    {
-      "city": "杭州",
-      "lat": 30.06517,
-      "lng": 102.19527,
-      "visited": true
-    },
-    {
-      "city": "北京",
-      "lat": 30.72608,
-      "lng": 108.67483,
-      "visited": true
-    },
-    {
-      "city": "上海",
-      "lat": 31.22222,
-      "lng": 121.45806,
-      "visited": true
-    }
-  ]
+  "travelCities": []
 };
 
 export default aboutPersonal;
