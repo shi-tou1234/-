@@ -209,6 +209,22 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         <div class="space-y-4">
           <div class="rounded border border-[var(--button-border-color)] p-4">
             <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <div class="text-sm font-semibold">About 文本（Markdown）</div>
+              <div class="flex flex-wrap items-center gap-2">
+                <select id="about-lang" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-1.5 text-sm">
+                  <option value="zh-cn">中文（zh-cn）</option>
+                  <option value="en">English（en）</option>
+                </select>
+                <button id="load-about-markdown-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
+                <button id="save-about-markdown-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
+              </div>
+            </div>
+            <textarea id="about-markdown-content" class="w-full min-h-[180px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="可编辑关于页历史文本内容"></textarea>
+            <p id="about-markdown-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
+          </div>
+
+          <div class="rounded border border-[var(--button-border-color)] p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
               <div class="text-sm font-semibold">网站记录（Timeline）</div>
               <div class="flex flex-wrap items-center gap-2">
                 <button id="load-about-timeline-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
@@ -231,6 +247,12 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
             <div class="grid grid-cols-1 gap-3">
               <textarea id="about-personal-intro" class="w-full min-h-[80px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="个人简介"></textarea>
               <textarea id="about-personal-music" class="w-full min-h-[120px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="音乐列表，每行：标题|歌手|可播放链接"></textarea>
+              <div class="flex flex-wrap items-center gap-2 rounded border border-[var(--button-border-color)]/70 bg-[var(--bg-color)]/40 px-3 py-2">
+                <input id="about-music-files" type="file" accept="audio/mpeg,.mp3" class="hidden" />
+                <label for="about-music-files" class="cursor-pointer rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">选择 MP3</label>
+                <button id="upload-about-music-btn" type="button" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">上传并追加到音乐列表</button>
+                <span id="about-music-files-count" class="text-xs text-[var(--text-color)]/65">未选择文件</span>
+              </div>
               <div>
                 <p class="text-sm mb-2">旅行城市（勾选代表已去过）</p>
                 <div id="about-personal-travel-cities" class="grid grid-cols-2 md:grid-cols-4 gap-2"></div>
@@ -351,6 +373,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   const HEADER_CONTACT_PATH = "src/data/header-contact.ts";
   const ABOUT_PROFILE_PATH = "src/data/about-profile.ts";
   const ABOUT_PERSONAL_PATH = "src/data/about-personal.ts";
+  const ABOUT_SPEC_PATH_PREFIX = "src/content/spec/about";
   const BLOG_GUIDE_CONTENT_PATH = "src/data/blog-guide-content.ts";
   const CATEGORY_OPTIONS_LIMIT = 120;
 
@@ -479,6 +502,17 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     await adminService.uploadFile(path, b64, `upload: ${safeName} for ${slug} (${lang})`, token, branch);
 
     return { name: safeName, type: file.type || "application/octet-stream" };
+  }
+
+  async function uploadAboutMusicFile({ file, token, branch }) {
+    const safeName = file.name.replace(/\s+/g, "-").replace(/[^\w.\-\u4e00-\u9fa5]/g, "");
+    const path = `public/music/${safeName}`;
+    const b64 = await fileToBase64(file);
+    await adminService.uploadFile(path, b64, `about: upload music ${safeName}`, token, branch);
+
+    const basePrefix = (BASE_URL || "/").replace(/\/$/, "");
+    const publicUrl = `${basePrefix}/music/${safeName}`.replace(/\/\//g, "/");
+    return { name: safeName, url: publicUrl.startsWith("/") ? publicUrl : `/${publicUrl}` };
   }
 
   async function renderPdfPagesToImages(file) {
@@ -1085,6 +1119,13 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   }
 
   initPostDateDefault();
+  document.getElementById("about-music-files")?.addEventListener("change", () => {
+    const files = document.getElementById("about-music-files")?.files;
+    const countEl = document.getElementById("about-music-files-count");
+    if (!countEl) return;
+    const count = files?.length || 0;
+    countEl.textContent = count > 0 ? `已选择 ${count} 个 MP3` : "未选择文件";
+  });
   document.getElementById("post-files")?.addEventListener("change", () => {
     const files = document.getElementById("post-files")?.files;
     const countEl = document.getElementById("post-files-count");
@@ -1356,6 +1397,42 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     }
   });
 
+  document.getElementById("load-about-markdown-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("about-markdown-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      const lang = (document.getElementById("about-lang")?.value || "zh-cn").trim();
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const path = `${ABOUT_SPEC_PATH_PREFIX}/${lang}.md`;
+      const meta = await getFileMeta(path, token, branch);
+      const content = decodeFileContent(meta?.content || "");
+      const input = document.getElementById("about-markdown-content");
+      if (input) input.value = content;
+      setMsg(msgEl, `已加载 ${lang} 文本`);
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("save-about-markdown-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("about-markdown-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      const lang = (document.getElementById("about-lang")?.value || "zh-cn").trim();
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const content = document.getElementById("about-markdown-content")?.value || "";
+      const path = `${ABOUT_SPEC_PATH_PREFIX}/${lang}.md`;
+      await upsertFile(path, content, `about: update markdown ${lang}`, token, branch);
+      setMsg(msgEl, `已保存 ${lang} 文本`);
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
   document.getElementById("load-about-timeline-btn")?.addEventListener("click", async () => {
     const msgEl = document.getElementById("about-timeline-msg");
     try {
@@ -1440,6 +1517,44 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const nextContent = buildAboutPersonalTs(parsed);
       await upsertFile(ABOUT_PERSONAL_PATH, nextContent, "about: update personal block", token, branch);
       setMsg(msgEl, "关于我的一些事情保存成功");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("upload-about-music-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("about-personal-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      const files = document.getElementById("about-music-files")?.files;
+      if (!token) throw new Error("请先填写 GitHub Token");
+      if (!files || files.length === 0) throw new Error("请先选择 MP3 文件");
+
+      const musicTextarea = document.getElementById("about-personal-music");
+      let appended = 0;
+      for (const file of files) {
+        const isMp3 = file.type === "audio/mpeg" || /\.mp3$/i.test(file.name);
+        if (!isMp3) continue;
+        const uploaded = await uploadAboutMusicFile({ file, token, branch });
+        const title = uploaded.name.replace(/\.mp3$/i, "");
+        const line = `${title}|Unknown Artist|${uploaded.url}`;
+        if (musicTextarea) {
+          const current = musicTextarea.value.trim();
+          musicTextarea.value = current ? `${current}\n${line}` : line;
+        }
+        appended += 1;
+      }
+
+      const fileInput = document.getElementById("about-music-files");
+      const countEl = document.getElementById("about-music-files-count");
+      if (fileInput) fileInput.value = "";
+      if (countEl) countEl.textContent = "未选择文件";
+
+      if (appended === 0) {
+        throw new Error("所选文件中没有可上传的 MP3");
+      }
+      setMsg(msgEl, `已上传 ${appended} 个 MP3，并追加到音乐列表。请点击“保存”写入关于页配置。`);
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }

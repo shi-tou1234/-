@@ -204,6 +204,7 @@ function getIntensityLevel(count: number, maxCount: number): number {
 }
 
 const pageTitle = t("header.about") + " - " + siteConfig.title;
+const worldMapImage = `${import.meta.env.BASE_URL}images/world-outline.svg`;
 ---
 <MainPageLayout title={pageTitle} lang={currentLang}>
         <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
@@ -260,16 +261,16 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                         <h2 class="mb-4 text-lg font-semibold text-[var(--text-color)]">{aboutLabels.introTitle}</h2>
                         <p class="text-[var(--text-color)]/80 leading-7">{aboutPersonal.intro}</p>
 
-                        <div class="mt-5 rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 p-4">
+                        <div class="mt-5 rounded-2xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/60 p-4 shadow-sm">
                                 <h3 class="text-base font-semibold text-[var(--text-color)] mb-3">{aboutLabels.musicTitle}</h3>
                                 <audio id="about-music-player" controls class="w-full" src={aboutPersonal.musicTracks[0]?.url || ''}></audio>
                                 <p class="mt-2 text-sm text-[var(--text-color)]/70"><strong>{aboutLabels.currentPlaying}:</strong> <span id="about-current-track">{aboutPersonal.musicTracks[0]?.title || aboutLabels.noTrack}</span></p>
-                                <ul class="mt-3 grid gap-2">
+                                <ul class="mt-3 grid gap-2 md:grid-cols-2">
                                         {aboutPersonal.musicTracks.map((track) => (
                                                 <li>
                                                         <button
                                                                 type="button"
-                                                                class="about-track-btn w-full rounded-lg border border-[var(--button-border-color)] px-3 py-2 text-left text-sm hover:bg-[var(--button-hover-color)]"
+                                                                class="about-track-btn w-full rounded-xl border border-[var(--button-border-color)] px-3 py-2 text-left text-sm hover:bg-[var(--button-hover-color)]"
                                                                 data-track-title={`${track.title} - ${track.artist}`}
                                                                 data-track-url={track.url}
                                                         >
@@ -281,9 +282,9 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                                 </ul>
                         </div>
 
-                        <div class="mt-5 rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 p-4">
+                        <div class="mt-5 rounded-2xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/60 p-4 shadow-sm">
                                 <h3 class="text-base font-semibold text-[var(--text-color)] mb-3">{aboutLabels.travelTitle}</h3>
-                                <div id="about-travel-map" class="about-travel-map" title={aboutLabels.travelTitle}>
+                                <div id="about-travel-map" class="about-travel-map" title={aboutLabels.travelTitle} style={`--travel-map-image:url('${worldMapImage}')`}>
                                         <div class="about-travel-map__background"></div>
                                         {travelPoints.map((city) => (
                                                 <button
@@ -419,6 +420,12 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                                         const trackUrl = button.dataset.trackUrl || '';
                                         const trackTitle = button.dataset.trackTitle || '';
                                         if (!trackUrl) return;
+                                        trackButtons.forEach((item) => {
+                                                if (item instanceof HTMLButtonElement) {
+                                                        item.classList.remove('is-active');
+                                                }
+                                        });
+                                        button.classList.add('is-active');
                                         player.src = trackUrl;
                                         currentTrack.textContent = trackTitle;
                                         player.play().catch(() => {});
@@ -469,7 +476,7 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
         .about-travel-map {
                 position: relative;
                 width: 100%;
-                height: 300px;
+                height: clamp(280px, 48vw, 420px);
                 overflow: hidden;
                 border-radius: 0.75rem;
                 border: 1px solid var(--button-border-color);
@@ -494,6 +501,18 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                         radial-gradient(circle at 20% 20%, rgba(29, 78, 216, 0.18), transparent 30%),
                         radial-gradient(circle at 82% 72%, rgba(14, 116, 144, 0.2), transparent 36%),
                         linear-gradient(140deg, #dbeafe 0%, #e0f2fe 40%, #cffafe 100%);
+                background-blend-mode: normal;
+        }
+
+        .about-travel-map__background::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background-image: var(--travel-map-image);
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                opacity: 0.78;
         }
 
         .about-travel-map__dot {
@@ -504,11 +523,30 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                 border: 1px solid color-mix(in srgb, var(--text-color) 30%, transparent);
                 background: color-mix(in srgb, var(--text-color) 20%, white);
                 transform: translate(-50%, -50%);
+                transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .about-travel-map__dot:hover {
+                transform: translate(-50%, -50%) scale(1.15);
         }
 
         .about-travel-map__dot.is-visited {
                 background: var(--link-color);
                 box-shadow: 0 0 0 4px color-mix(in srgb, var(--link-color) 25%, transparent);
+        }
+
+        .about-track-btn {
+                transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .about-track-btn:hover {
+                transform: translateY(-1px);
+                border-color: color-mix(in srgb, var(--link-color) 40%, var(--button-border-color));
+        }
+
+        .about-track-btn.is-active {
+                border-color: var(--link-color);
+                background: color-mix(in srgb, var(--link-color) 16%, var(--button-hover-color));
         }
 </style>
 
