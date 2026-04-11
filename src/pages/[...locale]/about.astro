@@ -509,6 +509,8 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
 
                         let activeTileIndex = 0;
                         let tileLayer = null;
+                        let switchedByError = false;
+                        let firstTileLoaded = false;
                         const mountTileLayer = (index) => {
                                 const source = tileSources[index];
                                 if (!source) return;
@@ -517,7 +519,16 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                                 }
                                 tileLayer = L.tileLayer(source.url, source.options).addTo(map);
 
+                                tileLayer.once('load', () => {
+                                        firstTileLoaded = true;
+                                        if (mapStatus instanceof HTMLElement) {
+                                                mapStatus.hidden = true;
+                                                mapStatus.textContent = '';
+                                        }
+                                });
+
                                 tileLayer.once('tileerror', () => {
+                                        switchedByError = true;
                                         const nextIndex = index + 1;
                                         if (nextIndex < tileSources.length) {
                                                 activeTileIndex = nextIndex;
@@ -528,6 +539,20 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                                                 }
                                         }
                                 });
+
+                                window.setTimeout(() => {
+                                        if (!firstTileLoaded && !switchedByError) {
+                                                const nextIndex = index + 1;
+                                                if (nextIndex < tileSources.length) {
+                                                        activeTileIndex = nextIndex;
+                                                        mountTileLayer(nextIndex);
+                                                        if (mapStatus instanceof HTMLElement) {
+                                                                mapStatus.hidden = false;
+                                                                mapStatus.textContent = mapTileFailed;
+                                                        }
+                                                }
+                                        }
+                                }, 2600);
                         };
 
                         mountTileLayer(activeTileIndex);
@@ -561,6 +586,12 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                         } else {
                                 map.fitBounds(latlngs, { padding: [32, 32] });
                         }
+
+                        map.whenReady(() => {
+                                map.invalidateSize();
+                                window.setTimeout(() => map.invalidateSize(), 120);
+                                window.setTimeout(() => map.invalidateSize(), 420);
+                        });
 
                         window.__aboutLeafletMap = map;
                 };
@@ -690,6 +721,91 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
         .about-track-btn.is-active {
                 border-color: var(--link-color);
                 background: color-mix(in srgb, var(--link-color) 16%, var(--button-hover-color));
+        }
+
+        .leaflet-container {
+                background: linear-gradient(135deg, #e0f2fe 0%, #e2e8f0 100%);
+                font: 12px/1.4 "Helvetica Neue", Arial, Helvetica, sans-serif;
+                outline: 0;
+                overflow: hidden;
+                -webkit-tap-highlight-color: transparent;
+        }
+
+        .leaflet-pane,
+        .leaflet-tile,
+        .leaflet-marker-icon,
+        .leaflet-marker-shadow,
+        .leaflet-tile-container,
+        .leaflet-pane > svg,
+        .leaflet-pane > canvas,
+        .leaflet-zoom-box,
+        .leaflet-image-layer,
+        .leaflet-layer {
+                position: absolute;
+                left: 0;
+                top: 0;
+        }
+
+        .leaflet-tile-container {
+                pointer-events: none;
+        }
+
+        .leaflet-tile {
+                max-width: none !important;
+                max-height: none !important;
+                width: 256px;
+                height: 256px;
+        }
+
+        .leaflet-control {
+                position: relative;
+                z-index: 800;
+                pointer-events: auto;
+        }
+
+        .leaflet-top,
+        .leaflet-bottom {
+                position: absolute;
+                z-index: 900;
+                pointer-events: none;
+        }
+
+        .leaflet-top {
+                top: 0;
+        }
+
+        .leaflet-right {
+                right: 0;
+        }
+
+        .leaflet-bottom {
+                bottom: 0;
+        }
+
+        .leaflet-left {
+                left: 0;
+        }
+
+        .leaflet-control-zoom a {
+                display: block;
+                width: 26px;
+                height: 26px;
+                line-height: 26px;
+                text-align: center;
+                color: #1e293b;
+                text-decoration: none;
+                font-weight: 700;
+                background: #fff;
+                border: 1px solid #94a3b8;
+        }
+
+        .leaflet-control-attribution {
+                margin: 0;
+                padding: 0 5px;
+                color: #334155;
+                background: color-mix(in srgb, #ffffff 88%, transparent);
+                font-size: 11px;
+                line-height: 1.4;
         }
 </style>
 
