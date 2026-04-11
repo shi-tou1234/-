@@ -53,8 +53,7 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
     <ClientRouter />
 </head>
 <body class="h-full bg-[var(--bg-color)]">
-  <a href="#main-content" class="skip-link">跳转到正文内容</a>
-    
+
     <div id="loading-overlay" aria-hidden="true">
       <div class="spinner"></div>
     </div>
@@ -173,37 +172,6 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
 </html>
 
 <style is:global>
-  .skip-link {
-    position: fixed;
-    left: 0.75rem;
-    top: 0.75rem;
-    z-index: 2000;
-    transform: translateY(-160%);
-    border-radius: 0.6rem;
-    border: 1px solid var(--button-border-color);
-    background: var(--bg-color);
-    color: var(--text-color);
-    padding: 0.45rem 0.7rem;
-    font-size: 0.82rem;
-    transition: transform 0.2s ease;
-  }
-
-  .skip-link:focus-visible {
-    transform: translateY(0);
-  }
-
-  a:focus-visible,
-  button:focus-visible,
-  input:focus-visible,
-  select:focus-visible,
-  textarea:focus-visible,
-  summary:focus-visible,
-  [tabindex]:focus-visible {
-    outline: 2px solid var(--link-color);
-    outline-offset: 2px;
-    border-radius: 0.5rem;
-  }
-
   #loading-overlay {
     position: fixed;
     inset: 0;

@@ -253,9 +253,24 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
                 <button id="upload-about-music-btn" type="button" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">上传并追加到音乐列表</button>
                 <span id="about-music-files-count" class="text-xs text-[var(--text-color)]/65">未选择文件</span>
               </div>
-              <div>
-                <p class="text-sm mb-2">旅行城市（勾选代表已去过）</p>
-                <div id="about-personal-travel-cities" class="grid grid-cols-2 md:grid-cols-4 gap-2"></div>
+              <div class="rounded border border-[var(--button-border-color)]/70 bg-[var(--bg-color)]/35 px-3 py-3">
+                <p class="text-sm mb-2">旅行城市（自定义添加）</p>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-2 mb-2">
+                  <input id="about-travel-city-name" type="text" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2 text-sm md:col-span-2" placeholder="城市名（例如：青岛）" />
+                  <input id="about-travel-city-lat" type="text" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2 text-sm" placeholder="纬度" />
+                  <input id="about-travel-city-lng" type="text" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2 text-sm" placeholder="经度" />
+                  <label class="inline-flex items-center gap-2 rounded border border-[var(--button-border-color)] px-3 py-2 text-sm">
+                    <input id="about-travel-city-visited" type="checkbox" class="h-4 w-4" />
+                    <span>已去过</span>
+                  </label>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <button id="lookup-about-city-btn" type="button" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">地图 API 查询坐标</button>
+                  <button id="append-about-city-btn" type="button" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">追加到列表</button>
+                  <button id="clear-about-city-btn" type="button" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">清空输入</button>
+                </div>
+                <textarea id="about-personal-travel-cities" class="mt-3 w-full min-h-[140px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="每行：城市|纬度|经度|是否去过(1/0)
+示例：青岛|36.0671|120.3826|1"></textarea>
               </div>
             </div>
             <p id="about-personal-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
@@ -839,37 +854,49 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       .filter((item) => item.title && item.url);
   }
 
-  function renderTravelCities(cities) {
-    const container = document.getElementById("about-personal-travel-cities");
-    if (!(container instanceof HTMLElement)) return;
-    container.innerHTML = "";
+  function travelCitiesToTextarea(items) {
+    if (!Array.isArray(items)) return "";
+    return items
+      .map((item) => {
+        const city = String(item?.city || "").trim();
+        const lat = Number(item?.lat);
+        const lng = Number(item?.lng);
+        const visited = item?.visited ? "1" : "0";
+        if (!city || !Number.isFinite(lat) || !Number.isFinite(lng)) return "";
+        return `${city}|${lat}|${lng}|${visited}`;
+      })
+      .filter(Boolean)
+      .join("\n");
+  }
 
-    const sortedCities = [...(Array.isArray(cities) ? cities : [])].sort((a, b) => String(a.city || "").localeCompare(String(b.city || ""), "zh-Hans-CN", { sensitivity: "base" }));
+  function textareaToTravelCities(raw) {
+    return String(raw || "")
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const [city, latText, lngText, visitedText] = line.split("|");
+        const lat = Number(latText);
+        const lng = Number(lngText);
+        return {
+          city: String(city || "").trim(),
+          lat,
+          lng,
+          visited: visitedText === "1" || /^true$/i.test(String(visitedText || "")),
+        };
+      })
+      .filter((item) => item.city && Number.isFinite(item.lat) && Number.isFinite(item.lng));
+  }
 
-    sortedCities.forEach((city) => {
-      const label = document.createElement("label");
-      label.className = "inline-flex items-center gap-2 rounded border border-[var(--button-border-color)] px-2 py-1 text-sm";
-
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.checked = Boolean(city?.visited);
-      checkbox.dataset.city = String(city?.city || "");
-      checkbox.className = "h-4 w-4";
-      checkbox.addEventListener("change", () => {
-        if (!aboutPersonalDraft || !Array.isArray(aboutPersonalDraft.travelCities)) return;
-        const target = aboutPersonalDraft.travelCities.find((item) => String(item.city) === String(city.city));
-        if (target) {
-          target.visited = checkbox.checked;
-        }
-      });
-
-      const text = document.createElement("span");
-      text.textContent = String(city?.city || "");
-
-      label.appendChild(checkbox);
-      label.appendChild(text);
-      container.appendChild(label);
-    });
+  function clearTravelCityInputs() {
+    const cityNameEl = document.getElementById("about-travel-city-name");
+    const cityLatEl = document.getElementById("about-travel-city-lat");
+    const cityLngEl = document.getElementById("about-travel-city-lng");
+    const cityVisitedEl = document.getElementById("about-travel-city-visited");
+    if (cityNameEl) cityNameEl.value = "";
+    if (cityLatEl) cityLatEl.value = "";
+    if (cityLngEl) cityLngEl.value = "";
+    if (cityVisitedEl) cityVisitedEl.checked = false;
   }
 
   function extractCategoriesFromMarkdown(markdown) {
@@ -1487,9 +1514,10 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
       const introEl = document.getElementById("about-personal-intro");
       const musicEl = document.getElementById("about-personal-music");
+      const travelEl = document.getElementById("about-personal-travel-cities");
       if (introEl) introEl.value = parsed?.intro || "";
       if (musicEl) musicEl.value = musicToTextarea(parsed?.musicTracks || []);
-      renderTravelCities(parsed?.travelCities || []);
+      if (travelEl) travelEl.value = travelCitiesToTextarea(parsed?.travelCities || []);
       setMsg(msgEl, "关于我的一些事情加载成功");
     } catch (error) {
       setMsg(msgEl, String(error), true);
@@ -1509,10 +1537,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
       parsed.intro = (document.getElementById("about-personal-intro")?.value || "").trim();
       parsed.musicTracks = textareaToMusic(document.getElementById("about-personal-music")?.value || "");
-
-      if (aboutPersonalDraft && Array.isArray(aboutPersonalDraft.travelCities)) {
-        parsed.travelCities = aboutPersonalDraft.travelCities;
-      }
+      parsed.travelCities = textareaToTravelCities(document.getElementById("about-personal-travel-cities")?.value || "");
 
       const nextContent = buildAboutPersonalTs(parsed);
       await upsertFile(ABOUT_PERSONAL_PATH, nextContent, "about: update personal block", token, branch);
@@ -1558,6 +1583,62 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }
+  });
+
+  document.getElementById("lookup-about-city-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("about-personal-msg");
+    try {
+      const cityName = (document.getElementById("about-travel-city-name")?.value || "").trim();
+      if (!cityName) throw new Error("请先输入城市名");
+
+      setMsg(msgEl, "正在通过地图 API 查询坐标...");
+      const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(cityName)}`;
+      const response = await fetch(url, {
+        headers: {
+          Accept: "application/json"
+        }
+      });
+      if (!response.ok) throw new Error(`查询失败：HTTP ${response.status}`);
+
+      const data = await response.json();
+      const first = Array.isArray(data) ? data[0] : null;
+      if (!first?.lat || !first?.lon) throw new Error("未查到坐标，请手动填写");
+
+      const latEl = document.getElementById("about-travel-city-lat");
+      const lngEl = document.getElementById("about-travel-city-lng");
+      if (latEl) latEl.value = Number(first.lat).toFixed(6);
+      if (lngEl) lngEl.value = Number(first.lon).toFixed(6);
+      setMsg(msgEl, "坐标查询成功，可点击“追加到列表”保存到文本框");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("append-about-city-btn")?.addEventListener("click", () => {
+    const msgEl = document.getElementById("about-personal-msg");
+    try {
+      const cityName = (document.getElementById("about-travel-city-name")?.value || "").trim();
+      const lat = Number((document.getElementById("about-travel-city-lat")?.value || "").trim());
+      const lng = Number((document.getElementById("about-travel-city-lng")?.value || "").trim());
+      const visited = Boolean(document.getElementById("about-travel-city-visited")?.checked);
+      if (!cityName) throw new Error("请填写城市名");
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) throw new Error("请填写有效纬度和经度");
+
+      const textarea = document.getElementById("about-personal-travel-cities");
+      if (!(textarea instanceof HTMLTextAreaElement)) throw new Error("未找到旅行城市文本框");
+
+      const line = `${cityName}|${lat}|${lng}|${visited ? 1 : 0}`;
+      const current = textarea.value.trim();
+      textarea.value = current ? `${current}\n${line}` : line;
+      clearTravelCityInputs();
+      setMsg(msgEl, `已追加城市：${cityName}`);
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("clear-about-city-btn")?.addEventListener("click", () => {
+    clearTravelCityInputs();
   });
 
   document.getElementById("insert-friend-template-btn")?.addEventListener("click", () => {
