@@ -916,34 +916,149 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     }
   }
 
-  async function geocodeByOpenMeteo(cityName) {
-    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=zh&format=json`;
-    const data = await requestJsonWithTimeout(url, 9000, { Accept: "application/json" });
-    const first = Array.isArray(data?.results) ? data.results[0] : null;
-    if (!first || !Number.isFinite(Number(first.latitude)) || !Number.isFinite(Number(first.longitude))) {
-      throw new Error("OPEN_METEO_EMPTY");
-    }
-    return {
-      lat: Number(first.latitude),
-      lng: Number(first.longitude),
-      source: "Open-Meteo",
-    };
+  function normalizeCityKeyword(value) {
+    return String(value || "")
+      .trim()
+      .replace(/\s+/g, "")
+      .replace(/（/g, "(")
+      .replace(/）/g, ")")
+      .toLowerCase();
   }
 
-  async function geocodeByNominatim(cityName) {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=zh-CN&q=${encodeURIComponent(cityName)}`;
-    const data = await requestJsonWithTimeout(url, 9000, {
-      Accept: "application/json",
-    });
-    const first = Array.isArray(data) ? data[0] : null;
-    if (!first || !Number.isFinite(Number(first.lat)) || !Number.isFinite(Number(first.lon))) {
-      throw new Error("NOMINATIM_EMPTY");
+  function buildCityQueryCandidates(cityName) {
+    const raw = String(cityName || "").trim();
+    const compact = raw.replace(/\s+/g, "");
+    const noSuffix = compact.replace(/(市|地区|自治州|盟|县|区)$/u, "");
+    const withCitySuffix = /(市|地区|自治州|盟|县|区)$/u.test(compact) ? compact : `${compact}市`;
+
+    return [...new Set([
+      raw,
+      compact,
+      noSuffix,
+      withCitySuffix,
+      `中国${compact}`,
+      `${compact} 中国`,
+    ].filter(Boolean))];
+  }
+
+  function isCoordinateInChina(lat, lng) {
+    return lat >= 18 && lat <= 54 && lng >= 73 && lng <= 135;
+  }
+
+  function pickBestGeoCandidate(candidates, inputKeyword) {
+    if (!Array.isArray(candidates) || candidates.length === 0) return null;
+
+    const normalizedInput = normalizeCityKeyword(inputKeyword);
+    const scored = candidates
+      .filter((item) => Number.isFinite(Number(item?.lat)) && Number.isFinite(Number(item?.lng)))
+      .map((item) => {
+        const lat = Number(item.lat);
+        const lng = Number(item.lng);
+        const name = String(item?.name || item?.displayName || "");
+        const normalizedName = normalizeCityKeyword(name);
+        const countryCode = String(item?.countryCode || "").toLowerCase();
+        const displayName = String(item?.displayName || "");
+        const inChina = isCoordinateInChina(lat, lng);
+
+        let score = 0;
+        if (inChina) score += 80;
+        if (countryCode === "cn") score += 60;
+        if (/中国|china/i.test(displayName)) score += 40;
+        if (normalizedName && normalizedInput && normalizedName.includes(normalizedInput)) score += 35;
+        if (normalizedName && normalizedInput && normalizedInput.includes(normalizedName)) score += 20;
+
+        return {
+          ...item,
+          lat,
+          lng,
+          score,
+        };
+      })
+      .sort((a, b) => b.score - a.score);
+
+    return scored[0] || null;
+  }
+
+  async function geocodeByOpenMeteo(cityQuery) {
+    const encoded = encodeURIComponent(cityQuery);
+    const base = "https://geocoding-api.open-meteo.com/v1/search";
+
+    const cnUrl = `${base}?name=${encoded}&count=8&language=zh&format=json&countryCode=CN`;
+    const globalUrl = `${base}?name=${encoded}&count=8&language=zh&format=json`;
+
+    let candidates = [];
+    try {
+      const cnData = await requestJsonWithTimeout(cnUrl, 9000, { Accept: "application/json" });
+      const cnResults = Array.isArray(cnData?.results) ? cnData.results : [];
+      candidates = cnResults.map((item) => ({
+        lat: Number(item?.latitude),
+        lng: Number(item?.longitude),
+        name: String(item?.name || ""),
+        displayName: [item?.name, item?.admin1, item?.country].filter(Boolean).join(", "),
+        countryCode: String(item?.country_code || ""),
+        source: "Open-Meteo",
+      }));
+    } catch {
     }
-    return {
-      lat: Number(first.lat),
-      lng: Number(first.lon),
-      source: "Nominatim",
-    };
+
+    if (candidates.length === 0) {
+      const globalData = await requestJsonWithTimeout(globalUrl, 9000, { Accept: "application/json" });
+      const globalResults = Array.isArray(globalData?.results) ? globalData.results : [];
+      candidates = globalResults.map((item) => ({
+        lat: Number(item?.latitude),
+        lng: Number(item?.longitude),
+        name: String(item?.name || ""),
+        displayName: [item?.name, item?.admin1, item?.country].filter(Boolean).join(", "),
+        countryCode: String(item?.country_code || ""),
+        source: "Open-Meteo",
+      }));
+    }
+
+    const best = pickBestGeoCandidate(candidates, cityQuery);
+    if (!best) throw new Error("OPEN_METEO_EMPTY");
+    return best;
+  }
+
+  async function geocodeByNominatim(cityQuery) {
+    const encoded = encodeURIComponent(cityQuery);
+    const cnUrl = `https://nominatim.openstreetmap.org/search?format=json&limit=8&accept-language=zh-CN&addressdetails=1&countrycodes=cn&q=${encoded}`;
+    const globalUrl = `https://nominatim.openstreetmap.org/search?format=json&limit=8&accept-language=zh-CN&addressdetails=1&q=${encoded}`;
+
+    let candidates = [];
+    try {
+      const cnData = await requestJsonWithTimeout(cnUrl, 9000, {
+        Accept: "application/json",
+      });
+      const cnResults = Array.isArray(cnData) ? cnData : [];
+      candidates = cnResults.map((item) => ({
+        lat: Number(item?.lat),
+        lng: Number(item?.lon),
+        name: String(item?.name || ""),
+        displayName: String(item?.display_name || ""),
+        countryCode: String(item?.address?.country_code || ""),
+        source: "Nominatim",
+      }));
+    } catch {
+    }
+
+    if (candidates.length === 0) {
+      const globalData = await requestJsonWithTimeout(globalUrl, 9000, {
+        Accept: "application/json",
+      });
+      const globalResults = Array.isArray(globalData) ? globalData : [];
+      candidates = globalResults.map((item) => ({
+        lat: Number(item?.lat),
+        lng: Number(item?.lon),
+        name: String(item?.name || ""),
+        displayName: String(item?.display_name || ""),
+        countryCode: String(item?.address?.country_code || ""),
+        source: "Nominatim",
+      }));
+    }
+
+    const best = pickBestGeoCandidate(candidates, cityQuery);
+    if (!best) throw new Error("NOMINATIM_EMPTY");
+    return best;
   }
 
   async function resolveCityCoordinates(cityName) {
@@ -952,16 +1067,26 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       geocodeByNominatim,
     ];
 
+    const queryCandidates = buildCityQueryCandidates(cityName);
     const errors = [];
-    for (const provider of providers) {
-      try {
-        return await provider(cityName);
-      } catch (error) {
-        errors.push(String(error));
+
+    for (const query of queryCandidates) {
+      for (const provider of providers) {
+        try {
+          const matched = await provider(query);
+          return {
+            lat: Number(matched.lat),
+            lng: Number(matched.lng),
+            source: matched.source,
+            matchedName: matched.displayName || matched.name || query,
+          };
+        } catch (error) {
+          errors.push(String(error));
+        }
       }
     }
 
-    throw new Error(`未查到坐标（已尝试多地图服务）。可手动填写经纬度后追加。${errors.length ? ` 详情：${errors[0]}` : ""}`);
+    throw new Error(`未查到坐标（已尝试多地图服务与多种城市名）。可手动填写经纬度后追加。${errors.length ? ` 详情：${errors[0]}` : ""}`);
   }
 
   function extractCategoriesFromMarkdown(markdown) {
@@ -1663,7 +1788,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const lngEl = document.getElementById("about-travel-city-lng");
       if (latEl) latEl.value = Number(result.lat).toFixed(6);
       if (lngEl) lngEl.value = Number(result.lng).toFixed(6);
-      setMsg(msgEl, `坐标查询成功（来源：${result.source}），可点击“追加到列表”保存到文本框`);
+      setMsg(msgEl, `坐标查询成功（来源：${result.source}，匹配：${result.matchedName || cityName}），可点击“追加到列表”保存到文本框`);
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }
