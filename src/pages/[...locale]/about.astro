@@ -171,34 +171,61 @@ const aboutLabels = currentLang === 'zh-cn'
         ? {
                 introTitle: '关于我的一些事情',
                 musicTitle: '音乐播放器',
-                travelTitle: '旅行地图（双击放大）',
+                travelTitle: '旅行地图（按省份，双击放大）',
+                provinceHighlightTitle: '去过的省份（高亮）',
                 siteRecordTitle: '网站记录',
                 currentPlaying: '正在播放',
                 noTrack: '未开始播放',
                 viewAllTimeline: '查看完整记录',
                 collapseTimeline: '收起历史记录',
-                mapNoCity: '暂未添加旅行城市，请在后台新增城市坐标。',
+                mapNoCity: '暂未添加省份坐标，请在后台新增省份数据。',
                 mapAttribution: '地图数据 © OpenStreetMap 贡献者',
                                                                 mapTileFailed: '地图底图加载失败，已自动切换线路。',
+                visitedLabel: '已去过',
+                plannedLabel: '想去',
           }
         : {
                 introTitle: 'About Me',
                 musicTitle: 'Music Player',
-                travelTitle: 'Travel Map (Double-click to zoom)',
+                travelTitle: 'Travel Map by Province (Double-click to zoom)',
+                provinceHighlightTitle: 'Visited Provinces (Highlighted)',
                 siteRecordTitle: 'Site Timeline',
                 currentPlaying: 'Now Playing',
                 noTrack: 'Not playing',
                 viewAllTimeline: 'View full history',
                 collapseTimeline: 'Collapse history',
-                mapNoCity: 'No travel cities yet. Add city coordinates in admin panel.',
+                mapNoCity: 'No province data yet. Add province coordinates in admin panel.',
                 mapAttribution: 'Map data © OpenStreetMap contributors',
                     mapTileFailed: 'Map tiles failed to load. Switched to fallback source.',
+                visitedLabel: 'Visited',
+                plannedLabel: 'Planned',
           };
 
 const timelineItems = [...aboutPersonal.siteTimeline];
 const timelineRecent = timelineItems.slice(-3).reverse();
 const timelineHistory = timelineItems.slice(0, Math.max(0, timelineItems.length - 3)).reverse();
-const travelCitiesPayload = JSON.stringify(aboutPersonal.travelCities || []);
+const travelPlaces = (aboutPersonal.travelCities || [])
+        .map((item: any) => ({
+                ...item,
+                province: String(item?.province || item?.city || '').trim(),
+        }))
+        .filter((item: any) => item.province && Number.isFinite(Number(item?.lat)) && Number.isFinite(Number(item?.lng)));
+
+const provinceVisitedMap = new Map<string, boolean>();
+travelPlaces.forEach((item: any) => {
+        const key = String(item.province || '').trim();
+        if (!key) return;
+        const existing = Boolean(provinceVisitedMap.get(key));
+        provinceVisitedMap.set(key, existing || Boolean(item.visited));
+});
+const travelProvinceSummary = Array.from(provinceVisitedMap.entries())
+        .map(([province, visited]) => ({ province, visited }))
+        .sort((a, b) => {
+                if (a.visited !== b.visited) return a.visited ? -1 : 1;
+                return a.province.localeCompare(b.province, 'zh-Hans-CN', { sensitivity: 'base' });
+        });
+
+const travelCitiesPayload = JSON.stringify(travelPlaces);
 
 function getIntensityLevel(count: number, maxCount: number): number {
     if (count <= 0) return 0;
@@ -290,9 +317,19 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                         <div class="mt-5 rounded-2xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/60 p-4 shadow-sm">
                                 <h3 class="text-base font-semibold text-[var(--text-color)] mb-3">{aboutLabels.travelTitle}</h3>
                                 <div id="about-travel-map" class="about-travel-map" title={aboutLabels.travelTitle}>
-                                        <div id="about-travel-leaflet" class="about-travel-map__leaflet" data-cities={travelCitiesPayload} data-map-no-city={aboutLabels.mapNoCity} data-map-tile-failed={aboutLabels.mapTileFailed} data-map-attribution={aboutLabels.mapAttribution}></div>
+                                        <div id="about-travel-leaflet" class="about-travel-map__leaflet" data-cities={travelCitiesPayload} data-map-no-city={aboutLabels.mapNoCity} data-map-tile-failed={aboutLabels.mapTileFailed} data-map-attribution={aboutLabels.mapAttribution} data-map-visited={aboutLabels.visitedLabel} data-map-planned={aboutLabels.plannedLabel}></div>
                                         <p id="about-travel-map-status" class="about-travel-map__status" hidden></p>
                                         <p id="about-travel-map-empty" class="about-travel-map__empty" hidden>{aboutLabels.mapNoCity}</p>
+                                </div>
+                                <div class="mt-3">
+                                        <p class="text-xs text-[var(--text-color)]/65">{aboutLabels.provinceHighlightTitle}</p>
+                                        <ul class="about-province-list mt-2">
+                                                {travelProvinceSummary.map((item) => (
+                                                        <li class={`about-province-chip ${item.visited ? 'is-visited' : 'is-planned'}`}>
+                                                                {item.province}
+                                                        </li>
+                                                ))}
+                                        </ul>
                                 </div>
                         </div>
                 </section>
@@ -459,6 +496,8 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                         const mapNoCity = mapContainer.dataset.mapNoCity || 'No city data';
                         const mapTileFailed = mapContainer.dataset.mapTileFailed || 'Map tiles failed to load';
                         const mapAttribution = mapContainer.dataset.mapAttribution || '© OpenStreetMap contributors';
+                        const mapVisitedLabel = mapContainer.dataset.mapVisited || 'Visited';
+                        const mapPlannedLabel = mapContainer.dataset.mapPlanned || 'Planned';
 
                         const raw = JSON.parse(payload);
                         const cities = Array.isArray(raw)
@@ -562,6 +601,7 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                                 const lat = Number(city.lat);
                                 const lng = Number(city.lng);
                                 const visited = Boolean(city.visited);
+                                const province = String(city.province || city.city || '').trim();
 
                                 const marker = L.circleMarker([lat, lng], {
                                         radius: visited ? 8 : 6,
@@ -571,7 +611,7 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                                         fillOpacity: visited ? 0.88 : 0.7,
                                 }).addTo(map);
 
-                                marker.bindPopup(`<strong>${city.city || 'Unknown'}</strong><br/>${visited ? 'Visited' : 'Planned'}`);
+                                marker.bindPopup(`<strong>${province || 'Unknown'}</strong><br/>${visited ? mapVisitedLabel : mapPlannedLabel}`);
                                 latlngs.push([lat, lng]);
                         });
 
@@ -721,6 +761,36 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
         .about-track-btn.is-active {
                 border-color: var(--link-color);
                 background: color-mix(in srgb, var(--link-color) 16%, var(--button-hover-color));
+        }
+
+        .about-province-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin: 0;
+                padding: 0;
+                list-style: none;
+        }
+
+        .about-province-chip {
+                border-radius: 999px;
+                border: 1px solid var(--button-border-color);
+                padding: 0.25rem 0.6rem;
+                font-size: 0.75rem;
+                line-height: 1.2;
+                background: color-mix(in srgb, var(--bg-color) 80%, transparent);
+                color: color-mix(in srgb, var(--text-color) 80%, transparent);
+        }
+
+        .about-province-chip.is-visited {
+                border-color: color-mix(in srgb, var(--link-color) 42%, var(--button-border-color));
+                background: color-mix(in srgb, var(--link-color) 18%, var(--button-hover-color));
+                color: var(--text-color);
+                font-weight: 600;
+        }
+
+        .about-province-chip.is-planned {
+                opacity: 0.78;
         }
 
         .leaflet-container {
