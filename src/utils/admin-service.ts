@@ -209,6 +209,40 @@ export function buildAboutProfileTs(profile: {
   return `export type AboutProfile = {\n  mbti: string\n  mbtiLink: string\n  major: string\n  majorLink: string\n  recentDoing: string\n  recentReading: string\n}\n\nconst aboutProfile: AboutProfile = ${JSON.stringify(profile, null, 2)}\n\nexport default aboutProfile\n`;
 }
 
+export function parseAboutPersonalFromTs(content: string) {
+  const marker = "const aboutPersonal";
+  const exportMarker = "export default aboutPersonal";
+  const start = content.indexOf(marker);
+  if (start < 0) throw new Error("无法解析关于页面扩展内容文件");
+
+  const eq = content.indexOf("=", start);
+  if (eq < 0) throw new Error("无法解析关于页面扩展内容文件");
+
+  const end = content.indexOf(exportMarker, eq);
+  if (end < 0) throw new Error("无法解析关于页面扩展内容文件");
+
+  const rawBlock = content.slice(eq + 1, end).trim().replace(/;\s*$/, "");
+  const normalized = rawBlock
+    .replace(/\n\s*\/\/.*$/gm, "")
+    .replace(/([\{,]\s*)([A-Za-z_$][A-Za-z0-9_$-]*)(\s*:)/g, '$1"$2"$3')
+    .replace(/,\s*([}\]])/g, "$1");
+
+  try {
+    return JSON.parse(normalized);
+  } catch {
+    throw new Error("无法解析关于页面扩展内容文件");
+  }
+}
+
+export function buildAboutPersonalTs(content: {
+  intro: string;
+  siteTimeline: Array<{ date: string; content: string }>;
+  musicTracks: Array<{ title: string; artist: string; url: string }>;
+  travelCities: Array<{ city: string; lat: number; lng: number; visited: boolean }>;
+}) {
+  return `export type SiteTimelineItem = {\n  date: string;\n  content: string;\n};\n\nexport type MusicTrack = {\n  title: string;\n  artist: string;\n  url: string;\n};\n\nexport type TravelCity = {\n  city: string;\n  lat: number;\n  lng: number;\n  visited: boolean;\n};\n\nexport type AboutPersonal = {\n  intro: string;\n  siteTimeline: SiteTimelineItem[];\n  musicTracks: MusicTrack[];\n  travelCities: TravelCity[];\n};\n\nconst aboutPersonal: AboutPersonal = ${JSON.stringify(content, null, 2)};\n\nexport default aboutPersonal;\n`;
+}
+
 // ====== Slug & Date Helpers ======
 
 export function normalizeSlug(input: string): string {

@@ -209,18 +209,34 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         <div class="space-y-4">
           <div class="rounded border border-[var(--button-border-color)] p-4">
             <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-              <div class="text-sm font-semibold">About（Markdown）</div>
+              <div class="text-sm font-semibold">网站记录（Timeline）</div>
               <div class="flex flex-wrap items-center gap-2">
-                <select id="about-lang" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-1.5 text-sm">
-                  <option value="zh-cn">中文（zh-cn）</option>
-                  <option value="en">English（en）</option>
-                </select>
-                <button id="load-about-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
-                <button id="save-about-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
+                <button id="load-about-timeline-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
+                <button id="save-about-timeline-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
               </div>
             </div>
-            <textarea id="about-content" class="w-full min-h-[180px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="About Markdown 内容"></textarea>
-            <p id="about-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
+            <textarea id="about-timeline-content" class="w-full min-h-[160px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="每行一条：日期|内容。例如：2026.4.11|优化归档摘要展示"></textarea>
+            <p class="text-xs mt-1 text-[var(--text-color)]/60">格式：每行“日期|内容”，保存后前台将渲染为时间线样式。</p>
+            <p id="about-timeline-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
+          </div>
+
+          <div class="rounded border border-[var(--button-border-color)] p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <div class="text-sm font-semibold">关于我的一些事情（音乐 / 旅行）</div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button id="load-about-personal-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
+                <button id="save-about-personal-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 gap-3">
+              <textarea id="about-personal-intro" class="w-full min-h-[80px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="个人简介"></textarea>
+              <textarea id="about-personal-music" class="w-full min-h-[120px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="音乐列表，每行：标题|歌手|可播放链接"></textarea>
+              <div>
+                <p class="text-sm mb-2">旅行城市（勾选代表已去过）</p>
+                <div id="about-personal-travel-cities" class="grid grid-cols-2 md:grid-cols-4 gap-2"></div>
+              </div>
+            </div>
+            <p id="about-personal-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
           </div>
 
           <div class="rounded border border-[var(--button-border-color)] p-4">
@@ -305,6 +321,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   import {
     AdminService,
     GitHubApiError,
+    buildAboutPersonalTs,
     buildAboutProfileTs,
     buildFriendLinksTs,
     buildBlogGuideContentTs,
@@ -313,6 +330,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     decodeFileContent,
     getNowDateTimeLocal,
     normalizeSlug,
+    parseAboutPersonalFromTs,
     parseAboutProfileFromTs,
     parseFriendLinksFromTs,
     parseBlogGuideContentFromTs,
@@ -332,6 +350,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   const ADMIN_SECURITY_URL = new URL("admin-security.json", `${window.location.origin}${BASE_URL}`).toString();
   const HEADER_CONTACT_PATH = "src/data/header-contact.ts";
   const ABOUT_PROFILE_PATH = "src/data/about-profile.ts";
+  const ABOUT_PERSONAL_PATH = "src/data/about-personal.ts";
   const BLOG_GUIDE_CONTENT_PATH = "src/data/blog-guide-content.ts";
   const CATEGORY_OPTIONS_LIMIT = 120;
 
@@ -735,6 +754,88 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     });
 
     return { frontmatter, content: bodyContent };
+  }
+
+  let aboutPersonalDraft = null;
+
+  function timelineToTextarea(items) {
+    if (!Array.isArray(items)) return "";
+    return items
+      .map((item) => `${String(item?.date || "").trim()}|${String(item?.content || "").trim()}`)
+      .filter((line) => !line.startsWith("|"))
+      .join("\n");
+  }
+
+  function textareaToTimeline(raw) {
+    return String(raw || "")
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const [date, ...rest] = line.split("|");
+        return {
+          date: String(date || "").trim(),
+          content: rest.join("|").trim(),
+        };
+      })
+      .filter((item) => item.date && item.content);
+  }
+
+  function musicToTextarea(items) {
+    if (!Array.isArray(items)) return "";
+    return items
+      .map((item) => `${String(item?.title || "").trim()}|${String(item?.artist || "").trim()}|${String(item?.url || "").trim()}`)
+      .filter((line) => !line.startsWith("||"))
+      .join("\n");
+  }
+
+  function textareaToMusic(raw) {
+    return String(raw || "")
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const [title, artist, ...rest] = line.split("|");
+        return {
+          title: String(title || "").trim(),
+          artist: String(artist || "").trim(),
+          url: rest.join("|").trim(),
+        };
+      })
+      .filter((item) => item.title && item.url);
+  }
+
+  function renderTravelCities(cities) {
+    const container = document.getElementById("about-personal-travel-cities");
+    if (!(container instanceof HTMLElement)) return;
+    container.innerHTML = "";
+
+    const sortedCities = [...(Array.isArray(cities) ? cities : [])].sort((a, b) => String(a.city || "").localeCompare(String(b.city || ""), "zh-Hans-CN", { sensitivity: "base" }));
+
+    sortedCities.forEach((city) => {
+      const label = document.createElement("label");
+      label.className = "inline-flex items-center gap-2 rounded border border-[var(--button-border-color)] px-2 py-1 text-sm";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = Boolean(city?.visited);
+      checkbox.dataset.city = String(city?.city || "");
+      checkbox.className = "h-4 w-4";
+      checkbox.addEventListener("change", () => {
+        if (!aboutPersonalDraft || !Array.isArray(aboutPersonalDraft.travelCities)) return;
+        const target = aboutPersonalDraft.travelCities.find((item) => String(item.city) === String(city.city));
+        if (target) {
+          target.visited = checkbox.checked;
+        }
+      });
+
+      const text = document.createElement("span");
+      text.textContent = String(city?.city || "");
+
+      label.appendChild(checkbox);
+      label.appendChild(text);
+      container.appendChild(label);
+    });
   }
 
   function extractCategoriesFromMarkdown(markdown) {
@@ -1255,36 +1356,90 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     }
   });
 
-  document.getElementById("load-about-btn")?.addEventListener("click", async () => {
-    const msgEl = document.getElementById("about-msg");
+  document.getElementById("load-about-timeline-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("about-timeline-msg");
     try {
       const token = getToken();
       const branch = getBranch();
-      const lang = (document.getElementById("about-lang")?.value || "zh-cn").trim();
       if (!token) throw new Error("请先填写 GitHub Token");
 
-      const path = `src/content/spec/about/${lang}.md`;
-      const meta = await getFileMeta(path, token, branch);
+      const meta = await getFileMeta(ABOUT_PERSONAL_PATH, token, branch);
       const content = decodeFileContent(meta?.content || "");
-      document.getElementById("about-content").value = content;
-      setMsg(msgEl, "加载成功");
+      const parsed = parseAboutPersonalFromTs(content);
+      aboutPersonalDraft = parsed;
+
+      const timelineInput = document.getElementById("about-timeline-content");
+      if (timelineInput) timelineInput.value = timelineToTextarea(parsed?.siteTimeline || []);
+      setMsg(msgEl, "网站记录加载成功");
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }
   });
 
-  document.getElementById("save-about-btn")?.addEventListener("click", async () => {
-    const msgEl = document.getElementById("about-msg");
+  document.getElementById("save-about-timeline-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("about-timeline-msg");
     try {
       const token = getToken();
       const branch = getBranch();
-      const lang = (document.getElementById("about-lang")?.value || "zh-cn").trim();
-      const content = document.getElementById("about-content")?.value || "";
       if (!token) throw new Error("请先填写 GitHub Token");
 
-      const path = `src/content/spec/about/${lang}.md`;
-      await upsertFile(path, content, `about: update ${lang}`, token, branch);
-      setMsg(msgEl, "保存成功");
+      const meta = await getFileMeta(ABOUT_PERSONAL_PATH, token, branch);
+      const content = decodeFileContent(meta?.content || "");
+      const parsed = parseAboutPersonalFromTs(content);
+      parsed.siteTimeline = textareaToTimeline(document.getElementById("about-timeline-content")?.value || "");
+
+      const nextContent = buildAboutPersonalTs(parsed);
+      await upsertFile(ABOUT_PERSONAL_PATH, nextContent, "about: update site timeline", token, branch);
+      setMsg(msgEl, "网站记录保存成功");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("load-about-personal-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("about-personal-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const meta = await getFileMeta(ABOUT_PERSONAL_PATH, token, branch);
+      const content = decodeFileContent(meta?.content || "");
+      const parsed = parseAboutPersonalFromTs(content);
+      aboutPersonalDraft = parsed;
+
+      const introEl = document.getElementById("about-personal-intro");
+      const musicEl = document.getElementById("about-personal-music");
+      if (introEl) introEl.value = parsed?.intro || "";
+      if (musicEl) musicEl.value = musicToTextarea(parsed?.musicTracks || []);
+      renderTravelCities(parsed?.travelCities || []);
+      setMsg(msgEl, "关于我的一些事情加载成功");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("save-about-personal-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("about-personal-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const meta = await getFileMeta(ABOUT_PERSONAL_PATH, token, branch);
+      const content = decodeFileContent(meta?.content || "");
+      const parsed = parseAboutPersonalFromTs(content);
+
+      parsed.intro = (document.getElementById("about-personal-intro")?.value || "").trim();
+      parsed.musicTracks = textareaToMusic(document.getElementById("about-personal-music")?.value || "");
+
+      if (aboutPersonalDraft && Array.isArray(aboutPersonalDraft.travelCities)) {
+        parsed.travelCities = aboutPersonalDraft.travelCities;
+      }
+
+      const nextContent = buildAboutPersonalTs(parsed);
+      await upsertFile(ABOUT_PERSONAL_PATH, nextContent, "about: update personal block", token, branch);
+      setMsg(msgEl, "关于我的一些事情保存成功");
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }

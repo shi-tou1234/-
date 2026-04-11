@@ -2,6 +2,7 @@
 import { getRelativeLocaleUrl } from '@utils/url-utils';
 import type { BlogEntryWithLocaleStatus } from '@utils/content-utils';
 import { buildCategoriesMap, getPostCategories } from '@utils/blog-taxonomy';
+import { buildPostPreview, truncateText } from '@utils/post-preview';
 
 interface Props {
   posts: BlogEntryWithLocaleStatus[];
@@ -60,6 +61,8 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
         <div class="space-y-2">
           {postsByYear[year].map((post) => {
             const postCategories = getPostCategories(post, language);
+            const postSummary = buildPostPreview(post.data.description || '', post.body || '', language, 80);
+            const shortSummary = truncateText(postSummary, 30);
             return (
               <a
                 href={getRelativeLocaleUrl(language, `/blog/${post.id}`)}
@@ -74,11 +77,12 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
 
                   <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-2">
-                      <h3 class="archive-explorer__post-title truncate text-2xl font-medium tracking-[0.01em]">{post.data.title}</h3>
+                      <h3 class="archive-explorer__post-title truncate text-2xl font-medium tracking-[0.01em]" data-summary-short={shortSummary}>{post.data.title}</h3>
                       {post.isFallback && (
                         <span class="rounded border border-[var(--button-border-color)] bg-[var(--button-hover-color)] px-1.5 py-0.5 text-xs text-[var(--text-color)]/70">fallback</span>
                       )}
                     </div>
+                    <p class="archive-explorer__post-summary mt-2 text-sm text-[var(--text-color)]/65">{postSummary}</p>
                   </div>
 
                   <div class="flex flex-wrap justify-start gap-2 text-sm text-[var(--text-color)]/65 md:justify-end">
@@ -404,6 +408,27 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
       };
 
       buttons.forEach((button) => {
+        if (button instanceof HTMLElement) {
+          button.addEventListener('keydown', (event) => {
+            const currentIndex = buttons.indexOf(button);
+            if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+              event.preventDefault();
+              const nextButton = buttons[(currentIndex + 1) % buttons.length];
+              if (nextButton instanceof HTMLElement) nextButton.focus();
+            }
+            if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+              event.preventDefault();
+              const prevIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+              const prevButton = buttons[prevIndex];
+              if (prevButton instanceof HTMLElement) prevButton.focus();
+            }
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              toggleCategory(button.dataset.filterCategory || '');
+            }
+          });
+        }
+
         button.addEventListener('click', () => {
           if (!(button instanceof HTMLElement)) return;
           toggleCategory(button.dataset.filterCategory || '');
@@ -504,7 +529,53 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
   }
 
   .archive-explorer__post-title {
+    position: relative;
     transition: color 0.2s ease, transform 0.2s ease, padding-left 0.2s ease, font-weight 0.2s ease;
+  }
+
+  .archive-explorer__post-summary {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-3px);
+    transition: max-height 0.24s ease, opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .archive-explorer__post:hover .archive-explorer__post-summary,
+  .archive-explorer__post:focus-visible .archive-explorer__post-summary {
+    max-height: 3.2rem;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .archive-explorer__post-title::after {
+    content: attr(data-summary-short);
+    position: absolute;
+    left: 0;
+    top: calc(100% + 0.4rem);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-3px);
+    background: color-mix(in srgb, var(--bg-color) 94%, var(--button-hover-color));
+    border: 1px solid var(--button-border-color);
+    border-radius: 0.5rem;
+    padding: 0.2rem 0.45rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    white-space: normal;
+    max-width: min(28rem, 80vw);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--shadow-color) 60%, transparent);
+    z-index: 20;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .archive-explorer__post-title:hover::after,
+  .archive-explorer__post-title:focus-visible::after {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .archive-explorer__ghost {

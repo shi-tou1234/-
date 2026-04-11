@@ -5,6 +5,7 @@ import Cover from '@components/Cover.astro'
 
 import { getBlogEntrySort, getSpec } from '@utils/content-utils'
 import aboutProfile from '@/data/about-profile'
+import aboutPersonal from '@/data/about-personal'
 
 import { siteConfig } from '@/config'
 import i18nit from '@i18n/translation'
@@ -165,6 +166,34 @@ const profileLabels = currentLang === 'zh-cn'
             noUpdate: 'No updates',
         };
 
+const aboutLabels = currentLang === 'zh-cn'
+        ? {
+                introTitle: '关于我的一些事情',
+                musicTitle: '音乐播放器',
+                travelTitle: '旅行地图（双击放大）',
+                siteRecordTitle: '网站记录',
+                currentPlaying: '正在播放',
+                noTrack: '未开始播放',
+          }
+        : {
+                introTitle: 'About Me',
+                musicTitle: 'Music Player',
+                travelTitle: 'Travel Map (Double-click to zoom)',
+                siteRecordTitle: 'Site Timeline',
+                currentPlaying: 'Now Playing',
+                noTrack: 'Not playing',
+          };
+
+const travelPoints = aboutPersonal.travelCities.map((city) => {
+        const x = ((city.lng + 180) / 360) * 100;
+        const y = ((90 - city.lat) / 180) * 100;
+        return {
+                ...city,
+                x: Number(x.toFixed(2)),
+                y: Number(y.toFixed(2)),
+        };
+});
+
 function getIntensityLevel(count: number, maxCount: number): number {
     if (count <= 0) return 0;
     const ratio = count / maxCount;
@@ -225,6 +254,63 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                                         </div>
                                 </div>
                         </div>
+                </section>
+
+                <section class="mb-8 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
+                        <h2 class="mb-4 text-lg font-semibold text-[var(--text-color)]">{aboutLabels.introTitle}</h2>
+                        <p class="text-[var(--text-color)]/80 leading-7">{aboutPersonal.intro}</p>
+
+                        <div class="mt-5 rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 p-4">
+                                <h3 class="text-base font-semibold text-[var(--text-color)] mb-3">{aboutLabels.musicTitle}</h3>
+                                <audio id="about-music-player" controls class="w-full" src={aboutPersonal.musicTracks[0]?.url || ''}></audio>
+                                <p class="mt-2 text-sm text-[var(--text-color)]/70"><strong>{aboutLabels.currentPlaying}:</strong> <span id="about-current-track">{aboutPersonal.musicTracks[0]?.title || aboutLabels.noTrack}</span></p>
+                                <ul class="mt-3 grid gap-2">
+                                        {aboutPersonal.musicTracks.map((track) => (
+                                                <li>
+                                                        <button
+                                                                type="button"
+                                                                class="about-track-btn w-full rounded-lg border border-[var(--button-border-color)] px-3 py-2 text-left text-sm hover:bg-[var(--button-hover-color)]"
+                                                                data-track-title={`${track.title} - ${track.artist}`}
+                                                                data-track-url={track.url}
+                                                        >
+                                                                <span class="font-semibold">{track.title}</span>
+                                                                <span class="ml-1 text-[var(--text-color)]/65">- {track.artist}</span>
+                                                        </button>
+                                                </li>
+                                        ))}
+                                </ul>
+                        </div>
+
+                        <div class="mt-5 rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 p-4">
+                                <h3 class="text-base font-semibold text-[var(--text-color)] mb-3">{aboutLabels.travelTitle}</h3>
+                                <div id="about-travel-map" class="about-travel-map" title={aboutLabels.travelTitle}>
+                                        <div class="about-travel-map__background"></div>
+                                        {travelPoints.map((city) => (
+                                                <button
+                                                        type="button"
+                                                        class={`about-travel-map__dot ${city.visited ? 'is-visited' : ''}`}
+                                                        style={`left:${city.x}%;top:${city.y}%;`}
+                                                        title={city.city}
+                                                        aria-label={city.city}
+                                                ></button>
+                                        ))}
+                                </div>
+                        </div>
+                </section>
+
+                <section class="mb-8 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
+                        <h2 class="mb-4 text-lg font-semibold text-[var(--text-color)]">{aboutLabels.siteRecordTitle}</h2>
+                        <ol class="about-timeline">
+                                {aboutPersonal.siteTimeline.map((item) => (
+                                        <li class="about-timeline__item">
+                                                <div class="about-timeline__dot"></div>
+                                                <div class="about-timeline__content rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
+                                                        <p class="text-xs text-[var(--text-color)]/60">{item.date}</p>
+                                                        <p class="mt-1 text-sm text-[var(--text-color)]/85">{item.content}</p>
+                                                </div>
+                                        </li>
+                                ))}
+                        </ol>
                 </section>
 
                 <section class="mb-8 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
@@ -318,6 +404,113 @@ const pageTitle = t("header.about") + " - " + siteConfig.title;
                 </section>
     </div>
 </MainPageLayout>
+
+<script>
+        function initAboutMusicAndTravel() {
+                const player = document.getElementById('about-music-player');
+                const currentTrack = document.getElementById('about-current-track');
+                const trackButtons = document.querySelectorAll('.about-track-btn');
+                const travelMap = document.getElementById('about-travel-map');
+
+                if (player instanceof HTMLAudioElement && currentTrack instanceof HTMLElement) {
+                        trackButtons.forEach((button) => {
+                                if (!(button instanceof HTMLButtonElement)) return;
+                                button.addEventListener('click', () => {
+                                        const trackUrl = button.dataset.trackUrl || '';
+                                        const trackTitle = button.dataset.trackTitle || '';
+                                        if (!trackUrl) return;
+                                        player.src = trackUrl;
+                                        currentTrack.textContent = trackTitle;
+                                        player.play().catch(() => {});
+                                });
+                        });
+                }
+
+                if (travelMap instanceof HTMLElement && travelMap.dataset.bound !== 'true') {
+                        travelMap.dataset.bound = 'true';
+                        travelMap.addEventListener('dblclick', () => {
+                                travelMap.classList.toggle('is-zoomed');
+                        });
+                }
+        }
+
+        initAboutMusicAndTravel();
+        document.addEventListener('astro:page-load', initAboutMusicAndTravel);
+        document.addEventListener('astro:after-swap', initAboutMusicAndTravel);
+</script>
+
+<style is:global>
+        .about-timeline {
+                position: relative;
+                margin: 0;
+                padding-left: 1.2rem;
+                list-style: none;
+                border-left: 2px dashed color-mix(in srgb, var(--link-color) 55%, var(--button-border-color));
+                display: grid;
+                gap: 0.9rem;
+        }
+
+        .about-timeline__item {
+                position: relative;
+                padding-left: 0.8rem;
+        }
+
+        .about-timeline__dot {
+                position: absolute;
+                left: -0.47rem;
+                top: 0.65rem;
+                width: 0.7rem;
+                height: 0.7rem;
+                border-radius: 999px;
+                background: var(--link-color);
+                box-shadow: 0 0 0 3px color-mix(in srgb, var(--link-color) 20%, transparent);
+        }
+
+        .about-travel-map {
+                position: relative;
+                width: 100%;
+                height: 300px;
+                overflow: hidden;
+                border-radius: 0.75rem;
+                border: 1px solid var(--button-border-color);
+                cursor: zoom-in;
+                transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .about-travel-map.is-zoomed {
+                position: fixed;
+                z-index: 1500;
+                inset: 5vh 5vw;
+                width: auto;
+                height: auto;
+                cursor: zoom-out;
+                box-shadow: 0 20px 38px color-mix(in srgb, var(--shadow-color) 80%, transparent);
+        }
+
+        .about-travel-map__background {
+                position: absolute;
+                inset: 0;
+                background:
+                        radial-gradient(circle at 20% 20%, rgba(29, 78, 216, 0.18), transparent 30%),
+                        radial-gradient(circle at 82% 72%, rgba(14, 116, 144, 0.2), transparent 36%),
+                        linear-gradient(140deg, #dbeafe 0%, #e0f2fe 40%, #cffafe 100%);
+        }
+
+        .about-travel-map__dot {
+                position: absolute;
+                width: 0.8rem;
+                height: 0.8rem;
+                border-radius: 999px;
+                border: 1px solid color-mix(in srgb, var(--text-color) 30%, transparent);
+                background: color-mix(in srgb, var(--text-color) 20%, white);
+                transform: translate(-50%, -50%);
+        }
+
+        .about-travel-map__dot.is-visited {
+                background: var(--link-color);
+                box-shadow: 0 0 0 4px color-mix(in srgb, var(--link-color) 25%, transparent);
+        }
+</style>
 
 <script>
         function initEnhancements() {

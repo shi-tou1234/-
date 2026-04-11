@@ -12,6 +12,7 @@ interface Props {
     description: string;
     image: string;
     pubDate: Date;
+    updatedDate?: Date;
     url: string;
     fallback: boolean;
     categories?: string[];
@@ -25,6 +26,7 @@ const {
     description,
     image,
     pubDate,
+    updatedDate,
     url,
     fallback,
     categories = [],
@@ -130,6 +132,12 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         <p class="description post-card__summary text-[var(--text-color)]/65 leading-relaxed">{previewText}</p>
         <div class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[var(--text-color)]/70">
             <span>{formatFullDate(pubDate, currentLang)}</span>
+            {updatedDate && updatedDate.valueOf() > pubDate.valueOf() && (
+                <>
+                    <span class="text-[var(--text-color)]/35">•</span>
+                    <span>{currentLang === 'en' ? `Last updated on ${formatFullDate(updatedDate, currentLang)}` : `最后更新于 ${formatFullDate(updatedDate, currentLang)}`}</span>
+                </>
+            )}
             <span class="text-[var(--text-color)]/35">•</span>
             <span>{readingLabel}</span>
         </div>

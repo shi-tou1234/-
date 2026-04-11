@@ -4,33 +4,12 @@ import PostCard from '@components/PostCard.astro';
 import type { CollectionEntry } from 'astro:content';
 import { getPostCategories } from '@utils/blog-taxonomy';
 import { estimateReadingMinutes } from '@utils/reading-time';
+import { buildPostPreview } from '@utils/post-preview';
 
 const { page } = Astro.props;
 const currentLang = Astro.currentLocale || 'zh-cn';
 
 const blogEntries = page.data as CollectionEntry<'blog'>[];
-
-function generatePostPreview(description: string, body: string, lang: string): string {
-    const desc = String(description || '').trim();
-    if (desc) return desc;
-
-    const cleaned = String(body || '')
-        .replace(/```[\s\S]*?```/g, ' ')
-        .replace(/`[^`]*`/g, ' ')
-        .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
-        .replace(/\[[^\]]*\]\([^)]*\)/g, ' ')
-        .replace(/<[^>]+>/g, ' ')
-        .replace(/[#>*_~\-|]+/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-
-    if (!cleaned) {
-        return lang === 'en' ? 'Open this post for details.' : '点击查看文章详情内容。';
-    }
-
-    const limit = lang === 'en' ? 170 : 90;
-    return cleaned.length > limit ? `${cleaned.slice(0, limit).trim()}...` : cleaned;
-}
 
 ---
 
@@ -53,7 +32,7 @@ function generatePostPreview(description: string, body: string, lang: string): s
         {
             blogEntries.map((entry, index) => {
                 const categories = getPostCategories(entry, currentLang);
-                const preview = generatePostPreview(entry.data.description || '', entry.body || '', currentLang);
+                const preview = buildPostPreview(entry.data.description || '', entry.body || '', currentLang, 80);
                 const readingMinutes = estimateReadingMinutes(entry.body || '');
 
                 return (
@@ -67,6 +46,7 @@ function generatePostPreview(description: string, body: string, lang: string): s
                         categories={categories}
                         preview={preview}
                         readingMinutes={readingMinutes}
+                        updatedDate={entry.data.updatedDate}
                         aosDelay={index * 95}
                     />
                 );
