@@ -24,7 +24,7 @@ export type AboutPersonal = {
 };
 
 const aboutPersonal: AboutPersonal = {
-  "intro": "cmchen, 一个奇怪的名字，不是吗？这个名字源于高中时的一个谐音梗。\n\n爱好\n\n旅行  \n  \n尝试用我的足迹去探索这个世界的美丽\n\n 音乐\n \n 喜欢 R&B、电子、K-pop 路人选手",
+  "intro": "cmchen, 一个奇怪的名字，不是吗？这个名字源于高中时的一个谐音梗。喜欢旅行，  尝试用我的足迹去探索这个世界的美丽。喜欢 R&B、电子、K-pop 路人选手。",
   "siteTimeline": [
     {
       "date": "2026.2.12",
@@ -106,7 +106,32 @@ const aboutPersonal: AboutPersonal = {
       "url": "/-/music/Lauv---Paris-in-the-Rain.mp3"
     }
   ],
-  "travelCities": []
+  "travelCities": [
+    {
+      "city": "宁波",
+      "lat": 29.87819,
+      "lng": 121.54945,
+      "visited": true
+    },
+    {
+      "city": "杭州",
+      "lat": 30.06517,
+      "lng": 102.19527,
+      "visited": true
+    },
+    {
+      "city": "北京",
+      "lat": 30.72608,
+      "lng": 108.67483,
+      "visited": true
+    },
+    {
+      "city": "上海",
+      "lat": 31.22222,
+      "lng": 121.45806,
+      "visited": true
+    }
+  ]
 };
 
 export default aboutPersonal;
