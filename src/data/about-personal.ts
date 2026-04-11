@@ -24,7 +24,7 @@ export type AboutPersonal = {
 };
 
 const aboutPersonal: AboutPersonal = {
-  "intro": "cmchen, 一个奇怪的名字，不是吗？这个名字源于高中时的一个谐音梗。",
+  "intro": "cmchen, 一个奇怪的名字，不是吗？这个名字源于高中时的一个谐音梗。\n\n爱好\n\n旅行  \n  \n尝试用我的足迹去探索这个世界的美丽\n\n 音乐\n \n 喜欢 R&B、电子、K-pop 路人选手",
   "siteTimeline": [
     {
       "date": "2026.2.12",
