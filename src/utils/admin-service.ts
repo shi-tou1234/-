@@ -380,6 +380,7 @@ export class AdminService {
     try {
       res = await fetch(url, {
         ...options,
+        cache: "no-store",
         headers: {
           ...headers,
           ...((options.headers as Record<string, string>) || {}),
@@ -503,18 +504,29 @@ export class AdminService {
     token: string,
     branch: string,
   ): Promise<void> {
-    const sha = await this.getFileSha(filePath, token, branch);
     const apiPath = this.contentsApiPath(filePath);
 
-    await this.githubRequest(apiPath, token, {
-      method: "PUT",
-      body: JSON.stringify({
-        message,
-        content: utf8ToBase64(content),
-        branch,
-        ...(sha ? { sha } : {}),
-      }),
-    });
+    // SHA 冲突常见于并发保存或代理缓存导致的旧 SHA；这里自动重试一次。
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const sha = await this.getFileSha(filePath, token, branch);
+
+      try {
+        await this.githubRequest(apiPath, token, {
+          method: "PUT",
+          body: JSON.stringify({
+            message,
+            content: utf8ToBase64(content),
+            branch,
+            ...(sha ? { sha } : {}),
+          }),
+        });
+        return;
+      } catch (err) {
+        if (!this.isShaConflictError(err) || attempt === 1) {
+          throw err;
+        }
+      }
+    }
   }
 
   /**
@@ -527,18 +539,28 @@ export class AdminService {
     token: string,
     branch: string,
   ): Promise<void> {
-    const sha = await this.getFileSha(filePath, token, branch);
     const apiPath = this.contentsApiPath(filePath);
 
-    await this.githubRequest(apiPath, token, {
-      method: "PUT",
-      body: JSON.stringify({
-        message,
-        content: base64Content,
-        branch,
-        ...(sha ? { sha } : {}),
-      }),
-    });
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const sha = await this.getFileSha(filePath, token, branch);
+
+      try {
+        await this.githubRequest(apiPath, token, {
+          method: "PUT",
+          body: JSON.stringify({
+            message,
+            content: base64Content,
+            branch,
+            ...(sha ? { sha } : {}),
+          }),
+        });
+        return;
+      } catch (err) {
+        if (!this.isShaConflictError(err) || attempt === 1) {
+          throw err;
+        }
+      }
+    }
   }
 
   /**
@@ -572,7 +594,7 @@ export class AdminService {
     token: string,
     branch: string,
   ): Promise<string | undefined> {
-    const apiPath = `${this.contentsApiPath(filePath)}?ref=${encodeURIComponent(branch)}`;
+    const apiPath = `${this.contentsApiPath(filePath)}?ref=${encodeURIComponent(branch)}&t=${Date.now()}`;
     try {
       const meta = await this.githubRequest(apiPath, token);
       return meta?.sha;
@@ -580,6 +602,12 @@ export class AdminService {
       if (err instanceof GitHubApiError && err.isNotFound) return undefined;
       throw err;
     }
+  }
+
+  private isShaConflictError(err: unknown): boolean {
+    if (!(err instanceof GitHubApiError)) return false;
+    if (err.status === 409 || err.status === 422) return true;
+    return /does\s+not\s+match|sha/i.test(err.message || "");
   }
 
   // ---- File Listing ----
