@@ -22,6 +22,7 @@
     "aos": "^2.3.4",
     "astro": "^5.13.7",
     "astro-icon": "^1.1.5",
+    "echarts": "5.4.3",
     "hastscript": "^9.0.1",
     "katex": "^0.16.22",
     "leaflet": "^1.9.4",

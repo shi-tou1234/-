@@ -429,11 +429,12 @@ const {
   }
 </style>
 
-<script is:inline src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-<script is:inline src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/map/js/china.js"></script>
 <script>
+  import * as echarts from "echarts";
+
   (function setupTravelMap() {
     const GEO_BASE = "https://geo.datav.aliyun.com/areas_v3/bound";
+    const LOCAL_CHINA_MAP_URL = "/maps/china.full.json";
     const FALLBACK_ADCODE_MAP = {
       "北京市": "110000",
       "天津市": "120000",
@@ -573,23 +574,13 @@ const {
     }
 
     async function ensureEchartsReady() {
-      if (window.echarts) return;
+      if (!window.echarts) {
+        window.echarts = echarts;
+      }
 
-      await new Promise((resolve, reject) => {
-        const start = Date.now();
-        const timer = window.setInterval(() => {
-          if (window.echarts) {
-            window.clearInterval(timer);
-            resolve();
-            return;
-          }
-
-          if (Date.now() - start > 10000) {
-            window.clearInterval(timer);
-            reject(new Error("ECharts load timeout"));
-          }
-        }, 80);
-      });
+      if (!window.echarts) {
+        throw new Error("ECharts load failed");
+      }
     }
 
     async function fetchGeoJson(adcode) {
@@ -604,6 +595,22 @@ const {
 
       const geoJson = await response.json();
       globalGeoCache.set(adcode, geoJson);
+      return geoJson;
+    }
+
+    async function fetchLocalChinaGeoJson() {
+      const cacheKey = "local-100000";
+      if (globalGeoCache.has(cacheKey)) {
+        return globalGeoCache.get(cacheKey);
+      }
+
+      const response = await fetch(LOCAL_CHINA_MAP_URL);
+      if (!response.ok) {
+        throw new Error("本地全国地图加载失败");
+      }
+
+      const geoJson = await response.json();
+      globalGeoCache.set(cacheKey, geoJson);
       return geoJson;
     }
 
@@ -842,15 +849,23 @@ const {
 
           try {
             geoJson = await fetchGeoJson("100000");
-            window.echarts.registerMap(countryMapName, geoJson);
-          } catch (error) {
-            const hasBuiltinChina = Boolean(window.echarts?.getMap && window.echarts.getMap("china"));
-            if (!hasBuiltinChina) {
-              setMapError("全国地图数据加载失败，请检查网络后刷新");
-              throw error;
+          } catch {
+            try {
+              geoJson = await fetchLocalChinaGeoJson();
+              notifier("边界数据线路切换为本地地图");
+            } catch (localError) {
+              const hasBuiltinChina = Boolean(window.echarts?.getMap && window.echarts.getMap("china"));
+              if (!hasBuiltinChina) {
+                setMapError("全国地图数据加载失败，请检查网络后刷新");
+                throw localError;
+              }
+              countryMapName = "china";
+              notifier("边界数据线路切换为内置地图");
             }
-            countryMapName = "china";
-            notifier("边界数据线路切换为内置地图");
+          }
+
+          if (geoJson) {
+            window.echarts.registerMap(countryMapName, geoJson);
           }
 
           mapState.provinceAdcodeByName.clear();
