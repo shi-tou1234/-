@@ -52,6 +52,7 @@ const {
       </div>
 
       <div class="map-stage" data-role="map"></div>
+      <div class="map-error" data-role="map-error" hidden>地图数据加载失败，请检查网络后刷新</div>
       <div class="loading" data-role="loading">正在加载地图数据...</div>
 
       <div class="legend">
@@ -228,6 +229,25 @@ const {
     gap: 16px;
     font-size: 0.8rem;
     color: var(--tm-subtle);
+  }
+
+  .map-error {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 28px);
+    max-width: 460px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 12px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    padding: 10px 14px;
+    z-index: 2;
+    backdrop-filter: blur(6px);
   }
 
   .legend-item {
@@ -410,6 +430,7 @@ const {
 </style>
 
 <script is:inline src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script is:inline src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/map/js/china.js"></script>
 <script>
   (function setupTravelMap() {
     const GEO_BASE = "https://geo.datav.aliyun.com/areas_v3/bound";
@@ -449,6 +470,13 @@ const {
       "香港特别行政区": "810000",
       "澳门特别行政区": "820000"
     };
+
+    const FALLBACK_ADCODE_BY_NORMALIZED = Object.fromEntries(
+      Object.entries(FALLBACK_ADCODE_MAP).map(([name, adcode]) => [
+        normalizeRegionName(name),
+        adcode,
+      ]),
+    );
 
     const globalGeoCache = window.__travelGeoCache || (window.__travelGeoCache = new Map());
 
@@ -609,6 +637,7 @@ const {
       const storageInputId = wrapper.dataset.storageInputId || "";
       const mapEl = wrapper.querySelector('[data-role="map"]');
       const loadingEl = wrapper.querySelector('[data-role="loading"]');
+      const mapErrorEl = wrapper.querySelector('[data-role="map-error"]');
       const backBtn = wrapper.querySelector('[data-role="back-btn"]');
       const crumbCountry = wrapper.querySelector('[data-role="crumb-country"]');
       const crumbCurrent = wrapper.querySelector('[data-role="crumb-current"]');
@@ -639,6 +668,17 @@ const {
         if (loadingEl instanceof HTMLElement) {
           loadingEl.style.display = loading ? "block" : "none";
         }
+      }
+
+      function setMapError(message = "") {
+        if (!(mapErrorEl instanceof HTMLElement)) return;
+        if (!message) {
+          mapErrorEl.hidden = true;
+          mapErrorEl.textContent = "";
+          return;
+        }
+        mapErrorEl.textContent = message;
+        mapErrorEl.hidden = false;
       }
 
       function getStorageInput() {
@@ -746,6 +786,7 @@ const {
           mapState.provinceAdcodeByName.get(raw) ||
           mapState.provinceAdcodeByNormalized.get(normalized) ||
           FALLBACK_ADCODE_MAP[raw] ||
+          FALLBACK_ADCODE_BY_NORMALIZED[normalized] ||
           null
         );
       }
@@ -792,26 +833,55 @@ const {
         if (backBtn instanceof HTMLElement) backBtn.classList.remove("show");
         if (crumbCurrent instanceof HTMLElement) crumbCurrent.textContent = "全国视图";
         if (crumbCountry instanceof HTMLElement) crumbCountry.classList.add("disabled");
+        setMapError("");
 
         setLoading(true);
         try {
-          const geoJson = await fetchGeoJson("100000");
-          window.echarts.registerMap("travel-map-china", geoJson);
+          let geoJson = null;
+          let countryMapName = "travel-map-china";
+
+          try {
+            geoJson = await fetchGeoJson("100000");
+            window.echarts.registerMap(countryMapName, geoJson);
+          } catch (error) {
+            const hasBuiltinChina = Boolean(window.echarts?.getMap && window.echarts.getMap("china"));
+            if (!hasBuiltinChina) {
+              setMapError("全国地图数据加载失败，请检查网络后刷新");
+              throw error;
+            }
+            countryMapName = "china";
+            notifier("边界数据线路切换为内置地图");
+          }
 
           mapState.provinceAdcodeByName.clear();
           mapState.provinceAdcodeByNormalized.clear();
 
-          (geoJson.features || []).forEach((feature) => {
-            const provinceName = String(feature?.properties?.name || "").trim();
-            const adcode = String(feature?.properties?.adcode || "").slice(0, 6);
-            if (provinceName && adcode) {
-              mapState.provinceAdcodeByName.set(provinceName, adcode);
-              mapState.provinceAdcodeByNormalized.set(normalizeRegionName(provinceName), adcode);
+          const provinceNames = geoJson
+            ? (geoJson.features || []).map((feature) => String(feature?.properties?.name || "").trim()).filter(Boolean)
+            : Object.keys(FALLBACK_ADCODE_MAP);
+
+          if (geoJson) {
+            (geoJson.features || []).forEach((feature) => {
+              const provinceName = String(feature?.properties?.name || "").trim();
+              const adcode = String(feature?.properties?.adcode || "").slice(0, 6);
+              if (provinceName && adcode) {
+                mapState.provinceAdcodeByName.set(provinceName, adcode);
+                mapState.provinceAdcodeByNormalized.set(normalizeRegionName(provinceName), adcode);
+              }
+            });
+          }
+
+          Object.entries(FALLBACK_ADCODE_MAP).forEach(([name, adcode]) => {
+            const normalized = normalizeRegionName(name);
+            if (!mapState.provinceAdcodeByName.has(name)) {
+              mapState.provinceAdcodeByName.set(name, adcode);
+            }
+            if (!mapState.provinceAdcodeByNormalized.has(normalized)) {
+              mapState.provinceAdcodeByNormalized.set(normalized, adcode);
             }
           });
 
-          const seriesData = (geoJson.features || []).map((feature) => {
-            const provinceName = String(feature?.properties?.name || "").trim();
+          const seriesData = provinceNames.map((provinceName) => {
             const provinceVisited = mapState.visitedProvinceNameSet.has(normalizeRegionName(provinceName));
             return {
               name: provinceName,
@@ -852,7 +922,7 @@ const {
                 {
                   name: "中国",
                   type: "map",
-                  map: "travel-map-china",
+                  map: countryMapName,
                   roam: true,
                   zoom: 1.16,
                   label: {
@@ -880,6 +950,7 @@ const {
             },
             true,
           );
+          setMapError("");
         } finally {
           setLoading(false);
         }

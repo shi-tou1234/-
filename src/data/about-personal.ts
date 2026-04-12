@@ -107,18 +107,7 @@ const aboutPersonal: AboutPersonal = {
       "url": "/-/music/Lauv---Paris-in-the-Rain.mp3"
     }
   ],
-  "travelCities": [
-    {
-      "province": "浙江省",
-      "city": "杭州市",
-      "visited": true
-    },
-    {
-      "province": "北京市",
-      "city": "北京市",
-      "visited": true
-    }
-  ]
+  "travelCities": []
 };
 
 export default aboutPersonal;
