@@ -1,5 +1,6 @@
 ---
 import MainPageLayout from '@layouts/MainPageLayout.astro';
+import TravelMap from '@/components/misc/TravelMap.astro';
 import { siteConfig } from '@/config';
 
 const pageTitle = `后台管理 - ${siteConfig.title}`;
@@ -207,8 +208,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         <h2 class="text-xl font-semibold mb-4">站点内容设置</h2>
 
         <div class="space-y-4">
-          <TravelMap editable={true} visitedCities={[]} />
-              <input type="hidden" id="about-personal-travel-cities" value="[]" />
+          <TravelMap editable={true} visitedCities={[]} storageInputId="about-personal-travel-cities" />
+          <input type="hidden" id="about-personal-travel-cities" value="[]" />
               
 
           <div class="rounded border border-[var(--button-border-color)] p-4">
@@ -242,23 +243,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
                 <span id="about-music-files-count" class="text-xs text-[var(--text-color)]/65">未选择文件</span>
               </div>
               <div class="rounded border border-[var(--button-border-color)]/70 bg-[var(--bg-color)]/35 px-3 py-3">
-                <p class="text-sm mb-2">去过的省份（自定义添加）</p>
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-2 mb-2">
-                  <input id="about-travel-city-name" type="text" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2 text-sm md:col-span-2" placeholder="省份名（例如：浙江省）" />
-                  <input id="about-travel-city-lat" type="text" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2 text-sm" placeholder="纬度" />
-                  <input id="about-travel-city-lng" type="text" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2 text-sm" placeholder="经度" />
-                  <label class="inline-flex items-center gap-2 rounded border border-[var(--button-border-color)] px-3 py-2 text-sm">
-                    <input id="about-travel-city-visited" type="checkbox" class="h-4 w-4" />
-                    <span>已去过</span>
-                  </label>
-                </div>
-                <div class="flex flex-wrap items-center gap-2">
-                  <button id="lookup-about-city-btn" type="button" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">地图 API 查询坐标</button>
-                  <button id="append-about-city-btn" type="button" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">追加到列表</button>
-                  <button id="clear-about-city-btn" type="button" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">清空输入</button>
-                </div>
-                <textarea id="about-personal-travel-cities" class="mt-3 w-full min-h-[140px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="每行：省份|纬度|经度|是否去过(1/0)
-示例：浙江省|29.1832|120.0934|1"></textarea>
+                <p class="text-sm">旅行城市请直接在上方地图中点选编辑，前台只负责展示。</p>
+                <p class="text-xs mt-1 text-[var(--text-color)]/65">说明：点击省份进入城市层级，点击城市切换“已去过”状态。</p>
               </div>
             </div>
             <p id="about-personal-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
@@ -842,239 +828,76 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       .filter((item) => item.title && item.url);
   }
 
-  function travelCitiesToTextarea(items) {
-    if (!Array.isArray(items)) return "";
-    return items
-      .map((item) => {
-        const province = String(item?.province || item?.city || "").trim();
-        const lat = Number(item?.lat);
-        const lng = Number(item?.lng);
-        const visited = item?.visited ? "1" : "0";
-        if (!province || !Number.isFinite(lat) || !Number.isFinite(lng)) return "";
-        return `${province}|${lat}|${lng}|${visited}`;
-      })
-      .filter(Boolean)
-      .join("\n");
-  }
+  function normalizeTravelCities(items) {
+    if (!Array.isArray(items)) return [];
 
-  function textareaToTravelCities(raw) {
-    return String(raw || "")
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter(Boolean)
-      .map((line) => {
-        const [province, latText, lngText, visitedText] = line.split("|");
-        const lat = Number(latText);
-        const lng = Number(lngText);
-        return {
-          province: String(province || "").trim(),
-          lat,
-          lng,
-          visited: visitedText === "1" || /^true$/i.test(String(visitedText || "")),
-        };
-      })
-      .filter((item) => item.province && Number.isFinite(item.lat) && Number.isFinite(item.lng));
-  }
+    const map = new Map();
+    items.forEach((item) => {
+      if (!item) return;
 
-  function clearTravelCityInputs() {
-    const cityNameEl = document.getElementById("about-travel-city-name");
-    const cityLatEl = document.getElementById("about-travel-city-lat");
-    const cityLngEl = document.getElementById("about-travel-city-lng");
-    const cityVisitedEl = document.getElementById("about-travel-city-visited");
-    if (cityNameEl) cityNameEl.value = "";
-    if (cityLatEl) cityLatEl.value = "";
-    if (cityLngEl) cityLngEl.value = "";
-    if (cityVisitedEl) cityVisitedEl.checked = false;
-  }
-
-  async function requestJsonWithTimeout(url, timeoutMs = 9000, headers = {}) {
-    const controller = new AbortController();
-    const timer = window.setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const response = await fetch(url, {
-        headers,
-        signal: controller.signal,
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+      if (typeof item === "string") {
+        const text = item.trim();
+        if (!text) return;
+        map.set(`${text.toLowerCase()}|${text.toLowerCase()}`, {
+          province: text,
+          city: text,
+          visited: true,
+        });
+        return;
       }
-      return await response.json();
-    } finally {
-      window.clearTimeout(timer);
-    }
-  }
 
-  function normalizeCityKeyword(value) {
-    return String(value || "")
-      .trim()
-      .replace(/\s+/g, "")
-      .replace(/（/g, "(")
-      .replace(/）/g, ")")
-      .toLowerCase();
-  }
+      const visited = item?.visited !== false;
+      if (!visited) return;
 
-  function buildCityQueryCandidates(cityName) {
-    const raw = String(cityName || "").trim();
-    const compact = raw.replace(/\s+/g, "");
-    const noSuffix = compact.replace(/(省|市|地区|自治州|盟|县|区|特别行政区)$/u, "");
-    const withCitySuffix = /(省|市|地区|自治州|盟|县|区|特别行政区)$/u.test(compact) ? compact : `${compact}省`;
+      const province = String(item?.province || item?.parent || item?.city || item?.name || "").trim();
+      const city = String(item?.city || item?.name || item?.province || "").trim();
+      if (!province && !city) return;
 
-    return [...new Set([
-      raw,
-      compact,
-      noSuffix,
-      withCitySuffix,
-      `中国${compact}`,
-      `${compact} 中国`,
-    ].filter(Boolean))];
-  }
-
-  function isCoordinateInChina(lat, lng) {
-    return lat >= 18 && lat <= 54 && lng >= 73 && lng <= 135;
-  }
-
-  function pickBestGeoCandidate(candidates, inputKeyword) {
-    if (!Array.isArray(candidates) || candidates.length === 0) return null;
-
-    const normalizedInput = normalizeCityKeyword(inputKeyword);
-    const scored = candidates
-      .filter((item) => Number.isFinite(Number(item?.lat)) && Number.isFinite(Number(item?.lng)))
-      .map((item) => {
-        const lat = Number(item.lat);
-        const lng = Number(item.lng);
-        const name = String(item?.name || item?.displayName || "");
-        const normalizedName = normalizeCityKeyword(name);
-        const countryCode = String(item?.countryCode || "").toLowerCase();
-        const displayName = String(item?.displayName || "");
-        const inChina = isCoordinateInChina(lat, lng);
-
-        let score = 0;
-        if (inChina) score += 80;
-        if (countryCode === "cn") score += 60;
-        if (/中国|china/i.test(displayName)) score += 40;
-        if (normalizedName && normalizedInput && normalizedName.includes(normalizedInput)) score += 35;
-        if (normalizedName && normalizedInput && normalizedInput.includes(normalizedName)) score += 20;
-
-        return {
-          ...item,
-          lat,
-          lng,
-          score,
-        };
-      })
-      .sort((a, b) => b.score - a.score);
-
-    return scored[0] || null;
-  }
-
-  async function geocodeByOpenMeteo(cityQuery) {
-    const encoded = encodeURIComponent(cityQuery);
-    const base = "https://geocoding-api.open-meteo.com/v1/search";
-
-    const cnUrl = `${base}?name=${encoded}&count=8&language=zh&format=json&countryCode=CN`;
-    const globalUrl = `${base}?name=${encoded}&count=8&language=zh&format=json`;
-
-    let candidates = [];
-    try {
-      const cnData = await requestJsonWithTimeout(cnUrl, 9000, { Accept: "application/json" });
-      const cnResults = Array.isArray(cnData?.results) ? cnData.results : [];
-      candidates = cnResults.map((item) => ({
-        lat: Number(item?.latitude),
-        lng: Number(item?.longitude),
-        name: String(item?.name || ""),
-        displayName: [item?.name, item?.admin1, item?.country].filter(Boolean).join(", "),
-        countryCode: String(item?.country_code || ""),
-        source: "Open-Meteo",
-      }));
-    } catch {
-    }
-
-    if (candidates.length === 0) {
-      const globalData = await requestJsonWithTimeout(globalUrl, 9000, { Accept: "application/json" });
-      const globalResults = Array.isArray(globalData?.results) ? globalData.results : [];
-      candidates = globalResults.map((item) => ({
-        lat: Number(item?.latitude),
-        lng: Number(item?.longitude),
-        name: String(item?.name || ""),
-        displayName: [item?.name, item?.admin1, item?.country].filter(Boolean).join(", "),
-        countryCode: String(item?.country_code || ""),
-        source: "Open-Meteo",
-      }));
-    }
-
-    const best = pickBestGeoCandidate(candidates, cityQuery);
-    if (!best) throw new Error("OPEN_METEO_EMPTY");
-    return best;
-  }
-
-  async function geocodeByNominatim(cityQuery) {
-    const encoded = encodeURIComponent(cityQuery);
-    const cnUrl = `https://nominatim.openstreetmap.org/search?format=json&limit=8&accept-language=zh-CN&addressdetails=1&countrycodes=cn&q=${encoded}`;
-    const globalUrl = `https://nominatim.openstreetmap.org/search?format=json&limit=8&accept-language=zh-CN&addressdetails=1&q=${encoded}`;
-
-    let candidates = [];
-    try {
-      const cnData = await requestJsonWithTimeout(cnUrl, 9000, {
-        Accept: "application/json",
+      const finalProvince = province || city;
+      const finalCity = city || province;
+      const key = `${finalProvince.toLowerCase()}|${finalCity.toLowerCase()}`;
+      map.set(key, {
+        province: finalProvince,
+        city: finalCity,
+        visited: true,
       });
-      const cnResults = Array.isArray(cnData) ? cnData : [];
-      candidates = cnResults.map((item) => ({
-        lat: Number(item?.lat),
-        lng: Number(item?.lon),
-        name: String(item?.name || ""),
-        displayName: String(item?.display_name || ""),
-        countryCode: String(item?.address?.country_code || ""),
-        source: "Nominatim",
-      }));
-    } catch {
-    }
+    });
 
-    if (candidates.length === 0) {
-      const globalData = await requestJsonWithTimeout(globalUrl, 9000, {
-        Accept: "application/json",
-      });
-      const globalResults = Array.isArray(globalData) ? globalData : [];
-      candidates = globalResults.map((item) => ({
-        lat: Number(item?.lat),
-        lng: Number(item?.lon),
-        name: String(item?.name || ""),
-        displayName: String(item?.display_name || ""),
-        countryCode: String(item?.address?.country_code || ""),
-        source: "Nominatim",
-      }));
-    }
-
-    const best = pickBestGeoCandidate(candidates, cityQuery);
-    if (!best) throw new Error("NOMINATIM_EMPTY");
-    return best;
+    return Array.from(map.values()).sort((a, b) => {
+      const byProvince = a.province.localeCompare(b.province, "zh-Hans-CN", { sensitivity: "base" });
+      if (byProvince !== 0) return byProvince;
+      return a.city.localeCompare(b.city, "zh-Hans-CN", { sensitivity: "base" });
+    });
   }
 
-  async function resolveCityCoordinates(cityName) {
-    const providers = [
-      geocodeByOpenMeteo,
-      geocodeByNominatim,
-    ];
+  function travelCitiesToStorage(items) {
+    return JSON.stringify(normalizeTravelCities(items));
+  }
 
-    const queryCandidates = buildCityQueryCandidates(cityName);
-    const errors = [];
+  function storageToTravelCities(raw) {
+    const text = String(raw || "").trim();
+    if (!text) return [];
 
-    for (const query of queryCandidates) {
-      for (const provider of providers) {
-        try {
-          const matched = await provider(query);
+    try {
+      const parsed = JSON.parse(text);
+      return normalizeTravelCities(parsed);
+    } catch {
+      const fallback = text
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => {
+          const [province, _lat, _lng, visitedText] = line.split("|");
           return {
-            lat: Number(matched.lat),
-            lng: Number(matched.lng),
-            source: matched.source,
-            matchedName: matched.displayName || matched.name || query,
+            province: String(province || "").trim(),
+            city: String(province || "").trim(),
+            visited: visitedText === "1" || /^true$/i.test(String(visitedText || "")),
           };
-        } catch (error) {
-          errors.push(String(error));
-        }
-      }
-    }
+        })
+        .filter((item) => item.province);
 
-    throw new Error(`未查到坐标（已尝试多地图服务与多种省份名）。可手动填写经纬度后追加。${errors.length ? ` 详情：${errors[0]}` : ""}`);
+      return normalizeTravelCities(fallback);
+    }
   }
 
   function extractCategoriesFromMarkdown(markdown) {
@@ -1695,7 +1518,12 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const travelEl = document.getElementById("about-personal-travel-cities");
       if (introEl) introEl.value = parsed?.intro || "";
       if (musicEl) musicEl.value = musicToTextarea(parsed?.musicTracks || []);
-      if (travelEl) travelEl.value = travelCitiesToTextarea(parsed?.travelCities || []);
+      if (travelEl) {
+        travelEl.value = travelCitiesToStorage(parsed?.travelCities || []);
+        document.dispatchEvent(new CustomEvent("travel-map-refresh", {
+          detail: { inputId: "about-personal-travel-cities" },
+        }));
+      }
       setMsg(msgEl, "关于我的一些事情加载成功");
     } catch (error) {
       setMsg(msgEl, String(error), true);
@@ -1715,7 +1543,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
       parsed.intro = (document.getElementById("about-personal-intro")?.value || "").trim();
       parsed.musicTracks = textareaToMusic(document.getElementById("about-personal-music")?.value || "");
-      parsed.travelCities = textareaToTravelCities(document.getElementById("about-personal-travel-cities")?.value || "");
+      parsed.travelCities = storageToTravelCities(document.getElementById("about-personal-travel-cities")?.value || "[]");
 
       const nextContent = buildAboutPersonalTs(parsed);
       await upsertFile(ABOUT_PERSONAL_PATH, nextContent, "about: update personal block", token, branch);

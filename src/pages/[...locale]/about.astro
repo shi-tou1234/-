@@ -1,1067 +1,313 @@
 ---
-import MainPageLayout from '@layouts/MainPageLayout.astro'
-import Markdown from '@components/misc/Markdown.astro'
-import Cover from '@components/Cover.astro'
+import MainPageLayout from '@layouts/MainPageLayout.astro';
+import Markdown from '@components/misc/Markdown.astro';
+import Cover from '@components/Cover.astro';
+import TravelMap from '@/components/misc/TravelMap.astro';
 
-import TravelMap from '@/components/misc/TravelMap.astro'
-import { getBlogEntrySort, getSpec } from '@utils/content-utils'
-import aboutProfile from '@/data/about-profile'
-import aboutPersonal from '@/data/about-personal'
+import { getSpec } from '@utils/content-utils';
+import aboutProfile from '@/data/about-profile';
+import aboutPersonal from '@/data/about-personal';
 
-import { siteConfig } from '@/config'
-import i18nit from '@i18n/translation'
-import { render } from 'astro:content'
-import { execSync } from 'node:child_process'
-import { i18n } from "astro:config/client";
-import 'leaflet/dist/leaflet.css'
+import { siteConfig } from '@/config';
+import i18nit from '@i18n/translation';
+import { render } from 'astro:content';
+import { i18n } from 'astro:config/client';
+
+type TravelInput = {
+  province?: string;
+  city?: string;
+  name?: string;
+  visited?: boolean;
+};
 
 export async function getStaticPaths() {
-	return i18n?.locales.map(locale => ({ params: { locale: locale == i18n?.defaultLocale ? undefined : (locale as string) } }));
+  return i18n?.locales.map((locale) => ({
+    params: { locale: locale == i18n?.defaultLocale ? undefined : (locale as string) },
+  }));
 }
-
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
 
 const aboutPost = await getSpec(currentLang, 'about');
 if (!aboutPost) {
-    throw new Error('No about post found');
+  throw new Error('No about post found');
 }
 const { Content } = await render(aboutPost);
 
-const HEATMAP_DAYS = 140;
-const today = new Date();
-today.setHours(0, 0, 0, 0);
-
-const startDate = new Date(today);
-startDate.setDate(today.getDate() - HEATMAP_DAYS + 1);
-
-const blogUpdateCountMap = new Map<string, number>();
-const codeUpdateCountMap = new Map<string, number>();
-const blogEntries = await getBlogEntrySort(currentLang);
-
-for (const entry of blogEntries) {
-    const date = new Date(entry.data.pubDate);
-    date.setHours(0, 0, 0, 0);
-    if (date.getTime() < startDate.getTime() || date.getTime() > today.getTime()) continue;
-    const key = date.toISOString().slice(0, 10);
-        blogUpdateCountMap.set(key, (blogUpdateCountMap.get(key) || 0) + 1);
-}
-
-try {
-        const since = startDate.toISOString().slice(0, 10);
-        const until = today.toISOString().slice(0, 10);
-        const output = execSync(
-                `git log --since="${since}" --until="${until} 23:59:59" --date=short --pretty=format:%ad -- src public script astro.config.mjs svelte.config.js tsconfig.json package.json pnpm-lock.yaml`,
-                { encoding: 'utf-8' }
-        );
-
-        for (const rawLine of output.split('\n')) {
-                const key = rawLine.trim();
-                if (!key) continue;
-                codeUpdateCountMap.set(key, (codeUpdateCountMap.get(key) || 0) + 1);
-        }
-} catch {
-}
-
-if (codeUpdateCountMap.size === 0) {
-        try {
-                const sinceIso = startDate.toISOString();
-                const untilDateTime = new Date(today);
-                untilDateTime.setHours(23, 59, 59, 999);
-                const untilIso = untilDateTime.toISOString();
-
-                for (let page = 1; 5 >= page; page += 1) {
-                        const url = `https://api.github.com/repos/shi-tou1234/-/commits?since=${encodeURIComponent(sinceIso)}&until=${encodeURIComponent(untilIso)}&per_page=100&page=${page}`;
-                        const response = await fetch(url, {
-                                headers: {
-                                        Accept: 'application/vnd.github+json',
-                                },
-                        });
-                        if (!response.ok) break;
-
-                        const commits = await response.json();
-                        if (!Array.isArray(commits) || commits.length === 0) break;
-
-                        for (const commit of commits) {
-                                const dateString = commit?.commit?.author?.date || commit?.commit?.committer?.date;
-                                if (!dateString) continue;
-                                const date = new Date(dateString);
-                                date.setHours(0, 0, 0, 0);
-                                if (date.getTime() < startDate.getTime() || date.getTime() > today.getTime()) continue;
-                                const key = date.toISOString().slice(0, 10);
-                                codeUpdateCountMap.set(key, (codeUpdateCountMap.get(key) || 0) + 1);
-                        }
-
-                        if (100 > commits.length) break;
-                }
-        } catch {
-        }
-}
-
-const daySeries = [] as Array<{ key: string; date: Date; blogCount: number; codeCount: number }>;
-for (let index = 0; index < HEATMAP_DAYS; index += 1) {
-    const date = new Date(startDate);
-    date.setDate(startDate.getDate() + index);
-    const key = date.toISOString().slice(0, 10);
-        daySeries.push({
-                key,
-                date,
-                blogCount: blogUpdateCountMap.get(key) || 0,
-                codeCount: codeUpdateCountMap.get(key) || 0,
-        });
-}
-
-const totalBlogUpdates = daySeries.reduce((sum, item) => sum + item.blogCount, 0);
-const totalCodeUpdates = daySeries.reduce((sum, item) => sum + item.codeCount, 0);
-const maxBlogCount = Math.max(...daySeries.map((item) => item.blogCount), 1);
-const maxCodeCount = Math.max(...daySeries.map((item) => item.codeCount), 1);
-const leadingPadCount = startDate.getDay();
-
-const heatmapCells = [
-        ...Array.from({ length: leadingPadCount }, () => null),
-        ...daySeries,
-] as Array<{ key: string; date: Date; blogCount: number; codeCount: number } | null>;
-
-const heatmapWeeks = [] as Array<Array<{ key: string; date: Date; blogCount: number; codeCount: number } | null>>;
-for (let index = 0; index < heatmapCells.length; index += 7) {
-    const week = heatmapCells.slice(index, index + 7);
-    while (week.length < 7) week.push(null);
-    heatmapWeeks.push(week);
-}
-
-const weekdayLabels = currentLang === 'zh-cn'
-    ? ['日', '一', '二', '三', '四', '五', '六']
-    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-const profileLabels = currentLang === 'zh-cn'
+const labels =
+  currentLang === 'zh-cn'
     ? {
-            traitTitle: '关于我的特质',
-            mbti: 'MBTI',
-            major: '所学专业',
-                        mbtiIntro: '查看 MBTI 介绍',
-                        majorIntro: '查看专业百科',
-            recentDoing: '最近在做',
-            recentReading: '最近读书',
-                        heatmapTitle: '博客与网站代码更新频率',
-                        heatmapSubtitle: `过去 ${HEATMAP_DAYS} 天 · 博客 ${totalBlogUpdates} 次 · 代码 ${totalCodeUpdates} 次`,
-                        heatmapBlog: '博客',
-                        heatmapCode: '代码',
-            legendLow: '低',
-            legendHigh: '高',
-            noUpdate: '暂无更新',
-        }
+        traitTitle: '关于我的特质',
+        mbti: 'MBTI',
+        major: '所学专业',
+        mbtiIntro: '查看 MBTI 介绍',
+        majorIntro: '查看专业百科',
+        recentDoing: '最近在做',
+        recentReading: '最近读书',
+        introTitle: '关于我的一些事情',
+        musicTitle: '音乐播放器',
+        siteRecordTitle: '网站记录',
+        currentPlaying: '正在播放',
+        noTrack: '未开始播放',
+        viewAllTimeline: '查看完整记录',
+        collapseTimeline: '收起历史记录',
+      }
     : {
-            traitTitle: 'My Traits',
-            mbti: 'MBTI',
-            major: 'Major',
-                        mbtiIntro: 'View MBTI intro',
-                        majorIntro: 'View major wiki',
-            recentDoing: 'Recent Focus',
-            recentReading: 'Recent Reading',
-                        heatmapTitle: 'Blog & Site Code Activity',
-                        heatmapSubtitle: `Last ${HEATMAP_DAYS} days · Blog ${totalBlogUpdates} · Code ${totalCodeUpdates}`,
-                        heatmapBlog: 'Blog',
-                        heatmapCode: 'Code',
-            legendLow: 'Low',
-            legendHigh: 'High',
-            noUpdate: 'No updates',
-        };
-
-const aboutLabels = currentLang === 'zh-cn'
-        ? {
-                introTitle: '关于我的一些事情',
-                musicTitle: '音乐播放器',
-                travelTitle: '旅行地图（按省份，双击放大）',
-                provinceHighlightTitle: '去过的省份（高亮）',
-                siteRecordTitle: '网站记录',
-                currentPlaying: '正在播放',
-                noTrack: '未开始播放',
-                viewAllTimeline: '查看完整记录',
-                collapseTimeline: '收起历史记录',
-                mapNoCity: '暂未添加省份坐标，请在后台新增省份数据。',
-                mapAttribution: '地图数据 © OpenStreetMap 贡献者',
-                                                                mapTileFailed: '地图底图加载失败，已自动切换线路。',
-                visitedLabel: '已去过',
-                plannedLabel: '想去',
-          }
-        : {
-                introTitle: 'About Me',
-                musicTitle: 'Music Player',
-                travelTitle: 'Travel Map by Province (Double-click to zoom)',
-                provinceHighlightTitle: 'Visited Provinces (Highlighted)',
-                siteRecordTitle: 'Site Timeline',
-                currentPlaying: 'Now Playing',
-                noTrack: 'Not playing',
-                viewAllTimeline: 'View full history',
-                collapseTimeline: 'Collapse history',
-                mapNoCity: 'No province data yet. Add province coordinates in admin panel.',
-                mapAttribution: 'Map data © OpenStreetMap contributors',
-                    mapTileFailed: 'Map tiles failed to load. Switched to fallback source.',
-                visitedLabel: 'Visited',
-                plannedLabel: 'Planned',
-          };
+        traitTitle: 'My Traits',
+        mbti: 'MBTI',
+        major: 'Major',
+        mbtiIntro: 'View MBTI intro',
+        majorIntro: 'View major wiki',
+        recentDoing: 'Recent Focus',
+        recentReading: 'Recent Reading',
+        introTitle: 'About Me',
+        musicTitle: 'Music Player',
+        siteRecordTitle: 'Site Timeline',
+        currentPlaying: 'Now Playing',
+        noTrack: 'Not playing',
+        viewAllTimeline: 'View full history',
+        collapseTimeline: 'Collapse history',
+      };
 
 const timelineItems = [...aboutPersonal.siteTimeline];
 const timelineRecent = timelineItems.slice(-3).reverse();
 const timelineHistory = timelineItems.slice(0, Math.max(0, timelineItems.length - 3)).reverse();
-const travelProvinceSummary = Array.from(new Set(aboutPersonal.travelCities || [])).map(province => ({ province, visited: true }));
 
-function getIntensityLevel(count: number, maxCount: number): number {
-    if (count <= 0) return 0;
-    const ratio = count / maxCount;
-    if (ratio < 0.25) return 1;
-    if (ratio < 0.5) return 2;
-    if (ratio < 0.75) return 3;
-    return 4;
-}
+const travelPlaces = (aboutPersonal.travelCities || [])
+  .map((item) => {
+    const source = item as TravelInput;
+    const province = String(source.province || source.city || '').trim();
+    const city = String(source.city || source.name || source.province || '').trim();
+    return {
+      province,
+      city,
+      visited: source.visited !== false,
+    };
+  })
+  .filter((item) => item.province && item.city && item.visited);
 
-const pageTitle = t("header.about") + " - " + siteConfig.title;
+const pageTitle = `${t('header.about')} - ${siteConfig.title}`;
 ---
+
 <MainPageLayout title={pageTitle} lang={currentLang}>
-        <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
+  <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
+    <Cover title={t('cover.title.about')} subTitle={t('cover.subTitle.about')} />
 
-                <Cover title={t("cover.title.about")} subTitle={t("cover.subTitle.about")}/>
+    <section class="mb-6 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
+      <Markdown class="markdown-content onload-animation">
+        <Content />
+      </Markdown>
 
-                <section class="mb-6 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
-                        <Markdown class="markdown-content onload-animation">
-                                <Content />
-                        </Markdown>
+      <div class="mt-5 border-t border-[var(--button-border-color)]/70 pt-4">
+        <h2 class="mb-4 text-lg font-semibold text-[var(--text-color)]">{labels.traitTitle}</h2>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
+            <p class="text-xs text-[var(--text-color)]/60">{labels.mbti}</p>
+            <a
+              href={aboutProfile.mbtiLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-1 flex items-center gap-2 text-base font-semibold text-[var(--link-color)] hover:underline"
+            >
+              <span>{aboutProfile.mbti}</span>
+              <span class="text-xs text-[var(--text-color)]/60">({labels.mbtiIntro})</span>
+            </a>
+          </div>
 
-                        <div class="mt-5 border-t border-[var(--button-border-color)]/70 pt-4">
-                                <h2 class="mb-4 text-lg font-semibold text-[var(--text-color)]">{profileLabels.traitTitle}</h2>
-                                <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-                                        <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
-                                                <p class="text-xs text-[var(--text-color)]/60">{profileLabels.mbti}</p>
-                                                <a
-                                                        href={aboutProfile.mbtiLink}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        class="mt-1 flex items-center gap-2 text-base font-semibold text-[var(--link-color)] hover:underline"
-                                                >
-                                                        <span aria-hidden="true" class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--button-hover-color)] text-[13px]">🧠</span>
-                                                        <span>{aboutProfile.mbti}</span>
-                                                        <span class="text-xs text-[var(--text-color)]/60">({profileLabels.mbtiIntro})</span>
-                                                </a>
-                                        </div>
-                                        <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
-                                                <p class="text-xs text-[var(--text-color)]/60">{profileLabels.major}</p>
-                                                <a
-                                                        href={aboutProfile.majorLink}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        class="mt-1 flex items-center gap-2 text-base font-semibold text-[var(--link-color)] hover:underline"
-                                                >
-                                                        <span aria-hidden="true" class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--button-hover-color)] text-[13px]">🎓</span>
-                                                        <span>{aboutProfile.major}</span>
-                                                        <span class="text-xs text-[var(--text-color)]/60">({profileLabels.majorIntro})</span>
-                                                </a>
-                                        </div>
-                                        <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3 md:col-span-2">
-                                                <p class="text-xs text-[var(--text-color)]/60">{profileLabels.recentDoing}</p>
-                                                <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.recentDoing}</p>
-                                        </div>
-                                        <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3 md:col-span-2">
-                                                <p class="text-xs text-[var(--text-color)]/60">{profileLabels.recentReading}</p>
-                                                <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.recentReading}</p>
-                                        </div>
-                                </div>
-                        </div>
-                </section>
+          <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
+            <p class="text-xs text-[var(--text-color)]/60">{labels.major}</p>
+            <a
+              href={aboutProfile.majorLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-1 flex items-center gap-2 text-base font-semibold text-[var(--link-color)] hover:underline"
+            >
+              <span>{aboutProfile.major}</span>
+              <span class="text-xs text-[var(--text-color)]/60">({labels.majorIntro})</span>
+            </a>
+          </div>
 
-                <section class="mb-8 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
-                        <h2 class="mb-4 text-lg font-semibold text-[var(--text-color)]">{aboutLabels.introTitle}</h2>
-                        <p class="text-[var(--text-color)]/80 leading-7">{aboutPersonal.intro}</p>
+          <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3 md:col-span-2">
+            <p class="text-xs text-[var(--text-color)]/60">{labels.recentDoing}</p>
+            <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.recentDoing}</p>
+          </div>
 
-                        <div class="mt-5 rounded-2xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/60 p-4 shadow-sm">
-                                <h3 class="text-base font-semibold text-[var(--text-color)] mb-3">{aboutLabels.musicTitle}</h3>
-                                <audio id="about-music-player" controls class="w-full" src={aboutPersonal.musicTracks[0]?.url || ''}></audio>
-                                <p class="mt-2 text-sm text-[var(--text-color)]/70"><strong>{aboutLabels.currentPlaying}:</strong> <span id="about-current-track">{aboutPersonal.musicTracks[0]?.title || aboutLabels.noTrack}</span></p>
-                                <ul class="mt-3 grid gap-2 md:grid-cols-2">
-                                        {aboutPersonal.musicTracks.map((track) => (
-                                                <li>
-                                                        <button
-                                                                type="button"
-                                                                class="about-track-btn w-full rounded-xl border border-[var(--button-border-color)] px-3 py-2 text-left text-sm hover:bg-[var(--button-hover-color)]"
-                                                                data-track-title={`${track.title} - ${track.artist}`}
-                                                                data-track-url={track.url}
-                                                        >
-                                                                <span class="font-semibold">{track.title}</span>
-                                                                <span class="ml-1 text-[var(--text-color)]/65">- {track.artist}</span>
-                                                        </button>
-                                                </li>
-                                        ))}
-                                </ul>
-                        </div>
+          <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3 md:col-span-2">
+            <p class="text-xs text-[var(--text-color)]/60">{labels.recentReading}</p>
+            <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.recentReading}</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-                        <div class="mt-5 rounded-2xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/60 p-4 shadow-sm">
-                                <h3 class="text-base font-semibold text-[var(--text-color)] mb-3">{aboutLabels.travelTitle}</h3>
-                                <TravelMap editable={false} visitedCities={aboutPersonal.travelCities || []} />import MainPageLayout from '@layouts/MainPageLayout.astro'
-import Markdown from '@components/misc/Markdown.astro'
-import Cover from '@components/Cover.astro'
+    <section class="mb-8 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
+      <h2 class="mb-4 text-lg font-semibold text-[var(--text-color)]">{labels.introTitle}</h2>
+      <p class="text-[var(--text-color)]/80 leading-7">{aboutPersonal.intro}</p>
 
-import TravelMap from '@/components/misc/TravelMap.astro'
-import { getBlogEntrySort, getSpec } from '@utils/content-utils'
-import aboutProfile from '@/data/about-profile'
-import aboutPersonal from '@/data/about-personal'
+      <div class="mt-5 rounded-2xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/60 p-4 shadow-sm">
+        <h3 class="text-base font-semibold text-[var(--text-color)] mb-3">{labels.musicTitle}</h3>
+        <audio id="about-music-player" controls class="w-full" src={aboutPersonal.musicTracks[0]?.url || ''}></audio>
+        <p class="mt-2 text-sm text-[var(--text-color)]/70">
+          <strong>{labels.currentPlaying}:</strong>
+          <span id="about-current-track">{aboutPersonal.musicTracks[0]?.title || labels.noTrack}</span>
+        </p>
+        <ul class="mt-3 grid gap-2 md:grid-cols-2">
+          {aboutPersonal.musicTracks.map((track) => (
+            <li>
+              <button
+                type="button"
+                class="about-track-btn w-full rounded-xl border border-[var(--button-border-color)] px-3 py-2 text-left text-sm hover:bg-[var(--button-hover-color)]"
+                data-track-title={`${track.title} - ${track.artist}`}
+                data-track-url={track.url}
+              >
+                <span class="font-semibold">{track.title}</span>
+                <span class="ml-1 text-[var(--text-color)]/65">- {track.artist}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-import { siteConfig } from '@/config'
-import i18nit from '@i18n/translation'
-import { render } from 'astro:content'
-import { execSync } from 'node:child_process'
-import { i18n } from "astro:config/client";
-import 'leaflet/dist/leaflet.css'
+      <div class="mt-5 rounded-2xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/60 p-4 shadow-sm">
+        <TravelMap editable={false} visitedCities={travelPlaces} />
+      </div>
+    </section>
 
-export async function getStaticPaths() {
-	return i18n?.locales.map(locale => ({ params: { locale: locale == i18n?.defaultLocale ? undefined : (locale as string) } }));
-}
+    <section class="mb-8 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
+      <h2 class="mb-4 text-lg font-semibold text-[var(--text-color)]">{labels.siteRecordTitle}</h2>
+      <ol class="about-timeline">
+        {timelineRecent.map((item) => (
+          <li class="about-timeline__item">
+            <div class="about-timeline__dot"></div>
+            <div class="about-timeline__content rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
+              <p class="text-xs text-[var(--text-color)]/60">{item.date}</p>
+              <p class="mt-1 text-sm text-[var(--text-color)]/85">{item.content}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
 
-
-const currentLang = Astro.currentLocale || i18n!.defaultLocale;
-const t = i18nit(currentLang);
-
-const aboutPost = await getSpec(currentLang, 'about');
-if (!aboutPost) {
-    throw new Error('No about post found');
-}
-const { Content } = await render(aboutPost);
-<MainPageLayout title={pageTitle} lang={currentLang}>
-        <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
-
-                <Cover title={t("cover.title.about")} subTitle={t("cover.subTitle.about")}/>
-
-                <section class="mb-6 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
-                        <Markdown class="markdown-content onload-animation">
-                                <Content />
-                        </Markdown>
-
-                        <div class="mt-5 border-t border-[var(--button-border-color)]/70 pt-4">
-                                <h2 class="mb-4 text-lg font-semibold text-[var(--text-color)]">{profileLabels.traitTitle}</h2>
-                                <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-                                        <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
-                                                <p class="text-xs text-[var(--text-color)]/60">{profileLabels.mbti}</p>
-                                                <a
-                                                        href={aboutProfile.mbtiLink}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        class="mt-1 flex items-center gap-2 text-base font-semibold text-[var(--link-color)] hover:underline"
-                                                >
-                                                        <span aria-hidden="true" class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--button-hover-color)] text-[13px]">🧠</span>
-                                                        <span>{aboutProfile.mbti}</span>
-                                                        <span class="text-xs text-[var(--text-color)]/60">({profileLabels.mbtiIntro})</span>
-                                                </a>
-                                        </div>
-                                        <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
-                                                <p class="text-xs text-[var(--text-color)]/60">{profileLabels.major}</p>
-                                                <a
-                                                        href={aboutProfile.majorLink}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        class="mt-1 flex items-center gap-2 text-base font-semibold text-[var(--link-color)] hover:underline"
-                                                >
-                                                        <span aria-hidden="true" class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--button-hover-color)] text-[13px]">🎓</span>
-                                                        <span>{aboutProfile.major}</span>
-                                                        <span class="text-xs text-[var(--text-color)]/60">({profileLabels.majorIntro})</span>
-                                                </a>
-                                        </div>
-                                        <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3 md:col-span-2">
-                                                <p class="text-xs text-[var(--text-color)]/60">{profileLabels.recentDoing}</p>
-                                                <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.recentDoing}</p>
-                                        </div>
-                                        <div class="rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3 md:col-span-2">
-                                                <p class="text-xs text-[var(--text-color)]/60">{profileLabels.recentReading}</p>
-                                                <p class="mt-1 text-base font-semibold text-[var(--text-color)]">{aboutProfile.recentReading}</p>
-                                        </div>
-                                </div>
-                        </div>
-                </section>
-
-                <section class="mb-8 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
-                        <h2 class="mb-4 text-lg font-semibold text-[var(--text-color)]">{aboutLabels.introTitle}</h2>
-                        <p class="text-[var(--text-color)]/80 leading-7">{aboutPersonal.intro}</p>
-
-                        <div class="mt-5 rounded-2xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/60 p-4 shadow-sm">
-                                <h3 class="text-base font-semibold text-[var(--text-color)] mb-3">{aboutLabels.musicTitle}</h3>
-                                <audio id="about-music-player" controls class="w-full" src={aboutPersonal.musicTracks[0]?.url || ''}></audio>
-                                <p class="mt-2 text-sm text-[var(--text-color)]/70"><strong>{aboutLabels.currentPlaying}:</strong> <span id="about-current-track">{aboutPersonal.musicTracks[0]?.title || aboutLabels.noTrack}</span></p>
-                                <ul class="mt-3 grid gap-2 md:grid-cols-2">
-                                        {aboutPersonal.musicTracks.map((track) => (
-                                                <li>
-                                                        <button
-                                                                type="button"
-                                                                class="about-track-btn w-full rounded-xl border border-[var(--button-border-color)] px-3 py-2 text-left text-sm hover:bg-[var(--button-hover-color)]"
-                                                                data-track-title={`${track.title} - ${track.artist}`}
-                                                                data-track-url={track.url}
-                                                        >
-                                                                <span class="font-semibold">{track.title}</span>
-                                                                <span class="ml-1 text-[var(--text-color)]/65">- {track.artist}</span>
-                                                        </button>
-                                                </li>
-                                        ))}
-                                </ul>
-                        </div>
-
-                        <div class="mt-5 rounded-2xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/60 p-4 shadow-sm">
-                                <h3 class="text-base font-semibold text-[var(--text-color)] mb-3">{aboutLabels.travelTitle}</h3>
-                                <div id="about-travel-map" class="about-travel-map" title={aboutLabels.travelTitle}>
-                                        <div id="about-travel-leaflet" class="about-travel-map__leaflet" data-cities={travelCitiesPayload} data-map-no-city={aboutLabels.mapNoCity} data-map-tile-failed={aboutLabels.mapTileFailed} data-map-attribution={aboutLabels.mapAttribution} data-map-visited={aboutLabels.visitedLabel} data-map-planned={aboutLabels.plannedLabel}></div>
-                                        <p id="about-travel-map-status" class="about-travel-map__status" hidden></p>
-                                        <p id="about-travel-map-empty" class="about-travel-map__empty" hidden>{aboutLabels.mapNoCity}</p>
-                                </div>
-                                <div class="mt-3">
-                                        <p class="text-xs text-[var(--text-color)]/65">{aboutLabels.provinceHighlightTitle}</p>
-                                        <ul class="about-province-list mt-2">
-                                                {travelProvinceSummary.map((item) => (
-                                                        <li class={`about-province-chip ${item.visited ? 'is-visited' : 'is-planned'}`}>
-                                                                {item.province}
-                                                        </li>
-                                                ))}
-                                        </ul>
-                                </div>
-                        </div>
-                </section>
-
-                <section class="mb-8 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
-                        <h2 class="mb-4 text-lg font-semibold text-[var(--text-color)]">{aboutLabels.siteRecordTitle}</h2>
-                        <ol class="about-timeline">
-                                {timelineRecent.map((item) => (
-                                        <li class="about-timeline__item">
-                                                <div class="about-timeline__dot"></div>
-                                                <div class="about-timeline__content rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
-                                                        <p class="text-xs text-[var(--text-color)]/60">{item.date}</p>
-                                                        <p class="mt-1 text-sm text-[var(--text-color)]/85">{item.content}</p>
-                                                </div>
-                                        </li>
-                                ))}
-                        </ol>
-                        {timelineHistory.length > 0 && (
-                                <>
-                                        <button id="about-timeline-toggle" type="button" class="mt-3 rounded-lg border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]" data-open="false" data-label-expand={aboutLabels.viewAllTimeline} data-label-collapse={aboutLabels.collapseTimeline}>{aboutLabels.viewAllTimeline}</button>
-                                        <ol id="about-timeline-history" class="about-timeline mt-3" hidden>
-                                                {timelineHistory.map((item) => (
-                                                        <li class="about-timeline__item">
-                                                                <div class="about-timeline__dot"></div>
-                                                                <div class="about-timeline__content rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
-                                                                        <p class="text-xs text-[var(--text-color)]/60">{item.date}</p>
-                                                                        <p class="mt-1 text-sm text-[var(--text-color)]/85">{item.content}</p>
-                                                                </div>
-                                                        </li>
-                                                ))}
-                                        </ol>
-                                </>
-                        )}
-                </section>
-
-                <section class="mb-8 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
-                        <div class="mb-4 flex flex-wrap items-end justify-between gap-2">
-                                <div>
-                                        <h2 class="text-lg font-semibold text-[var(--text-color)]">{profileLabels.heatmapTitle}</h2>
-                                        <p
-                                                id="about-heatmap-subtitle"
-                                                data-days={HEATMAP_DAYS}
-                                                data-blog-total={totalBlogUpdates}
-                                                data-code-total={totalCodeUpdates}
-                                                data-blog-label={profileLabels.heatmapBlog}
-                                                data-code-label={profileLabels.heatmapCode}
-                                                data-lang={currentLang}
-                                                class="text-sm text-[var(--text-color)]/65"
-                                        >{profileLabels.heatmapSubtitle}</p>
-                                        <p class="mt-1 flex items-center gap-3 text-xs text-[var(--text-color)]/60">
-                                                <span>{profileLabels.heatmapBlog}: {totalBlogUpdates}</span>
-                                                <span id="about-code-total" data-label={profileLabels.heatmapCode} data-value={totalCodeUpdates}>{profileLabels.heatmapCode}: {totalCodeUpdates}</span>
-                                        </p>
-                                </div>
-                                <div class="flex items-center gap-2 text-xs text-[var(--text-color)]/65">
-                                        <span>{profileLabels.legendLow}</span>
-                                        {[0, 1, 2, 3, 4].map((level) => (
-                                                <span
-                                                        class="h-3.5 w-3.5 rounded-sm border border-[var(--button-border-color)]"
-                                                        style={level === 0
-                                                                ? 'background: var(--button-hover-color);'
-                                                                : `background: color-mix(in srgb, var(--link-color) ${20 + level * 18}%, var(--button-hover-color));`}
-                                                ></span>
-                                        ))}
-                                        <span>{profileLabels.legendHigh}</span>
-                                </div>
-                        </div>
-
-                        <div class="about-heatmap-wrap overflow-x-auto">
-                                <div class="inline-flex gap-2 min-w-full">
-                                        <div class="grid grid-rows-7 gap-1 pt-5 text-[10px] text-[var(--text-color)]/55">
-                                                {weekdayLabels.map((label, index) => (
-                                                        <span class={`flex h-10 items-center ${index % 2 === 0 ? '' : 'opacity-0'}`}>{label}</span>
-                                                ))}
-                                        </div>
-
-                                        <div class="flex gap-1">
-                                                {heatmapWeeks.map((week) => (
-                                                        <div class="grid grid-rows-7 gap-1">
-                                                                {week.map((cell) => (
-                                                                        cell ? (
-                                                                                <div class="flex h-10 w-6 flex-col gap-[2px]">
-                                                                                        <span
-                                                                                                title={`${cell.key} · ${profileLabels.heatmapBlog}: ${cell.blogCount}`}
-                                                                                                class="h-[19px] w-6 rounded-sm border border-[var(--button-border-color)]"
-                                                                                                style={(() => {
-                                                                                                        const level = getIntensityLevel(cell.blogCount, maxBlogCount);
-                                                                                                        return level === 0
-                                                                                                            ? 'background: var(--button-hover-color);'
-                                                                                                            : `background: color-mix(in srgb, var(--link-color) ${20 + level * 18}%, var(--button-hover-color));`;
-                                                                                                })()}
-                                                                                        ></span>
-                                                                                        <span
-                                                                                                title={`${cell.key} · ${profileLabels.heatmapCode}: ${cell.codeCount}`}
-                                                                                                data-code-cell="1"
-                                                                                                data-date={cell.key}
-                                                                                                class="h-[19px] w-6 rounded-sm border border-[var(--button-border-color)]"
-                                                                                                style={(() => {
-                                                                                                        const level = getIntensityLevel(cell.codeCount, maxCodeCount);
-                                                                                                        return level === 0
-                                                                                                            ? 'background: var(--button-hover-color);'
-                                                                                                            : `background: color-mix(in srgb, var(--link-color) ${20 + level * 18}%, var(--button-hover-color));`;
-                                                                                                })()}
-                                                                                        ></span>
-                                                                                </div>
-                                                                        ) : (
-                                                                                <span class="h-10 w-6 rounded-sm bg-transparent"></span>
-                                                                        )
-                                                                ))}
-                                                        </div>
-                                                ))}
-                                        </div>
-                                </div>
-                        </div>
-
-                        <div class="mt-3 flex items-center gap-4 text-xs text-[var(--text-color)]/65">
-                                <span class="font-medium">{profileLabels.heatmapBlog}</span>
-                                <span class="font-medium">{profileLabels.heatmapCode}</span>
-                        </div>
-
-                        {totalBlogUpdates + totalCodeUpdates === 0 && (
-                                <p class="mt-3 text-sm text-[var(--text-color)]/65">{profileLabels.noUpdate}</p>
-                        )}
-                </section>
-    </div>
+      {timelineHistory.length > 0 && (
+        <>
+          <button
+            id="about-timeline-toggle"
+            type="button"
+            class="mt-3 rounded-lg border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]"
+            data-open="false"
+            data-label-expand={labels.viewAllTimeline}
+            data-label-collapse={labels.collapseTimeline}
+          >
+            {labels.viewAllTimeline}
+          </button>
+          <ol id="about-timeline-history" class="about-timeline mt-3" hidden>
+            {timelineHistory.map((item) => (
+              <li class="about-timeline__item">
+                <div class="about-timeline__dot"></div>
+                <div class="about-timeline__content rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
+                  <p class="text-xs text-[var(--text-color)]/60">{item.date}</p>
+                  <p class="mt-1 text-sm text-[var(--text-color)]/85">{item.content}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </>
+      )}
+    </section>
+  </div>
 </MainPageLayout>
 
 <script>
-        import L from 'leaflet';
+  function initAboutPage() {
+    const player = document.getElementById('about-music-player');
+    const currentTrack = document.getElementById('about-current-track');
+    const trackButtons = document.querySelectorAll('.about-track-btn');
 
-        function initAboutMusicAndTravel() {
-                const player = document.getElementById('about-music-player');
-                const currentTrack = document.getElementById('about-current-track');
-                const trackButtons = document.querySelectorAll('.about-track-btn');
-                
+    if (player instanceof HTMLAudioElement && currentTrack instanceof HTMLElement) {
+      trackButtons.forEach((button) => {
+        if (!(button instanceof HTMLButtonElement)) return;
+        button.addEventListener('click', () => {
+          const trackUrl = button.dataset.trackUrl || '';
+          const trackTitle = button.dataset.trackTitle || '';
+          if (!trackUrl) return;
 
-                if (player instanceof HTMLAudioElement && currentTrack instanceof HTMLElement) {
-                        trackButtons.forEach((button) => {
-                                if (!(button instanceof HTMLButtonElement)) return;
-                                button.addEventListener('click', () => {
-                                        const trackUrl = button.dataset.trackUrl || '';
-                                        const trackTitle = button.dataset.trackTitle || '';
-                                        if (!trackUrl) return;
-                                        trackButtons.forEach((item) => {
-                                                if (item instanceof HTMLButtonElement) {
-                                                        item.classList.remove('is-active');
-                                                }
-                                        });
-                                        button.classList.add('is-active');
-                                        player.src = trackUrl;
-                                        currentTrack.textContent = trackTitle;
-                                        player.play().catch(() => {});
-                                });
-                        });
-                }
+          trackButtons.forEach((item) => {
+            if (item instanceof HTMLButtonElement) {
+              item.classList.remove('is-active');
+            }
+          });
 
-                const initTravelMap = async () => {
-                        if (!(mapContainer instanceof HTMLElement)) return;
+          button.classList.add('is-active');
+          player.src = trackUrl;
+          currentTrack.textContent = trackTitle;
+          player.play().catch(() => {});
+        });
+      });
+    }
 
-                        const payload = mapContainer.dataset.cities || '[]';
-                        const mapNoCity = mapContainer.dataset.mapNoCity || 'No city data';
-                        const mapTileFailed = mapContainer.dataset.mapTileFailed || 'Map tiles failed to load';
-                        const mapAttribution = mapContainer.dataset.mapAttribution || '© OpenStreetMap contributors';
-                        const mapVisitedLabel = mapContainer.dataset.mapVisited || 'Visited';
-                        const mapPlannedLabel = mapContainer.dataset.mapPlanned || 'Planned';
+    const timelineToggle = document.getElementById('about-timeline-toggle');
+    const timelineHistory = document.getElementById('about-timeline-history');
 
-                        const raw = JSON.parse(payload);
-                        const cities = Array.isArray(raw)
-                                ? raw.filter((item) => Number.isFinite(Number(item?.lat)) && Number.isFinite(Number(item?.lng)))
-                                : [];
+    if (
+      timelineToggle instanceof HTMLButtonElement &&
+      timelineHistory instanceof HTMLElement &&
+      timelineToggle.dataset.bound !== 'true'
+    ) {
+      timelineToggle.dataset.bound = 'true';
+      timelineToggle.addEventListener('click', () => {
+        const opened = timelineToggle.dataset.open === 'true';
+        timelineToggle.dataset.open = opened ? 'false' : 'true';
+        timelineHistory.hidden = opened;
+        timelineToggle.textContent = opened
+          ? timelineToggle.dataset.labelExpand || 'View more'
+          : timelineToggle.dataset.labelCollapse || 'Collapse';
+      });
+    }
+  }
 
-                        if (mapEmpty instanceof HTMLElement) mapEmpty.hidden = true;
-                        mapContainer.hidden = false;
-                        if (mapStatus instanceof HTMLElement) {
-                                mapStatus.hidden = true;
-                                mapStatus.textContent = '';
-                        }
-
-                        if (window.__aboutLeafletMap) {
-                                window.__aboutLeafletMap.remove();
-                        }
-
-                        const map = L.map(mapContainer, {
-                                zoomControl: true,
-                                attributionControl: true,
-                        });
-
-                        const tileSources = [
-                                {
-                                        url: 'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
-                                        options: {
-                                                subdomains: ['1', '2', '3', '4'],
-                                                maxZoom: 18,
-                                                attribution: '地图数据 © 高德地图',
-                                        },
-                                },
-                                {
-                                        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                        options: {
-                                                maxZoom: 18,
-                                                attribution: mapAttribution,
-                                        },
-                                },
-                                {
-                                        url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-                                        options: {
-                                                subdomains: 'abcd',
-                                                maxZoom: 20,
-                                                attribution: '© CARTO',
-                                        },
-                                },
-                        ];
-
-                        let activeTileIndex = 0;
-                        let tileLayer = null;
-                        let switchedByError = false;
-                        let firstTileLoaded = false;
-                        const mountTileLayer = (index) => {
-                                const source = tileSources[index];
-                                if (!source) return;
-                                if (tileLayer) {
-                                        map.removeLayer(tileLayer);
-                                }
-                                tileLayer = L.tileLayer(source.url, source.options).addTo(map);
-
-                                tileLayer.once('load', () => {
-                                        firstTileLoaded = true;
-                                        if (mapStatus instanceof HTMLElement) {
-                                                mapStatus.hidden = true;
-                                                mapStatus.textContent = '';
-                                        }
-                                });
-
-                                tileLayer.once('tileerror', () => {
-                                        switchedByError = true;
-                                        const nextIndex = index + 1;
-                                        if (nextIndex < tileSources.length) {
-                                                activeTileIndex = nextIndex;
-                                                mountTileLayer(nextIndex);
-                                                if (mapStatus instanceof HTMLElement) {
-                                                        mapStatus.hidden = false;
-                                                        mapStatus.textContent = mapTileFailed;
-                                                }
-                                        }
-                                });
-
-                                window.setTimeout(() => {
-                                        if (!firstTileLoaded && !switchedByError) {
-                                                const nextIndex = index + 1;
-                                                if (nextIndex < tileSources.length) {
-                                                        activeTileIndex = nextIndex;
-                                                        mountTileLayer(nextIndex);
-                                                        if (mapStatus instanceof HTMLElement) {
-                                                                mapStatus.hidden = false;
-                                                                mapStatus.textContent = mapTileFailed;
-                                                        }
-                                                }
-                                        }
-                                }, 2600);
-                        };
-
-                        mountTileLayer(activeTileIndex);
-
-                        const latlngs = [];
-                        cities.forEach((city) => {
-                                const lat = Number(city.lat);
-                                const lng = Number(city.lng);
-                                const visited = Boolean(city.visited);
-                                const province = String(city.province || city.city || '').trim();
-
-                                const marker = L.circleMarker([lat, lng], {
-                                        radius: visited ? 8 : 6,
-                                        color: visited ? '#0284c7' : '#64748b',
-                                        weight: 2,
-                                        fillColor: visited ? '#0ea5e9' : '#cbd5e1',
-                                        fillOpacity: visited ? 0.88 : 0.7,
-                                }).addTo(map);
-
-                                marker.bindPopup(`<strong>${province || 'Unknown'}</strong><br/>${visited ? mapVisitedLabel : mapPlannedLabel}`);
-                                latlngs.push([lat, lng]);
-                        });
-
-                        if (latlngs.length === 0) {
-                                map.setView([35.8617, 104.1954], 4);
-                                if (mapStatus instanceof HTMLElement) {
-                                        mapStatus.hidden = false;
-                                        mapStatus.textContent = mapNoCity;
-                                }
-                        } else if (latlngs.length === 1) {
-                                map.setView(latlngs[0], 4);
-                        } else {
-                                map.fitBounds(latlngs, { padding: [32, 32] });
-                        }
-
-                        map.whenReady(() => {
-                                map.invalidateSize();
-                                window.setTimeout(() => map.invalidateSize(), 120);
-                                window.setTimeout(() => map.invalidateSize(), 420);
-                        });
-
-                        window.__aboutLeafletMap = map;
-                };
-
-                if (travelMap instanceof HTMLElement && travelMap.dataset.bound !== 'true') {
-                        travelMap.dataset.bound = 'true';
-                        travelMap.addEventListener('dblclick', () => {
-                                travelMap.classList.toggle('is-zoomed');
-                                window.setTimeout(() => {
-                                        if (window.__aboutLeafletMap) {
-                                                window.__aboutLeafletMap.invalidateSize();
-                                        }
-                                }, 220);
-                        });
-                }
-
-                const timelineToggle = document.getElementById('about-timeline-toggle');
-                const timelineHistory = document.getElementById('about-timeline-history');
-                if (timelineToggle instanceof HTMLButtonElement && timelineHistory instanceof HTMLElement && timelineToggle.dataset.bound !== 'true') {
-                        timelineToggle.dataset.bound = 'true';
-                        timelineToggle.addEventListener('click', () => {
-                                const opened = timelineToggle.dataset.open === 'true';
-                                timelineToggle.dataset.open = opened ? 'false' : 'true';
-                                timelineHistory.hidden = opened;
-                                timelineToggle.textContent = opened
-                                        ? timelineToggle.dataset.labelExpand || 'View more'
-                                        : timelineToggle.dataset.labelCollapse || 'Collapse';
-                        });
-                }
-
-                initTravelMap().catch(() => {});
-        }
-
-        initAboutMusicAndTravel();
-        document.addEventListener('astro:page-load', initAboutMusicAndTravel);
-        document.addEventListener('astro:after-swap', initAboutMusicAndTravel);
+  initAboutPage();
+  document.addEventListener('astro:page-load', initAboutPage);
+  document.addEventListener('astro:after-swap', initAboutPage);
 </script>
 
 <style is:global>
-        .about-timeline {
-                position: relative;
-                margin: 0;
-                padding-left: 1.2rem;
-                list-style: none;
-                border-left: 2px dashed color-mix(in srgb, var(--link-color) 55%, var(--button-border-color));
-                display: grid;
-                gap: 0.9rem;
-        }
+  .about-timeline {
+    position: relative;
+    margin: 0;
+    padding-left: 1.2rem;
+    list-style: none;
+    border-left: 2px dashed color-mix(in srgb, var(--link-color) 55%, var(--button-border-color));
+    display: grid;
+    gap: 0.9rem;
+  }
 
-        .about-timeline__item {
-                position: relative;
-                padding-left: 0.8rem;
-        }
+  .about-timeline__item {
+    position: relative;
+    padding-left: 0.8rem;
+  }
 
-        .about-timeline__dot {
-                position: absolute;
-                left: -0.47rem;
-                top: 0.65rem;
-                width: 0.7rem;
-                height: 0.7rem;
-                border-radius: 999px;
-                background: var(--link-color);
-                box-shadow: 0 0 0 3px color-mix(in srgb, var(--link-color) 20%, transparent);
-        }
+  .about-timeline__dot {
+    position: absolute;
+    left: -0.47rem;
+    top: 0.65rem;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 999px;
+    background: var(--link-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--link-color) 20%, transparent);
+  }
 
-        .about-travel-map {
-                position: relative;
-                width: 100%;
-                height: clamp(280px, 48vw, 420px);
-                border-radius: 0.75rem;
-                border: 1px solid var(--button-border-color);
-                cursor: zoom-in;
-                transition: transform 0.25s ease, box-shadow 0.25s ease;
-                overflow: hidden;
-        }
+  .about-track-btn {
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
 
-        .about-travel-map.is-zoomed {
-                position: fixed;
-                z-index: 1500;
-                inset: 5vh 5vw;
-                width: auto;
-                height: auto;
-                cursor: zoom-out;
-                box-shadow: 0 20px 38px color-mix(in srgb, var(--shadow-color) 80%, transparent);
-        }
+  .about-track-btn:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--link-color) 40%, var(--button-border-color));
+  }
 
-        .about-travel-map__leaflet {
-                position: absolute;
-                inset: 0;
-        }
-
-        .about-travel-map__empty {
-                position: absolute;
-                inset: 0;
-                display: grid;
-                place-items: center;
-                text-align: center;
-                color: color-mix(in srgb, var(--text-color) 70%, transparent);
-                background: linear-gradient(135deg, #eff6ff 0%, #ecfeff 100%);
-                padding: 1rem;
-        }
-
-        .about-travel-map__status {
-                position: absolute;
-                left: 0.65rem;
-                bottom: 0.65rem;
-                z-index: 450;
-                border-radius: 0.45rem;
-                border: 1px solid var(--button-border-color);
-                background: color-mix(in srgb, var(--bg-color) 92%, transparent);
-                color: color-mix(in srgb, var(--text-color) 76%, transparent);
-                font-size: 0.72rem;
-                line-height: 1.2;
-                padding: 0.3rem 0.45rem;
-                box-shadow: 0 5px 14px color-mix(in srgb, var(--shadow-color) 60%, transparent);
-        }
-
-        .about-track-btn {
-                transition: transform 0.2s ease, border-color 0.2s ease;
-        }
-
-        .about-track-btn:hover {
-                transform: translateY(-1px);
-                border-color: color-mix(in srgb, var(--link-color) 40%, var(--button-border-color));
-        }
-
-        .about-track-btn.is-active {
-                border-color: var(--link-color);
-                background: color-mix(in srgb, var(--link-color) 16%, var(--button-hover-color));
-        }
-
-        .about-province-list {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 0.5rem;
-                margin: 0;
-                padding: 0;
-                list-style: none;
-        }
-
-        .about-province-chip {
-                border-radius: 999px;
-                border: 1px solid var(--button-border-color);
-                padding: 0.25rem 0.6rem;
-                font-size: 0.75rem;
-                line-height: 1.2;
-                background: color-mix(in srgb, var(--bg-color) 80%, transparent);
-                color: color-mix(in srgb, var(--text-color) 80%, transparent);
-        }
-
-        .about-province-chip.is-visited {
-                border-color: color-mix(in srgb, var(--link-color) 42%, var(--button-border-color));
-                background: color-mix(in srgb, var(--link-color) 18%, var(--button-hover-color));
-                color: var(--text-color);
-                font-weight: 600;
-        }
-
-        .about-province-chip.is-planned {
-                opacity: 0.78;
-        }
-
-        .leaflet-container {
-                background: linear-gradient(135deg, #e0f2fe 0%, #e2e8f0 100%);
-                font: 12px/1.4 "Helvetica Neue", Arial, Helvetica, sans-serif;
-                outline: 0;
-                overflow: hidden;
-                -webkit-tap-highlight-color: transparent;
-        }
-
-        .leaflet-pane,
-        .leaflet-tile,
-        .leaflet-marker-icon,
-        .leaflet-marker-shadow,
-        .leaflet-tile-container,
-        .leaflet-pane > svg,
-        .leaflet-pane > canvas,
-        .leaflet-zoom-box,
-        .leaflet-image-layer,
-        .leaflet-layer {
-                position: absolute;
-                left: 0;
-                top: 0;
-        }
-
-        .leaflet-tile-container {
-                pointer-events: none;
-        }
-
-        .leaflet-tile {
-                max-width: none !important;
-                max-height: none !important;
-                width: 256px;
-                height: 256px;
-        }
-
-        .leaflet-control {
-                position: relative;
-                z-index: 800;
-                pointer-events: auto;
-        }
-
-        .leaflet-top,
-        .leaflet-bottom {
-                position: absolute;
-                z-index: 900;
-                pointer-events: none;
-        }
-
-        .leaflet-top {
-                top: 0;
-        }
-
-        .leaflet-right {
-                right: 0;
-        }
-
-        .leaflet-bottom {
-                bottom: 0;
-        }
-
-        .leaflet-left {
-                left: 0;
-        }
-
-        .leaflet-control-zoom a {
-                display: block;
-                width: 26px;
-                height: 26px;
-                line-height: 26px;
-                text-align: center;
-                color: #1e293b;
-                text-decoration: none;
-                font-weight: 700;
-                background: #fff;
-                border: 1px solid #94a3b8;
-        }
-
-        .leaflet-control-attribution {
-                margin: 0;
-                padding: 0 5px;
-                color: #334155;
-                background: color-mix(in srgb, #ffffff 88%, transparent);
-                font-size: 11px;
-                line-height: 1.4;
-        }
+  .about-track-btn.is-active {
+    border-color: var(--link-color);
+    background: color-mix(in srgb, var(--link-color) 16%, var(--button-hover-color));
+  }
 </style>
-
-<script>
-        function initEnhancements() {
-                if (!document.getElementById('about-heatmap-subtitle')) return;
-                renderHeatmapSubtitle();
-                refreshCodeHeatmapFromGithub();
-        }
-
-        function renderHeatmapSubtitle() {
-                const subtitleEl = document.getElementById('about-heatmap-subtitle');
-                if (!subtitleEl) return;
-                const days = Number(subtitleEl.getAttribute('data-days') || '140');
-                const blogTotal = Number(subtitleEl.getAttribute('data-blog-total') || '0');
-                const codeTotal = Number(subtitleEl.getAttribute('data-code-total') || '0');
-                const blogLabel = subtitleEl.getAttribute('data-blog-label') || 'Blog';
-                const codeLabel = subtitleEl.getAttribute('data-code-label') || 'Code';
-                const lang = subtitleEl.getAttribute('data-lang') || 'en';
-
-                subtitleEl.textContent = lang === 'zh-cn'
-                        ? `过去 ${days} 天 · ${blogLabel} ${blogTotal} 次 · ${codeLabel} ${codeTotal} 次`
-                        : `Last ${days} days · ${blogLabel} ${blogTotal} · ${codeLabel} ${codeTotal}`;
-        }
-
-        function getCodeCellStyle(level) {
-                if (level <= 0) return 'background: var(--button-hover-color);';
-                return `background: color-mix(in srgb, var(--link-color) ${20 + level * 18}%, var(--button-hover-color));`;
-        }
-
-        function getIntensityLevel(count, maxCount) {
-                if (count <= 0) return 0;
-                const ratio = count / Math.max(maxCount, 1);
-                if (ratio < 0.25) return 1;
-                if (ratio < 0.5) return 2;
-                if (ratio < 0.75) return 3;
-                return 4;
-        }
-
-        async function refreshCodeHeatmapFromGithub() {
-                const codeCells = Array.from(document.querySelectorAll('[data-code-cell="1"][data-date]'));
-                if (codeCells.length === 0) return;
-
-                const dates = codeCells.map((cell) => cell.getAttribute('data-date')).filter(Boolean).sort();
-                if (dates.length === 0) return;
-
-                const since = `${dates[0]}T00:00:00.000Z`;
-                const until = `${dates[dates.length - 1]}T23:59:59.999Z`;
-                const countMap = new Map();
-
-                try {
-                        for (let page = 1; 5 >= page; page += 1) {
-                                const url = `https://api.github.com/repos/shi-tou1234/-/commits?sha=main&since=${encodeURIComponent(since)}&until=${encodeURIComponent(until)}&per_page=100&page=${page}`;
-                                const response = await fetch(url, { headers: { Accept: 'application/vnd.github+json' } });
-                                if (!response.ok) break;
-                                const commits = await response.json();
-                                if (!Array.isArray(commits) || commits.length === 0) break;
-
-                                for (const commit of commits) {
-                                        const dateString = commit?.commit?.author?.date || commit?.commit?.committer?.date;
-                                        if (!dateString) continue;
-                                        const key = new Date(dateString).toISOString().slice(0, 10);
-                                        countMap.set(key, (countMap.get(key) || 0) + 1);
-                                }
-
-                                if (100 > commits.length) break;
-                        }
-
-                        let maxCodeCount = 1;
-                        let totalCodeUpdates = 0;
-                        for (const value of countMap.values()) {
-                                maxCodeCount = Math.max(maxCodeCount, value);
-                                totalCodeUpdates += value;
-                        }
-
-                        codeCells.forEach((cell) => {
-                                const key = cell.getAttribute('data-date');
-                                if (!key) return;
-                                const count = countMap.get(key) || 0;
-                                const level = getIntensityLevel(count, maxCodeCount);
-                                cell.setAttribute('style', getCodeCellStyle(level));
-                                const label = document.getElementById('about-code-total')?.getAttribute('data-label') || 'Code';
-                                cell.setAttribute('title', `${key} · ${label}: ${count}`);
-                        });
-
-                        const totalEl = document.getElementById('about-code-total');
-                        if (totalEl) {
-                                const label = totalEl.getAttribute('data-label') || 'Code';
-                                totalEl.textContent = `${label}: ${totalCodeUpdates}`;
-                                totalEl.setAttribute('data-value', String(totalCodeUpdates));
-                        }
-
-                        const subtitleEl = document.getElementById('about-heatmap-subtitle');
-                        if (subtitleEl) {
-                                subtitleEl.setAttribute('data-code-total', String(totalCodeUpdates));
-                                renderHeatmapSubtitle();
-                        }
-                } catch {
-                }
-        }
-
-        initEnhancements();
-        document.addEventListener("astro:page-load", initEnhancements);
-        document.addEventListener("astro:after-swap", initEnhancements);
-</script>

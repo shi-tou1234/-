@@ -9,11 +9,19 @@ export type MusicTrack = {
   url: string;
 };
 
+export type TravelProvince = {
+  province: string;
+  city: string;
+  visited: boolean;
+  lat?: number;
+  lng?: number;
+};
+
 export type AboutPersonal = {
   intro: string;
   siteTimeline: SiteTimelineItem[];
   musicTracks: MusicTrack[];
-  travelCities: string[];
+  travelCities: TravelProvince[];
 };
 
 const aboutPersonal: AboutPersonal = {
@@ -100,8 +108,16 @@ const aboutPersonal: AboutPersonal = {
     }
   ],
   "travelCities": [
-    "浙江省",
-    "北京市"
+    {
+      "province": "浙江省",
+      "city": "杭州市",
+      "visited": true
+    },
+    {
+      "province": "北京市",
+      "city": "北京市",
+      "visited": true
+    }
   ]
 };
 
