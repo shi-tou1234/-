@@ -434,7 +434,8 @@ const {
 
   (function setupTravelMap() {
     const GEO_BASE = "https://geo.datav.aliyun.com/areas_v3/bound";
-    const LOCAL_CHINA_MAP_URL = "/maps/china.full.json";
+    const BASE_URL = import.meta.env.BASE_URL || "/";
+    const LOCAL_CHINA_MAP_URL = `${BASE_URL.endsWith("/") ? BASE_URL : `${BASE_URL}/`}maps/china.full.json`;
     const FALLBACK_ADCODE_MAP = {
       "北京市": "110000",
       "天津市": "120000",
