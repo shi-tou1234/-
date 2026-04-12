@@ -436,7 +436,9 @@ const {
     const GEO_BASE = "https://geo.datav.aliyun.com/areas_v3/bound";
     const GEO_BASE_LEGACY = "https://geo.datav.aliyun.com/areas/bound";
     const BASE_URL = import.meta.env.BASE_URL || "/";
-    const LOCAL_CHINA_MAP_URL = `${BASE_URL.endsWith("/") ? BASE_URL : `${BASE_URL}/`}maps/china.full.json`;
+    const BASE_PREFIX = BASE_URL.endsWith("/") ? BASE_URL : `${BASE_URL}/`;
+    const LOCAL_CHINA_MAP_URL = `${BASE_PREFIX}maps/china.full.json`;
+    const LOCAL_PROVINCE_MAP_PREFIX = `${BASE_PREFIX}maps/provinces`;
     const FALLBACK_ADCODE_MAP = {
       "北京市": "110000",
       "天津市": "120000",
@@ -597,6 +599,7 @@ const {
 
       const encodedCode = encodeURIComponent(code);
       const candidateUrls = [
+        `${LOCAL_PROVINCE_MAP_PREFIX}/${encodedCode}.json`,
         `${GEO_BASE}/${encodedCode}_full.json`,
         `${GEO_BASE}/${encodedCode}.json`,
         `${GEO_BASE_LEGACY}/${encodedCode}.json`,
