@@ -1,0 +1,727 @@
+---
+export interface Props {
+    editable?;
+    visitedCities?[];
+}
+
+const { editable = false, visitedCities = [] } = Astro.props;
+---
+
+<div class="travel-map-wrapper" data-editable={String(editable)} data-visited={JSON.stringify(visitedCities)}>
+    <div class="stats-bar">
+        <div class="stat-card">
+            <span class="stat-number" id="visitedCount">0</span>
+            <div class="stat-label">已访问城市</div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number" id="visitedProvinces">0</span>
+            <div class="stat-label">涉及省份</div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number" id="coverageRate">0%</span>
+            <div class="stat-label">全国覆盖率</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="map-container">
+            <div class="breadcrumb">
+                <span id="chinaCrumb" style="cursor: pointer; display: none;">中国</span>
+                <span class="breadcrumb-separator" id="crumbSep" style="display: none;">›</span>
+                <span class="current" id="currentCrumb">全国地图</span>
+                <div class="mode-indicator" id="modeIndicator">省级</div>
+            </div>
+            <button class="back-btn" id="backBtn">← 返回全国视图</button>
+            <div id="map"></div>
+            <div class="loading" id="loading">正在加载地图数据...</div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color visited"></div>
+                    <span>已去过</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color unvisited"></div>
+                    <span>未去过</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="panel">
+                <div class="panel-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 6v6l4 2"></path>
+                    </svg>
+                    探索进度
+                </div>
+                <div class="progress-ring">
+                    <svg width="120" height="120">
+                        <circle class="progress-ring-bg" cx="60" cy="60" r="52"></circle>
+                        <circle class="progress-ring-fill" cx="60" cy="60" r="52" 
+                                stroke-dasharray="326.73" 
+                                stroke-dashoffset="326.73"
+                                id="progressCircle"></circle>
+                    </svg>
+                    <div class="progress-text" id="progressText">0%</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    已点亮城市
+                </div>
+                <input type="text" class="search-box" id="citySearch" placeholder="搜索已标记的城市...">
+                <div class="city-list" id="cityList">
+                    <div class="empty-state">暂无标记<br>提示：点击省份可下钻查看该省城市</div>
+                </div>
+            </div>
+            
+            {editable && (
+            <div class="panel">
+                <button id="clearAllBtn" class="secondary" style="width: 100%; border: 1px solid rgba(255,107,107,0.3); background: rgba(255,107,107,0.1); color: #ef4444; border-radius: 8px; padding: 10px;">
+                    🗑️ 清空所有记录
+                </button>
+            </div>
+            )}
+        </div>
+    </div>
+</div>
+
+<div class="notification" id="notification">操作成功！</div>
+
+<style>
+    .travel-map-wrapper {
+        --tm-bg: #1e293b;
+        --tm-text: #f8fafc;
+        --tm-primary: #38bdf8;
+        --tm-secondary: #0ea5e9;
+        font-family: inherit;
+        background: transparent;
+        color: var(--text-color);
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .travel-map-wrapper * {
+        box-sizing: border-box;
+    }
+
+    .stats-bar {
+        display: flex;
+        gap: 15px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+    }
+
+    .stat-card {
+        flex: 1;
+        background: var(--bg-color);
+        border: 1px solid var(--button-border-color);
+        border-radius: 12px;
+        padding: 15px 20px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        min-width: 100px;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+        font-weight: bold;
+        background: linear-gradient(45deg, var(--tm-primary), var(--tm-secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        margin-top: 5px;
+    }
+
+    .main-content {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 20px;
+    }
+
+    @media (max-width: 1024px) {
+        .main-content {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .map-container {
+        background: var(--bg-color);
+        border-radius: 16px;
+        border: 1px solid var(--button-border-color);
+        padding: 15px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #map {
+        width: 100%;
+        height: 500px;
+        border-radius: 12px;
+        flex: 1;
+    }
+
+    .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .panel {
+        background: var(--bg-color);
+        border-radius: 16px;
+        border: 1px solid var(--button-border-color);
+        padding: 20px;
+    }
+
+    .panel-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--tm-primary);
+    }
+
+    .city-list {
+        max-height: 250px;
+        overflow-y: auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+    }
+
+    .city-tag {
+        background: color-mix(in srgb, var(--tm-primary) 15%, transparent);
+        border: 1px solid color-mix(in srgb, var(--tm-primary) 30%, transparent);
+        color: var(--tm-primary);
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .travel-map-wrapper[data-editable="true"] .city-tag:hover {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: rgba(239, 68, 68, 0.3);
+        color: #ef4444;
+    }
+
+    .travel-map-wrapper[data-editable="true"] .city-tag::after {
+        content: '×';
+        font-size: 1rem;
+        opacity: 0.7;
+    }
+
+    .progress-ring {
+        width: 120px;
+        height: 120px;
+        margin: 15px auto;
+        position: relative;
+    }
+
+    .progress-ring-bg {
+        fill: none;
+        stroke: var(--button-border-color);
+        stroke-width: 8;
+    }
+
+    .progress-ring-fill {
+        fill: none;
+        stroke: var(--tm-primary);
+        stroke-width: 8;
+        stroke-linecap: round;
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+        transition: stroke-dashoffset 0.5s ease;
+    }
+
+    .progress-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--tm-primary);
+    }
+
+    button.back-btn {
+        background: color-mix(in srgb, var(--tm-primary) 15%, transparent);
+        color: var(--tm-primary);
+        border: 1px solid color-mix(in srgb, var(--tm-primary) 30%, transparent);
+        border-radius: 8px;
+        padding: 8px 12px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        display: none;
+        align-self: flex-start;
+        font-size: 0.85rem;
+    }
+
+    button.back-btn.show {
+        display: inline-block;
+    }
+
+    .legend {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-top: 10px;
+        justify-content: center;
+        font-size: 0.8rem;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .legend-color {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        border: 1px solid var(--button-border-color);
+    }
+
+    .legend-color.visited {
+        background: linear-gradient(135deg, var(--tm-primary), var(--tm-secondary));
+    }
+
+    .legend-color.unvisited {
+        background: color-mix(in srgb, var(--bg-color) 80%, transparent);
+    }
+
+    .search-box {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid var(--button-border-color);
+        border-radius: 8px;
+        background: var(--bg-color);
+        color: var(--text-color);
+        font-size: 0.85rem;
+        outline: none;
+    }
+
+    .search-box:focus {
+        border-color: var(--tm-primary);
+    }
+
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #10b981;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+        font-size: 0.9rem;
+    }
+
+    .notification.show {
+        transform: translateX(0);
+    }
+
+    .empty-state {
+        color: color-mix(in srgb, var(--text-color) 50%, transparent);
+        font-size: 0.8rem;
+        text-align: center;
+        width: 100%;
+        padding: 20px 10px;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+        color: var(--text-color);
+    }
+
+    .mode-indicator {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--tm-primary) 15%, transparent);
+        color: var(--tm-primary);
+        border: 1px solid color-mix(in srgb, var(--tm-primary) 30%, transparent);
+        margin-left: auto;
+    }
+
+    .loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 0.9rem;
+        color: var(--text-color);
+    }
+
+    /* Scrollbar */
+    .city-list::-webkit-scrollbar {
+        width: 4px;
+    }
+    .city-list::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .city-list::-webkit-scrollbar-thumb {
+        background: var(--button-border-color);
+        border-radius: 2px;
+    }
+</style>
+
+<!-- load echarts -->
+<script is:inline src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script>
+    const initTravelMap = () => {
+        const wrappers = document.querySelectorAll('.travel-map-wrapper');
+        
+        wrappers.forEach(wrapper => {
+            const isEditable = wrapper.getAttribute('data-editable') === 'true';
+            let visitedCities = new Set(JSON.parse(wrapper.getAttribute('data-visited') || '[]'));
+            let visitedProvinces = new Set();
+            
+            const mapEl = wrapper.querySelector('#map');
+            if (!mapEl) return;
+            
+            let myChart = echarts.getInstanceByDom(mapEl);
+            if (myChart) myChart.dispose();
+            myChart = echarts.init(mapEl);
+            
+            const loadingEl = wrapper.querySelector('#loading');
+            const backBtn = wrapper.querySelector('#backBtn');
+            const clearAllBtn = wrapper.querySelector('#clearAllBtn');
+            const searchBox = wrapper.querySelector('#citySearch');
+            const notif = wrapper.querySelector('#notification');
+            
+            let currentLevel = 'country';
+            let currentProvince  = null;
+            let geoJsonCache = {};
+            let provinceCityMap = {};
+            let isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // Major cities points removed as requested
+            // Use dynamic loading for geo data
+            const getMapColor = (visited) => visited ? '#38bdf8' : (isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)');
+            
+            const showNotification = (msg, bg = '#10b981') => {
+                if(!notif) return;
+                notif.textContent = msg;
+                notif.style.background = bg;
+                notif.classList.add('show');
+                setTimeout(() => notif.classList.remove('show'), 2000);
+            };
+
+            const notifyAdminChange = () => {
+                if (isEditable) {
+                    const hiddenInput = document.getElementById('about-personal-travel-cities');
+                    if (hiddenInput) hiddenInput.value = JSON.stringify(Array.from(visitedCities));
+                }
+            };
+
+            document.addEventListener('aboutPersonalLoaded', () => {
+                if (isEditable) {
+                    const hiddenInput = document.getElementById('about-personal-travel-cities');
+                    if (hiddenInput && hiddenInput.value) {
+                        try {
+                            const parsed = JSON.parse(hiddenInput.value);
+                            visitedCities = new Set(parsed);
+                            visitedProvinces.clear();
+                            updateStats();
+                            currentLevel === 'country' ? renderChinaMap() : renderProvinceMap(currentProvince!);
+                        } catch (e) {}
+                    }
+                }
+            });
+
+            const updateStats = () => {
+                const count = visitedCities.size;
+                wrapper.querySelector('#visitedCount')!.textContent = count.toString();
+                // Estimate provinces based on visited cities (since we removed the majorCities hardcode, we build from fetched geojson)
+                wrapper.querySelector('#visitedProvinces')!.textContent = visitedProvinces.size.toString();
+                
+                const cov = Math.min(100, Math.round((count / Math.max(340, count)) * 100));
+                wrapper.querySelector('#coverageRate')!.textContent = cov + '%';
+                wrapper.querySelector('#progressText')!.textContent = cov + '%';
+                
+                const circle = wrapper.querySelector('#progressCircle');
+                if(circle) circle.style.strokeDashoffset = (326.73 * (1 - cov / 100)).toString();
+                
+                renderCityList();
+            };
+
+            const renderCityList = () => {
+                const listEl = wrapper.querySelector('#cityList');
+                const query = searchBox?.value.toLowerCase().trim() || '';
+                
+                const filtered = Array.from(visitedCities).filter(c => (c as string).toLowerCase().includes(query));
+                if (filtered.length === 0) {
+                    listEl.innerHTML = '<div class="empty-state">暂无标记</div>';
+                } else {
+                    listEl.innerHTML = filtered.map(city => 
+                        `<span class="city-tag" data-city="${city}">${city}</span>`
+                    ).join('');
+                    
+                    if (isEditable) {
+                        listEl.querySelectorAll('.city-tag').forEach(tag => {
+                            tag.addEventListener('click', () => toggleCity((tag).dataset.city!));
+                        });
+                    }
+                }
+            };
+
+            if(searchBox) searchBox.addEventListener('input', renderCityList);
+
+            const toggleCity = (cityName) => {
+                if (!isEditable) return;
+                
+                if (visitedCities.has(cityName)) {
+                    visitedCities.delete(cityName);
+                } else {
+                    visitedCities.add(cityName);
+                    if (currentLevel === 'province' && currentProvince) {
+                        visitedProvinces.add(currentProvince);
+                    }
+                }
+                
+                updateStats();
+                notifyAdminChange();
+                
+                if (currentLevel === 'country') {
+                    renderChinaMap();
+                } else {
+                    renderProvinceMap(currentProvince!);
+                }
+            };
+
+            if(clearAllBtn) clearAllBtn.addEventListener('click', () => {
+                if (confirm('确定要清空所有记录吗？')) {
+                    visitedCities.clear();
+                    visitedProvinces.clear();
+                    updateStats();
+                    notifyAdminChange();
+                    currentLevel === 'country' ? renderChinaMap() : renderProvinceMap(currentProvince!);
+                }
+            });
+
+            const fetchGeoJson = async (adcode) => {
+                if (geoJsonCache[adcode]) return geoJsonCache[adcode];
+                const res = await fetch(`https://geo.datav.aliyun.com/areas_v3/bound/${adcode}_full.json`);
+                if (!res.ok) throw new Error('网络请求失败');
+                const json = await res.json();
+                geoJsonCache[adcode] = json;
+                return json;
+            };
+
+            const getProvinceAdcode = (name) => {
+                const map = {
+                    '北京市': '110000', '天津市': '120000', '上海市': '310000', '重庆市': '500000',
+                    '河北省': '130000', '山西省': '140000', '辽宁省': '210000', '吉林省': '220000',
+                    '黑龙江省': '230000', '江苏省': '320000', '浙江省': '330000', '安徽省': '340000',
+                    '福建省': '350000', '江西省': '360000', '山东省': '370000', '河南省': '410000',
+                    '湖北省': '420000', '湖南省': '430000', '广东省': '440000', '海南省': '460000',
+                    '四川省': '510000', '贵州省': '520000', '云南省': '530000', '陕西省': '610000',
+                    '甘肃省': '620000', '青海省': '630000', '台湾省': '710000', '内蒙古自治区': '150000',
+                    '广西壮族自治区': '450000', '西藏自治区': '540000', '宁夏回族自治区': '640000',
+                    '新疆维吾尔自治区': '650000', '香港特别行政区': '810000', '澳门特别行政区': '820000'
+                };
+                return map[name] || '100000';
+            };
+
+            const renderChinaMap = async () => {
+                currentLevel = 'country';
+                if(backBtn) backBtn.classList.remove('show');
+                if(loadingEl) loadingEl.style.display = 'block';
+                wrapper.querySelector('#currentCrumb')!.textContent = '全国地图';
+                wrapper.querySelector('#modeIndicator')!.textContent = '省级';
+                wrapper.querySelector('#chinaCrumb')!.style.display = 'none';
+                wrapper.querySelector('#crumbSep')!.style.display = 'none';
+                
+                try {
+                    const geojson = await fetchGeoJson('100000');
+                    echarts.registerMap('china', geojson);
+                    
+                    // Record all provinces present
+                    geojson.features.forEach((f) => {
+                        const name = f.properties.name;
+                    });
+
+                    // Pre-calculate which provinces have visited cities. 
+                    // Without explicit mappings, we just check if visitedProvinces has it or fallback.
+                    const seriesData = geojson.features.map((f) => {
+                        return {
+                            name: f.properties.name,
+                            value: visitedProvinces.has(f.properties.name) ? 1 : 0
+                        };
+                    });
+                    
+                    const option = {
+                        backgroundColor: 'transparent',
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: (p) => `<b>${p.name}</b><br/>点击进入查看城市`
+                        },
+                        series: [{
+                            type: 'map',
+                            map: 'china',
+                            roam: true,
+                            zoom: 1.2,
+                            itemStyle: {
+                                areaColor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                                borderColor: isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
+                            },
+                            emphasis: {
+                                label: {color: '#fff'},
+                                itemStyle: {
+                                    areaColor: '#38bdf8'
+                                }
+                            },
+                            data: seriesData.map((d) => ({
+                                name: d.name,
+                                itemStyle: {
+                                    areaColor: d.value ? '#38bdf8' : undefined
+                                }
+                            }))
+                        }]
+                    };
+                    
+                    myChart.setOption(option, true);
+                } catch(e) {
+                    showNotification('地图加载失败', '#ef4444');
+                } finally {
+                    if(loadingEl) loadingEl.style.display = 'none';
+                }
+            };
+
+            const renderProvinceMap = async (provinceName) => {
+                currentLevel = 'province';
+                currentProvince = provinceName;
+                if(backBtn) backBtn.classList.add('show');
+                if(loadingEl) loadingEl.style.display = 'block';
+                
+                wrapper.querySelector('#currentCrumb')!.textContent = provinceName;
+                wrapper.querySelector('#modeIndicator')!.textContent = '城市级';
+                wrapper.querySelector('#chinaCrumb')!.style.display = 'inline';
+                wrapper.querySelector('#crumbSep')!.style.display = 'inline';
+                
+                try {
+                    const adcode = getProvinceAdcode(provinceName);
+                    const geojson = await fetchGeoJson(adcode);
+                    echarts.registerMap('province', geojson);
+                    
+                    // Collect all cities of this province dynamically
+                    provinceCityMap[provinceName] = geojson.features.map((f) => f.properties.name);
+                    
+                    // Update visitedProvinces if any visited city is inside
+                    let hasVisited = false;
+                    const seriesData = geojson.features.map((f) => {
+                        const isVisited = visitedCities.has(f.properties.name);
+                        if (isVisited) hasVisited = true;
+                        return {
+                            name: f.properties.name,
+                            value: isVisited ? 1 : 0
+                        };
+                    });
+                    if (hasVisited) visitedProvinces.add(provinceName);
+                    else visitedProvinces.delete(provinceName);
+
+                    const option = {
+                        backgroundColor: 'transparent',
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: (p) => `<b>${p.name}</b><br/>${p.value ? '✅ 已去过' : '❌ 未去过'}`
+                        },
+                        series: [{
+                            type: 'map',
+                            map: 'province',
+                            roam: true,
+                            zoom: 0.9,
+                            itemStyle: {
+                                areaColor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                                borderColor: isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
+                            },
+                            emphasis: {
+                                itemStyle: {
+                                    areaColor: '#bae6fd'
+                                }
+                            },
+                            data: seriesData.map((d) => ({
+                                name: d.name,
+                                itemStyle: {
+                                    areaColor: d.value ? '#38bdf8' : undefined
+                                }
+                            }))
+                        }]
+                    };
+                    
+                    myChart.setOption(option, true);
+                    updateStats();
+                } catch(e) {
+                    showNotification('该省份地图加载失败', '#ef4444');
+                } finally {
+                    if(loadingEl) loadingEl.style.display = 'none';
+                }
+            };
+
+            myChart.on('click', (params) => {
+                if (currentLevel === 'country') {
+                    if (params.name) renderProvinceMap(params.name);
+                } else {
+                    if (params.name) toggleCity(params.name);
+                }
+            });
+
+            const onBackChina = () => {
+                if (currentLevel === 'province') {
+                    renderChinaMap();
+                    updateStats(); // Refresh provinces coverage visually
+                }
+            };
+            if(backBtn) backBtn.addEventListener('click', onBackChina);
+            wrapper.querySelector('#chinaCrumb')?.addEventListener('click', onBackChina);
+
+            // Rebuild visitedProvinces incrementally for existing visitedCities
+            // (Assuming we don't have all adcodes loaded, we will let it populate as users browse)
+            // Initial render
+            updateStats();
+            renderChinaMap();
+
+            window.addEventListener('resize', () => myChart.resize());
+        });
+    };
+
+    document.addEventListener('astro:page-load', initTravelMap);
+    document.addEventListener('astro:after-swap', initTravelMap);
+</script>

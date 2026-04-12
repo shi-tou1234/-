@@ -207,21 +207,9 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         <h2 class="text-xl font-semibold mb-4">站点内容设置</h2>
 
         <div class="space-y-4">
-          <div class="rounded border border-[var(--button-border-color)] p-4">
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-              <div class="text-sm font-semibold">About 文本（Markdown）</div>
-              <div class="flex flex-wrap items-center gap-2">
-                <select id="about-lang" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-1.5 text-sm">
-                  <option value="zh-cn">中文（zh-cn）</option>
-                  <option value="en">English（en）</option>
-                </select>
-                <button id="load-about-markdown-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
-                <button id="save-about-markdown-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
-              </div>
-            </div>
-            <textarea id="about-markdown-content" class="w-full min-h-[180px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="可编辑关于页历史文本内容"></textarea>
-            <p id="about-markdown-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
-          </div>
+          <TravelMap editable={true} visitedCities={[]} />
+              <input type="hidden" id="about-personal-travel-cities" value="[]" />
+              
 
           <div class="rounded border border-[var(--button-border-color)] p-4">
             <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
@@ -1775,51 +1763,9 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     }
   });
 
-  document.getElementById("lookup-about-city-btn")?.addEventListener("click", async () => {
-    const msgEl = document.getElementById("about-personal-msg");
-    try {
-      const cityName = (document.getElementById("about-travel-city-name")?.value || "").trim();
-      if (!cityName) throw new Error("请先输入省份名");
+  
 
-      setMsg(msgEl, "正在查询坐标（多线路回退）...");
-      const result = await resolveCityCoordinates(cityName);
-
-      const latEl = document.getElementById("about-travel-city-lat");
-      const lngEl = document.getElementById("about-travel-city-lng");
-      if (latEl) latEl.value = Number(result.lat).toFixed(6);
-      if (lngEl) lngEl.value = Number(result.lng).toFixed(6);
-      setMsg(msgEl, `省份坐标查询成功（来源：${result.source}，匹配：${result.matchedName || cityName}），可点击“追加到列表”保存到文本框`);
-    } catch (error) {
-      setMsg(msgEl, String(error), true);
-    }
-  });
-
-  document.getElementById("append-about-city-btn")?.addEventListener("click", () => {
-    const msgEl = document.getElementById("about-personal-msg");
-    try {
-      const cityName = (document.getElementById("about-travel-city-name")?.value || "").trim();
-      const lat = Number((document.getElementById("about-travel-city-lat")?.value || "").trim());
-      const lng = Number((document.getElementById("about-travel-city-lng")?.value || "").trim());
-      const visited = Boolean(document.getElementById("about-travel-city-visited")?.checked);
-      if (!cityName) throw new Error("请填写省份名");
-      if (!Number.isFinite(lat) || !Number.isFinite(lng)) throw new Error("请填写有效纬度和经度");
-
-      const textarea = document.getElementById("about-personal-travel-cities");
-      if (!(textarea instanceof HTMLTextAreaElement)) throw new Error("未找到省份文本框");
-
-      const line = `${cityName}|${lat}|${lng}|${visited ? 1 : 0}`;
-      const current = textarea.value.trim();
-      textarea.value = current ? `${current}\n${line}` : line;
-      clearTravelCityInputs();
-      setMsg(msgEl, `已追加省份：${cityName}`);
-    } catch (error) {
-      setMsg(msgEl, String(error), true);
-    }
-  });
-
-  document.getElementById("clear-about-city-btn")?.addEventListener("click", () => {
-    clearTravelCityInputs();
-  });
+  
 
   document.getElementById("insert-friend-template-btn")?.addEventListener("click", () => {
     const msgEl = document.getElementById("friends-msg");
