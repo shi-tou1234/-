@@ -107,7 +107,18 @@ const aboutPersonal: AboutPersonal = {
       "url": "/-/music/Lauv---Paris-in-the-Rain.mp3"
     }
   ],
-  "travelCities": []
+  "travelCities": [
+    {
+      "province": "浙江省",
+      "city": "宁波市",
+      "visited": true
+    },
+    {
+      "province": "浙江省",
+      "city": "舟山市",
+      "visited": true
+    }
+  ]
 };
 
 export default aboutPersonal;
