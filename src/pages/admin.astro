@@ -194,6 +194,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
             </div>
 
             <div class="flex flex-wrap gap-2">
+              <button id="open-preview-editor-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">预览编辑器</button>
+              <button id="apply-preview-content-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">从预览回填</button>
               <button id="publish-post-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">保存文章</button>
               <button id="delete-post-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">删除当前语言</button>
               <button id="delete-post-all-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">删除整个博客目录</button>
@@ -353,6 +355,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   const ADMIN_GH_TOKEN_KEY = "cmchen_admin_gh_token";
   const ADMIN_GH_BRANCH_KEY = "cmchen_admin_gh_branch";
   const ADMIN_GH_API_URL_KEY = "cmchen_admin_api_url";
+  const ADMIN_PREVIEW_DRAFT_KEY = "cmchen_admin_preview_draft";
+  const ADMIN_PREVIEW_RESULT_KEY = "cmchen_admin_preview_result";
   const REPO_OWNER = "shi-tou1234";
   const REPO_NAME = "-";
   const GITHUB_API_DEFAULT = "https://api.github.com";
@@ -365,6 +369,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   const ABOUT_SPEC_PATH_PREFIX = "src/content/spec/about";
   const BLOG_GUIDE_CONTENT_PATH = "src/data/blog-guide-content.ts";
   const CATEGORY_OPTIONS_LIMIT = 120;
+  const PREVIEW_TOOL_PATH = "admin-preview/index.html";
 
   const loginSection = document.getElementById("login-section");
   const adminPanel = document.getElementById("admin-panel");
@@ -457,6 +462,47 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     localStorage.setItem(ADMIN_GH_TOKEN_KEY, token);
     localStorage.setItem(ADMIN_GH_BRANCH_KEY, branch || "main");
     syncApiBase();
+  }
+
+  function getPreviewPageUrl() {
+    return new URL(PREVIEW_TOOL_PATH, `${window.location.origin}${BASE_URL}`).toString();
+  }
+
+  function savePreviewDraft() {
+    const content = document.getElementById("post-content")?.value || "";
+    const title = document.getElementById("post-title")?.value || "";
+    const slug = document.getElementById("post-slug")?.value || "";
+    const lang = document.getElementById("post-lang")?.value || "zh-cn";
+    const payload = {
+      content,
+      title,
+      slug,
+      lang,
+      updatedAt: Date.now(),
+      returnUrl: `${window.location.origin}${BASE_URL}admin`,
+    };
+    localStorage.setItem(ADMIN_PREVIEW_DRAFT_KEY, JSON.stringify(payload));
+  }
+
+  function applyPreviewResult() {
+    const raw = localStorage.getItem(ADMIN_PREVIEW_RESULT_KEY);
+    if (!raw) return false;
+
+    try {
+      const parsed = JSON.parse(raw);
+      const nextContent = String(parsed?.content || "");
+      const textarea = document.getElementById("post-content");
+      if (textarea) {
+        textarea.value = nextContent;
+      }
+      localStorage.removeItem(ADMIN_PREVIEW_RESULT_KEY);
+      setMsg(document.getElementById("post-msg"), "已从预览页回填 Markdown，可直接保存文章");
+      return true;
+    } catch {
+      localStorage.removeItem(ADMIN_PREVIEW_RESULT_KEY);
+      setMsg(document.getElementById("post-msg"), "预览回填数据损坏，请重新打开预览", true);
+      return false;
+    }
   }
 
   async function verifyPassword(password) {
@@ -605,6 +651,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   }
 
   loadGitHubDraft();
+  applyPreviewResult();
   document.getElementById("gh-token")?.addEventListener("change", saveGitHubDraft);
   document.getElementById("gh-branch")?.addEventListener("change", saveGitHubDraft);
 
@@ -1188,6 +1235,18 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     clearPostEditor();
     setMsg(document.getElementById("post-msg"), "已切换到新建文章模式");
   });
+  document.getElementById("open-preview-editor-btn")?.addEventListener("click", () => {
+    savePreviewDraft();
+    const previewUrl = getPreviewPageUrl();
+    window.open(previewUrl, "_blank", "noopener,noreferrer");
+    setMsg(document.getElementById("post-msg"), "已打开预览编辑器，新内容可在返回后回填");
+  });
+  document.getElementById("apply-preview-content-btn")?.addEventListener("click", () => {
+    const applied = applyPreviewResult();
+    if (!applied) {
+      setMsg(document.getElementById("post-msg"), "未检测到预览回填内容，请先在预览页点击“返回发布”", true);
+    }
+  });
   document.getElementById("post-select")?.addEventListener("dblclick", async () => {
     const msgEl = document.getElementById("post-msg");
     try {
@@ -1251,6 +1310,10 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     const type = (selectEl?.value || "").trim();
     if (!type) return;
     insertMarkdownSnippet(type);
+  });
+
+  window.addEventListener("focus", () => {
+    applyPreviewResult();
   });
 
   document.getElementById("upload-files-btn")?.addEventListener("click", async () => {
