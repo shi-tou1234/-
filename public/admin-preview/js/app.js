@@ -153,6 +153,7 @@ let returnPublishBtn;
 let currentTheme = 'light';
 let autoSaveTimer = null;
 let isInitialized = false;
+let lastSelection = '';
 
 const ADMIN_PREVIEW_DRAFT_KEY = 'cmchen_admin_preview_draft';
 const ADMIN_PREVIEW_RESULT_KEY = 'cmchen_admin_preview_result';
@@ -263,6 +264,11 @@ function bindEvents() {
         updateWordCount();
         scheduleAutoSave();
     });
+
+    // 编辑区选区变化时，同步高亮预览中的对应内容
+    editor.addEventListener('select', syncSelectionHighlightFromEditor);
+    editor.addEventListener('mouseup', syncSelectionHighlightFromEditor);
+    editor.addEventListener('keyup', syncSelectionHighlightFromEditor);
     
     // 主题切换
     if (themeToggle) {
@@ -349,8 +355,139 @@ function updatePreview() {
         
         // 代码高亮
         highlightCode();
+
+        // 重渲染后恢复选区高亮
+        syncSelectionHighlightFromEditor();
     } catch (error) {
         console.error('更新预览失败:', error);
+    }
+}
+
+function getEditorSelectionText() {
+    if (!editor) return '';
+    const start = editor.selectionStart ?? 0;
+    const end = editor.selectionEnd ?? 0;
+    if (end <= start) return '';
+    return editor.value.slice(start, end).replace(/\r\n/g, '\n');
+}
+
+function clearSelectionHighlights() {
+    if (!preview) return;
+    const marks = preview.querySelectorAll('.sync-selection-highlight');
+    marks.forEach(function(mark) {
+        const parent = mark.parentNode;
+        if (!parent) return;
+        while (mark.firstChild) {
+            parent.insertBefore(mark.firstChild, mark);
+        }
+        parent.removeChild(mark);
+        parent.normalize();
+    });
+}
+
+function buildTextIndexMap(root) {
+    const nodes = [];
+    let text = '';
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode: function(node) {
+            if (!node.nodeValue) return NodeFilter.FILTER_REJECT;
+            return node.nodeValue.length > 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        }
+    });
+
+    let current = walker.nextNode();
+    while (current) {
+        nodes.push({
+            node: current,
+            start: text.length,
+            end: text.length + current.nodeValue.length
+        });
+        text += current.nodeValue;
+        current = walker.nextNode();
+    }
+
+    return { text, nodes };
+}
+
+function findNodeOffsetByIndex(indexMap, index, forEnd = false) {
+    const nodes = indexMap.nodes;
+    if (nodes.length === 0) return null;
+
+    for (let i = 0; i < nodes.length; i++) {
+        const item = nodes[i];
+        const inRange = forEnd ? index > item.start && index <= item.end : index >= item.start && index < item.end;
+        if (inRange) {
+            return {
+                node: item.node,
+                offset: index - item.start
+            };
+        }
+    }
+
+    const last = nodes[nodes.length - 1];
+    return {
+        node: last.node,
+        offset: last.node.nodeValue.length
+    };
+}
+
+function highlightTextInElement(root, query) {
+    if (!root || !query) return null;
+
+    const indexMap = buildTextIndexMap(root);
+    if (!indexMap.text) return null;
+
+    const startIndex = indexMap.text.indexOf(query);
+    if (startIndex < 0) return null;
+
+    const endIndex = startIndex + query.length;
+    const startPos = findNodeOffsetByIndex(indexMap, startIndex, false);
+    const endPos = findNodeOffsetByIndex(indexMap, endIndex, true);
+    if (!startPos || !endPos) return null;
+
+    const range = document.createRange();
+    range.setStart(startPos.node, Math.max(0, startPos.offset));
+    range.setEnd(endPos.node, Math.max(0, endPos.offset));
+
+    const wrapper = document.createElement('span');
+    wrapper.className = 'sync-selection-highlight';
+    wrapper.appendChild(range.extractContents());
+    range.insertNode(wrapper);
+    return wrapper;
+}
+
+function syncSelectionHighlightFromEditor() {
+    if (!preview || !editor) return;
+
+    const selected = getEditorSelectionText();
+    if (selected === lastSelection) return;
+    lastSelection = selected;
+
+    clearSelectionHighlights();
+
+    const normalized = selected.trim();
+    if (!normalized) return;
+
+    const candidates = [selected, normalized]
+        .map(function(item) { return item.replace(/\r\n/g, '\n'); })
+        .filter(function(item, idx, arr) { return item && arr.indexOf(item) === idx; });
+
+    let target = null;
+    const codeBlocks = preview.querySelectorAll('pre code');
+    for (let i = 0; i < codeBlocks.length && !target; i++) {
+        for (let j = 0; j < candidates.length && !target; j++) {
+            target = highlightTextInElement(codeBlocks[i], candidates[j]);
+        }
+    }
+
+    if (!target) {
+        for (let i = 0; i < candidates.length && !target; i++) {
+            target = highlightTextInElement(preview, candidates[i]);
+        }
+    }
+
+    if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
     }
 }
 

@@ -219,6 +219,12 @@ html, body {
     background-color: var(--bg-primary);
 }
 
+.sync-selection-highlight {
+    background: color-mix(in srgb, var(--accent-color) 26%, transparent);
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-color) 35%, transparent);
+}
+
 /* ===== Markdown 样式 ===== */
 .markdown-body {
     font-family: var(--font-sans);
