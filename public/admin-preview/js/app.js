@@ -153,7 +153,6 @@ let returnPublishBtn;
 let currentTheme = 'light';
 let autoSaveTimer = null;
 let isInitialized = false;
-let lastSelectionSignature = '';
 
 const ADMIN_PREVIEW_DRAFT_KEY = 'cmchen_admin_preview_draft';
 const ADMIN_PREVIEW_RESULT_KEY = 'cmchen_admin_preview_result';
@@ -494,6 +493,17 @@ function countOccurrencesBefore(text, query, limitIndex) {
     return count;
 }
 
+function buildSelectionCandidates(selectedText) {
+    const raw = String(selectedText || '').replace(/\r\n/g, '\n');
+    const trimmed = raw.trim();
+    const noNbsp = raw.replace(/\u00A0/g, ' ');
+    const collapsed = noNbsp.replace(/[ \t\f\v\u00A0]+/g, ' ');
+    const collapsedTrimmed = collapsed.trim();
+    return [raw, trimmed, noNbsp, collapsed, collapsedTrimmed]
+        .map(function(item) { return item; })
+        .filter(function(item, idx, arr) { return item && arr.indexOf(item) === idx; });
+}
+
 function findAllMatchRanges(text, query) {
     const ranges = [];
     if (!text || !query) return ranges;
@@ -573,9 +583,6 @@ function syncSelectionHighlightFromEditor() {
 
     const selection = getEditorSelection();
     const selected = selection.text;
-    const signature = `${selection.start}:${selection.end}:${selected}`;
-    if (signature === lastSelectionSignature) return;
-    lastSelectionSignature = signature;
 
     clearSelectionHighlights();
 
@@ -585,9 +592,7 @@ function syncSelectionHighlightFromEditor() {
     const rawEditorContent = editor.value.replace(/\r\n/g, '\n');
     const occurrenceHint = countOccurrencesBefore(rawEditorContent, selected, selection.start);
 
-    const candidates = [selected, normalized]
-        .map(function(item) { return item.replace(/\r\n/g, '\n'); })
-        .filter(function(item, idx, arr) { return item && arr.indexOf(item) === idx; });
+    const candidates = buildSelectionCandidates(selected);
 
     let target = null;
     const codeBlocks = preview.querySelectorAll('pre code');
@@ -600,6 +605,21 @@ function syncSelectionHighlightFromEditor() {
     if (!target) {
         for (let i = 0; i < candidates.length && !target; i++) {
             target = highlightTextInElement(preview, candidates[i], occurrenceHint);
+        }
+    }
+
+    // 若按出现序号未命中，降级为首个出现再试一次，避免完全匹配不上
+    if (!target) {
+        for (let i = 0; i < codeBlocks.length && !target; i++) {
+            for (let j = 0; j < candidates.length && !target; j++) {
+                target = highlightTextInElement(codeBlocks[i], candidates[j], 0);
+            }
+        }
+    }
+
+    if (!target) {
+        for (let i = 0; i < candidates.length && !target; i++) {
+            target = highlightTextInElement(preview, candidates[i], 0);
         }
     }
 
