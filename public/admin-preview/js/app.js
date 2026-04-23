@@ -153,7 +153,7 @@ let returnPublishBtn;
 let currentTheme = 'light';
 let autoSaveTimer = null;
 let isInitialized = false;
-let lastSelection = '';
+let lastSelectionSignature = '';
 
 const ADMIN_PREVIEW_DRAFT_KEY = 'cmchen_admin_preview_draft';
 const ADMIN_PREVIEW_RESULT_KEY = 'cmchen_admin_preview_result';
@@ -363,12 +363,16 @@ function updatePreview() {
     }
 }
 
-function getEditorSelectionText() {
-    if (!editor) return '';
+function getEditorSelection() {
+    if (!editor) return { text: '', start: 0, end: 0 };
     const start = editor.selectionStart ?? 0;
     const end = editor.selectionEnd ?? 0;
-    if (end <= start) return '';
-    return editor.value.slice(start, end).replace(/\r\n/g, '\n');
+    if (end <= start) return { text: '', start, end };
+    return {
+        text: editor.value.slice(start, end).replace(/\r\n/g, '\n'),
+        start,
+        end
+    };
 }
 
 function clearSelectionHighlights() {
@@ -431,16 +435,124 @@ function findNodeOffsetByIndex(indexMap, index, forEnd = false) {
     };
 }
 
-function highlightTextInElement(root, query) {
+function normalizeChar(char) {
+    if (char === '\r') return '';
+    if (char === '\u00A0') return ' ';
+    if (char === '\t') return ' ';
+    if (/[\u200B\u200C\u200D\uFEFF]/.test(char)) return '';
+    return char;
+}
+
+function buildNormalizedIndex(text, collapseWhitespace) {
+    const normalizedChars = [];
+    const normToRawStart = [];
+    const normToRawEnd = [];
+    let lastWasWhitespace = false;
+
+    for (let i = 0; i < text.length; i++) {
+        const rawChar = text[i];
+        const normalized = normalizeChar(rawChar);
+        if (!normalized) continue;
+
+        const isWhitespace = /\s/.test(normalized);
+        if (collapseWhitespace && isWhitespace) {
+            if (lastWasWhitespace) {
+                const last = normToRawEnd.length - 1;
+                if (last >= 0) normToRawEnd[last] = i + 1;
+                continue;
+            }
+            normalizedChars.push(' ');
+            normToRawStart.push(i);
+            normToRawEnd.push(i + 1);
+            lastWasWhitespace = true;
+            continue;
+        }
+
+        normalizedChars.push(normalized);
+        normToRawStart.push(i);
+        normToRawEnd.push(i + 1);
+        lastWasWhitespace = false;
+    }
+
+    return {
+        normalizedText: normalizedChars.join(''),
+        normToRawStart,
+        normToRawEnd
+    };
+}
+
+function countOccurrencesBefore(text, query, limitIndex) {
+    if (!query) return 0;
+    let count = 0;
+    let from = 0;
+    while (from <= limitIndex) {
+        const idx = text.indexOf(query, from);
+        if (idx < 0 || idx >= limitIndex) break;
+        count += 1;
+        from = idx + 1;
+    }
+    return count;
+}
+
+function findAllMatchRanges(text, query) {
+    const ranges = [];
+    if (!text || !query) return ranges;
+    let from = 0;
+    while (from <= text.length - query.length) {
+        const idx = text.indexOf(query, from);
+        if (idx < 0) break;
+        ranges.push({ start: idx, end: idx + query.length });
+        from = idx + 1;
+    }
+    return ranges;
+}
+
+function findMatchRangeWithFallback(rawText, query, occurrenceHint) {
+    const exactMatches = findAllMatchRanges(rawText, query);
+    if (exactMatches.length > 0) {
+        const pick = occurrenceHint < exactMatches.length ? occurrenceHint : 0;
+        return exactMatches[pick];
+    }
+
+    const rawSoft = buildNormalizedIndex(rawText, false);
+    const querySoft = buildNormalizedIndex(query, false);
+    if (querySoft.normalizedText) {
+        const softMatches = findAllMatchRanges(rawSoft.normalizedText, querySoft.normalizedText);
+        if (softMatches.length > 0) {
+            const pick = occurrenceHint < softMatches.length ? occurrenceHint : 0;
+            const matched = softMatches[pick];
+            return {
+                start: rawSoft.normToRawStart[matched.start],
+                end: rawSoft.normToRawEnd[matched.end - 1]
+            };
+        }
+    }
+
+    const rawLoose = buildNormalizedIndex(rawText, true);
+    const queryLoose = buildNormalizedIndex(query, true);
+    if (!queryLoose.normalizedText) return null;
+    const looseMatches = findAllMatchRanges(rawLoose.normalizedText, queryLoose.normalizedText);
+    if (looseMatches.length === 0) return null;
+
+    const pick = occurrenceHint < looseMatches.length ? occurrenceHint : 0;
+    const matched = looseMatches[pick];
+    return {
+        start: rawLoose.normToRawStart[matched.start],
+        end: rawLoose.normToRawEnd[matched.end - 1]
+    };
+}
+
+function highlightTextInElement(root, query, occurrenceHint) {
     if (!root || !query) return null;
 
     const indexMap = buildTextIndexMap(root);
     if (!indexMap.text) return null;
 
-    const startIndex = indexMap.text.indexOf(query);
-    if (startIndex < 0) return null;
+    const matchedRange = findMatchRangeWithFallback(indexMap.text, query, occurrenceHint || 0);
+    if (!matchedRange) return null;
 
-    const endIndex = startIndex + query.length;
+    const startIndex = matchedRange.start;
+    const endIndex = matchedRange.end;
     const startPos = findNodeOffsetByIndex(indexMap, startIndex, false);
     const endPos = findNodeOffsetByIndex(indexMap, endIndex, true);
     if (!startPos || !endPos) return null;
@@ -459,14 +571,19 @@ function highlightTextInElement(root, query) {
 function syncSelectionHighlightFromEditor() {
     if (!preview || !editor) return;
 
-    const selected = getEditorSelectionText();
-    if (selected === lastSelection) return;
-    lastSelection = selected;
+    const selection = getEditorSelection();
+    const selected = selection.text;
+    const signature = `${selection.start}:${selection.end}:${selected}`;
+    if (signature === lastSelectionSignature) return;
+    lastSelectionSignature = signature;
 
     clearSelectionHighlights();
 
     const normalized = selected.trim();
     if (!normalized) return;
+
+    const rawEditorContent = editor.value.replace(/\r\n/g, '\n');
+    const occurrenceHint = countOccurrencesBefore(rawEditorContent, selected, selection.start);
 
     const candidates = [selected, normalized]
         .map(function(item) { return item.replace(/\r\n/g, '\n'); })
@@ -476,13 +593,13 @@ function syncSelectionHighlightFromEditor() {
     const codeBlocks = preview.querySelectorAll('pre code');
     for (let i = 0; i < codeBlocks.length && !target; i++) {
         for (let j = 0; j < candidates.length && !target; j++) {
-            target = highlightTextInElement(codeBlocks[i], candidates[j]);
+            target = highlightTextInElement(codeBlocks[i], candidates[j], occurrenceHint);
         }
     }
 
     if (!target) {
         for (let i = 0; i < candidates.length && !target; i++) {
-            target = highlightTextInElement(preview, candidates[i]);
+            target = highlightTextInElement(preview, candidates[i], occurrenceHint);
         }
     }
 
