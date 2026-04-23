@@ -102,6 +102,10 @@ const aboutPersonal: AboutPersonal = {
     {
       "date": "2026.4.12",
       "content": "增加旅行地图，音乐播放器，归档页高亮介绍，优化关于页面，修改更新为时间轴"
+    },
+    {
+      "date": "2026.4.22",
+      "content": "增加后台markdown预览功能"
     }
   ],
   "musicTracks": [
