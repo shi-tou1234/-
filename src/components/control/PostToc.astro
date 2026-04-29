@@ -184,6 +184,8 @@ document.addEventListener('astro:after-swap', initPostToc);
 }
 
 .post-toc-panel {
+  display: flex;
+  flex-direction: column;
   width: max(10rem, min(15rem, var(--toc-width)));
   max-height: 58vh;
   overflow: hidden;
@@ -225,8 +227,12 @@ document.addEventListener('astro:after-swap', initPostToc);
   margin: 0;
   padding: 0.55rem;
   list-style: none;
-  max-height: calc(58vh - 3rem);
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 .post-toc-item a {
@@ -318,6 +324,7 @@ document.addEventListener('astro:after-swap', initPostToc);
     bottom: calc(16vh + 2.8rem);
     width: auto;
     max-height: 44vh;
+    max-height: 44dvh;
     transform: translateY(12px);
     opacity: 0;
     pointer-events: none;
