@@ -147,7 +147,7 @@ $$
 
 // ===== DOM 元素 =====
 let editor, preview, wordCount, themeToggle, themeIcon, loadExampleBtn, exportMdBtn, clearBtn, hljsTheme;
-let returnPublishBtn;
+let returnPublishBtn, convertGfmBtn, gfmModal, gfmOutput, gfmCopyBtn, gfmApplyBtn, gfmCloseBtn;
 
 // ===== 状态 =====
 let currentTheme = 'light';
@@ -199,6 +199,12 @@ function init() {
     clearBtn = document.getElementById('clear');
     hljsTheme = document.getElementById('hljs-theme');
     returnPublishBtn = document.getElementById('return-publish');
+    convertGfmBtn = document.getElementById('convert-gfm');
+    gfmModal = document.getElementById('gfm-modal');
+    gfmOutput = document.getElementById('gfm-output');
+    gfmCopyBtn = document.getElementById('gfm-copy');
+    gfmApplyBtn = document.getElementById('gfm-apply');
+    gfmCloseBtn = document.getElementById('gfm-close');
     
     // 检查 DOM 元素
     if (!editor || !preview) {
@@ -297,6 +303,20 @@ function bindEvents() {
             exportMarkdown();
         });
     }
+
+    if (convertGfmBtn) {
+        convertGfmBtn.addEventListener('click', function() {
+            console.log('GFM 转换按钮点击');
+            if (!editor) return;
+            const raw = editor.value || '';
+            if (!raw.trim()) {
+                alert('没有内容可转换');
+                return;
+            }
+            const converted = convertToGithubMarkdown(raw);
+            openGfmModal(converted);
+        });
+    }
     
     // 清空
     if (clearBtn) {
@@ -316,6 +336,39 @@ function bindEvents() {
             returnToPublish();
         });
     }
+
+    if (gfmCopyBtn) {
+        gfmCopyBtn.addEventListener('click', function() {
+            handleGfmCopy();
+        });
+    }
+
+    if (gfmApplyBtn) {
+        gfmApplyBtn.addEventListener('click', function() {
+            applyGfmToEditor();
+        });
+    }
+
+    if (gfmCloseBtn) {
+        gfmCloseBtn.addEventListener('click', function() {
+            closeGfmModal();
+        });
+    }
+
+    if (gfmModal) {
+        gfmModal.addEventListener('click', function(event) {
+            const target = event.target;
+            if (target instanceof HTMLElement && target.hasAttribute('data-gfm-close')) {
+                closeGfmModal();
+            }
+        });
+    }
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeGfmModal();
+        }
+    });
     
     // 工具栏按钮
     const toolBtns = document.querySelectorAll('.tool-btn[data-action]');
@@ -1027,6 +1080,183 @@ function handleTabKey(e) {
         updatePreview();
         scheduleAutoSave();
     }
+}
+
+function openGfmModal(content) {
+    if (!gfmModal || !gfmOutput) return;
+    gfmOutput.value = content;
+    gfmModal.hidden = false;
+    gfmModal.classList.add('is-open');
+}
+
+function closeGfmModal() {
+    if (!gfmModal) return;
+    gfmModal.classList.remove('is-open');
+    gfmModal.hidden = true;
+}
+
+function setCopyStatus(message) {
+    if (!gfmCopyBtn) return;
+    const original = gfmCopyBtn.textContent || '复制';
+    gfmCopyBtn.textContent = message;
+    window.setTimeout(() => {
+        if (gfmCopyBtn) gfmCopyBtn.textContent = original;
+    }, 1200);
+}
+
+async function copyTextToClipboard(text) {
+    if (!text) return false;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (error) {
+            console.warn('Clipboard API copy failed:', error);
+        }
+    }
+
+    const temp = document.createElement('textarea');
+    temp.value = text;
+    temp.style.position = 'fixed';
+    temp.style.opacity = '0';
+    temp.style.pointerEvents = 'none';
+    document.body.appendChild(temp);
+    temp.focus();
+    temp.select();
+    let success = false;
+    try {
+        success = document.execCommand('copy');
+    } catch (error) {
+        console.warn('Legacy copy failed:', error);
+    }
+    document.body.removeChild(temp);
+    return success;
+}
+
+function handleGfmCopy() {
+    if (!gfmOutput) return;
+    const text = gfmOutput.value;
+    if (!text) return;
+    copyTextToClipboard(text).then((success) => {
+        setCopyStatus(success ? '已复制' : '复制失败');
+    });
+}
+
+function applyGfmToEditor() {
+    if (!editor || !gfmOutput) return;
+    editor.value = gfmOutput.value;
+    updatePreview();
+    updateWordCount();
+    saveToStorage();
+    closeGfmModal();
+}
+
+function extractAdmonitionTitle(raw) {
+    if (!raw) return '';
+    const bracketMatch = raw.match(/\[([^\]]+)\]/);
+    if (bracketMatch) return bracketMatch[1].trim();
+    const attrMatch = raw.match(/title\s*=\s*['\"]([^'\"]+)['\"]/);
+    if (attrMatch) return attrMatch[1].trim();
+    const cleaned = raw.replace(/\{[^}]*\}/g, '').trim();
+    return cleaned;
+}
+
+function convertInlineSyntax(line) {
+    if (!line) return line;
+    let output = line;
+    output = output.replace(/::github\{[^}]*repo\s*=\s*['\"]([^'\"]+)['\"][^}]*\}/g, '[$1](https://github.com/$1)');
+    output = output.replace(/::music\{[^}]*id\s*=\s*['\"]?(\d+)['\"]?[^}]*\}/g, '[NetEase Music $1](https://music.163.com/#/song?id=$1)');
+    output = output.replace(/\{([^{}\n]+)\}\(([^()\n]+)\)/g, '$1 ($2)');
+    output = output.replace(/!!([^!\n]+)!!/g, '**$1**');
+    output = output.replace(/==([^=\n]+)==/g, '**$1**');
+    return output;
+}
+
+function convertToGithubMarkdown(input) {
+    if (!input) return '';
+    const lines = input.replace(/\r\n/g, '\n').split('\n');
+    const output = [];
+    let inFence = false;
+    let fenceMarker = '';
+    let inBlock = false;
+    let blockType = '';
+    let blockTitle = '';
+    let blockLines = [];
+
+    const isAdmonitionType = (type) => ['tip', 'note', 'important', 'warning', 'caution'].includes(type);
+    const isQuoteType = (type) => type === 'quote';
+
+    const flushBlock = () => {
+        if (!blockType) return;
+        if (blockType === 'quote') {
+            if (blockTitle) {
+                output.push(`> **${blockTitle}**`);
+            }
+        } else {
+            const label = blockTitle ? `[!${blockType.toUpperCase()}] ${blockTitle}` : `[!${blockType.toUpperCase()}]`;
+            output.push(`> ${label}`);
+        }
+
+        const contentLines = blockLines.length > 0 ? blockLines : [''];
+        contentLines.forEach((line) => {
+            const converted = convertInlineSyntax(line);
+            output.push(converted.trim() ? `> ${converted}` : '>');
+        });
+    };
+
+    for (const line of lines) {
+        const fenceMatch = line.match(/^(```+|~~~+)/);
+
+        if (inFence) {
+            output.push(line);
+            if (fenceMatch && line.startsWith(fenceMarker)) {
+                inFence = false;
+                fenceMarker = '';
+            }
+            continue;
+        }
+
+        if (fenceMatch) {
+            inFence = true;
+            fenceMarker = fenceMatch[1];
+            output.push(line);
+            continue;
+        }
+
+        if (inBlock) {
+            if (/^\s*:::\s*$/.test(line)) {
+                flushBlock();
+                inBlock = false;
+                blockType = '';
+                blockTitle = '';
+                blockLines = [];
+            } else {
+                blockLines.push(line);
+            }
+            continue;
+        }
+
+        const blockMatch = line.match(/^\s*:::(\w+)(.*)$/);
+        if (blockMatch) {
+            const type = blockMatch[1].toLowerCase();
+            const rest = blockMatch[2] || '';
+            if (isAdmonitionType(type) || isQuoteType(type)) {
+                inBlock = true;
+                blockType = type;
+                blockTitle = extractAdmonitionTitle(rest);
+                blockLines = [];
+                continue;
+            }
+        }
+
+        output.push(convertInlineSyntax(line));
+    }
+
+    if (inBlock) {
+        flushBlock();
+    }
+
+    return output.join('\n');
 }
 
 // ===== 导出 Markdown =====

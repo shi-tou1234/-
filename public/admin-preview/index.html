@@ -81,6 +81,7 @@
                 <button class="tool-btn" id="export-md" title="导出 Markdown">
                     <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
                 </button>
+                <button class="tool-btn tool-btn--text" id="convert-gfm" title="转换为 GitHub Markdown">GFM</button>
                 <button class="tool-btn" id="clear" title="清空">
                     <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                 </button>
@@ -106,6 +107,25 @@
                 <div id="preview" class="preview markdown-body"></div>
             </div>
         </main>
+    </div>
+
+    <div class="gfm-modal" id="gfm-modal" hidden>
+        <div class="gfm-modal__backdrop" data-gfm-close></div>
+        <div class="gfm-modal__panel" role="dialog" aria-modal="true" aria-labelledby="gfm-modal-title">
+            <div class="gfm-modal__header">
+                <h2 class="gfm-modal__title" id="gfm-modal-title">GitHub Markdown</h2>
+                <button class="tool-btn" id="gfm-close" type="button" title="关闭">
+                    <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="gfm-modal__body">
+                <textarea id="gfm-output" class="gfm-output" readonly></textarea>
+            </div>
+            <div class="gfm-modal__actions">
+                <button class="tool-btn tool-btn--text" id="gfm-copy" type="button">复制</button>
+                <button class="tool-btn tool-btn--text" id="gfm-apply" type="button">替换编辑器</button>
+            </div>
+        </div>
     </div>
 
     <!-- KaTeX JS -->

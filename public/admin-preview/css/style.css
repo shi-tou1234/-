@@ -518,6 +518,100 @@ html, body {
     }
 }
 
+/* ===== GitHub Markdown modal ===== */
+.gfm-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 50;
+}
+
+.gfm-modal[hidden] {
+    display: none;
+}
+
+.gfm-modal.is-open {
+    display: flex;
+}
+
+.gfm-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.gfm-modal__panel {
+    position: relative;
+    z-index: 1;
+    width: min(920px, 100%);
+    max-height: 82vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+.gfm-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+}
+
+.gfm-modal__title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.gfm-modal__body {
+    padding: 12px 16px;
+    flex: 1;
+    display: flex;
+}
+
+.gfm-output {
+    flex: 1;
+    width: 100%;
+    min-height: 260px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 12px;
+    resize: none;
+}
+
+.gfm-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+}
+
+@media (max-width: 768px) {
+    .gfm-modal {
+        padding: 12px;
+    }
+
+    .gfm-modal__panel {
+        max-height: 88vh;
+    }
+}
+
 /* ===== 打印样式 ===== */
 @media print {
     .toolbar,

@@ -1,9 +1,9 @@
 ---
 import { i18n } from "astro:config/client";
-import i18nit from '@i18n/translation'
+import i18nit from '@i18n/translation';
 import { getRelativeLocaleUrl } from '@utils/url-utils';
 
-const { page } = Astro.props;
+const { page, basePath = '/' } = Astro.props;
 
 const currentPage = page.currentPage;
 const totalPages = page.lastPage;
@@ -11,17 +11,41 @@ const totalPages = page.lastPage;
 const showPrevious = currentPage > 1;
 const showNext = currentPage < totalPages;
 
-const previousPageUrl = currentPage === 2 ? '/' : `/${currentPage - 1}/`;
-const nextPageUrl = `/${currentPage + 1}/`;
+const normalizedBase = basePath.startsWith('/') ? basePath : `/${basePath}`;
+const baseWithSlash = normalizedBase.endsWith('/') ? normalizedBase : `${normalizedBase}/`;
 
+const getPagePath = (targetPage) => {
+  if (targetPage <= 1) return baseWithSlash;
+  return `${baseWithSlash}${targetPage}/`;
+};
 
+const previousPageUrl = getPagePath(currentPage - 1);
+const nextPageUrl = getPagePath(currentPage + 1);
+
+const buildPageItems = (current, total) => {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, index) => index + 1);
+  }
+
+  if (current <= 3) {
+    return [1, 2, 3, 4, 'ellipsis', total];
+  }
+
+  if (current >= total - 2) {
+    return [1, 'ellipsis', total - 3, total - 2, total - 1, total];
+  }
+
+  return [1, 'ellipsis', current - 1, current, current + 1, 'ellipsis', total];
+};
+
+const pageItems = buildPageItems(currentPage, totalPages);
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
 
 ---
 
-<nav data-aos="fade-up" class="flex justify-between items-center my-8 max-w-[var(--page-width)] mx-auto text-sm">
+<nav data-aos="fade-up" class="page-nav-shell flex justify-between items-center my-8 max-w-[var(--page-width)] mx-auto text-sm">
   <div class="prev-page w-24 md:w-28">
     {
       showPrevious ? (
@@ -37,8 +61,26 @@ const t = i18nit(currentLang);
     }
   </div>
 
-  <div class="page-info text-[var(--text-color)]/60">
-    {t("pageNavigation.currentPage", { currentPage: currentPage, totalPages: totalPages })}
+  <div class="page-center">
+    <div class="page-numbers" aria-label="Pagination">
+      {pageItems.map((item) => (
+        item === 'ellipsis' ? (
+          <span class="page-number-ellipsis" aria-hidden="true">…</span>
+        ) : item === currentPage ? (
+          <span class="page-number-link is-active" aria-current="page">{item}</span>
+        ) : (
+          <a
+            href={getRelativeLocaleUrl(currentLang, getPagePath(item))}
+            class="page-number-link"
+          >
+            {item}
+          </a>
+        )
+      ))}
+    </div>
+    <div class="page-info text-[var(--text-color)]/60">
+      {t("pageNavigation.currentPage", { currentPage: currentPage, totalPages: totalPages })}
+    </div>
   </div>
 
   <div class="next-page w-24 md:w-28">
@@ -58,6 +100,68 @@ const t = i18nit(currentLang);
 </nav>
 
 <style is:global>
+  .page-nav-shell {
+    gap: 1rem;
+  }
+
+  .page-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .page-numbers {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.45rem;
+  }
+
+  .page-number-link,
+  .page-number-ellipsis {
+    min-width: 2.1rem;
+    height: 2rem;
+    padding: 0 0.55rem;
+    border-radius: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border: 1px solid var(--button-border-color);
+    color: var(--text-color);
+    background: color-mix(in srgb, var(--bg-color) 88%, transparent);
+    box-shadow: 0 3px 10px color-mix(in srgb, var(--shadow-color) 26%, transparent);
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease, color 0.22s ease;
+  }
+
+  .page-number-link:hover {
+    background: var(--button-hover-color);
+    border-color: color-mix(in srgb, var(--link-color) 45%, var(--button-border-color));
+    color: var(--link-color);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--shadow-color) 42%, transparent);
+  }
+
+  .page-number-link:active {
+    transform: translateY(0) scale(0.97);
+    box-shadow: 0 3px 9px color-mix(in srgb, var(--shadow-color) 26%, transparent);
+  }
+
+  .page-number-link.is-active {
+    border-color: color-mix(in srgb, var(--link-color) 55%, var(--button-border-color));
+    color: var(--link-color);
+    background: var(--button-hover-color);
+    font-weight: 600;
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--shadow-color) 36%, transparent);
+  }
+
+  .page-number-ellipsis {
+    border-style: dashed;
+    color: color-mix(in srgb, var(--text-color) 65%, transparent);
+    cursor: default;
+  }
   .page-nav-btn {
     background: color-mix(in srgb, var(--bg-color) 88%, transparent);
     box-shadow: 0 3px 10px color-mix(in srgb, var(--shadow-color) 26%, transparent);
@@ -75,5 +179,23 @@ const t = i18nit(currentLang);
   .page-nav-btn:active {
     transform: translateY(0) scale(0.97);
     box-shadow: 0 3px 9px color-mix(in srgb, var(--shadow-color) 26%, transparent);
+  }
+
+  @media (max-width: 640px) {
+    .page-center {
+      gap: 0.3rem;
+    }
+
+    .page-number-link,
+    .page-number-ellipsis {
+      min-width: 1.8rem;
+      height: 1.7rem;
+      padding: 0 0.4rem;
+      font-size: 0.75rem;
+    }
+
+    .page-info {
+      font-size: 0.72rem;
+    }
   }
 </style>
