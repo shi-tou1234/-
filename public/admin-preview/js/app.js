@@ -148,11 +148,14 @@ $$
 // ===== DOM 元素 =====
 let editor, preview, wordCount, themeToggle, themeIcon, loadExampleBtn, exportMdBtn, clearBtn, hljsTheme;
 let returnPublishBtn, convertGfmBtn, gfmModal, gfmOutput, gfmCopyBtn, gfmApplyBtn, gfmCloseBtn;
+let formatBlogBtn, formatStandardBtn, sourceView, viewModeBtns, previewTitle;
 
 // ===== 状态 =====
 let currentTheme = 'light';
 let autoSaveTimer = null;
 let isInitialized = false;
+let currentViewMode = 'preview';
+let currentFormat = 'blog';
 
 const ADMIN_PREVIEW_DRAFT_KEY = 'cmchen_admin_preview_draft';
 const ADMIN_PREVIEW_RESULT_KEY = 'cmchen_admin_preview_result';
@@ -205,6 +208,11 @@ function init() {
     gfmCopyBtn = document.getElementById('gfm-copy');
     gfmApplyBtn = document.getElementById('gfm-apply');
     gfmCloseBtn = document.getElementById('gfm-close');
+    formatBlogBtn = document.getElementById('format-blog');
+    formatStandardBtn = document.getElementById('format-standard');
+    sourceView = document.getElementById('source-view');
+    viewModeBtns = document.querySelectorAll('.view-mode-btn');
+    previewTitle = document.getElementById('preview-title');
     
     // 检查 DOM 元素
     if (!editor || !preview) {
@@ -304,9 +312,27 @@ function bindEvents() {
         });
     }
 
-    if (convertGfmBtn) {
-        convertGfmBtn.addEventListener('click', function() {
-            console.log('GFM 转换按钮点击');
+    if (formatBlogBtn) {
+        formatBlogBtn.addEventListener('click', function() {
+            console.log('博客格式按钮点击');
+            if (!editor) return;
+            const raw = editor.value || '';
+            if (!raw.trim()) {
+                alert('没有内容可转换');
+                return;
+            }
+            const converted = convertToBlogMarkdown(raw);
+            editor.value = converted;
+            updatePreview();
+            updateWordCount();
+            saveToStorage();
+            setActiveFormat('blog');
+        });
+    }
+
+    if (formatStandardBtn) {
+        formatStandardBtn.addEventListener('click', function() {
+            console.log('标准格式按钮点击');
             if (!editor) return;
             const raw = editor.value || '';
             if (!raw.trim()) {
@@ -315,6 +341,17 @@ function bindEvents() {
             }
             const converted = convertToGithubMarkdown(raw);
             openGfmModal(converted);
+        });
+    }
+
+    // 视图模式切换
+    if (viewModeBtns.length > 0) {
+        viewModeBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const mode = btn.dataset.view;
+                if (mode === currentViewMode) return;
+                setViewMode(mode);
+            });
         });
     }
     
@@ -393,6 +430,15 @@ function bindEvents() {
 // ===== 更新预览 =====
 function updatePreview() {
     if (!editor || !preview) return;
+    
+    // 如果当前在源码视图模式，同步更新源码视图
+    if (currentViewMode === 'source' && sourceView) {
+        const converted = convertToBlogMarkdown(editor.value);
+        if (sourceView.value !== converted) {
+            sourceView.value = converted;
+        }
+        return;
+    }
     
     try {
         const markdown = editor.value;
@@ -1080,6 +1126,63 @@ function handleTabKey(e) {
         updatePreview();
         scheduleAutoSave();
     }
+}
+
+// ===== 格式切换 =====
+function setActiveFormat(format) {
+    currentFormat = format;
+    if (formatBlogBtn) formatBlogBtn.classList.toggle('tool-btn--active', format === 'blog');
+    if (formatStandardBtn) formatStandardBtn.classList.toggle('tool-btn--active', format === 'standard');
+}
+
+// ===== 视图模式切换 =====
+function setViewMode(mode) {
+    currentViewMode = mode;
+    viewModeBtns.forEach(function(btn) {
+        btn.classList.toggle('view-mode-btn--active', btn.dataset.view === mode);
+    });
+    if (previewTitle) {
+        previewTitle.textContent = mode === 'preview' ? '预览' : '博客源码';
+    }
+    if (mode === 'source') {
+        if (preview) preview.style.display = 'none';
+        if (sourceView) {
+            sourceView.style.display = 'block';
+            const converted = convertToBlogMarkdown(editor ? editor.value : '');
+            sourceView.value = converted;
+        }
+    } else {
+        if (preview) preview.style.display = 'block';
+        if (sourceView) sourceView.style.display = 'none';
+        updatePreview();
+    }
+}
+
+// ===== 转换为博客 Markdown 格式 =====
+function convertToBlogMarkdown(input) {
+    if (!input) return '';
+    let output = input;
+
+    // 1. 将 GFM 提醒 ( [!TIP], [!NOTE], [!WARNING], [!CAUTION], [!IMPORTANT] ) 转换为博客 tip 卡片
+    const admonitionPattern = /^> \[!(\w+)\](?:[ \t]+(.*?))?\n(>(?:.*\n?))*$/gm;
+    output = output.replace(admonitionPattern, function(match, type, title, body) {
+        const lines = body.split('\n').map(function(line) {
+            return line.replace(/^>\s?/, '');
+        }).filter(function(line) {
+            return line.trim() !== '';
+        }).join('\n');
+        const titleLine = title ? title.trim() : '';
+        const content = titleLine ? titleLine + '\n' + lines : lines;
+        return ':::tip\n' + content + '\n:::';
+    });
+
+    // 2. 将标准 markdown 链接 [text](url) 还原为自定义格式（如果是特殊链接）
+    output = output.replace(/\[([^\]]+)\]\(https:\/\/github\.com\/([^)]+)\)/g, '::github{repo="$2"}');
+    output = output.replace(/\[NetEase Music (\d+)\]\(https:\/\/music\.163\.com\/#\/song\?id=(\d+)\)/g, '::music{id="$1"}');
+
+    // 3. 将 GFM 任务列表 - [ ] / - [x] 保持原样（博客系统也支持）
+
+    return output;
 }
 
 function openGfmModal(content) {

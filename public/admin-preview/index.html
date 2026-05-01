@@ -81,7 +81,11 @@
                 <button class="tool-btn" id="export-md" title="导出 Markdown">
                     <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
                 </button>
-                <button class="tool-btn tool-btn--text" id="convert-gfm" title="转换为 GitHub Markdown">GFM</button>
+                <span class="tool-btn-group">
+                    <button class="tool-btn tool-btn--text tool-btn--active" id="format-blog" title="博客专用 Markdown 格式">博客格式</button>
+                    <button class="tool-btn tool-btn--text" id="format-standard" title="转换为标准 Markdown 格式">标准格式</button>
+                </span>
+                <div class="tool-separator"></div>
                 <button class="tool-btn" id="clear" title="清空">
                     <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                 </button>
@@ -102,9 +106,16 @@
             <!-- 预览区 -->
             <div class="preview-pane">
                 <div class="pane-header">
-                    <span class="pane-title">预览</span>
+                    <div class="pane-header-left">
+                        <span class="pane-title" id="preview-title">预览</span>
+                        <span class="view-mode-toggle">
+                            <button class="view-mode-btn view-mode-btn--active" data-view="preview" title="渲染预览">预览</button>
+                            <button class="view-mode-btn" data-view="source" title="查看博客源码">源码</button>
+                        </span>
+                    </div>
                 </div>
                 <div id="preview" class="preview markdown-body"></div>
+                <textarea id="source-view" class="source-view" readonly placeholder="博客 Markdown 源码"></textarea>
             </div>
         </main>
     </div>
@@ -113,7 +124,7 @@
         <div class="gfm-modal__backdrop" data-gfm-close></div>
         <div class="gfm-modal__panel" role="dialog" aria-modal="true" aria-labelledby="gfm-modal-title">
             <div class="gfm-modal__header">
-                <h2 class="gfm-modal__title" id="gfm-modal-title">GitHub Markdown</h2>
+                <h2 class="gfm-modal__title" id="gfm-modal-title">标准 Markdown 格式</h2>
                 <button class="tool-btn" id="gfm-close" type="button" title="关闭">
                     <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                 </button>

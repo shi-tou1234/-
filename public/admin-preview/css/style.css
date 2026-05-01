@@ -139,6 +139,46 @@ html, body {
     font-weight: 600;
 }
 
+/* 按钮组（相邻按钮无间隔） */
+.tool-btn-group {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.tool-btn-group .tool-btn--text {
+    border: none;
+    border-radius: 0;
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 600;
+    height: 28px;
+    background-color: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tool-btn-group .tool-btn--text:hover {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.tool-btn-group .tool-btn--text.tool-btn--active {
+    background-color: var(--accent-color);
+    color: #ffffff;
+}
+
+.tool-btn-group .tool-btn--text.tool-btn--active:hover {
+    background-color: var(--accent-hover);
+}
+
+.tool-btn-group .tool-btn--text + .tool-btn--text {
+    border-left: 1px solid var(--border-color);
+}
+
 .tool-btn:hover {
     background-color: var(--bg-primary);
     color: var(--text-primary);
@@ -178,12 +218,75 @@ html, body {
     flex-shrink: 0;
 }
 
+.pane-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .pane-title {
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--text-secondary);
+}
+
+/* 视图模式切换 */
+.view-mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.view-mode-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-tertiary);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1.5;
+}
+
+.view-mode-btn:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-tertiary);
+}
+
+.view-mode-btn--active {
+    color: var(--accent-color);
+    background-color: color-mix(in srgb, var(--accent-color) 12%, transparent);
+    font-weight: 600;
+}
+
+.view-mode-btn--active:hover {
+    background-color: color-mix(in srgb, var(--accent-color) 18%, transparent);
+}
+
+.view-mode-btn + .view-mode-btn {
+    border-left: 1px solid var(--border-color);
+}
+
+/* 源码视图 */
+.source-view {
+    flex: 1;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    outline: none;
+    resize: none;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    display: none;
+    tab-size: 4;
 }
 
 .word-count {
