@@ -106,6 +106,14 @@ const aboutPersonal: AboutPersonal = {
     {
       "date": "2026.4.22",
       "content": "增加后台markdown预览功能"
+    },
+    {
+      "date": "2026.5.2",
+      "content": "完善预览界面"
+    },
+    {
+      "date": "2026.5.3",
+      "content": "增加阅读进度显示，修复目录逻辑，增加后台导出博客"
     }
   ],
   "musicTracks": [
