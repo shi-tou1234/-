@@ -113,7 +113,7 @@ const aboutPersonal: AboutPersonal = {
     },
     {
       "date": "2026.5.3",
-      "content": "增加阅读进度显示，修复目录逻辑，增加后台导出博客"
+      "content": "增加阅读进度显示，修复目录逻辑，增加后台导出博客，修改时间轴样式，热力图提交数量"
     }
   ],
   "musicTracks": [
