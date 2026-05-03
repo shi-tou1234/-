@@ -350,41 +350,43 @@ function getIntensityLevel(count: number, maxCount: number): number {
 
     <section class="mb-8 rounded-xl border border-[var(--button-border-color)] bg-[var(--postcard-bg-color)]/40 p-4 md:p-5">
       <h2 class="mb-4 text-lg font-semibold text-[var(--text-color)]">{labels.siteRecordTitle}</h2>
-      <ol class="about-timeline">
-        {timelineRecent.map((item) => (
-          <li class="about-timeline__item">
-            <div class="about-timeline__dot"></div>
-            <div class="about-timeline__content rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
-              <p class="text-xs text-[var(--text-color)]/60">{item.date}</p>
-              <p class="mt-1 text-sm text-[var(--text-color)]/85">{item.content}</p>
+      <div class="about-timeline">
+        {timelineRecent.map((item, index) => (
+          <div class="about-timeline__card">
+            <div class="about-timeline__accent"></div>
+            <div class="about-timeline__body">
+              <span class="about-timeline__date">{item.date}</span>
+              <p class="about-timeline__text">{item.content}</p>
             </div>
-          </li>
+          </div>
         ))}
-      </ol>
+      </div>
 
       {timelineHistory.length > 0 && (
         <>
-          <button
-            id="about-timeline-toggle"
-            type="button"
-            class="mt-3 rounded-lg border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]"
-            data-open="false"
-            data-label-expand={labels.viewAllTimeline}
-            data-label-collapse={labels.collapseTimeline}
-          >
-            {labels.viewAllTimeline}
-          </button>
-          <ol id="about-timeline-history" class="about-timeline mt-3" hidden>
-            {timelineHistory.map((item) => (
-              <li class="about-timeline__item">
-                <div class="about-timeline__dot"></div>
-                <div class="about-timeline__content rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3">
-                  <p class="text-xs text-[var(--text-color)]/60">{item.date}</p>
-                  <p class="mt-1 text-sm text-[var(--text-color)]/85">{item.content}</p>
+          <div class="about-timeline__more">
+            <button
+              id="about-timeline-toggle"
+              type="button"
+              class="about-timeline__toggle"
+              data-open="false"
+              data-label-expand={labels.viewAllTimeline}
+              data-label-collapse={labels.collapseTimeline}
+            >
+              {labels.viewAllTimeline}
+            </button>
+          </div>
+          <div id="about-timeline-history" class="about-timeline" hidden>
+            {timelineHistory.map((item, index) => (
+              <div class="about-timeline__card">
+                <div class="about-timeline__accent"></div>
+                <div class="about-timeline__body">
+                  <span class="about-timeline__date">{item.date}</span>
+                  <p class="about-timeline__text">{item.content}</p>
                 </div>
-              </li>
+              </div>
             ))}
-          </ol>
+          </div>
         </>
       )}
     </section>
@@ -540,61 +542,108 @@ function getIntensityLevel(count: number, maxCount: number): number {
 
 <style is:global>
   .about-timeline {
-    position: relative;
-    margin: 0;
-    padding-left: 1.5rem;
-    list-style: none;
     display: grid;
-    gap: 1rem;
+    gap: 0.75rem;
   }
 
-  .about-timeline::before {
+  .about-timeline__card {
+    display: flex;
+    gap: 0;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid var(--button-border-color);
+    background: var(--bg-color);
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+    cursor: default;
+  }
+
+  .about-timeline__card:hover {
+    border-color: color-mix(in srgb, var(--link-color) 30%, var(--button-border-color));
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--shadow-color) 50%, transparent);
+    transform: translateY(-2px);
+  }
+
+  .about-timeline__accent {
+    width: 4px;
+    flex-shrink: 0;
+    background: linear-gradient(to bottom, var(--link-color), color-mix(in srgb, var(--link-color) 40%, var(--button-border-color)));
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+  }
+
+  .about-timeline__card:hover .about-timeline__accent {
+    opacity: 1;
+  }
+
+  .about-timeline__body {
+    flex: 1;
+    min-width: 0;
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .about-timeline__date {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--link-color);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .about-timeline__date::before {
     content: '';
-    position: absolute;
-    left: 0.25rem;
-    top: 0.35rem;
-    bottom: 0.35rem;
-    width: 2px;
-    background: linear-gradient(to bottom, var(--link-color), color-mix(in srgb, var(--link-color) 30%, var(--button-border-color)));
-    border-radius: 999px;
-  }
-
-  .about-timeline__item {
-    position: relative;
-    padding-left: 1rem;
-    transition: transform 0.25s ease;
-  }
-
-  .about-timeline__item:hover {
-    transform: translateX(3px);
-  }
-
-  .about-timeline__dot {
-    position: absolute;
-    left: -1.05rem;
-    top: 0.65rem;
-    width: 0.6rem;
-    height: 0.6rem;
+    display: inline-block;
+    width: 0.45rem;
+    height: 0.45rem;
     border-radius: 999px;
     background: var(--link-color);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--link-color) 18%, transparent);
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
-    z-index: 1;
+    flex-shrink: 0;
   }
 
-  .about-timeline__item:hover .about-timeline__dot {
-    box-shadow: 0 0 0 5px color-mix(in srgb, var(--link-color) 22%, transparent);
-    transform: scale(1.15);
+  .about-timeline__text {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--text-color);
   }
 
-  .about-timeline__content {
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  .about-timeline__more {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
   }
 
-  .about-timeline__item:hover .about-timeline__content {
+  .about-timeline__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid var(--button-border-color);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--bg-color) 95%, var(--link-color));
+    color: color-mix(in srgb, var(--text-color) 75%, transparent);
+    padding: 0.45rem 1.2rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .about-timeline__toggle:hover {
+    border-color: var(--link-color);
+    color: var(--link-color);
+    background: color-mix(in srgb, var(--bg-color) 92%, var(--link-color));
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--shadow-color) 40%, transparent);
     transform: translateY(-1px);
-    box-shadow: 0 4px 16px var(--shadow-color);
-    border-color: color-mix(in srgb, var(--link-color) 35%, var(--button-border-color));
+  }
+
+  .about-timeline__toggle:active {
+    transform: translateY(0) scale(0.97);
   }
 
   .about-track-btn {
