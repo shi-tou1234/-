@@ -96,14 +96,17 @@ function initPostToc() {
   let navigatingTimeout = null;
   let isNavigating = false;
 
-  const SCROLL_OFFSET = 20;
+  const SCROLL_OFFSET = 100;
 
-  const getHeaderOffset = () => {
+  const getScrollTarget = (heading) => {
+    if (!heading) return 0;
+    const rect = heading.getBoundingClientRect();
     const header = document.getElementById('main-header');
-    if (!header) return SCROLL_OFFSET;
-    if (window.innerWidth >= 768) return SCROLL_OFFSET;
-    if (header.classList.contains('header-hidden')) return SCROLL_OFFSET;
-    return header.offsetHeight + 12;
+    let offset = SCROLL_OFFSET;
+    if (header && window.innerWidth < 768 && !header.classList.contains('header-hidden')) {
+      offset = header.offsetHeight + 12;
+    }
+    return window.scrollY + rect.top - offset;
   };
 
   const updateProgress = () => {
@@ -171,8 +174,7 @@ function initPostToc() {
     const target = document.getElementById(targetId);
     if (!target) return;
 
-    const offset = getHeaderOffset();
-    const targetPosition = target.getBoundingClientRect().top + window.scrollY - offset;
+    const targetPosition = getScrollTarget(target);
     window.scrollTo({ top: Math.max(0, targetPosition), behavior: 'smooth' });
 
     if (window.location.hash !== `#${targetId}`) {
