@@ -93,12 +93,16 @@ function initPostToc() {
   const links = Array.from(list.querySelectorAll('a[data-toc-target]'));
   let activeId = '';
   let tickingProgress = false;
+  let navigatingTimeout = null;
+  let isNavigating = false;
+
+  const SCROLL_OFFSET = 20;
 
   const getHeaderOffset = () => {
     const header = document.getElementById('main-header');
-    if (!header) return 0;
-    if (window.innerWidth >= 768) return 0;
-    if (header.classList.contains('header-hidden')) return 0;
+    if (!header) return SCROLL_OFFSET;
+    if (window.innerWidth >= 768) return SCROLL_OFFSET;
+    if (header.classList.contains('header-hidden')) return SCROLL_OFFSET;
     return header.offsetHeight + 12;
   };
 
@@ -145,13 +149,31 @@ function initPostToc() {
     });
   };
 
+  const forceActive = (id) => {
+    if (!id) return;
+    if (navigatingTimeout) {
+      clearTimeout(navigatingTimeout);
+      navigatingTimeout = null;
+    }
+    isNavigating = true;
+    activeId = id;
+    links.forEach((link) => {
+      const isActive = link.getAttribute('data-toc-target') === id;
+      link.classList.toggle('is-active', isActive);
+    });
+    navigatingTimeout = setTimeout(() => {
+      isNavigating = false;
+      navigatingTimeout = null;
+    }, 600);
+  };
+
   const scrollToHeading = (targetId) => {
     const target = document.getElementById(targetId);
     if (!target) return;
 
     const offset = getHeaderOffset();
     const targetPosition = target.getBoundingClientRect().top + window.scrollY - offset;
-    window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+    window.scrollTo({ top: Math.max(0, targetPosition), behavior: 'smooth' });
 
     if (window.location.hash !== `#${targetId}`) {
       history.replaceState(null, '', `#${targetId}`);
@@ -168,13 +190,14 @@ function initPostToc() {
         setPanelOpen(false);
       }
 
+      forceActive(targetId);
       scrollToHeading(targetId);
-      updateActive(targetId);
     });
   });
 
   const observer = new IntersectionObserver(
     (entries) => {
+      if (isNavigating) return;
       const visible = entries
         .filter((entry) => entry.isIntersecting)
         .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
@@ -190,7 +213,7 @@ function initPostToc() {
   );
 
   headings.forEach((heading) => observer.observe(heading));
-  updateActive(headings[0].id);
+  forceActive(headings[0].id);
   updateProgress();
 
   fab.onclick = () => setPanelOpen(true);
