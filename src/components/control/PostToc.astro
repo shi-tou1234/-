@@ -16,6 +16,12 @@ const { title } = Astro.props;
   <aside id="post-toc-panel" class="post-toc-panel" aria-label={title}>
     <div class="post-toc-panel__head">
       <h2 class="post-toc-panel__title">{title}</h2>
+      <div class="post-toc-progress" id="post-toc-progress">
+        <div class="post-toc-progress__track">
+          <div class="post-toc-progress__bar" id="post-toc-progress-bar"></div>
+        </div>
+        <span class="post-toc-progress__text" id="post-toc-progress-text">0%</span>
+      </div>
       <button id="post-toc-close" type="button" class="post-toc-panel__close" aria-label="close">x</button>
     </div>
     <ol id="post-toc-list" class="post-toc-list"></ol>
@@ -86,6 +92,42 @@ function initPostToc() {
 
   const links = Array.from(list.querySelectorAll('a[data-toc-target]'));
   let activeId = '';
+  let tickingProgress = false;
+
+  const getHeaderOffset = () => {
+    const header = document.getElementById('main-header');
+    if (!header) return 0;
+    if (window.innerWidth >= 768) return 0;
+    if (header.classList.contains('header-hidden')) return 0;
+    return header.offsetHeight + 12;
+  };
+
+  const updateProgress = () => {
+    const progressBar = document.getElementById('post-toc-progress-bar');
+    const progressText = document.getElementById('post-toc-progress-text');
+    if (!progressBar || !progressText) return;
+
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    if (docHeight <= 0) {
+      progressBar.style.width = '0%';
+      progressText.textContent = '0%';
+      return;
+    }
+    const percent = Math.min(Math.max(Math.round((scrollTop / docHeight) * 100), 0), 100);
+    progressBar.style.width = `${percent}%`;
+    progressText.textContent = `${percent}%`;
+  };
+
+  const onScrollProgress = () => {
+    if (!tickingProgress) {
+      window.requestAnimationFrame(() => {
+        updateProgress();
+        tickingProgress = false;
+      });
+      tickingProgress = true;
+    }
+  };
 
   const setPanelOpen = (open) => {
     panel.classList.toggle('is-open', open);
@@ -103,28 +145,30 @@ function initPostToc() {
     });
   };
 
+  const scrollToHeading = (targetId) => {
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    const offset = getHeaderOffset();
+    const targetPosition = target.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+
+    if (window.location.hash !== `#${targetId}`) {
+      history.replaceState(null, '', `#${targetId}`);
+    }
+  };
+
   links.forEach((link) => {
     link.addEventListener('click', (event) => {
       event.preventDefault();
       const targetId = link.getAttribute('data-toc-target');
       if (!targetId) return;
-      const target = document.getElementById(targetId);
-      if (!target) return;
-
-      const jumpToTarget = () => {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        if (window.location.hash !== `#${targetId}`) {
-          history.replaceState(null, '', `#${targetId}`);
-        }
-      };
 
       if (window.innerWidth < 1024) {
         setPanelOpen(false);
-        requestAnimationFrame(jumpToTarget);
-      } else {
-        jumpToTarget();
       }
 
+      scrollToHeading(targetId);
       updateActive(targetId);
     });
   });
@@ -140,13 +184,14 @@ function initPostToc() {
     },
     {
       root: null,
-      rootMargin: '-22% 0px -62% 0px',
-      threshold: [0, 1],
+      rootMargin: '-80px 0px -55% 0px',
+      threshold: 0,
     },
   );
 
   headings.forEach((heading) => observer.observe(heading));
   updateActive(headings[0].id);
+  updateProgress();
 
   fab.onclick = () => setPanelOpen(true);
   closeBtn.onclick = () => setPanelOpen(false);
@@ -165,6 +210,14 @@ function initPostToc() {
 
   document.addEventListener('keydown', escHandler);
   window.__postTocEscHandler = escHandler;
+
+  const oldScrollHandler = window.__postTocScrollHandler;
+  if (oldScrollHandler) {
+    window.removeEventListener('scroll', oldScrollHandler);
+  }
+
+  window.addEventListener('scroll', onScrollProgress, { passive: true });
+  window.__postTocScrollHandler = onScrollProgress;
 
   if (window.innerWidth >= 1024) {
     setPanelOpen(false);
@@ -221,6 +274,40 @@ document.addEventListener('astro:after-swap', initPostToc);
   background: transparent;
   color: var(--text-color);
   cursor: pointer;
+}
+
+.post-toc-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.post-toc-progress__track {
+  flex: 1 1 auto;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--button-border-color);
+  overflow: hidden;
+  min-width: 2rem;
+}
+
+.post-toc-progress__bar {
+  height: 100%;
+  width: 0%;
+  background: var(--link-color);
+  border-radius: 999px;
+  transition: width 0.1s linear;
+}
+
+.post-toc-progress__text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--link-color);
+  white-space: nowrap;
+  min-width: 2.4rem;
+  text-align: right;
 }
 
 .post-toc-list {
@@ -323,8 +410,8 @@ document.addEventListener('astro:after-swap', initPostToc);
     left: 0.8rem;
     bottom: calc(16vh + 2.8rem);
     width: auto;
-    max-height: 44vh;
-    max-height: 44dvh;
+    max-height: 55vh;
+    max-height: 55dvh;
     transform: translateY(12px);
     opacity: 0;
     pointer-events: none;
