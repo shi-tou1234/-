@@ -211,8 +211,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
           <h2 class="text-xl font-semibold">导出文章</h2>
         </div>
         <div class="flex flex-wrap items-center gap-3">
-          <button id="export-csv-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">导出 CSV（元数据）</button>
-          <button id="export-markdown-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">导出 Markdown（全文）</button>
+          <button id="export-csv-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">导出 ZIP（CSV 元数据）</button>
+          <button id="export-markdown-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">导出 ZIP（Markdown 全文）</button>
         </div>
         <div id="export-progress-wrap" class="hidden mt-3">
           <div class="flex items-center gap-3">
@@ -1174,11 +1174,22 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       return;
     }
 
-    setMsg(msgEl, "正在获取文章列表...");
+    setMsg(msgEl, "正在加载 JSZip 库...");
     saveGitHubDraft();
     if (progressWrap) progressWrap.classList.remove("hidden");
     if (progressBar) progressBar.style.width = "0%";
     if (progressText) progressText.textContent = "0 / 0";
+
+    let JSZip;
+    try {
+      JSZip = (await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm')).default;
+    } catch {
+      setMsg(msgEl, "JSZip 库加载失败，请检查网络连接", true);
+      if (progressWrap) progressWrap.classList.add("hidden");
+      return;
+    }
+
+    setMsg(msgEl, "正在获取文章列表...");
 
     let entries;
     try {
@@ -1214,32 +1225,41 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       await new Promise((r) => setTimeout(r, 10));
     }
 
+    setMsg(msgEl, "正在生成压缩包...");
+
+    const zip = new JSZip();
+
     if (format === "csv") {
       const csvRows = [["title", "slug", "lang", "date", "description", "category"]];
       for (const post of posts) {
         const { frontmatter } = parsePostMarkdown(post.markdown);
-        csvRows.push([
+        const row = [
           escapeCsvField(frontmatter.title || ""),
           post.slug,
           post.lang,
           frontmatter.pubDate || "",
           escapeCsvField(frontmatter.description || ""),
           escapeCsvField(frontmatter.category || ""),
-        ]);
+        ];
+        csvRows.push(row);
+
+        const langDir = post.lang === "zh-cn" ? "中文" : "English";
+        const filePath = `${langDir}/${post.slug}.csv`;
+        zip.file(filePath, `\uFEFF${row.join(",")}\n`);
       }
-      const csvContent = csvRows.map((row) => row.join(",")).join("\n");
-      downloadFile(csvContent, `blog-export-${Date.now()}.csv`, "text/csv;charset=utf-8");
-      setMsg(msgEl, `导出成功：${posts.length} 篇文章元数据已导出为 CSV`);
+      const csvContent = csvRows.map((r) => r.join(",")).join("\n");
+      zip.file("_全部元数据汇总.csv", `\uFEFF${csvContent}\n`);
     } else if (format === "markdown") {
-      let mdContent = `# Blog Export\n\n导出时间：${new Date().toLocaleString("zh-CN")}\n\n---\n\n`;
       for (const post of posts) {
-        mdContent += `## ${post.slug} (${post.lang})\n\n`;
-        mdContent += post.markdown;
-        mdContent += "\n\n---\n\n";
+        const langDir = post.lang === "zh-cn" ? "中文" : "English";
+        const filePath = `${langDir}/${post.slug}.md`;
+        zip.file(filePath, post.markdown);
       }
-      downloadFile(mdContent, `blog-export-${Date.now()}.md`, "text/markdown;charset=utf-8");
-      setMsg(msgEl, `导出成功：${posts.length} 篇文章全文已导出为 Markdown`);
     }
+
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    downloadBlob(zipBlob, `blog-export-${Date.now()}.zip`);
+    setMsg(msgEl, `导出成功：${posts.length} 篇文章已打包为 ZIP（按语言分目录，每篇独立文件）`);
 
     if (progressWrap) progressWrap.classList.add("hidden");
   }
@@ -1252,8 +1272,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     return str;
   }
 
-  function downloadFile(content, filename, mimeType) {
-    const blob = new Blob([`\uFEFF${content}`], { type: `${mimeType};charset=utf-8` });
+  function downloadBlob(blob, filename) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
