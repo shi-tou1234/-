@@ -53,7 +53,7 @@ async function fetchCommitsFromGitHub() {
   const headers = { Accept: 'application/vnd.github+json' };
 
   try {
-    for (let page = 1; page <= 5; page += 1) {
+    for (let page = 1; page <= 10; page += 1) {
       const url = `https://api.github.com/repos/shi-tou1234/-/commits?sha=main&since=${encodeURIComponent(sinceIso)}&until=${encodeURIComponent(untilIso)}&per_page=100&page=${page}`;
       const response = await fetch(url, { headers });
       if (!response.ok) break;
@@ -433,7 +433,7 @@ function getIntensityLevel(count: number, maxCount: number): number {
     const countMap = new Map();
 
     try {
-      for (let page = 1; page <= 5; page += 1) {
+      for (let page = 1; page <= 10; page += 1) {
         const url = `https://api.github.com/repos/shi-tou1234/-/commits?sha=main&since=${encodeURIComponent(since)}&until=${encodeURIComponent(until)}&per_page=100&page=${page}`;
         const response = await fetch(url, { headers: { Accept: 'application/vnd.github+json' } });
         if (!response.ok) break;
@@ -542,27 +542,59 @@ function getIntensityLevel(count: number, maxCount: number): number {
   .about-timeline {
     position: relative;
     margin: 0;
-    padding-left: 1.2rem;
+    padding-left: 1.5rem;
     list-style: none;
-    border-left: 2px dashed color-mix(in srgb, var(--link-color) 55%, var(--button-border-color));
     display: grid;
-    gap: 0.9rem;
+    gap: 1rem;
+  }
+
+  .about-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.25rem;
+    top: 0.35rem;
+    bottom: 0.35rem;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--link-color), color-mix(in srgb, var(--link-color) 30%, var(--button-border-color)));
+    border-radius: 999px;
   }
 
   .about-timeline__item {
     position: relative;
-    padding-left: 0.8rem;
+    padding-left: 1rem;
+    transition: transform 0.25s ease;
+  }
+
+  .about-timeline__item:hover {
+    transform: translateX(3px);
   }
 
   .about-timeline__dot {
     position: absolute;
-    left: -0.47rem;
+    left: -1.05rem;
     top: 0.65rem;
-    width: 0.7rem;
-    height: 0.7rem;
+    width: 0.6rem;
+    height: 0.6rem;
     border-radius: 999px;
     background: var(--link-color);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--link-color) 20%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--link-color) 18%, transparent);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    z-index: 1;
+  }
+
+  .about-timeline__item:hover .about-timeline__dot {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--link-color) 22%, transparent);
+    transform: scale(1.15);
+  }
+
+  .about-timeline__content {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+
+  .about-timeline__item:hover .about-timeline__content {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px var(--shadow-color);
+    border-color: color-mix(in srgb, var(--link-color) 35%, var(--button-border-color));
   }
 
   .about-track-btn {
