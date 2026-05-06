@@ -4,6 +4,7 @@ import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
 import Search from '@components/misc/Search.astro';
 import blogGuideContent from '@/data/blog-guide-content';
+import { getRelativeLocaleUrl } from '@utils/url-utils';
 
 
 interface Props {
@@ -21,6 +22,14 @@ const isZh = lang === 'zh-cn';
 const guideText = isZh ? blogGuideContent['zh-cn'] : blogGuideContent.en;
 const baseUrl = import.meta.env.BASE_URL || '/';
 
+const navIndex = getRelativeLocaleUrl(lang, '/');
+const navArchives = getRelativeLocaleUrl(lang, '/archives/');
+const navAbout = getRelativeLocaleUrl(lang, '/about/');
+const navFriends = getRelativeLocaleUrl(lang, '/friends/');
+const navHomeLabel = isZh ? '首页' : 'Home';
+const navArchiveLabel = isZh ? '归档' : 'Archive';
+const navAboutLabel = isZh ? '关于' : 'About';
+const navFriendsLabel = isZh ? '友链' : 'Friends';
 ---
 
 <Layout title={title} lang={lang}>
@@ -29,7 +38,7 @@ const baseUrl = import.meta.env.BASE_URL || '/';
     <div>
       <Header />
     </div>
-    <main id="main-content" class="relative z-10 flex-grow pt-[72px] md:pt-[92px]">
+    <main id="main-content" class="relative z-10 flex-grow pt-[72px] md:pt-[92px] transition-fade">
       <slot />
     </main>
 
@@ -86,6 +95,26 @@ const baseUrl = import.meta.env.BASE_URL || '/';
         </div>
       </div>
     )}
+
+    <!-- 移动端底部导航栏 -->
+    <nav id="mobile-bottom-nav" class="mobile-bottom-nav" aria-label="Mobile navigation">
+      <a href={navIndex} class="mobile-bottom-nav__link" data-nav-home>
+        <svg class="mobile-bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="mobile-bottom-nav__label">{navHomeLabel}</span>
+      </a>
+      <a href={navArchives} class="mobile-bottom-nav__link" data-nav-archives>
+        <svg class="mobile-bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+        <span class="mobile-bottom-nav__label">{navArchiveLabel}</span>
+      </a>
+      <a href={navAbout} class="mobile-bottom-nav__link" data-nav-about>
+        <svg class="mobile-bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="mobile-bottom-nav__label">{navAboutLabel}</span>
+      </a>
+      <a href={navFriends} class="mobile-bottom-nav__link" data-nav-friends>
+        <svg class="mobile-bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="mobile-bottom-nav__label">{navFriendsLabel}</span>
+      </a>
+    </nav>
 
     <Footer />
     <Search />
@@ -586,4 +615,101 @@ const baseUrl = import.meta.env.BASE_URL || '/';
   opacity: 1;
   transform: translateY(0) scale(1);
 }
+
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 900;
+  display: none;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0.35rem 0 0.6rem;
+  background: color-mix(in srgb, var(--bg-color) 88%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--button-border-color);
+  box-shadow: 0 -4px 20px color-mix(in srgb, var(--shadow-color) 30%, transparent);
+}
+
+@media (max-width: 775px) {
+  .mobile-bottom-nav {
+    display: flex;
+  }
+}
+
+.mobile-bottom-nav__link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.25rem 0.6rem;
+  text-decoration: none;
+  color: var(--text-color);
+  opacity: 0.5;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 0.5rem;
+}
+
+.mobile-bottom-nav__link:hover,
+.mobile-bottom-nav__link.is-active {
+  opacity: 1;
+}
+
+.mobile-bottom-nav__link:active {
+  transform: scale(0.92);
+}
+
+.mobile-bottom-nav__icon {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.mobile-bottom-nav__label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+@media (hover: hover) {
+  .mobile-bottom-nav__link:hover {
+    opacity: 0.8;
+  }
+}
+
+@media (max-width: 775px) {
+  body {
+    padding-bottom: 3.2rem;
+  }
+}
+
+html.post-reading-fullscreen ~ body,
+html.post-reading-fullscreen .mobile-bottom-nav {
+  display: none !important;
+}
+
+@media (max-width: 775px) {
+  html.post-reading-fullscreen ~ body {
+    padding-bottom: 0;
+  }
+}
 </style>
+
+<script>
+function initMobileBottomNav() {
+  const nav = document.getElementById('mobile-bottom-nav');
+  if (!nav) return;
+  const links = nav.querySelectorAll('a');
+  const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+
+  links.forEach((link) => {
+    const href = link.getAttribute('href')?.replace(/\/+$/, '') || '';
+    link.classList.toggle('is-active', href === currentPath || (href !== '/' && currentPath.startsWith(href)));
+  });
+}
+
+document.addEventListener('astro:page-load', initMobileBottomNav);
+document.addEventListener('astro:after-swap', initMobileBottomNav);
+</script>

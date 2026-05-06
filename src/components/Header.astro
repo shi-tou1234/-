@@ -42,33 +42,33 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
     <!-- nav_bar (desktop) -->
     <div id="nav-bar" class={`hidden md:flex flex-1 min-w-0 items-center justify-center font-bold z-20 ${desktopNavTextClass}`}>
       <div id="nav-bar-list" class="transition relative z-10 flex items-center justify-center rounded-outer p-2 backdrop-blur rounded-xl bg-[color:var(--bg-color)]/20 overflow-x-auto whitespace-nowrap max-w-[min(58vw,860px)]">
-      <a href={ indexPage } class={`transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
+      <a href={ indexPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === indexPage
-                ? 'bg-[var(--button-hover-color)]'
+                ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
-            {t("header.home")}
+            <span class="nav-link-text">{t("header.home")}</span>
         </a>
-      <a href={ archivesPage } class={`transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
+      <a href={ archivesPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === archivesPage
-                ? 'bg-[var(--button-hover-color)]'
+                ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
-            {t("header.archive")}
+            <span class="nav-link-text">{t("header.archive")}</span>
         </a>
-      <a href={ aboutPage } class={`transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
+      <a href={ aboutPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === aboutPage
-                ? 'bg-[var(--button-hover-color)]'
+                ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
-            {t("header.about")}
+            <span class="nav-link-text">{t("header.about")}</span>
         </a>
-      <a href={ friendsPage } class={`transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
+      <a href={ friendsPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === friendsPage
-                ? 'bg-[var(--button-hover-color)]'
+                ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
-            {t("header.friends")}
+            <span class="nav-link-text">{t("header.friends")}</span>
         </a>
       </div>
     </div>
@@ -165,20 +165,68 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 
 <style is:global>
 #main-header {
-  transition: transform 0.3s ease, background-color 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease, backdrop-filter 0.28s ease;
+  transition: transform 0.3s ease, background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, backdrop-filter 0.35s ease;
 }
 
 #main-header.header-scrolled {
-  background-color: color-mix(in srgb, var(--bg-color) 72%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid color-mix(in srgb, var(--button-border-color) 70%, transparent);
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--shadow-color) 35%, transparent);
+  background-color: color-mix(in srgb, var(--bg-color) 68%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid color-mix(in srgb, var(--button-border-color) 60%, transparent);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--shadow-color) 30%, transparent);
+}
+
+#main-header.header-scrolled::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--link-color) 18%, transparent), transparent);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+#main-header.header-scrolled::after {
+  opacity: 1;
 }
 
 .header-logo {
   font-family: "EB Garamond", cursive;
   letter-spacing: 1px;
+}
+
+.nav-link-item {
+  position: relative;
+}
+
+.nav-link-item .nav-link-text {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-link-item .nav-link-text::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 0.6;
+}
+
+.nav-link-item:hover .nav-link-text::after {
+  width: 100%;
+}
+
+.nav-link-item.is-active .nav-link-text::after {
+  width: 100%;
+  opacity: 1;
 }
 
 .header-slice-text {
@@ -247,8 +295,9 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
   /* 移动端 (小于 776px) 的毛玻璃和阴影 */
   @media (max-width: 775px) {
     #main-header.header-scrolled {
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background-color: color-mix(in srgb, var(--bg-color) 62%, transparent);
     }
   }
 

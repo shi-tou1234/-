@@ -54,6 +54,8 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
 </head>
 <body class="h-full bg-[var(--bg-color)]">
 
+    <div id="global-progress-bar" class="global-progress-bar" aria-hidden="true"></div>
+
     <div id="loading-overlay" aria-hidden="true">
       <div class="spinner"></div>
     </div>
@@ -79,6 +81,44 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
             clearTimeout(loaderWatchdog);
         }
 
+        let progressTicking = false;
+        let progressBar = null;
+
+        function updateGlobalProgress() {
+            if (!progressBar) {
+                progressBar = document.getElementById('global-progress-bar');
+                if (!progressBar) return;
+            }
+            const isBlogPost = /\/blog\/.+/.test(window.location.pathname);
+            if (!isBlogPost) {
+                progressBar.style.width = '0%';
+                progressBar.classList.remove('is-visible');
+                progressTicking = false;
+                return;
+            }
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            if (docHeight <= 0) {
+                progressBar.style.width = '0%';
+                progressTicking = false;
+                return;
+            }
+            const percent = Math.min(Math.max(Math.round((scrollTop / docHeight) * 100), 0), 100);
+            progressBar.style.width = `${percent}%`;
+            progressBar.classList.add('is-visible');
+            progressTicking = false;
+        }
+
+        function onGlobalProgressScroll() {
+            if (!progressTicking) {
+                window.requestAnimationFrame(updateGlobalProgress);
+                progressTicking = true;
+            }
+        }
+
+        window.addEventListener('scroll', onGlobalProgressScroll, { passive: true });
+        updateGlobalProgress();
+
         // 1. 开始准备跳转
         document.addEventListener('astro:before-preparation', () => {
             clearLoaderTimers();
@@ -96,12 +136,14 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
         document.addEventListener('astro:after-swap', () => {
             clearLoaderTimers();
             hideLoadingOverlay();
+            updateGlobalProgress();
         });
 
         // 3. 兜底方案：页面完全加载完成（包括资源）
         document.addEventListener('astro:page-load', () => {
             clearLoaderTimers();
             hideLoadingOverlay();
+            updateGlobalProgress();
         });
 
         // 额外兜底：导航异常、脚本报错后恢复可交互状态
@@ -172,6 +214,38 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
 </html>
 
 <style is:global>
+  .global-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--link-color), color-mix(in srgb, var(--link-color) 60%, #38bdf8));
+    z-index: 99999;
+    transition: width 0.1s linear;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .global-progress-bar.is-visible {
+    opacity: 1;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .transition-fade {
+    animation: fadeIn 0.35s ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .transition-fade {
+      animation: none;
+    }
+  }
+
   #loading-overlay {
     position: fixed;
     inset: 0;

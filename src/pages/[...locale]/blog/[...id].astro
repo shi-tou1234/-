@@ -294,7 +294,24 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
         cursor: pointer;
         box-shadow: 0 8px 24px var(--shadow-color);
         backdrop-filter: blur(8px);
-        transition: background 0.2s ease, transform 0.2s ease;
+        transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        animation: post-back-pulse 3s ease-in-out 1s;
+    }
+
+    .post-back-floating__button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 32px color-mix(in srgb, var(--shadow-color) 80%, transparent);
+        border-color: color-mix(in srgb, var(--link-color) 40%, var(--button-border-color));
+    }
+
+    .post-back-floating__button:active {
+        transform: scale(0.95);
+    }
+
+    @keyframes post-back-pulse {
+        0%, 100% { box-shadow: 0 8px 24px var(--shadow-color); }
+        15% { box-shadow: 0 8px 24px var(--shadow-color), 0 0 0 6px color-mix(in srgb, var(--link-color) 14%, transparent); }
+        30% { box-shadow: 0 8px 24px var(--shadow-color); }
     }
 
     .post-back-floating__button:hover {
