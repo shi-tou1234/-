@@ -103,7 +103,7 @@ function initPostToc() {
     const rect = heading.getBoundingClientRect();
     const header = document.getElementById('main-header');
     let offset = SCROLL_OFFSET;
-    if (header && window.innerWidth < 768 && !header.classList.contains('header-hidden')) {
+    if (header) {
       offset = header.offsetHeight + 12;
     }
     return window.scrollY + rect.top - offset;

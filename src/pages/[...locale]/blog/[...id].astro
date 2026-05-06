@@ -81,7 +81,7 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
 
 ---
 <MainPageLayout title={pageTitle} lang={currentLang}>
-    <div id="post-reading-shell" class="mx-auto w-full max-w-[var(--page-width)] py-8 md:mt-0 mt-18">
+    <div id="post-reading-shell" class="mx-auto w-full max-w-[var(--page-width)] py-8">
         <nav class="mb-4 text-sm text-[var(--text-color)]/65" aria-label={currentLang === 'en' ? 'Breadcrumb' : '面包屑导航'}>
             <a href={getRelativeLocaleUrl(currentLang, '/')} class="hover:text-[var(--link-color)]">{homeLabel}</a>
             {activeCategory && (
