@@ -165,30 +165,24 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 
 <style is:global>
 #main-header {
-  position: relative;
   isolation: isolate;
   --header-surface-alpha: 0.06;
   transition: transform 0.3s ease, backdrop-filter 0.35s ease, filter 0.35s ease;
 }
 
-#main-header::before,
-#main-header::after {
+#main-header::before {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-}
-
-#main-header::before {
   z-index: 0;
   background: var(--bg-color);
   opacity: var(--header-surface-alpha);
 }
 
 #main-header.header-scrolled {
-  backdrop-filter: blur(24px) saturate(1.14);
-  -webkit-backdrop-filter: blur(24px) saturate(1.14);
-  box-shadow: 0 10px 24px color-mix(in srgb, var(--shadow-color) 10%, transparent);
+  backdrop-filter: blur(28px) saturate(1.18);
+  -webkit-backdrop-filter: blur(28px) saturate(1.18);
 }
 
 .header-inner {
@@ -351,12 +345,11 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
   }
 }
 
-  /* 移动端 (小于 776px) 的毛玻璃和阴影 */
+  /* 移动端 (小于 776px) 的毛玻璃效果 */
   @media (max-width: 775px) {
     #main-header.header-scrolled {
-      backdrop-filter: blur(26px) saturate(1.12);
-      -webkit-backdrop-filter: blur(26px) saturate(1.12);
-      box-shadow: 0 8px 22px color-mix(in srgb, var(--shadow-color) 8%, transparent);
+      backdrop-filter: blur(30px) saturate(1.16);
+      -webkit-backdrop-filter: blur(30px) saturate(1.16);
     }
 
     #mobile-menu {
@@ -726,7 +719,7 @@ if (document.readyState !== 'loading') {
     function updateHeader() {
       const currentScrollY = window.scrollY;
       const scrollProgress = Math.min(Math.max(currentScrollY / 160, 0), 1);
-      header.style.setProperty('--header-surface-alpha', String(0.06 + scrollProgress * 0.16));
+      header.style.setProperty('--header-surface-alpha', String(0.04 + scrollProgress * 0.12));
       header.classList.toggle('header-scrolled', currentScrollY > 4);
       ticking = false;
     }
