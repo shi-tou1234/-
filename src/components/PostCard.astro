@@ -95,7 +95,7 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     class="post-card block min-w-0 w-full max-w-[var(--page-width)] mx-auto my-6 rounded-xl shadow border border-[var(--button-border-color)] overflow-hidden transition-all duration-300 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)]"
 >
     {image && (
-        <div class="cover h-60 overflow-hidden">
+        <div class="cover post-card__cover h-60 overflow-hidden">
             <ImageModule src={image} alt={title} class="post-card__image w-full h-full object-cover object-center"/>
         </div>
     )}
@@ -146,10 +146,12 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
 
 <style is:global>
     .post-card {
-        transform: translateY(0) scale(1);
-        box-shadow: 0 8px 20px color-mix(in srgb, var(--shadow-color) 72%, transparent);
-        transition: transform 0.58s cubic-bezier(0.18, 0.82, 0.2, 1), box-shadow 0.42s ease, border-color 0.34s ease, opacity 0.52s ease, filter 0.45s ease;
-        will-change: transform, opacity;
+        position: relative;
+        transform: translate3d(0, 0, 0) scale(1);
+        background: color-mix(in srgb, var(--bg-color) 96%, transparent);
+        box-shadow: 0 10px 24px color-mix(in srgb, var(--shadow-color) 60%, transparent);
+        transition: transform 0.58s cubic-bezier(0.18, 0.82, 0.2, 1), box-shadow 0.42s ease, border-color 0.34s ease, opacity 0.52s ease, filter 0.45s ease, background-color 0.34s ease;
+        will-change: transform, opacity, box-shadow;
     }
 
     .post-card.post-card-reveal {
@@ -166,21 +168,44 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     }
 
     .post-card:hover {
-        transform: translateY(-7px) scale(1.012);
-        box-shadow: 0 18px 36px color-mix(in srgb, var(--shadow-color) 100%, transparent);
-        border-color: color-mix(in srgb, var(--link-color) 35%, var(--button-border-color));
+        transform: translate3d(0, -8px, 0) scale(1.02);
+        box-shadow: 0 24px 48px color-mix(in srgb, var(--shadow-color) 100%, transparent);
+        border-color: color-mix(in srgb, var(--link-color) 40%, var(--button-border-color));
+        background: color-mix(in srgb, var(--bg-color) 92%, var(--button-hover-color));
     }
 
     .post-card:active {
-        transform: translateY(-3px) scale(1.004);
+        transform: translate3d(0, -4px, 0) scale(1.008);
+    }
+
+    .post-card__cover {
+        position: relative;
+        isolation: isolate;
+        background: linear-gradient(135deg, color-mix(in srgb, var(--bg-color) 84%, var(--button-hover-color)), color-mix(in srgb, var(--bg-color) 72%, var(--link-color)));
+    }
+
+    .post-card__cover::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 18%, color-mix(in srgb, var(--bg-color) 28%, transparent) 100%);
+        opacity: 0;
+        transition: opacity 0.42s ease;
+        pointer-events: none;
     }
 
     .post-card__image {
-        transition: transform 0.6s ease;
+        transition: transform 0.7s cubic-bezier(0.18, 0.82, 0.2, 1), filter 0.45s ease;
+        will-change: transform;
     }
 
     .post-card:hover .post-card__image {
-        transform: scale(1.05);
+        transform: scale(1.08) translate3d(0, -2px, 0);
+        filter: saturate(1.06);
+    }
+
+    .post-card:hover .post-card__cover::after {
+        opacity: 1;
     }
 
     .post-card__placeholder {
@@ -257,6 +282,14 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         color: var(--post-tag-text-dark);
         border-color: var(--post-tag-border-dark);
         text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .post-card,
+        .post-card__image,
+        .post-card__cover::after {
+            transition: none !important;
+        }
     }
 
     .post-card:hover .post-card__tag {

@@ -7,12 +7,16 @@ interface Props {
   class?: string
 }
 const className = Astro.props.class
+const currentLang = (Astro.currentLocale || 'zh-cn').toLowerCase()
+const copyButtonLabel = currentLang.startsWith('en') ? 'Copy code' : '复制代码'
+const copyDoneLabel = currentLang.startsWith('en') ? 'Copied' : '已复制'
+const copyErrorLabel = currentLang.startsWith('en') ? 'Copy failed' : '复制失败'
 ---
 <div data-pagefind-body class=`markdown-content ${className}`>
     <slot/>
 </div>
 
-<script>
+<script define:vars={{ copyButtonLabel, copyDoneLabel, copyErrorLabel }}>
   const LIGHTBOX_ID = 'markdown-image-lightbox';
   const LIGHTBOX_MIN_SCALE = 1;
   const LIGHTBOX_MAX_SCALE = 6;
@@ -596,6 +600,88 @@ const className = Astro.props.class
     });
   }
 
+  async function copyCodeText(text) {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    const helper = document.createElement('textarea');
+    helper.value = text;
+    helper.setAttribute('readonly', 'true');
+    helper.style.position = 'fixed';
+    helper.style.top = '0';
+    helper.style.left = '0';
+    helper.style.opacity = '0';
+    document.body.appendChild(helper);
+    helper.focus();
+    helper.select();
+
+    const succeeded = document.execCommand('copy');
+    helper.remove();
+
+    if (!succeeded) {
+      throw new Error('Copy command failed');
+    }
+  }
+
+  function updateCopyButtonState(button, state) {
+    if (!(button instanceof HTMLButtonElement)) return;
+
+    button.dataset.copyState = state;
+    button.textContent = state === 'copied' ? copyDoneLabel : copyButtonLabel;
+    button.setAttribute('aria-label', state === 'copied' ? copyDoneLabel : copyButtonLabel);
+  }
+
+  function initCodeCopyButtons() {
+    const codeBlocks = Array.from(document.querySelectorAll('.markdown-content pre'));
+    if (codeBlocks.length === 0) return;
+
+    codeBlocks.forEach((pre) => {
+      if (!(pre instanceof HTMLElement) || pre.dataset.copyBound === 'true') return;
+
+      const codeElement = pre.querySelector('code');
+      const codeText = (codeElement?.textContent || '').replace(/\n$/, '');
+      if (!codeText.trim()) return;
+
+      pre.dataset.copyBound = 'true';
+
+      const copyButton = document.createElement('button');
+      copyButton.type = 'button';
+      copyButton.className = 'markdown-code-copy-button';
+      copyButton.textContent = copyButtonLabel;
+      copyButton.setAttribute('aria-label', copyButtonLabel);
+      copyButton.setAttribute('title', copyButtonLabel);
+
+      let resetTimer = null;
+
+      copyButton.addEventListener('click', async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        try {
+          await copyCodeText(codeText);
+          updateCopyButtonState(copyButton, 'copied');
+        } catch (_error) {
+          updateCopyButtonState(copyButton, 'error');
+          copyButton.textContent = copyErrorLabel;
+        }
+
+        if (resetTimer) {
+          clearTimeout(resetTimer);
+        }
+
+        resetTimer = window.setTimeout(() => {
+          updateCopyButtonState(copyButton, 'idle');
+          copyButton.setAttribute('title', copyButtonLabel);
+        }, 1400);
+      });
+
+      pre.appendChild(copyButton);
+      updateCopyButtonState(copyButton, 'idle');
+    });
+  }
+
   function stabilizeMarkdownImages() {
     ensureImageLightbox();
     const images = document.querySelectorAll('.markdown-content img');
@@ -648,9 +734,11 @@ const className = Astro.props.class
   }
 
   stabilizeMarkdownImages();
+  initCodeCopyButtons();
   setupSpoilers();
   cleanupImageLightbox();
   document.addEventListener('astro:page-load', stabilizeMarkdownImages);
+  document.addEventListener('astro:page-load', initCodeCopyButtons);
   document.addEventListener('astro:page-load', setupSpoilers);
   document.addEventListener('astro:before-preparation', () => cleanupImageLightbox());
   document.addEventListener('astro:after-swap', () => {
@@ -660,6 +748,7 @@ const className = Astro.props.class
       cleanupImageLightbox();
     }
   });
+  document.addEventListener('astro:after-swap', initCodeCopyButtons);
 </script>
 
 <style is:global>

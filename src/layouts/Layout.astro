@@ -219,12 +219,13 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
     top: 0;
     left: 0;
     width: 0%;
-    height: 3px;
+    height: 4px;
     background: linear-gradient(90deg, var(--link-color), color-mix(in srgb, var(--link-color) 60%, #38bdf8));
     z-index: 99999;
     transition: width 0.1s linear;
     pointer-events: none;
     opacity: 0;
+    box-shadow: 0 0 18px color-mix(in srgb, var(--link-color) 28%, transparent);
   }
 
   .global-progress-bar.is-visible {
@@ -237,7 +238,8 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
   }
 
   .transition-fade {
-    animation: fadeIn 0.35s ease-out;
+    animation: fadeIn 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    animation-fill-mode: both;
   }
 
   @media (prefers-reduced-motion: reduce) {

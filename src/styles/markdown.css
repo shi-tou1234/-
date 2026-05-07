@@ -176,12 +176,13 @@
 
 .markdown-content pre {
   margin: 1.5rem 0;
-  padding: 1rem;
+  padding: 2.75rem 1rem 1rem;
   overflow: auto;
   border-radius: 10px;
   border: 1px solid var(--button-border-color);
   font-family: 'JetBrains Mono Variable', ui-monospace;
   line-height: 1.5;
+  position: relative;
 }
 
 [data-theme="dark"] .markdown-content pre {
@@ -192,6 +193,55 @@
   padding: 0;
   background: none;
   font-size: 0.9rem;
+}
+
+.markdown-content pre .markdown-code-copy-button {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4.6rem;
+  padding: 0.35rem 0.72rem;
+  border: 1px solid var(--button-border-color);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-color) 88%, transparent);
+  color: var(--text-color);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--shadow-color) 30%, transparent);
+  opacity: 0.78;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.markdown-content pre:hover .markdown-code-copy-button,
+.markdown-content pre:focus-within .markdown-code-copy-button {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.markdown-content pre .markdown-code-copy-button:hover {
+  background: var(--button-hover-color);
+  border-color: color-mix(in srgb, var(--link-color) 42%, var(--button-border-color));
+  color: var(--link-color);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--shadow-color) 42%, transparent);
+}
+
+.markdown-content pre .markdown-code-copy-button.is-copied {
+  background: var(--link-color);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--link-color) 42%, transparent);
+}
+
+@media (hover: none) {
+  .markdown-content pre .markdown-code-copy-button {
+    opacity: 1;
+  }
 }
 
 [data-theme="dark"] .markdown-content pre code {

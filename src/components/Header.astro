@@ -28,7 +28,7 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 
 <!-- header -->
 <div id="main-header" class="fixed top-0 left-0 right-0 z-50 overflow-visible transition-transform duration-300 ease-in-out">
-<div class="flex items-center pt-2 md:py-4 text-[var(--text-color)] max-w-[var(--header-width)] mx-auto">
+<div class="header-inner flex items-center pt-2 md:py-4 text-[var(--text-color)] max-w-[var(--header-width)] mx-auto">
     <!-- logo -->
     <div class="pr-3 md:pr-5 py-2 z-30 shrink-0 header-logo">
         <a href={ indexPage } >
@@ -116,11 +116,11 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
         )}
         <div class="relative md:hidden shrink-0">
           <!-- Mobile Menu -->
-          <button id="mobile-menu-button" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+            <button id="mobile-menu-button" aria-expanded="false" aria-controls="mobile-menu" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
               <Icon name="fa6-solid:align-justify" class="w-5 h-5" />
           </button>
               <!-- Mobile Menu -->
-              <div id="mobile-menu" class="hidden fixed right-2 top-16 w-36 bg-[var(--bg-color)]/95 backdrop-blur border border-[var(--button-border-color)] rounded-lg shadow-[0_8px_24px_var(--shadow-color)] z-[1200] text-[var(--text-color)]">
+              <div id="mobile-menu" aria-hidden="true" class="hidden fixed right-2 top-16 w-36 bg-[var(--bg-color)]/95 backdrop-blur border border-[var(--button-border-color)] rounded-lg shadow-[0_8px_24px_var(--shadow-color)] z-[1200] text-[var(--text-color)]">
                 <div class="tiny-only px-2 py-2 border-b border-[var(--button-border-color)] space-y-2">
                   <p class="text-[11px] leading-4 text-[var(--text-color)]/75 px-1">建议使用浏览器或电脑打开，以获得最佳显示效果。</p>
                   <div class="grid grid-cols-3 gap-2">
@@ -165,13 +165,59 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 
 <style is:global>
 #main-header {
-  transition: transform 0.3s ease, background-color 0.4s ease, backdrop-filter 0.4s ease;
+  position: relative;
+  isolation: isolate;
+  --header-surface-alpha: 0.12;
+  --header-border-alpha: 0.08;
+  transition: transform 0.3s ease, backdrop-filter 0.35s ease, filter 0.35s ease;
+}
+
+#main-header::before,
+#main-header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#main-header::before {
+  z-index: 0;
+  background: var(--bg-color);
+  opacity: var(--header-surface-alpha);
+}
+
+#main-header::after {
+  z-index: 1;
+  inset: auto 0 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--link-color) 32%, transparent), transparent);
+  opacity: var(--header-border-alpha);
 }
 
 #main-header.header-scrolled {
-  background-color: color-mix(in srgb, var(--bg-color) 58%, transparent);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(22px) saturate(1.16);
+  -webkit-backdrop-filter: blur(22px) saturate(1.16);
+  box-shadow: 0 14px 32px color-mix(in srgb, var(--shadow-color) 18%, transparent);
+}
+
+.header-inner {
+  position: relative;
+  z-index: 2;
+}
+
+#nav-bar-list {
+  border: 1px solid color-mix(in srgb, var(--button-border-color) 72%, transparent);
+  background: color-mix(in srgb, var(--bg-color) 30%, transparent);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--shadow-color) 28%, transparent);
+  backdrop-filter: blur(18px) saturate(1.12);
+  -webkit-backdrop-filter: blur(18px) saturate(1.12);
+  transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+#nav-bar-list:hover {
+  border-color: color-mix(in srgb, var(--link-color) 18%, var(--button-border-color));
+  box-shadow: 0 16px 32px color-mix(in srgb, var(--shadow-color) 36%, transparent);
+  transform: translateY(-1px);
 }
 
 .header-logo {
@@ -181,6 +227,22 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 
 .nav-link-item {
   position: relative;
+  overflow: hidden;
+  transition: color 0.24s ease, background-color 0.24s ease, transform 0.24s ease, box-shadow 0.24s ease;
+}
+
+.nav-link-item::before {
+  content: '';
+  position: absolute;
+  left: 0.6rem;
+  right: 0.6rem;
+  bottom: 0.4rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--link-color) 70%, currentColor), transparent);
+  transform: scaleX(0);
+  transform-origin: center;
+  opacity: 0.88;
+  transition: transform 0.24s ease;
 }
 
 .nav-link-item .nav-link-text {
@@ -195,11 +257,25 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
   left: 50%;
   width: 0;
   height: 2px;
-  background: currentColor;
+  background: linear-gradient(90deg, currentColor, color-mix(in srgb, var(--link-color) 72%, currentColor));
   border-radius: 2px;
   transform: translateX(-50%);
   transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  opacity: 0.6;
+  opacity: 0.72;
+}
+
+.nav-link-item:hover,
+.nav-link-item:focus-visible,
+.nav-link-item.is-active {
+  color: var(--link-color);
+  background: color-mix(in srgb, var(--button-hover-color) 72%, transparent);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--shadow-color) 16%, transparent);
+}
+
+.nav-link-item:hover::before,
+.nav-link-item:focus-visible::before,
+.nav-link-item.is-active::before {
+  transform: scaleX(1);
 }
 
 .nav-link-item:hover .nav-link-text::after {
@@ -209,6 +285,12 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 .nav-link-item.is-active .nav-link-text::after {
   width: 100%;
   opacity: 1;
+}
+
+.nav-link-item:hover .nav-link-text,
+.nav-link-item:focus-visible .nav-link-text,
+.nav-link-item.is-active .nav-link-text {
+  color: inherit;
 }
 
 .header-slice-text {
@@ -277,10 +359,51 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
   /* 移动端 (小于 776px) 的毛玻璃和阴影 */
   @media (max-width: 775px) {
     #main-header.header-scrolled {
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      background-color: color-mix(in srgb, var(--bg-color) 52%, transparent);
+      backdrop-filter: blur(24px) saturate(1.14);
+      -webkit-backdrop-filter: blur(24px) saturate(1.14);
+      box-shadow: 0 10px 26px color-mix(in srgb, var(--shadow-color) 16%, transparent);
     }
+
+    #mobile-menu {
+      width: min(86vw, 320px);
+    }
+  }
+
+  #mobile-menu {
+    display: block;
+    opacity: 0;
+    transform: translateY(-10px) scale(0.97);
+    transform-origin: top right;
+    filter: blur(6px);
+    pointer-events: none;
+    transition: opacity 0.24s ease, transform 0.24s ease, filter 0.24s ease;
+  }
+
+  #mobile-menu:not(.hidden) {
+    display: block;
+  }
+
+  #mobile-menu.is-open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+    pointer-events: auto;
+  }
+
+  #mobile-menu.is-tiny-screen {
+    top: 0;
+    right: 0;
+    width: min(84vw, 300px);
+    height: 100vh;
+    border-radius: 0;
+    border-top: 0;
+    border-right: 0;
+    padding-top: 3.8rem;
+    overflow-y: auto;
+  }
+
+  #mobile-menu.is-tiny-screen .tiny-only {
+    display: block;
   }
 
 </style>
@@ -296,20 +419,49 @@ function initMobileNav() {
   const themeToggleButton = document.getElementById('themeToggle');
   const guideOpenButton = document.getElementById('blog-guide-open-btn');
   const languageMenu = document.getElementById('language-menu');
+  let mobileMenuCloseTimer = null;
 
   if (!menuButton) return;
+
+  const setMobileMenuOpen = (open) => {
+    if (!mobileMenu) return;
+
+    if (mobileMenuCloseTimer) {
+      clearTimeout(mobileMenuCloseTimer);
+      mobileMenuCloseTimer = null;
+    }
+
+    if (open) {
+      mobileMenu.classList.remove('hidden');
+      mobileMenu.setAttribute('aria-hidden', 'false');
+      menuButton.setAttribute('aria-expanded', 'true');
+      requestAnimationFrame(() => {
+        mobileMenu.classList.add('is-open');
+      });
+      return;
+    }
+
+    mobileMenu.classList.remove('is-open');
+    mobileMenu.setAttribute('aria-hidden', 'true');
+    menuButton.setAttribute('aria-expanded', 'false');
+    mobileMenuCloseTimer = window.setTimeout(() => {
+      if (!mobileMenu.classList.contains('is-open')) {
+        mobileMenu.classList.add('hidden');
+      }
+    }, 240);
+  };
 
   menuButton.onclick = (e) => {
     e.stopPropagation();
     languageMenu?.classList.add('hidden');
-    mobileMenu?.classList.toggle('hidden');
+    setMobileMenuOpen(!(mobileMenu && mobileMenu.classList.contains('is-open')));
   };
 
   if (mobileSearchButton && searchButton && mobileSearchButton.dataset.bound !== 'true') {
     mobileSearchButton.dataset.bound = 'true';
     mobileSearchButton.addEventListener('click', () => {
       searchButton.click();
-      mobileMenu?.classList.add('hidden');
+      setMobileMenuOpen(false);
     });
   }
 
@@ -317,7 +469,7 @@ function initMobileNav() {
     mobileThemeButton.dataset.bound = 'true';
     mobileThemeButton.addEventListener('click', () => {
       themeToggleButton.click();
-      mobileMenu?.classList.add('hidden');
+      setMobileMenuOpen(false);
     });
   }
 
@@ -325,7 +477,7 @@ function initMobileNav() {
     mobileGuideButton.dataset.bound = 'true';
     mobileGuideButton.addEventListener('click', () => {
       guideOpenButton.click();
-      mobileMenu?.classList.add('hidden');
+      setMobileMenuOpen(false);
     });
   }
 
@@ -353,11 +505,25 @@ function initMobileNav() {
       !menuButton.contains(event.target) &&
       !mobileMenu.contains(event.target)
     ) {
-      mobileMenu.classList.add('hidden');
+      setMobileMenuOpen(false);
     }
   };
   document.addEventListener('click', handleDocClick);
   window.__headerMobileOutsideClickHandler = handleDocClick;
+
+  if (mobileMenu && mobileMenu.dataset.linksBound !== 'true') {
+    mobileMenu.dataset.linksBound = 'true';
+    mobileMenu.querySelectorAll('a[href]').forEach((link) => {
+      link.addEventListener('click', () => {
+        setMobileMenuOpen(false);
+      });
+    });
+  }
+
+  mobileMenu?.classList.remove('is-open');
+  mobileMenu?.classList.add('hidden');
+  mobileMenu?.setAttribute('aria-hidden', 'true');
+  menuButton.setAttribute('aria-expanded', 'false');
 
 }
 
@@ -564,7 +730,10 @@ if (document.readyState !== 'loading') {
 
     function updateHeader() {
       const currentScrollY = window.scrollY;
-      header.classList.toggle('header-scrolled', currentScrollY > 8);
+      const scrollProgress = Math.min(Math.max(currentScrollY / 120, 0), 1);
+      header.style.setProperty('--header-surface-alpha', String(0.12 + scrollProgress * 0.62));
+      header.style.setProperty('--header-border-alpha', String(0.08 + scrollProgress * 0.14));
+      header.classList.toggle('header-scrolled', currentScrollY > 4);
       ticking = false;
     }
 
