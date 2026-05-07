@@ -167,8 +167,7 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 #main-header {
   position: relative;
   isolation: isolate;
-  --header-surface-alpha: 0.12;
-  --header-border-alpha: 0.08;
+  --header-surface-alpha: 0.06;
   transition: transform 0.3s ease, backdrop-filter 0.35s ease, filter 0.35s ease;
 }
 
@@ -186,18 +185,10 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
   opacity: var(--header-surface-alpha);
 }
 
-#main-header::after {
-  z-index: 1;
-  inset: auto 0 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--link-color) 32%, transparent), transparent);
-  opacity: var(--header-border-alpha);
-}
-
 #main-header.header-scrolled {
-  backdrop-filter: blur(22px) saturate(1.16);
-  -webkit-backdrop-filter: blur(22px) saturate(1.16);
-  box-shadow: 0 14px 32px color-mix(in srgb, var(--shadow-color) 18%, transparent);
+  backdrop-filter: blur(24px) saturate(1.14);
+  -webkit-backdrop-filter: blur(24px) saturate(1.14);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--shadow-color) 10%, transparent);
 }
 
 .header-inner {
@@ -206,17 +197,21 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 }
 
 #nav-bar-list {
-  border: 1px solid color-mix(in srgb, var(--button-border-color) 72%, transparent);
-  background: color-mix(in srgb, var(--bg-color) 30%, transparent);
-  box-shadow: 0 10px 24px color-mix(in srgb, var(--shadow-color) 28%, transparent);
-  backdrop-filter: blur(18px) saturate(1.12);
-  -webkit-backdrop-filter: blur(18px) saturate(1.12);
+  border: 1px solid color-mix(in srgb, #ffffff 16%, transparent);
+  background: color-mix(in srgb, var(--bg-color) 18%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #ffffff 22%, transparent),
+    0 12px 28px color-mix(in srgb, var(--shadow-color) 14%, transparent);
+  backdrop-filter: blur(22px) saturate(1.16);
+  -webkit-backdrop-filter: blur(22px) saturate(1.16);
   transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 #nav-bar-list:hover {
-  border-color: color-mix(in srgb, var(--link-color) 18%, var(--button-border-color));
-  box-shadow: 0 16px 32px color-mix(in srgb, var(--shadow-color) 36%, transparent);
+  border-color: color-mix(in srgb, #ffffff 26%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #ffffff 26%, transparent),
+    0 16px 32px color-mix(in srgb, var(--shadow-color) 18%, transparent);
   transform: translateY(-1px);
 }
 
@@ -359,9 +354,9 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
   /* 移动端 (小于 776px) 的毛玻璃和阴影 */
   @media (max-width: 775px) {
     #main-header.header-scrolled {
-      backdrop-filter: blur(24px) saturate(1.14);
-      -webkit-backdrop-filter: blur(24px) saturate(1.14);
-      box-shadow: 0 10px 26px color-mix(in srgb, var(--shadow-color) 16%, transparent);
+      backdrop-filter: blur(26px) saturate(1.12);
+      -webkit-backdrop-filter: blur(26px) saturate(1.12);
+      box-shadow: 0 8px 22px color-mix(in srgb, var(--shadow-color) 8%, transparent);
     }
 
     #mobile-menu {
@@ -730,9 +725,8 @@ if (document.readyState !== 'loading') {
 
     function updateHeader() {
       const currentScrollY = window.scrollY;
-      const scrollProgress = Math.min(Math.max(currentScrollY / 120, 0), 1);
-      header.style.setProperty('--header-surface-alpha', String(0.12 + scrollProgress * 0.62));
-      header.style.setProperty('--header-border-alpha', String(0.08 + scrollProgress * 0.14));
+      const scrollProgress = Math.min(Math.max(currentScrollY / 160, 0), 1);
+      header.style.setProperty('--header-surface-alpha', String(0.06 + scrollProgress * 0.16));
       header.classList.toggle('header-scrolled', currentScrollY > 4);
       ticking = false;
     }
