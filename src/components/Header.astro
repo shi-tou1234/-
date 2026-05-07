@@ -27,7 +27,7 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 ---
 
 <!-- header -->
-<div id="main-header" class="fixed top-0 left-0 right-0 z-50 overflow-visible transition-transform duration-300 ease-in-out">
+<div id="main-header" class="sticky top-0 left-0 right-0 z-50 w-full overflow-visible transition-transform duration-300 ease-in-out">
 <div class="header-inner flex items-center pt-2 md:py-4 text-[var(--text-color)] max-w-[var(--header-width)] mx-auto">
     <!-- logo -->
     <div class="pr-3 md:pr-5 py-2 z-30 shrink-0 header-logo">
@@ -713,43 +713,6 @@ document.addEventListener('astro:page-load', updateHeaderRunningDays);
 document.addEventListener('astro:after-swap', updateHeaderRunningDays);
 if (document.readyState !== 'loading') {
   updateHeaderRunningDays();
-}
-</script>
-
-<script>
-function syncHeaderHeight() {
-  const header = document.getElementById('main-header');
-  if (!header) return;
-
-  let ticking = false;
-
-  function updateHeaderHeight() {
-    document.documentElement.style.setProperty('--site-header-height', `${Math.ceil(header.getBoundingClientRect().height)}px`);
-    ticking = false;
-  }
-
-  function onResize() {
-    if (!ticking) {
-      window.requestAnimationFrame(updateHeaderHeight);
-      ticking = true;
-    }
-  }
-
-  const oldHeaderResizeHandler = window.__headerResizeHandler;
-  if (oldHeaderResizeHandler) {
-    window.removeEventListener('resize', oldHeaderResizeHandler);
-  }
-
-  window.addEventListener('resize', onResize, { passive: true });
-  window.__headerResizeHandler = onResize;
-  onResize();
-}
-
-document.addEventListener('DOMContentLoaded', syncHeaderHeight);
-document.addEventListener('astro:page-load', syncHeaderHeight);
-document.addEventListener('astro:after-swap', syncHeaderHeight);
-if (document.readyState !== 'loading') {
-  syncHeaderHeight();
 }
 </script>
 
