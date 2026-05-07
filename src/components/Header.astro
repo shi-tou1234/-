@@ -41,7 +41,7 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 
     <!-- nav_bar (desktop) -->
     <div id="nav-bar" class={`hidden md:flex flex-1 min-w-0 items-center justify-center font-bold z-20 ${desktopNavTextClass}`}>
-      <div id="nav-bar-list" class="transition relative z-10 flex items-center justify-center rounded-outer p-2 backdrop-blur rounded-xl bg-[color:var(--bg-color)]/20 overflow-x-auto whitespace-nowrap max-w-[min(58vw,860px)]">
+      <div id="nav-bar-list" class="transition relative z-10 flex items-center justify-center rounded-outer p-2 overflow-x-auto whitespace-nowrap max-w-[min(58vw,860px)]">
       <a href={ indexPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === indexPage
                 ? 'bg-[var(--button-hover-color)] is-active'
