@@ -717,6 +717,43 @@ if (document.readyState !== 'loading') {
 </script>
 
 <script>
+function syncHeaderHeight() {
+  const header = document.getElementById('main-header');
+  if (!header) return;
+
+  let ticking = false;
+
+  function updateHeaderHeight() {
+    document.documentElement.style.setProperty('--site-header-height', `${Math.ceil(header.getBoundingClientRect().height)}px`);
+    ticking = false;
+  }
+
+  function onResize() {
+    if (!ticking) {
+      window.requestAnimationFrame(updateHeaderHeight);
+      ticking = true;
+    }
+  }
+
+  const oldHeaderResizeHandler = window.__headerResizeHandler;
+  if (oldHeaderResizeHandler) {
+    window.removeEventListener('resize', oldHeaderResizeHandler);
+  }
+
+  window.addEventListener('resize', onResize, { passive: true });
+  window.__headerResizeHandler = onResize;
+  onResize();
+}
+
+document.addEventListener('DOMContentLoaded', syncHeaderHeight);
+document.addEventListener('astro:page-load', syncHeaderHeight);
+document.addEventListener('astro:after-swap', syncHeaderHeight);
+if (document.readyState !== 'loading') {
+  syncHeaderHeight();
+}
+</script>
+
+<script>
   function initHeaderScroll() {
     const header = document.getElementById('main-header');
     if (!header) return;
