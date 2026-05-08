@@ -198,38 +198,33 @@ async function searchPicsum(
   _query: string,
   _config: CoverImageConfig,
 ): Promise<CoverImageResult | null> {
-  const seed = hashString(postId)
-  const width = 800
-  const height = 450
+  const width = 1200
+  const height = 630
 
-  const listUrl = `https://picsum.photos/v2/list?page=${(seed % 10) + 1}&limit=30`
+  let photographer = 'Lorem Picsum'
+  let photographerUrl = 'https://picsum.photos'
+
   try {
-    const listResponse = await fetch(listUrl, {
+    const listResponse = await fetch('https://picsum.photos/v2/list?page=1&limit=100', {
       signal: AbortSignal.timeout(5000),
     })
     if (listResponse.ok) {
-      const list = (await listResponse.json()) as Array<{ id: string; author: string; url: string }>
+      const list = (await listResponse.json()) as Array<{ author: string; url: string }>
       if (list.length > 0) {
+        const seed = hashString(postId)
         const item = list[seed % list.length]
-        return {
-          url: `https://picsum.photos/id/${item.id}/${width}/${height}`,
-          photographer: item.author,
-          photographerUrl: item.url,
-          alt: _query,
-          width,
-          height,
-        }
+        photographer = item.author
+        photographerUrl = item.url
       }
     }
   } catch {
-    // 列表获取失败，使用直接 URL
+    // 列表获取失败，使用默认署名
   }
 
-  const imageId = (seed % 1000)
   return {
-    url: `https://picsum.photos/id/${imageId}/${width}/${height}`,
-    photographer: 'Lorem Picsum',
-    photographerUrl: 'https://picsum.photos',
+    url: `https://picsum.photos/seed/${encodeURIComponent(postId)}/${width}/${height}`,
+    photographer,
+    photographerUrl,
     alt: _query,
     width,
     height,
