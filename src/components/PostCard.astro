@@ -103,14 +103,14 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     class="post-card block min-w-0 w-full max-w-[var(--page-width)] mx-auto my-6 rounded-xl shadow border border-[var(--button-border-color)] overflow-hidden transition-all duration-300 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)]"
 >
     {image && (
-        <div class="cover post-card__cover aspect-[1200/630] overflow-hidden">
-            <ImageModule src={image} alt={title} class="post-card__image w-full h-full object-cover object-center"/>
+        <div class="cover post-card__cover overflow-hidden">
+            <ImageModule src={image} alt={title} class="post-card__image"/>
         </div>
     )}
 
     {!image && externalImage && (
-        <div class="cover post-card__cover aspect-[1200/630] overflow-hidden">
-            <ImageModule src={externalImage} alt={title} class="post-card__image w-full h-full object-cover object-center"/>
+        <div class="cover post-card__cover overflow-hidden">
+            <ImageModule src={externalImage} alt={title} class="post-card__image"/>
             {photographer && (
                 <span class="post-card__photo-credit" title={`Photo by ${photographer}`}>
                     {photographerUrl ? (
@@ -124,7 +124,7 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     )}
 
     {!image && !externalImage && (
-        <div class="post-card__placeholder aspect-[1200/630]">
+        <div class="post-card__placeholder aspect-[1200/300]">
             <div class="post-card__decor-grid" aria-hidden="true">
                 {placeholderDecorations.map((decoration) => (
                     <span class="post-card__decor-item" style={decoration}></span>
@@ -204,6 +204,7 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     .post-card__cover {
         position: relative;
         isolation: isolate;
+        line-height: 0;
         background: linear-gradient(135deg, color-mix(in srgb, var(--bg-color) 84%, var(--button-hover-color)), color-mix(in srgb, var(--bg-color) 72%, var(--link-color)));
     }
 
@@ -218,6 +219,9 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     }
 
     .post-card__image {
+        display: block;
+        width: 100%;
+        height: auto;
         transition: transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.5s ease;
         will-change: transform;
     }
