@@ -103,13 +103,13 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     class="post-card block min-w-0 w-full max-w-[var(--page-width)] mx-auto my-6 rounded-xl shadow border border-[var(--button-border-color)] overflow-hidden transition-all duration-300 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)]"
 >
     {image && (
-        <div class="cover post-card__cover h-60 overflow-hidden">
+        <div class="cover post-card__cover aspect-[1200/630] overflow-hidden">
             <ImageModule src={image} alt={title} class="post-card__image w-full h-full object-cover object-center"/>
         </div>
     )}
 
     {!image && externalImage && (
-        <div class="cover post-card__cover h-60 overflow-hidden">
+        <div class="cover post-card__cover aspect-[1200/630] overflow-hidden">
             <ImageModule src={externalImage} alt={title} class="post-card__image w-full h-full object-cover object-center"/>
             {photographer && (
                 <span class="post-card__photo-credit" title={`Photo by ${photographer}`}>
@@ -124,7 +124,7 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     )}
 
     {!image && !externalImage && (
-        <div class="post-card__placeholder h-56">
+        <div class="post-card__placeholder aspect-[1200/630]">
             <div class="post-card__decor-grid" aria-hidden="true">
                 {placeholderDecorations.map((decoration) => (
                     <span class="post-card__decor-item" style={decoration}></span>
@@ -218,13 +218,13 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     }
 
     .post-card__image {
-        transition: transform 0.7s cubic-bezier(0.18, 0.82, 0.2, 1), filter 0.45s ease;
+        transition: transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.5s ease;
         will-change: transform;
     }
 
     .post-card:hover .post-card__image {
-        transform: scale(1.08) translate3d(0, -2px, 0);
-        filter: saturate(1.06);
+        transform: scale(1.04);
+        filter: brightness(1.06) saturate(1.04);
     }
 
     .post-card:hover .post-card__cover::after {
