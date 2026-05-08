@@ -20,6 +20,7 @@ import { formatFullDate } from '@/utils/time'
 import { getBlogEntrySort } from '@utils/content-utils'
 import { estimateReadingMinutes, estimateWordCount } from '@utils/reading-time'
 import { getPostCategories, encodeCategoryParam } from '@utils/blog-taxonomy'
+import { resolveCoverImage } from '@utils/cover-image-api'
 
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
@@ -61,13 +62,16 @@ const { entry, prev, next } = Astro.props;
 const { Content } = await render(entry); // 获取渲染后的正文内容
 
 const pageTitle = entry.data.title + ' - ' + siteConfig.title;
-const image = blogCoverUrl(entry.data.image, entry.id);
+const userImage = blogCoverUrl(entry.data.image, entry.id);
+const currentCategories = getPostCategories(entry, currentLang);
+const resolvedCover = await resolveCoverImage(entry.id, userImage, entry.data.title, currentCategories);
+const image = resolvedCover.source === 'user' ? resolvedCover.imageUrl : '';
+const externalImage = resolvedCover.source !== 'user' ? resolvedCover.imageUrl : '';
 const readingMinutes = estimateReadingMinutes(entry.body || '');
 const wordCount = estimateWordCount(entry.body || '');
 const backButtonText = currentLang === 'zh-cn' ? '返回上一页' : 'Back to previous page';
 const backFallbackUrl = getRelativeLocaleUrl(currentLang, '/');
 const allBlogPosts = await getBlogEntrySort(currentLang);
-const currentCategories = getPostCategories(entry, currentLang);
 const activeCategory = currentCategories[0] || '';
 const sameCategoryPosts = activeCategory
     ? allBlogPosts
@@ -108,6 +112,20 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
         {image && (
             <div class="cover h-[55vh] min-h-[260px] max-h-[620px] overflow-hidden rounded-xl border border-[var(--button-border-color)]">
                 <ImageModule src={image} class="w-full h-full object-cover object-center"/>
+            </div>
+        )}
+        {!image && externalImage && (
+            <div class="cover h-[55vh] min-h-[260px] max-h-[620px] overflow-hidden rounded-xl border border-[var(--button-border-color)] relative">
+                <ImageModule src={externalImage} class="w-full h-full object-cover object-center"/>
+                {resolvedCover.photographer && (
+                    <span class="absolute bottom-3 right-3 z-10 text-xs px-2.5 py-1 rounded-full bg-black/50 text-white/80 backdrop-blur">
+                        {resolvedCover.photographerUrl ? (
+                            <a href={resolvedCover.photographerUrl} target="_blank" rel="noopener noreferrer" class="hover:underline">Photo by {resolvedCover.photographer}</a>
+                        ) : (
+                            <>Photo by {resolvedCover.photographer}</>
+                        )}
+                    </span>
+                )}
             </div>
         )}
         {entry.isFallback && (

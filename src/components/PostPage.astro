@@ -5,11 +5,20 @@ import type { CollectionEntry } from 'astro:content';
 import { getPostCategories } from '@utils/blog-taxonomy';
 import { estimateReadingMinutes } from '@utils/reading-time';
 import { buildPostPreview } from '@utils/post-preview';
+import { resolveCoverImage } from '@utils/cover-image-api';
 
 const { page } = Astro.props;
 const currentLang = Astro.currentLocale || 'zh-cn';
 
 const blogEntries = page.data as CollectionEntry<'blog'>[];
+
+const resolvedCovers = await Promise.all(
+    blogEntries.map(async (entry) => {
+        const categories = getPostCategories(entry, currentLang);
+        const userImage = blogCoverUrl(entry.data.image, entry.id);
+        return resolveCoverImage(entry.id, userImage, entry.data.title, categories);
+    }),
+);
 
 ---
 
@@ -34,12 +43,13 @@ const blogEntries = page.data as CollectionEntry<'blog'>[];
                 const categories = getPostCategories(entry, currentLang);
                 const preview = buildPostPreview(entry.data.description || '', entry.body || '', currentLang, 80);
                 const readingMinutes = estimateReadingMinutes(entry.body || '');
+                const resolved = resolvedCovers[index];
 
                 return (
                     <PostCard
                         title={entry.data.title}
                         description={entry.data.description}
-                        image={blogCoverUrl(entry.data.image, entry.id)}
+                        image={resolved.source === 'user' ? resolved.imageUrl : ''}
                         pubDate={entry.data.pubDate}
                         url={entry.id}
                         fallback={entry.isFallback}
@@ -48,6 +58,10 @@ const blogEntries = page.data as CollectionEntry<'blog'>[];
                         readingMinutes={readingMinutes}
                         updatedDate={entry.data.updatedDate}
                         aosDelay={index * 95}
+                        externalImage={resolved.source !== 'user' ? resolved.imageUrl : ''}
+                        imageSource={resolved.source}
+                        photographer={resolved.photographer}
+                        photographerUrl={resolved.photographerUrl}
                     />
                 );
             })
