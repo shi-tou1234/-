@@ -810,3 +810,26 @@ rt {
   color: #666;
   font-family: 'Times New Roman', Times, serif;
 }
+
+.onload-animation {
+  animation: onload-fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes onload-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onload-animation {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

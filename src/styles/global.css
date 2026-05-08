@@ -15,8 +15,6 @@
     @apply bg-[--bg-color] text-[--text-color];
     font-family: "Noto Serif SC", "Times New Roman", "STZhongsong", serif;
     overflow-y: scroll;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
   }
 
   html {
