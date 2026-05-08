@@ -32,24 +32,24 @@
   img,
   [role="button"] {
     transition-property: color, background-color, border-color, opacity, transform, box-shadow, filter;
-    transition-duration: 220ms;
-    transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition-duration: 180ms;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   a:hover,
   button:hover,
   [role="button"]:hover {
-    transform: translateY(-1px);
+    transform: translateY(-0.5px);
   }
 
   a:active,
   button:active,
   [role="button"]:active {
-    transform: translateY(0) scale(0.98);
+    transform: translateY(0) scale(0.985);
   }
 
   img:hover {
-    filter: saturate(1.04);
+    filter: saturate(1.03);
   }
 
   :focus-visible {

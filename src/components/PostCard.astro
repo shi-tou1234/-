@@ -49,6 +49,7 @@ const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 
 const readingLabel = currentLang === 'en' ? `${readingMinutes} min read` : `${readingMinutes} 分钟阅读`;
 const previewText = String(preview || description || '').trim();
+const cardLabel = currentLang === 'en' ? `Read article: ${title}` : `阅读文章：${title}`;
 
 function hashString(input: string): number {
     let hash = 0;
@@ -96,12 +97,18 @@ function getTagStyle(tag: string): string {
 const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
 ---
 
-<a
-    href={pageUrl}
+<article
     data-card-reveal
-    style={`--card-reveal-delay:${aosDelay}ms;`}
-    class="post-card block min-w-0 w-full max-w-[var(--page-width)] mx-auto my-6 rounded-xl shadow overflow-hidden transition-all duration-300 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)]"
+    style={`--card-reveal-delay:${aosDelay}ms; --card-width:min(720px, 88vw);`}
+    class="post-card group relative mx-auto my-5 block min-w-0 w-full max-w-[var(--card-width)] overflow-hidden rounded-[1.35rem] border border-[var(--button-border-color)]/80 bg-[color-mix(in_srgb,var(--bg-color)_96%,transparent)] shadow-[0_12px_34px_color-mix(in_srgb,var(--shadow-color)_58%,transparent)]"
 >
+    <a
+        href={pageUrl}
+        aria-label={cardLabel}
+        class="post-card__stretched-link absolute inset-0 z-10 rounded-[inherit]"
+    >
+    </a>
+
     {image && (
         <div class="cover post-card__cover overflow-hidden">
             <ImageModule src={image} alt={title} class="post-card__image"/>
@@ -112,19 +119,21 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         <div class="cover post-card__cover overflow-hidden">
             <ImageModule src={externalImage} alt={title} class="post-card__image"/>
             {photographer && (
-                <span class="post-card__photo-credit" title={`Photo by ${photographer}`}>
-                    {photographerUrl ? (
-                        <a href={photographerUrl} target="_blank" rel="noopener noreferrer">{photographer}</a>
-                    ) : (
-                        photographer
-                    )}
-                </span>
+                photographerUrl ? (
+                    <a href={photographerUrl} target="_blank" rel="noopener noreferrer" class="post-card__photo-credit" title={`Photo by ${photographer}`}>
+                        {photographer}
+                    </a>
+                ) : (
+                    <span class="post-card__photo-credit" title={`Photo by ${photographer}`}>
+                        {photographer}
+                    </span>
+                )
             )}
         </div>
     )}
 
     {!image && !externalImage && (
-        <div class="post-card__placeholder aspect-[1200/300]">
+        <div class="post-card__placeholder aspect-[1200/630]">
             <div class="post-card__decor-grid" aria-hidden="true">
                 {placeholderDecorations.map((decoration) => (
                     <span class="post-card__decor-item" style={decoration}></span>
@@ -133,9 +142,9 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         </div>
     )}
 
-    <div class="content p-6">
+    <div class="content post-card__body pointer-events-none p-4 md:p-5">
         {categories.length > 0 && (
-            <div class="mb-3 flex flex-wrap gap-2">
+            <div class="post-card__tags mb-2.5 flex flex-wrap gap-2">
                 {categories.map((category) => (
                     <span class="post-card__tag" style={getTagStyle(category)}>
                         #{category}
@@ -144,16 +153,16 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
             </div>
         )}
 
-        <h2 class="title text-xl font-semibold text-[var(--text-color)] mb-3">
+        <h2 class="title post-card__title text-lg font-semibold text-[var(--text-color)] mb-2.5 md:text-xl">
             {title}
             {
                 fallback && (
-                <span class="self-center px-1 ml-2 text-sm text-[var(--text-color)]/70 font-mono uppercase bg-[var(--button-hover-color)] rounded border border-[var(--button-border-color)]">{i18n!.defaultLocale}</span>
+                <span class="self-center px-1 ml-2 text-xs text-[var(--text-color)]/70 font-mono uppercase bg-[var(--button-hover-color)] rounded border border-[var(--button-border-color)]">{i18n!.defaultLocale}</span>
                 )
             }
         </h2>
-        <p class="description post-card__summary text-[var(--text-color)]/65 leading-relaxed">{previewText}</p>
-        <div class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[var(--text-color)]/70">
+        <p class="description post-card__summary text-sm leading-relaxed text-[var(--text-color)]/66 md:text-[0.96rem]">{previewText}</p>
+        <div class="post-card__meta mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--text-color)]/66 md:text-sm">
             <span>{formatFullDate(pubDate, currentLang)}</span>
             {updatedDate && updatedDate.valueOf() > pubDate.valueOf() && (
                 <>
@@ -165,22 +174,31 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
             <span>{readingLabel}</span>
         </div>
     </div>
-</a>
+</article>
 
 <style is:global>
     .post-card {
         position: relative;
         transform: translate3d(0, 0, 0) scale(1);
         background: color-mix(in srgb, var(--bg-color) 96%, transparent);
-        box-shadow: 0 0 0 1px var(--button-border-color), 0 10px 24px color-mix(in srgb, var(--shadow-color) 60%, transparent);
-        transition: transform 0.58s cubic-bezier(0.18, 0.82, 0.2, 1), box-shadow 0.42s ease, opacity 0.52s ease, filter 0.45s ease, background-color 0.34s ease;
+        box-shadow: 0 0 0 1px var(--button-border-color), 0 12px 34px color-mix(in srgb, var(--shadow-color) 58%, transparent);
+        transition: transform 0.62s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.52s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, background-color 0.3s ease, opacity 0.45s ease;
         will-change: transform, opacity, box-shadow;
+    }
+
+    .post-card__stretched-link {
+        outline: none;
+    }
+
+    .post-card__stretched-link:focus-visible {
+        outline: 2px solid var(--link-color);
+        outline-offset: 4px;
     }
 
     .post-card.post-card-reveal {
         opacity: 0;
-        transform: translate3d(0, 28px, 0) scale(0.985);
-        filter: blur(6px) saturate(0.92);
+        transform: translate3d(0, 24px, 0) scale(0.985);
+        filter: blur(5px) saturate(0.94);
     }
 
     .post-card.post-card-reveal.is-visible {
@@ -191,18 +209,20 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     }
 
     .post-card:hover {
-        transform: translate3d(0, -8px, 0) scale(1.02);
-        box-shadow: 0 0 0 1px color-mix(in srgb, var(--link-color) 40%, var(--button-border-color)), 0 24px 48px color-mix(in srgb, var(--shadow-color) 100%, transparent);
-        background: color-mix(in srgb, var(--bg-color) 92%, var(--button-hover-color));
+        transform: translate3d(0, -6px, 0) scale(1.008);
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--link-color) 28%, var(--button-border-color)), 0 26px 54px color-mix(in srgb, var(--shadow-color) 100%, transparent);
+        border-color: color-mix(in srgb, var(--link-color) 26%, var(--button-border-color));
+        background: color-mix(in srgb, var(--bg-color) 94%, var(--button-hover-color));
     }
 
     .post-card:active {
-        transform: translate3d(0, -4px, 0) scale(1.008);
+        transform: translate3d(0, -3px, 0) scale(1.004);
     }
 
     .post-card__cover {
         position: relative;
         isolation: isolate;
+        aspect-ratio: 1200 / 630;
         line-height: 0;
         background: linear-gradient(135deg, color-mix(in srgb, var(--bg-color) 84%, var(--button-hover-color)), color-mix(in srgb, var(--bg-color) 72%, var(--link-color)));
     }
@@ -211,27 +231,48 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, transparent 18%, color-mix(in srgb, var(--bg-color) 28%, transparent) 100%);
+        background: linear-gradient(180deg, transparent 12%, color-mix(in srgb, var(--bg-color) 30%, transparent) 100%);
         opacity: 0;
-        transition: opacity 0.42s ease;
+        transition: opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1);
         pointer-events: none;
     }
 
     .post-card__image {
         display: block;
         width: 100%;
-        height: auto;
-        transition: transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.5s ease;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 0.72s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease, opacity 0.3s ease;
         will-change: transform;
     }
 
     .post-card:hover .post-card__image {
-        transform: scale(1.04);
-        filter: brightness(1.06) saturate(1.04);
+        transform: scale(1.035);
+        filter: brightness(1.04) saturate(1.06) contrast(1.01);
     }
 
     .post-card:hover .post-card__cover::after {
         opacity: 1;
+    }
+
+    .post-card__body {
+        display: grid;
+        gap: 0.2rem;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+    }
+
+    .post-card:hover .post-card__body {
+        transform: translateY(-2px);
+    }
+
+    .post-card:hover .post-card__title {
+        color: var(--link-color);
+    }
+
+    .post-card:hover .post-card__summary,
+    .post-card:hover .post-card__meta {
+        color: color-mix(in srgb, var(--text-color) 78%, var(--link-color));
     }
 
     .post-card__placeholder {
@@ -265,20 +306,20 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         border-radius: 0.9rem;
         border: 2px solid rgba(255, 255, 255, 0.82);
         box-shadow: 0 8px 18px color-mix(in srgb, var(--shadow-color) 42%, transparent);
-        animation: post-card-float 9.5s ease-in-out infinite;
+        animation: post-card-float 10.5s cubic-bezier(0.45, 0, 0.15, 1) infinite;
     }
 
     .post-card__decor-item:nth-child(3n) {
-        animation-duration: 10s;
+        animation-duration: 11.5s;
     }
 
     .post-card__decor-item:nth-child(4n) {
-        animation-duration: 12s;
+        animation-duration: 12.5s;
     }
 
     @keyframes post-card-float {
         0%, 100% { transform: translate(-50%, -50%) rotate(0deg) translateY(0); }
-        50% { transform: translate(-50%, -50%) rotate(4deg) translateY(-3px); }
+        50% { transform: translate(-50%, -50%) rotate(3deg) translateY(-4px); }
     }
 
     .post-card__summary {
@@ -288,6 +329,10 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         overflow: hidden;
     }
 
+    .post-card__tags {
+        align-content: flex-start;
+    }
+
     .post-card__tag {
         display: inline-flex;
         align-items: center;
@@ -295,12 +340,12 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         border: 1px solid var(--post-tag-border);
         background: var(--post-tag-bg);
         color: var(--post-tag-text);
-        font-size: 0.72rem;
+        font-size: 0.68rem;
         line-height: 1;
-        padding: 0.3rem 0.55rem;
+        padding: 0.28rem 0.5rem;
         font-weight: 700;
         box-shadow: 0 4px 10px color-mix(in srgb, var(--post-tag-border) 35%, transparent);
-        transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), filter 0.24s ease, box-shadow 0.24s ease;
     }
 
     [data-theme='dark'] .post-card__tag {
@@ -310,25 +355,17 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
     }
 
-    @media (prefers-reduced-motion: reduce) {
-        .post-card,
-        .post-card__image,
-        .post-card__cover::after {
-            transition: none !important;
-        }
-    }
-
     .post-card:hover .post-card__tag {
-        transform: translateY(-1px);
-        filter: saturate(1.12);
-        box-shadow: 0 7px 14px color-mix(in srgb, var(--post-tag-border) 58%, transparent);
+        transform: translateY(-2px);
+        filter: saturate(1.1);
+        box-shadow: 0 8px 16px color-mix(in srgb, var(--post-tag-border) 58%, transparent);
     }
 
     .post-card__photo-credit {
         position: absolute;
-        bottom: 8px;
-        right: 10px;
-        z-index: 5;
+        bottom: 0.7rem;
+        right: 0.75rem;
+        z-index: 30;
         font-size: 0.65rem;
         padding: 2px 8px;
         border-radius: 999px;
@@ -338,8 +375,8 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         -webkit-backdrop-filter: blur(6px);
         pointer-events: auto;
         opacity: 0;
-        transform: translateY(4px);
-        transition: opacity 0.28s ease, transform 0.28s ease;
+        transform: translateY(6px);
+        transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .post-card__photo-credit a {
@@ -354,5 +391,33 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     .post-card:hover .post-card__photo-credit {
         opacity: 1;
         transform: translateY(0);
+    }
+
+    .post-card__body,
+    .post-card__title,
+    .post-card__summary,
+    .post-card__meta {
+        transform: translate3d(0, 0, 0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .post-card,
+        .post-card__image,
+        .post-card__cover::after,
+        .post-card__body,
+        .post-card__tag,
+        .post-card__photo-credit {
+            transition: none !important;
+            animation: none !important;
+        }
+
+        .post-card:hover,
+        .post-card:active,
+        .post-card:hover .post-card__body,
+        .post-card:hover .post-card__image,
+        .post-card:hover .post-card__tag {
+            transform: none !important;
+            filter: none !important;
+        }
     }
 </style>

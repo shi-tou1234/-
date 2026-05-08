@@ -148,12 +148,13 @@ const resolvedCovers = await Promise.all(
 <style is:global>
     .post-list-shell {
         position: relative;
+        --post-card-width: min(720px, 88vw);
     }
 
     .post-list-content {
         opacity: 0;
-        transform: translateY(8px);
-        transition: opacity 0.45s ease, transform 0.45s ease;
+        transform: translateY(10px);
+        transition: opacity 0.52s cubic-bezier(0.16, 1, 0.3, 1), transform 0.52s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .post-list-content.is-ready {
@@ -165,10 +166,10 @@ const resolvedCovers = await Promise.all(
         position: absolute;
         inset: 0;
         display: grid;
-        gap: 1rem;
+        gap: 1.1rem;
         pointer-events: none;
         opacity: 0;
-        transition: opacity 0.26s ease;
+        transition: opacity 0.26s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .post-list-shell.is-loading .post-list-skeleton {
@@ -181,26 +182,28 @@ const resolvedCovers = await Promise.all(
 
     .post-list-skeleton__item {
         border: 1px solid var(--button-border-color);
-        border-radius: 0.9rem;
+        border-radius: 1.35rem;
         overflow: hidden;
         background: color-mix(in srgb, var(--bg-color) 90%, var(--button-hover-color));
+        width: var(--post-card-width);
+        margin-inline: auto;
     }
 
     .post-list-skeleton__cover {
-        height: 10rem;
+        aspect-ratio: 1200 / 630;
         background: linear-gradient(100deg, color-mix(in srgb, var(--button-hover-color) 76%, transparent), color-mix(in srgb, var(--bg-color) 86%, transparent), color-mix(in srgb, var(--button-hover-color) 76%, transparent));
         background-size: 220% 100%;
         animation: post-list-skeleton-wave 1.5s linear infinite;
     }
 
     .post-list-skeleton__content {
-        padding: 1rem;
+        padding: 0.95rem 1rem 1.05rem;
         display: grid;
-        gap: 0.5rem;
+        gap: 0.45rem;
     }
 
     .post-list-skeleton__line {
-        height: 0.78rem;
+        height: 0.72rem;
         border-radius: 999px;
         background: linear-gradient(100deg, color-mix(in srgb, var(--button-hover-color) 70%, transparent), color-mix(in srgb, var(--bg-color) 90%, transparent), color-mix(in srgb, var(--button-hover-color) 70%, transparent));
         background-size: 220% 100%;
