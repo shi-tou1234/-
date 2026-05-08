@@ -110,12 +110,12 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
             {!showUpdatedDate && <div class="pb-10"></div>}
         </div>
         {image && (
-            <div class="cover h-[55vh] min-h-[260px] max-h-[620px] overflow-hidden rounded-xl border border-[var(--button-border-color)]">
+            <div class="cover h-[55vh] min-h-[260px] max-h-[620px] overflow-hidden rounded-xl ring-1 ring-inset ring-[var(--button-border-color)]">
                 <ImageModule src={image} class="w-full h-full object-cover object-center"/>
             </div>
         )}
         {!image && externalImage && (
-            <div class="cover h-[55vh] min-h-[260px] max-h-[620px] overflow-hidden rounded-xl border border-[var(--button-border-color)] relative">
+            <div class="cover h-[55vh] min-h-[260px] max-h-[620px] overflow-hidden rounded-xl ring-1 ring-inset ring-[var(--button-border-color)] relative">
                 <ImageModule src={externalImage} class="w-full h-full object-cover object-center"/>
                 {resolvedCover.photographer && (
                     <span class="absolute bottom-3 right-3 z-10 text-xs px-2.5 py-1 rounded-full bg-black/50 text-white/80 backdrop-blur">
