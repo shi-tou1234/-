@@ -100,7 +100,7 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     href={pageUrl}
     data-card-reveal
     style={`--card-reveal-delay:${aosDelay}ms;`}
-    class="post-card block min-w-0 w-full max-w-[var(--page-width)] mx-auto my-6 rounded-xl shadow border border-[var(--button-border-color)] overflow-hidden transition-all duration-300 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)]"
+    class="post-card block min-w-0 w-full max-w-[var(--page-width)] mx-auto my-6 rounded-xl shadow overflow-hidden transition-all duration-300 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)]"
 >
     {image && (
         <div class="cover post-card__cover overflow-hidden">
@@ -172,8 +172,8 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         position: relative;
         transform: translate3d(0, 0, 0) scale(1);
         background: color-mix(in srgb, var(--bg-color) 96%, transparent);
-        box-shadow: 0 10px 24px color-mix(in srgb, var(--shadow-color) 60%, transparent);
-        transition: transform 0.58s cubic-bezier(0.18, 0.82, 0.2, 1), box-shadow 0.42s ease, border-color 0.34s ease, opacity 0.52s ease, filter 0.45s ease, background-color 0.34s ease;
+        box-shadow: 0 0 0 1px var(--button-border-color), 0 10px 24px color-mix(in srgb, var(--shadow-color) 60%, transparent);
+        transition: transform 0.58s cubic-bezier(0.18, 0.82, 0.2, 1), box-shadow 0.42s ease, opacity 0.52s ease, filter 0.45s ease, background-color 0.34s ease;
         will-change: transform, opacity, box-shadow;
     }
 
@@ -192,8 +192,7 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
 
     .post-card:hover {
         transform: translate3d(0, -8px, 0) scale(1.02);
-        box-shadow: 0 24px 48px color-mix(in srgb, var(--shadow-color) 100%, transparent);
-        border-color: color-mix(in srgb, var(--link-color) 40%, var(--button-border-color));
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--link-color) 40%, var(--button-border-color)), 0 24px 48px color-mix(in srgb, var(--shadow-color) 100%, transparent);
         background: color-mix(in srgb, var(--bg-color) 92%, var(--button-hover-color));
     }
 

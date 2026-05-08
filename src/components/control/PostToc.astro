@@ -150,7 +150,7 @@ function initPostToc() {
       const isActive = link.getAttribute('data-toc-target') === id;
       link.classList.toggle('is-active', isActive);
       if (isActive) {
-        link.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        link.scrollIntoView({ block: 'nearest' });
       }
     });
   };
@@ -167,7 +167,7 @@ function initPostToc() {
       const isActive = link.getAttribute('data-toc-target') === id;
       link.classList.toggle('is-active', isActive);
       if (isActive) {
-        link.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        link.scrollIntoView({ block: 'nearest' });
       }
     });
     navigatingTimeout = setTimeout(() => {
@@ -351,6 +351,12 @@ document.addEventListener('astro:after-swap', initPostToc);
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   touch-action: pan-y;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.post-toc-list::-webkit-scrollbar {
+  display: none;
 }
 
 .post-toc-item a {
