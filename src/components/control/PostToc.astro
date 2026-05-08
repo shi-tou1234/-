@@ -149,6 +149,9 @@ function initPostToc() {
     links.forEach((link) => {
       const isActive = link.getAttribute('data-toc-target') === id;
       link.classList.toggle('is-active', isActive);
+      if (isActive) {
+        link.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
     });
   };
 
@@ -163,6 +166,9 @@ function initPostToc() {
     links.forEach((link) => {
       const isActive = link.getAttribute('data-toc-target') === id;
       link.classList.toggle('is-active', isActive);
+      if (isActive) {
+        link.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
     });
     navigatingTimeout = setTimeout(() => {
       isNavigating = false;
