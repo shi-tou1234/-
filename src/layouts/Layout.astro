@@ -222,7 +222,7 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
     height: 4px;
     background: linear-gradient(90deg, var(--link-color), color-mix(in srgb, var(--link-color) 60%, #38bdf8));
     z-index: 99999;
-    transition: width 0.16s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease;
+    transition: width 0.1s linear;
     pointer-events: none;
     opacity: 0;
     box-shadow: 0 0 18px color-mix(in srgb, var(--link-color) 28%, transparent);
@@ -233,12 +233,12 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
   }
 
   @keyframes fadeInSoft {
-    from { opacity: 0; transform: translateY(10px) scale(0.996); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .transition-fade {
-    animation: fadeInSoft 0.36s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: fadeInSoft 0.42s cubic-bezier(0.22, 1, 0.36, 1);
     animation-fill-mode: both;
   }
 
@@ -257,7 +257,7 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
     background-color: rgba(255, 255, 255, 0.7);
     z-index: 9999;
     backdrop-filter: blur(2px);
-    animation: fadeInOverlay 0.22s ease-out;
+    animation: fadeInOverlay 0.3s ease-out;
     pointer-events: auto;
   }
 
@@ -276,7 +276,7 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
     border: 4px solid var(--button-hover-color);
     border-top: 4px solid var(--link-color);
     border-radius: 50%;
-    animation: spin 0.9s linear infinite;
+    animation: spin 1s linear infinite;
   }
 
   @keyframes spin {
@@ -301,8 +301,7 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
 
     // 2. 统一初始化
     AOS.init({
-      duration: 640,
-      easing: 'ease-out-cubic',
+      duration: 800,
       once: true,
     });
     
