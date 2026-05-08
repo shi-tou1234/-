@@ -1,4 +1,4 @@
-export type CoverImageProvider = 'pexels' | 'unsplash' | 'pixabay'
+export type CoverImageProvider = 'pexels' | 'unsplash' | 'pixabay' | 'picsum'
 
 export interface CoverImageConfig {
   enabled: boolean

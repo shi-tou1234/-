@@ -193,7 +193,51 @@ async function searchPixabay(
   }
 }
 
+async function searchPicsum(
+  postId: string,
+  _query: string,
+  _config: CoverImageConfig,
+): Promise<CoverImageResult | null> {
+  const seed = hashString(postId)
+  const width = 800
+  const height = 450
+
+  const listUrl = `https://picsum.photos/v2/list?page=${(seed % 10) + 1}&limit=30`
+  try {
+    const listResponse = await fetch(listUrl, {
+      signal: AbortSignal.timeout(5000),
+    })
+    if (listResponse.ok) {
+      const list = (await listResponse.json()) as Array<{ id: string; author: string; url: string }>
+      if (list.length > 0) {
+        const item = list[seed % list.length]
+        return {
+          url: `https://picsum.photos/id/${item.id}/${width}/${height}`,
+          photographer: item.author,
+          photographerUrl: item.url,
+          alt: _query,
+          width,
+          height,
+        }
+      }
+    }
+  } catch {
+    // 列表获取失败，使用直接 URL
+  }
+
+  const imageId = (seed % 1000)
+  return {
+    url: `https://picsum.photos/id/${imageId}/${width}/${height}`,
+    photographer: 'Lorem Picsum',
+    photographerUrl: 'https://picsum.photos',
+    alt: _query,
+    width,
+    height,
+  }
+}
+
 async function searchCoverImage(
+  postId: string,
   query: string,
   config: CoverImageConfig,
 ): Promise<CoverImageResult | null> {
@@ -204,6 +248,8 @@ async function searchCoverImage(
       return searchUnsplash(query, config)
     case 'pixabay':
       return searchPixabay(query, config)
+    case 'picsum':
+      return searchPicsum(postId, query, config)
     default:
       return searchPexels(query, config)
   }
@@ -231,7 +277,24 @@ export async function resolveCoverImage(
     }
   }
 
-  if (!coverImageConfig.enabled || !coverImageConfig.apiKey) {
+  if (!coverImageConfig.enabled) {
+    return { imageUrl: '', photographer: '', photographerUrl: '', source: 'none' }
+  }
+
+  if (!coverImageConfig.apiKey) {
+    try {
+      const result = await searchPicsum(postId, title, coverImageConfig)
+      if (result) {
+        return {
+          imageUrl: result.url,
+          photographer: result.photographer,
+          photographerUrl: result.photographerUrl,
+          source: 'api',
+        }
+      }
+    } catch (err) {
+      console.warn(`[cover-image] Picsum 获取失败 (${postId}):`, err)
+    }
     return { imageUrl: '', photographer: '', photographerUrl: '', source: 'none' }
   }
 
@@ -249,7 +312,7 @@ export async function resolveCoverImage(
   const query = buildSearchQuery(title, categories, coverImageConfig.searchStrategy)
 
   try {
-    const result = await searchCoverImage(query, coverImageConfig)
+    const result = await searchCoverImage(postId, query, coverImageConfig)
 
     if (result) {
       cache[postId] = {
