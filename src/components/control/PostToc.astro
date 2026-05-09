@@ -315,16 +315,13 @@ initPostToc();
 
 <style is:global>
 .post-toc-root {
-  position: fixed;
-  left: var(--toc-offset-left);
-  top: 24vh;
   z-index: 990;
 }
 
 .post-toc-panel {
   display: flex;
   flex-direction: column;
-  width: max(10rem, min(15rem, var(--toc-width)));
+  width: 100%;
   max-height: 58vh;
   overflow: hidden;
   border: 1px solid var(--button-border-color);
@@ -454,6 +451,7 @@ initPostToc();
 
 @media (max-width: 1023px) {
   .post-toc-root {
+    position: fixed;
     left: auto;
     right: 1rem;
     top: auto;

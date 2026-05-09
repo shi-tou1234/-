@@ -85,73 +85,76 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
 
 ---
 <MainPageLayout title={pageTitle} lang={currentLang}>
-    <div id="post-reading-shell" class="mx-auto w-full max-w-[var(--page-width)] py-8">
-        <nav class="mb-4 text-sm text-[var(--text-color)]/65" aria-label={currentLang === 'en' ? 'Breadcrumb' : '面包屑导航'}>
-            <a href={getRelativeLocaleUrl(currentLang, '/')} class="hover:text-[var(--link-color)]">{homeLabel}</a>
-            {activeCategory && (
-                <>
-                    <span class="px-2">&gt;</span>
-                    <a href={categoryPageUrl} class="hover:text-[var(--link-color)]">{activeCategory}</a>
-                </>
-            )}
-            <span class="px-2">&gt;</span>
-            <span class="text-[var(--text-color)]/90">{entry.data.title}</span>
-        </nav>
-
-        <div class="mb-8 text-center">
-            <h1 class="font-bold text-3xl mb-2 pt-10 text-[var(--text-color)]">{ entry.data.title }</h1>
-            <div class="pt-2">
-                <ReadingTime minutes={readingMinutes} words={wordCount} language={currentLang} />
-            </div>
-            <p class="font-bold text-[var(--text-color)]/60 pt-4 pb-2">{ formatFullDate(entry.data.pubDate, currentLang) }</p>
-            {showUpdatedDate && entry.data.updatedDate && (
-                <p class="font-medium text-sm text-[var(--text-color)]/55 pb-10">{updatedLabel} {formatFullDate(entry.data.updatedDate, currentLang)}</p>
-            )}
-            {!showUpdatedDate && <div class="pb-10"></div>}
-        </div>
-        {image && (
-            <div class="cover h-[55vh] min-h-[260px] max-h-[620px] overflow-hidden rounded-xl ring-1 ring-inset ring-[var(--button-border-color)]">
-                <ImageModule src={image} class="w-full h-full object-cover object-center"/>
-            </div>
-        )}
-        {!image && externalImage && (
-            <div class="cover h-[55vh] min-h-[260px] max-h-[620px] overflow-hidden rounded-xl ring-1 ring-inset ring-[var(--button-border-color)] relative">
-                <ImageModule src={externalImage} class="w-full h-full object-cover object-center"/>
-                {resolvedCover.photographer && (
-                    <span class="absolute bottom-3 right-3 z-10 text-xs px-2.5 py-1 rounded-full bg-black/50 text-white/80 backdrop-blur">
-                        {resolvedCover.photographerUrl ? (
-                            <a href={resolvedCover.photographerUrl} target="_blank" rel="noopener noreferrer" class="hover:underline">Photo by {resolvedCover.photographer}</a>
-                        ) : (
-                            <>Photo by {resolvedCover.photographer}</>
-                        )}
-                    </span>
+    <div id="post-reading-shell" class="mx-auto w-full py-8 post-layout-container">
+        <div class="post-content-column">
+            <nav class="mb-4 text-sm text-[var(--text-color)]/65" aria-label={currentLang === 'en' ? 'Breadcrumb' : '面包屑导航'}>
+                <a href={getRelativeLocaleUrl(currentLang, '/')} class="hover:text-[var(--link-color)]">{homeLabel}</a>
+                {activeCategory && (
+                    <>
+                        <span class="px-2">&gt;</span>
+                        <a href={categoryPageUrl} class="hover:text-[var(--link-color)]">{activeCategory}</a>
+                    </>
                 )}
+                <span class="px-2">&gt;</span>
+                <span class="text-[var(--text-color)]/90">{entry.data.title}</span>
+            </nav>
+
+            <div class="mb-8 text-center">
+                <h1 class="font-bold text-3xl mb-2 pt-10 text-[var(--text-color)]">{ entry.data.title }</h1>
+                <div class="pt-2">
+                    <ReadingTime minutes={readingMinutes} words={wordCount} language={currentLang} />
+                </div>
+                <p class="font-bold text-[var(--text-color)]/60 pt-4 pb-2">{ formatFullDate(entry.data.pubDate, currentLang) }</p>
+                {showUpdatedDate && entry.data.updatedDate && (
+                    <p class="font-medium text-sm text-[var(--text-color)]/55 pb-10">{updatedLabel} {formatFullDate(entry.data.updatedDate, currentLang)}</p>
+                )}
+                {!showUpdatedDate && <div class="pb-10"></div>}
             </div>
-        )}
-        {entry.isFallback && (
-        <div class="my-8 flex items-start gap-3 rounded-lg border border-[var(--warning-border-color)] bg-[var(--warning-bg-color)] p-4 text-sm text-[var(--warning-text-color)] transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0 opacity-80">
-            <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
-            </svg>
-            
-            <div>
-            <p class="leading-relaxed">
-                <span class="font-semibold">{t("langNote.note")}</span> 
-                {t("langNote.description")}
-            </p>
+            {image && (
+                <div class="cover h-[55vh] min-h-[260px] max-h-[620px] overflow-hidden rounded-xl ring-1 ring-inset ring-[var(--button-border-color)]">
+                    <ImageModule src={image} class="w-full h-full object-cover object-center"/>
+                </div>
+            )}
+            {!image && externalImage && (
+                <div class="cover h-[55vh] min-h-[260px] max-h-[620px] overflow-hidden rounded-xl ring-1 ring-inset ring-[var(--button-border-color)] relative">
+                    <ImageModule src={externalImage} class="w-full h-full object-cover object-center"/>
+                    {resolvedCover.photographer && (
+                        <span class="absolute bottom-3 right-3 z-10 text-xs px-2.5 py-1 rounded-full bg-black/50 text-white/80 backdrop-blur">
+                            {resolvedCover.photographerUrl ? (
+                                <a href={resolvedCover.photographerUrl} target="_blank" rel="noopener noreferrer" class="hover:underline">Photo by {resolvedCover.photographer}</a>
+                            ) : (
+                                <>Photo by {resolvedCover.photographer}</>
+                            )}
+                        </span>
+                    )}
+                </div>
+            )}
+            {entry.isFallback && (
+            <div class="my-8 flex items-start gap-3 rounded-lg border border-[var(--warning-border-color)] bg-[var(--warning-bg-color)] p-4 text-sm text-[var(--warning-text-color)] transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0 opacity-80">
+                <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+                </svg>
+                
+                <div>
+                <p class="leading-relaxed">
+                    <span class="font-semibold">{t("langNote.note")}</span> 
+                    {t("langNote.description")}
+                </p>
+                </div>
             </div>
+            )}
+            <Markdown class="mb-6 markdown-content onload-animation">
+                <Content />
+            </Markdown>
+            {licenseConfig.enable &&
+            <LicenseCard title={entry.data.title} pubDate={entry.data.pubDate}/>
+            }
+            {
+                siteConfig.blogNavi.enable &&
+                <BlogNavi prev={prev} next={next}/>
+            }
         </div>
-        )}
-        <Markdown class="mb-6 markdown-content onload-animation">
-            <Content />
-        </Markdown>
-        {licenseConfig.enable &&
-        <LicenseCard title={entry.data.title} pubDate={entry.data.pubDate}/>
-        }
-        {
-            siteConfig.blogNavi.enable &&
-            <BlogNavi prev={prev} next={next}/>
-        }
+        <PostToc title={t('toc')} />
     </div>
 
     <div class="post-back-floating">
@@ -165,7 +168,6 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
     </div>
 
     <BackTop />
-    <PostToc title={t('toc')} />
     {sameCategoryPosts.length > 0 && activeCategory && (
         <CategoryPostNavi
             language={currentLang}
@@ -268,6 +270,38 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
 </script>
 
 <style is:global>
+    .post-layout-container {
+        display: grid;
+        grid-template-columns: minmax(0, var(--page-width)) var(--toc-width);
+        gap: 2rem;
+        justify-content: center;
+        padding: 0 1rem;
+        align-items: start;
+    }
+
+    .post-content-column {
+        min-width: 0;
+        max-width: var(--page-width);
+        justify-self: end;
+    }
+
+    .post-layout-container > .post-toc-root {
+        position: sticky;
+        top: 100px;
+        align-self: start;
+    }
+
+    @media (max-width: 1400px) {
+        .post-layout-container {
+            grid-template-columns: minmax(0, var(--page-width));
+            justify-content: center;
+        }
+
+        .post-content-column {
+            justify-self: center;
+        }
+    }
+
     #post-reading-shell {
         transition: max-width 0.25s ease, padding 0.25s ease;
     }
