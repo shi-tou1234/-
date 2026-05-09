@@ -127,7 +127,6 @@ function initPostToc() {
   };
 
   const getActiveHeadingId = () => {
-    if (isNavigating) return null;
     const header = document.getElementById('main-header');
     let offset = SCROLL_OFFSET;
     if (header) {
@@ -146,17 +145,29 @@ function initPostToc() {
     return activeId;
   };
 
+  const ensureActiveLinkVisible = () => {
+    const activeLink = links.find((link) => link.classList.contains('is-active'));
+    if (activeLink) {
+      keepActiveLinkVisible(activeLink);
+    }
+  };
+
   const onScrollProgress = () => {
     if (!tickingProgress) {
+      tickingProgress = true;
       window.requestAnimationFrame(() => {
-        updateProgress();
-        const activeId = getActiveHeadingId();
-        if (activeId) {
-          updateActive(activeId);
+        try {
+          updateProgress();
+          const activeId = getActiveHeadingId();
+          if (activeId) {
+            updateActive(activeId);
+            ensureActiveLinkVisible();
+          }
+        } catch (e) {
+          console.warn('TOC scroll update error:', e);
         }
         tickingProgress = false;
       });
-      tickingProgress = true;
     }
   };
 
