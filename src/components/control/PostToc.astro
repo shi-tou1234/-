@@ -126,10 +126,34 @@ function initPostToc() {
     progressText.textContent = `${percent}%`;
   };
 
+  const getActiveHeadingId = () => {
+    if (isNavigating) return null;
+    const header = document.getElementById('main-header');
+    let offset = SCROLL_OFFSET;
+    if (header) {
+      offset = header.offsetHeight + 12;
+    }
+    const scrollTop = window.scrollY + offset;
+
+    let activeId = headings[0]?.id;
+    for (let i = 0; i < headings.length; i++) {
+      const heading = headings[i];
+      const headingTop = heading.getBoundingClientRect().top + window.scrollY;
+      if (headingTop <= scrollTop) {
+        activeId = heading.id;
+      }
+    }
+    return activeId;
+  };
+
   const onScrollProgress = () => {
     if (!tickingProgress) {
       window.requestAnimationFrame(() => {
         updateProgress();
+        const activeId = getActiveHeadingId();
+        if (activeId) {
+          updateActive(activeId);
+        }
         tickingProgress = false;
       });
       tickingProgress = true;
