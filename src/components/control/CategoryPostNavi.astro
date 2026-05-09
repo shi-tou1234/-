@@ -35,14 +35,11 @@ const viewAllText = language === 'zh-cn' ? '查看该分类全部文章' : 'View
 
 <style is:global>
 .post-category-nav-root {
-  position: fixed;
-  right: calc(50vw + var(--page-width) / 2 + 3rem);
-  top: 24vh;
-  z-index: 990;
+  width: 100%;
 }
 
 .post-category-nav-panel {
-  width: max(11rem, min(16rem, var(--toc-width)));
+  width: 100%;
   max-height: 58vh;
   border: 1px solid var(--button-border-color);
   border-radius: 0.9rem;
@@ -106,11 +103,5 @@ const viewAllText = language === 'zh-cn' ? '查看该分类全部文章' : 'View
   background: var(--button-hover-color);
   color: var(--text-color);
   transform: translateX(-2px);
-}
-
-@media (max-width: 1400px) {
-  .post-category-nav-root {
-    display: none;
-  }
 }
 </style>

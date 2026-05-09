@@ -96,7 +96,7 @@ function initPostToc() {
   let navigatingTimeout = null;
   let isNavigating = false;
 
-  const SCROLL_OFFSET = 100;
+  const SCROLL_OFFSET = 24;
 
   const getScrollTarget = (heading) => {
     if (!heading) return 0;
@@ -104,7 +104,7 @@ function initPostToc() {
     const header = document.getElementById('main-header');
     let offset = SCROLL_OFFSET;
     if (header) {
-      offset = header.offsetHeight + 12;
+      offset = header.getBoundingClientRect().height + 8;
     }
     return window.scrollY + rect.top - offset;
   };
@@ -130,7 +130,7 @@ function initPostToc() {
     const header = document.getElementById('main-header');
     let offset = SCROLL_OFFSET;
     if (header) {
-      offset = header.offsetHeight + 12;
+      offset = header.getBoundingClientRect().height + 8;
     }
     const scrollTop = window.scrollY + offset;
 
@@ -214,6 +214,9 @@ function initPostToc() {
       clearTimeout(navigatingTimeout);
       navigatingTimeout = null;
     }
+    if (window.__postTocScrollEndHandler) {
+      window.removeEventListener('scrollend', window.__postTocScrollEndHandler);
+    }
     isNavigating = true;
     activeId = id;
     links.forEach((link) => {
@@ -223,10 +226,26 @@ function initPostToc() {
         keepActiveLinkVisible(link);
       }
     });
-    navigatingTimeout = setTimeout(() => {
+
+    const endNavigation = () => {
       isNavigating = false;
       navigatingTimeout = null;
-    }, 600);
+      if (window.__postTocScrollEndHandler) {
+        window.removeEventListener('scrollend', window.__postTocScrollEndHandler);
+        window.__postTocScrollEndHandler = null;
+      }
+      const currentId = getActiveHeadingId();
+      if (currentId) {
+        updateActive(currentId);
+      }
+    };
+
+    window.__postTocScrollEndHandler = endNavigation;
+    window.addEventListener('scrollend', endNavigation, { once: true });
+
+    navigatingTimeout = setTimeout(() => {
+      endNavigation();
+    }, 1200);
   };
 
   const scrollToHeading = (targetId) => {
@@ -444,8 +463,8 @@ initPostToc();
 }
 
 @media (max-width: 1400px) {
-  .post-toc-root {
-    display: none;
+  .post-toc-panel {
+    max-height: 45vh;
   }
 }
 
