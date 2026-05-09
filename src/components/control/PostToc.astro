@@ -297,10 +297,10 @@ function initPostToc() {
 
   const oldScrollHandler = window.__postTocScrollHandler;
   if (oldScrollHandler) {
-    window.removeEventListener('scroll', oldScrollHandler);
+    document.removeEventListener('scroll', oldScrollHandler, true);
   }
 
-  window.addEventListener('scroll', onScrollProgress, { passive: true });
+  document.addEventListener('scroll', onScrollProgress, { passive: true, capture: true });
   window.__postTocScrollHandler = onScrollProgress;
 
   if (window.innerWidth >= 1024) {
@@ -310,6 +310,7 @@ function initPostToc() {
 
 document.addEventListener('astro:page-load', initPostToc);
 document.addEventListener('astro:after-swap', initPostToc);
+initPostToc();
 </script>
 
 <style is:global>
