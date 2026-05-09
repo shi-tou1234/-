@@ -17,7 +17,7 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
 ---
 
 <!DOCTYPE html>
-<html lang={pageLang} class="h-full">
+<html lang={pageLang} class="min-h-full">
 <head>
     <script is:inline>
         (function() {
@@ -52,7 +52,7 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
     <title>{pageTitle}</title>
     <ClientRouter />
 </head>
-<body class="h-full bg-[var(--bg-color)]">
+<body class="min-h-full bg-[var(--bg-color)]">
 
     <div id="global-progress-bar" class="global-progress-bar" aria-hidden="true"></div>
 

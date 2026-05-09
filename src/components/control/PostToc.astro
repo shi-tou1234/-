@@ -6,7 +6,7 @@ interface Props {
 const { title } = Astro.props;
 ---
 
-<div id="post-toc-root" data-toc-title={title} class="post-toc-root" hidden>
+<div id="post-toc-root" data-toc-title={title} class="post-toc-root">
   <button id="post-toc-fab" type="button" class="post-toc-fab" aria-expanded="false" aria-controls="post-toc-panel">
     {title}
   </button>
@@ -76,11 +76,11 @@ function initPostToc() {
   });
 
   if (!headings.length) {
-    root.hidden = true;
+    root.classList.add('post-toc-root--hidden');
     return;
   }
 
-  root.hidden = false;
+  root.classList.remove('post-toc-root--hidden');
 
   list.innerHTML = headings
     .map((heading) => {
@@ -338,6 +338,10 @@ initPostToc();
 <style is:global>
 .post-toc-root {
   z-index: 990;
+}
+
+.post-toc-root--hidden {
+  display: none !important;
 }
 
 .post-toc-panel {
