@@ -175,7 +175,6 @@ function initPostToc() {
     panel.classList.toggle('is-open', open);
     backdrop.classList.toggle('is-open', open);
     fab.setAttribute('aria-expanded', open ? 'true' : 'false');
-    document.documentElement.classList.toggle('post-toc-mobile-open', open);
   };
 
   const keepActiveLinkVisible = (link) => {
@@ -301,7 +300,50 @@ function initPostToc() {
     setPanelOpen(!isOpen);
   };
   closeBtn.onclick = () => setPanelOpen(false);
-  backdrop.onclick = () => setPanelOpen(false);
+
+  document.addEventListener('click', (event) => {
+    if (!panel.classList.contains('is-open')) return;
+    const target = event.target;
+    if (target instanceof Node && !panel.contains(target) && target !== fab && !fab.contains(target)) {
+      setPanelOpen(false);
+    }
+  });
+
+  let touchStartY = 0;
+  let touchCurrentY = 0;
+  let touchActive = false;
+
+  panel.addEventListener('touchstart', (event) => {
+    if (!panel.classList.contains('is-open')) return;
+    touchStartY = event.touches[0].clientY;
+    touchCurrentY = touchStartY;
+    touchActive = true;
+    panel.style.transition = 'none';
+  }, { passive: true });
+
+  panel.addEventListener('touchmove', (event) => {
+    if (!touchActive) return;
+    touchCurrentY = event.touches[0].clientY;
+    const deltaY = touchCurrentY - touchStartY;
+
+    if (deltaY > 0 && list.scrollTop <= 0) {
+      panel.style.transform = `translateY(${deltaY}px)`;
+      panel.style.opacity = String(Math.max(0, 1 - deltaY / 200));
+    }
+  }, { passive: true });
+
+  panel.addEventListener('touchend', () => {
+    if (!touchActive) return;
+    touchActive = false;
+    panel.style.transition = '';
+
+    const deltaY = touchCurrentY - touchStartY;
+    if (deltaY > 60 && list.scrollTop <= 0) {
+      setPanelOpen(false);
+    }
+    panel.style.transform = '';
+    panel.style.opacity = '';
+  });
 
   const oldEscHandler = window.__postTocEscHandler;
   if (oldEscHandler) {
@@ -541,7 +583,6 @@ initPostToc();
   .post-toc-backdrop.is-open {
     display: block;
     opacity: 1;
-    pointer-events: auto;
   }
 
   .post-toc-panel {
@@ -569,11 +610,6 @@ initPostToc();
     display: inline-flex;
     align-items: center;
     justify-content: center;
-  }
-
-  html.post-toc-mobile-open,
-  html.post-toc-mobile-open body {
-    overflow: hidden;
   }
 }
 </style>
