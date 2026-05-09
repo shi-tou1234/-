@@ -519,13 +519,8 @@ initPostToc();
 
 @media (max-width: 1023px) {
   .post-toc-root {
-    position: fixed;
-    left: auto;
-    right: 1rem;
-    top: auto;
-    bottom: 16vh;
-    z-index: 1200;
     display: block;
+    z-index: 1200;
   }
 
   .post-toc-fab {
@@ -589,7 +584,7 @@ initPostToc();
     position: fixed;
     right: 0.8rem;
     left: 0.8rem;
-    bottom: calc(16vh + 2.8rem);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 6.2rem);
     width: auto;
     max-height: 55vh;
     max-height: 55dvh;
