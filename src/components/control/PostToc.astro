@@ -467,15 +467,8 @@ initPostToc();
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   touch-action: pan-y;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.post-toc-list::-webkit-scrollbar {
-  display: none;
 }
 
 .post-toc-item a {
@@ -584,11 +577,12 @@ initPostToc();
     position: fixed;
     right: 0.8rem;
     left: 0.8rem;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 6.2rem);
+    top: calc(60px + 3.2rem);
+    bottom: auto;
     width: auto;
     max-height: 55vh;
     max-height: 55dvh;
-    transform: translateY(12px);
+    transform: translateY(-12px);
     opacity: 0;
     pointer-events: none;
     transition: transform 0.22s ease, opacity 0.22s ease;
