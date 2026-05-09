@@ -625,16 +625,21 @@ const navFriendsLabel = isZh ? '友链' : 'Friends';
   display: none;
   align-items: center;
   justify-content: space-around;
-  padding: 0.35rem 0 0.6rem;
+  padding: 0.35rem 0 max(0.6rem, env(safe-area-inset-bottom, 0.6rem));
   background: color-mix(in srgb, var(--bg-color) 88%, transparent);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid var(--button-border-color);
   box-shadow: 0 -4px 20px color-mix(in srgb, var(--shadow-color) 30%, transparent);
   overflow-x: auto;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+  min-height: unset;
+  height: auto;
 }
 
 .mobile-bottom-nav::-webkit-scrollbar {
@@ -691,7 +696,7 @@ const navFriendsLabel = isZh ? '友链' : 'Friends';
 
 @media (max-width: 775px) {
   body {
-    padding-bottom: 3.2rem;
+    padding-bottom: calc(3.2rem + env(safe-area-inset-bottom, 0px));
   }
 }
 

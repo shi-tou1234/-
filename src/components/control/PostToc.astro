@@ -296,7 +296,10 @@ function initPostToc() {
   forceActive(headings[0].id);
   updateProgress();
 
-  fab.onclick = () => setPanelOpen(true);
+  fab.onclick = () => {
+    const isOpen = panel.classList.contains('is-open');
+    setPanelOpen(!isOpen);
+  };
   closeBtn.onclick = () => setPanelOpen(false);
   backdrop.onclick = () => setPanelOpen(false);
 
@@ -483,8 +486,10 @@ initPostToc();
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 0.35rem;
     min-width: 3.4rem;
-    height: 2.25rem;
+    height: 2.5rem;
+    padding: 0 0.85rem;
     border-radius: 999px;
     border: 1px solid var(--button-border-color);
     background: color-mix(in srgb, var(--bg-color) 94%, transparent);
@@ -494,6 +499,29 @@ initPostToc();
     cursor: pointer;
     font-size: 0.82rem;
     font-weight: 600;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+
+  .post-toc-fab:active {
+    transform: scale(0.94);
+  }
+
+  .post-toc-fab::after {
+    content: '';
+    display: inline-block;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.22s ease;
+    opacity: 0.7;
+  }
+
+  .post-toc-fab[aria-expanded="true"]::after {
+    transform: rotate(-135deg);
   }
 
   .post-toc-backdrop {
