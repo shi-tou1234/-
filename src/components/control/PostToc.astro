@@ -145,13 +145,6 @@ function initPostToc() {
     return activeId;
   };
 
-  const ensureActiveLinkVisible = () => {
-    const activeLink = links.find((link) => link.classList.contains('is-active'));
-    if (activeLink) {
-      keepActiveLinkVisible(activeLink);
-    }
-  };
-
   const onScrollProgress = () => {
     if (!tickingProgress) {
       tickingProgress = true;
@@ -161,7 +154,6 @@ function initPostToc() {
           const activeId = getActiveHeadingId();
           if (activeId) {
             updateActive(activeId);
-            ensureActiveLinkVisible();
           }
         } catch (e) {
           console.warn('TOC scroll update error:', e);
