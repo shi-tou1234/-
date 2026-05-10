@@ -118,6 +118,10 @@ const aboutPersonal: AboutPersonal = {
     {
       "date": "2026.5.7",
       "content": "进一步优化各个动画效果，导航栏置顶和透明"
+    },
+    {
+      "date": "2026.5.10",
+      "content": "提升移动端体验，修复一系列bug，博客文章卡片增加封面图"
     }
   ],
   "musicTracks": [
