@@ -95,6 +95,7 @@ function initPostToc() {
   let tickingProgress = false;
   let navigatingTimeout = null;
   let isNavigating = false;
+  let suspendAutoKeepVisibleUntil = 0;
 
   const SCROLL_OFFSET = 24;
 
@@ -169,9 +170,10 @@ function initPostToc() {
     fab.setAttribute('aria-expanded', open ? 'true' : 'false');
   };
 
-  const keepActiveLinkVisible = (link) => {
+  const keepActiveLinkVisible = (link, force = false) => {
     if (!link) return;
     if (list.scrollHeight <= list.clientHeight) return;
+    if (!force && Date.now() < suspendAutoKeepVisibleUntil) return;
 
     const listRect = list.getBoundingClientRect();
     const linkRect = link.getBoundingClientRect();
@@ -194,7 +196,7 @@ function initPostToc() {
       const isActive = link.getAttribute('data-toc-target') === id;
       link.classList.toggle('is-active', isActive);
       if (isActive) {
-        keepActiveLinkVisible(link);
+        keepActiveLinkVisible(link, false);
       }
     });
   };
@@ -214,7 +216,7 @@ function initPostToc() {
       const isActive = link.getAttribute('data-toc-target') === id;
       link.classList.toggle('is-active', isActive);
       if (isActive) {
-        keepActiveLinkVisible(link);
+        keepActiveLinkVisible(link, true);
       }
     });
 
@@ -312,6 +314,14 @@ function initPostToc() {
     touchActive = true;
     panel.style.transition = 'none';
   }, { passive: true });
+
+  const suspendAutoKeepVisible = () => {
+    suspendAutoKeepVisibleUntil = Date.now() + 1200;
+  };
+
+  list.addEventListener('wheel', suspendAutoKeepVisible, { passive: true });
+  list.addEventListener('touchstart', suspendAutoKeepVisible, { passive: true });
+  list.addEventListener('pointerdown', suspendAutoKeepVisible, { passive: true });
 
   panel.addEventListener('touchmove', (event) => {
     if (!touchActive) return;
