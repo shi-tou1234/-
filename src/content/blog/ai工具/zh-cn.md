@@ -1,7 +1,7 @@
 ---
 title: AI工具
 pubDate: 2026-02-21T06:08:00.000Z
-updatedDate: 2026-04-29T14:57:39.836Z
+updatedDate: 2026-05-12T12:54:03.302Z
 draft: false
 description: 
 category: 工具使用
@@ -22,7 +22,7 @@ slugId: ai工具
 [deepseek](https://chat.deepseek.com/)
 
 最新旗舰：deepseek v4 pro max
-等了一年，v4终于来了，价格来到了地板价，flash速度很快，能力不输给pro，同时代码,agent,世界知识能力大幅度提升，数学推理能力没得说，支持 1M 上下文，思考和生成速度有了很大的提升。目前已经开始多模态灰度测试，我自己购买了10元的api，烧了330w token花了1.43，缓存命中率高达99%，简直无敌，祝贺d老师重回国产巅峰！
+等了一年，v4终于来了，价格来到了地板价，flash速度很快，能力不输给pro，同时代码,agent,世界知识能力大幅度提升，数学推理能力没得说，支持 1M 上下文，思考和生成速度有了很大的提升。目前已经开始多模态灰度测试，我自己购买了10元的api，烧了3300w token花了1.43，缓存命中率高达99%，简直无敌，祝贺d老师重回国产巅峰！
 
 [GLM](https://chat.z.ai/)
 
@@ -47,12 +47,12 @@ slugId: ai工具
 [xiaomi mimo studio](https://aistudio.xiaomimimo.com/#/c)
 
 最新旗舰：xiaomi mimo v2.5 pro
-小米自研的大模型，跑分真不真实不知道，自从v2.5出来以后有了明显的进步，跑分超过了deepseek的旗舰，但是相对应的，价格也上去了，还没有深度测评过，等我
+小米自研的大模型，跑分真不真实不知道，自从v2.5出来以后有了明显的进步，跑分超过了deepseek的旗舰，但是相对应的，价格也上去了，但是你这个缓存命中率认真的吗？我一句你好花了10000wtoken，价格0.1？你在开什么国际玩笑，就无语
 
 [GPT](https://chatgpt.com/)
 
 最新旗舰：GPT 5.5 pro
-需要梯子，写文章水平很高，推理能力很强，后端和程序改错能力很强，免费用户额度有限。可恶，最近给我降智了
+需要梯子，写文章水平很高，推理能力很强，后端和程序改错能力很强，免费用户额度有限。，免费版给了5.5 instance
 
 [Gemini](https://gemini.google.com/app)
 
