@@ -4,7 +4,6 @@ import Cover from '@components/Cover.astro';
 import PostPage from '@components/PostPage.astro';
 import Navi from '@components/control/Navi.astro';
 import BackTop from '@components/control/BackTop.astro';
-import RssFeed from '@components/RssFeed.astro';
 
 import { getBlogEntrySort } from '@utils/content-utils'
 import { siteConfig } from '@/config';
@@ -80,6 +79,5 @@ const updateNotice = latestUpdatedEntry && latestUpdatedEntry.data.updatedDate
   <Cover title={t("cover.title.home")} subTitle={t("cover.subTitle.home")} signatures={coverSignatures} />
     <PostPage page={page} />
     <Navi page={page} />
-    <RssFeed />
     <BackTop />
 </MainPageLayout>
