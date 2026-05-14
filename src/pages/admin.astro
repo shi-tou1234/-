@@ -183,6 +183,10 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
                   </div>
                 </div>
               </div>
+              <div class="flex items-center gap-2 pt-1">
+                <input id="post-pinned" type="checkbox" class="rounded border border-[var(--button-border-color)]" />
+                <label for="post-pinned" class="text-sm cursor-pointer select-none">置顶博客（始终显示在首页第一篇）</label>
+              </div>
             </details>
 
             <div class="flex flex-wrap gap-2 items-center">
@@ -1078,6 +1082,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     if (categoryInput) categoryInput.value = "";
     if (categorySelect instanceof HTMLSelectElement) categorySelect.value = "";
     if (contentInput) contentInput.value = "";
+    const pinnedCheckbox = document.getElementById("post-pinned");
+    if (pinnedCheckbox instanceof HTMLInputElement) pinnedCheckbox.checked = false;
   }
 
   function getSelectedPostSlug() {
@@ -1331,6 +1337,11 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     }
     if (contentInput) contentInput.value = (content || "").trim();
 
+    const pinnedCheckbox = document.getElementById("post-pinned");
+    if (pinnedCheckbox instanceof HTMLInputElement) {
+      pinnedCheckbox.checked = frontmatter.pinned === "true" || frontmatter.pinned === true;
+    }
+
     setMsg(msgEl, `已载入：${slug} (${lang})`);
   }
 
@@ -1539,6 +1550,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const description = (document.getElementById("post-desc")?.value || "").trim();
       const image = (document.getElementById("post-cover")?.value || "").trim();
       const category = (document.getElementById("post-category")?.value || "").trim();
+      const pinnedCheckbox = document.getElementById("post-pinned");
+      const pinned = pinnedCheckbox instanceof HTMLInputElement ? pinnedCheckbox.checked : false;
       const contentInput = document.getElementById("post-content");
       const content = sanitizeMarkdownImageAlt(contentInput?.value || "");
       if (contentInput) contentInput.value = content;
@@ -1562,7 +1575,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         image,
         category,
         slugId: slug,
-        content
+        content,
+        pinned
       });
 
       const path = `src/content/blog/${slug}/${lang}.md`;

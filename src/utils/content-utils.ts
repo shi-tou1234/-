@@ -24,6 +24,9 @@ export async function getBlogEntrySort(
   };
 
   const defaultSort = (a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => {
+    const aPinned = a.data.pinned ? 1 : 0;
+    const bPinned = b.data.pinned ? 1 : 0;
+    if (aPinned !== bPinned) return bPinned - aPinned;
     const timeDiff = b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
     if (timeDiff !== 0) return timeDiff;
     return b.id.localeCompare(a.id);

@@ -264,11 +264,13 @@ export function buildPostMarkdown(data: {
   category: string;
   slugId: string;
   content: string;
+  pinned?: boolean;
 }): string {
   const imageLine = data.image ? `image: ${data.image}\n` : "";
   const categoryLine = data.category ? `category: ${data.category}\n` : "";
   const updatedDateLine = data.updatedDate ? `updatedDate: ${data.updatedDate}\n` : "";
-  return `---\ntitle: ${data.title}\npubDate: ${data.date}\n${updatedDateLine}draft: false\ndescription: ${data.description}\n${imageLine}${categoryLine}slugId: ${data.slugId}\n---\n\n${data.content}\n`;
+  const pinnedLine = data.pinned ? `pinned: true\n` : "";
+  return `---\ntitle: ${data.title}\npubDate: ${data.date}\n${updatedDateLine}draft: false\n${pinnedLine}description: ${data.description}\n${imageLine}${categoryLine}slugId: ${data.slugId}\n---\n\n${data.content}\n`;
 }
 
 export function toIsoDateTime(dateTimeLocalValue: string): string {

@@ -8,6 +8,7 @@ const blogCollection = defineCollection({
         pubDate: z.date(),
         updatedDate: z.date().optional(),
         draft: z.boolean().optional().default(false),
+        pinned: z.boolean().optional().default(false),
         description: z.union([z.string(), z.null()]).optional().transform((value: string | null | undefined) => value ?? ''),
         image: z.union([z.string(), z.null()]).optional().transform((value: string | null | undefined) => value ?? ''),
         category: z.union([z.string(), z.null()]).optional().transform((value: string | null | undefined) => value ?? ''),
