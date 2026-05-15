@@ -26,12 +26,10 @@ const navIndex = getRelativeLocaleUrl(lang, '/');
 const navArchives = getRelativeLocaleUrl(lang, '/archives/');
 const navAbout = getRelativeLocaleUrl(lang, '/about/');
 const navTools = getRelativeLocaleUrl(lang, '/tools/');
-const navLinks = getRelativeLocaleUrl(lang, '/links/');
 const navHomeLabel = isZh ? '首页' : 'Home';
 const navArchiveLabel = isZh ? '归档' : 'Archive';
 const navAboutLabel = isZh ? '关于' : 'About';
 const navToolsLabel = isZh ? '工具栏' : 'Tools';
-const navLinksLabel = isZh ? '链接' : 'Links';
 ---
 
 <Layout title={title} lang={lang}>
@@ -115,10 +113,6 @@ const navLinksLabel = isZh ? '链接' : 'Links';
       <a href={navTools} class="mobile-bottom-nav__link" data-nav-tools>
         <svg class="mobile-bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.6 5.6L3 18v3h3l6.1-6.1a4 4 0 0 0 5.6-5.6l-3-3z"/><path d="M12.5 8.5 16 5"/></svg>
         <span class="mobile-bottom-nav__label">{navToolsLabel}</span>
-      </a>
-      <a href={navLinks} class="mobile-bottom-nav__link" data-nav-links>
-        <svg class="mobile-bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 1 0-7l1-1a5 5 0 0 1 7 7l-1 1"/><path d="M14 11a5 5 0 0 1 0 7l-1 1a5 5 0 0 1-7-7l1-1"/></svg>
-        <span class="mobile-bottom-nav__label">{navLinksLabel}</span>
       </a>
     </nav>
 

@@ -9,6 +9,12 @@ const translation: Translation = {
         tools: "工具栏",
         links: "链接",
     },
+    navTagline: {
+        home: "博客主页",
+        archive: "文章列表",
+        about: "了解更多",
+        tools: "工具与链接",
+    },
     cover: {
         title: {
             home: "欢迎来到 cmchen 的博客",
@@ -24,7 +30,7 @@ const translation: Translation = {
             archive: "共 {count} 篇文章",
             categories: "共 {count} 个分类",
             about: "",
-            tools: "常用工具，快速直达",
+            tools: "常用工具与站点链接，快速直达",
             links: "精选站点，轻松互访",
             page404: "恭喜你发现一片未知的世界，这片世界还处于建设之中，请过段时间再来看看呢！"
         }

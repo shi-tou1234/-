@@ -24,7 +24,6 @@ const indexPage = getRelativeLocaleUrl(currentLang, "/");
 const archivesPage = getRelativeLocaleUrl(currentLang, "/archives/");
 const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
-const linksPage = getRelativeLocaleUrl(currentLang, "/links/");
 ---
 
 <!-- header -->
@@ -48,35 +47,40 @@ const linksPage = getRelativeLocaleUrl(currentLang, "/links/");
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
-            <span class="nav-link-text">{t("header.home")}</span>
+            <div class="nav-link-inner">
+              <span class="nav-link-text">{t("header.home")}</span>
+              <span class="nav-link-tagline">{t("navTagline.home")}</span>
+            </div>
         </a>
       <a href={ archivesPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === archivesPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
-            <span class="nav-link-text">{t("header.archive")}</span>
+            <div class="nav-link-inner">
+              <span class="nav-link-text">{t("header.archive")}</span>
+              <span class="nav-link-tagline">{t("navTagline.archive")}</span>
+            </div>
         </a>
         <a href={ aboutPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === aboutPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
-            <span class="nav-link-text">{t("header.about")}</span>
+            <div class="nav-link-inner">
+              <span class="nav-link-text">{t("header.about")}</span>
+              <span class="nav-link-tagline">{t("navTagline.about")}</span>
+            </div>
         </a>
         <a href={ toolsPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
           Astro.url.pathname === toolsPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
-          <span class="nav-link-text">{t("header.tools")}</span>
-        </a>
-        <a href={ linksPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
-          Astro.url.pathname === linksPage
-            ? 'bg-[var(--button-hover-color)] is-active'
-            : 'hover:bg-[var(--button-hover-color)]'
-          }`}>
-          <span class="nav-link-text">{t("header.links")}</span>
+          <div class="nav-link-inner">
+            <span class="nav-link-text">{t("header.tools")}</span>
+            <span class="nav-link-tagline">{t("navTagline.tools")}</span>
+          </div>
         </a>
       </div>
     </div>
@@ -164,12 +168,6 @@ const linksPage = getRelativeLocaleUrl(currentLang, "/links/");
                       ? 'bg-[var(--button-hover-color)]' 
                       : 'hover:bg-[var(--button-hover-color)]'
                   }`}>{t("header.tools")}</a>
-
-                  <a href={ linksPage } class={`mx-2 my-1 p-2 text-sm rounded ${
-                    Astro.url.pathname === linksPage 
-                      ? 'bg-[var(--button-hover-color)]' 
-                      : 'hover:bg-[var(--button-hover-color)]'
-                  }`}>{t("header.links")}</a>
                 </div>
               </div>
         </div>
@@ -273,6 +271,26 @@ const linksPage = getRelativeLocaleUrl(currentLang, "/links/");
 .nav-link-item:focus-visible .nav-link-text,
 .nav-link-item.is-active .nav-link-text {
   color: inherit;
+}
+
+.nav-link-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+}
+
+.nav-link-tagline {
+  font-size: 0.65rem;
+  font-weight: 400;
+  opacity: 0.55;
+  letter-spacing: 0.02em;
+  transition: opacity 0.24s ease;
+}
+
+.nav-link-item:hover .nav-link-tagline,
+.nav-link-item.is-active .nav-link-tagline {
+  opacity: 0.8;
 }
 
 .header-slice-text {

@@ -7,6 +7,12 @@ export interface Translation {
         tools: string;
         links: string;
     };
+    navTagline: {
+        home: string;
+        archive: string;
+        about: string;
+        tools: string;
+    };
     cover: {
         title: {
             home: string;

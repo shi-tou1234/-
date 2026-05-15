@@ -7,7 +7,7 @@ export async function getStaticPaths() {
 }
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
-const targetUrl = getRelativeLocaleUrl(currentLang, '/links/');
+const targetUrl = getRelativeLocaleUrl(currentLang, '/tools/');
 ---
 <!doctype html>
 <html lang={currentLang}>
@@ -15,9 +15,9 @@ const targetUrl = getRelativeLocaleUrl(currentLang, '/links/');
     <meta charset="utf-8" />
     <meta http-equiv="refresh" content={`0; url=${targetUrl}`} />
     <link rel="canonical" href={targetUrl} />
-    <title>Links</title>
+    <title>Tools</title>
   </head>
   <body>
-    <p><a href={targetUrl}>Continue to links</a></p>
+    <p><a href={targetUrl}>Continue to tools</a></p>
   </body>
 </html>

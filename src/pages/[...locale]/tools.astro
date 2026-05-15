@@ -1,10 +1,10 @@
 ---
 import MainPageLayout from '@layouts/MainPageLayout.astro'
 import Cover from '@components/Cover.astro'
-import Toolbar from '@components/Toolbar.astro';
-import type { ToolbarItem } from '@components/Toolbar.astro';
+import NavCard from '@components/NavCard.astro';
+import type { NavCardItem } from '@components/NavCard.astro';
 
-import { siteConfig } from '@/config'
+import { siteConfig, friendLinkConfig } from '@/config'
 import i18nit from '@i18n/translation'
 
 import { i18n } from "astro:config/client";
@@ -15,21 +15,38 @@ export async function getStaticPaths() {
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
+const isZh = currentLang === 'zh-cn';
 
 const pageTitle = t("header.tools") + " - " + siteConfig.title;
 
-const toolLinks: ToolbarItem[] = [
+const navCards: NavCardItem[] = [
   {
-    name: currentLang === 'zh-cn' ? '真值表' : 'Truth Table',
+    name: isZh ? '真值表' : 'Truth Table',
     url: 'https://shi-tou1234.github.io/zhenzhibiao',
     icon: 'fa6-solid:table',
-    description: currentLang === 'zh-cn' ? '逻辑真值表生成工具' : 'Logic truth table generator',
+    description: isZh ? '逻辑真值表生成工具，支持多种逻辑运算' : 'Logic truth table generator with multiple operations',
+    gradient: 'linear-gradient(-45deg, #667eea 0%, #764ba2 100%)',
   },
   {
-    name: currentLang === 'zh-cn' ? '在线计算' : 'Calculator',
+    name: isZh ? '在线计算' : 'Calculator',
     url: 'https://shi-tou1234.github.io/jisuan/',
     icon: 'fa6-solid:calculator',
-    description: currentLang === 'zh-cn' ? '在线计算工具' : 'Online calculator',
+    description: isZh ? '多功能在线计算工具，便捷实用' : 'Multi-function online calculator, convenient and practical',
+    gradient: 'linear-gradient(-45deg, #11998e 0%, #38ef7d 100%)',
+  },
+  {
+    name: 'GitHub',
+    url: 'https://github.com/shi-tou1234',
+    icon: 'fa6-brands:github',
+    description: isZh ? '我的 GitHub 主页，开源项目与代码' : 'My GitHub profile, open source projects',
+    gradient: 'linear-gradient(-45deg, #434343 0%, #1a1a1a 100%)',
+  },
+  {
+    name: 'Gitee',
+    url: 'https://gitee.com/cmchen1234',
+    icon: 'simple-icons:gitee',
+    description: isZh ? '我的 Gitee 主页，国内代码托管平台' : 'My Gitee profile, domestic code hosting',
+    gradient: 'linear-gradient(-45deg, #f83600 0%, #f9d423 100%)',
   },
 ];
 ---
@@ -38,6 +55,18 @@ const toolLinks: ToolbarItem[] = [
     <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
         <Cover title={t("cover.title.tools")} subTitle={t("cover.subTitle.tools")} />
 
-        <Toolbar items={toolLinks} />
+        <div class="nav-card-grid">
+            {navCards.map((card) => <NavCard item={card} />)}
+        </div>
     </div>
 </MainPageLayout>
+
+<style is:global>
+  .nav-card-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 1rem 1rem 2rem;
+  }
+</style>
