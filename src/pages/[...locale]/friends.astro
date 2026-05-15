@@ -2,7 +2,8 @@
 import MainPageLayout from '@layouts/MainPageLayout.astro'
 import { siteConfig, friendLinkConfig } from '@/config'
 import Cover from '@components/Cover.astro';
-import { Icon } from "astro-icon/components";
+import Toolbar from '@components/Toolbar.astro';
+import type { ToolbarItem } from '@components/Toolbar.astro';
 
 import i18nit from '@i18n/translation';
 
@@ -14,59 +15,56 @@ export async function getStaticPaths() {
 
 const currentLang = Astro.currentLocale || i18n!.defaultLocale;
 const t = i18nit(currentLang);
+const isZh = currentLang === 'zh-cn';
 
 const pageTitle = t("header.friends") + " - " + siteConfig.title;
+
+const toolLinks: ToolbarItem[] = [
+  {
+    name: isZh ? '真值表' : 'Truth Table',
+    url: 'https://shi-tou1234.github.io/zhenzhibiao',
+    icon: 'fa6-solid:table',
+    description: isZh ? '逻辑真值表生成工具' : 'Logic truth table generator',
+  },
+  {
+    name: isZh ? '在线计算' : 'Calculator',
+    url: 'https://shi-tou1234.github.io/jisuan/',
+    icon: 'fa6-solid:calculator',
+    description: isZh ? '在线计算工具' : 'Online calculator',
+  },
+];
+
+const friendItems: ToolbarItem[] = friendLinkConfig.map((friend) => {
+  let iconName = 'fa6-solid:link';
+  try {
+    const friendUrl = new URL(friend.url);
+    if (/(^|\.)github\.com$/i.test(friendUrl.hostname)) {
+      iconName = 'fa6-brands:github';
+    } else if (/(^|\.)gitee\.com$/i.test(friendUrl.hostname)) {
+      iconName = 'simple-icons:gitee';
+    }
+  } catch {
+    iconName = 'fa6-solid:link';
+  }
+  return {
+    name: friend.name,
+    url: friend.url,
+    icon: iconName,
+    description: friend.description,
+  };
+});
+
+const toolbarItems: ToolbarItem[] = [...toolLinks, ...friendItems];
+
+const toolbarHint = isZh
+  ? '常用工具与友链，点击即可访问'
+  : 'Tools & Friends, click to visit';
 ---
 
 <MainPageLayout title={pageTitle} lang={currentLang}>
     <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
         <Cover title={t("cover.title.friends")} subTitle={t("cover.subTitle.friends")} />
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-[var(--text-color)]">
-            {
-                friendLinkConfig.map((friend) => {
-                    let platform = '';
-                    let iconName = '';
-                    try {
-                        const friendUrl = new URL(friend.url);
-                        if (/(^|\.)github\.com$/i.test(friendUrl.hostname)) {
-                            platform = 'GitHub';
-                            iconName = 'fa6-brands:github';
-                        } else if (/(^|\.)gitee\.com$/i.test(friendUrl.hostname)) {
-                            platform = 'Gitee';
-                            iconName = 'simple-icons:gitee';
-                        }
-                    } catch {
-                        platform = '';
-                        iconName = '';
-                    }
 
-                    return (
-                        <a 
-                            href={friend.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            class="flex items-center p-4 border border-[var(--button-border-color)] rounded-lg shadow-sm active:bg-[var(--button-hover-color)] hover:bg-[var(--button-hover-color)] transition-all duration-300 hover:scale-105"
-                        >
-                            <img 
-                                src={friend.avatar} 
-                                alt={friend.name} 
-                                class="w-16 h-16 rounded-full object-cover mr-4"
-                                onerror="this.src='https://www.gravatar.com/avatar/?d=mp'"
-                            />
-                            <div class="flex-1 min-w-0">
-                                <h2 class="font-bold text-lg truncate flex items-center gap-2">
-                                                                    {iconName && <Icon name={iconName} class="w-4 h-4 shrink-0" />}
-                                  <span class="truncate">{friend.name}</span>
-                                                                    {platform && <span class="text-xs text-[var(--text-color)]/55">{platform}</span>}
-                                </h2>
-                                <p class="text-[var(--text-color)]/60 text-sm">{friend.description}</p>
-                            </div>
-                        </a>
-                    )
-                })
-            }
-        </div>
-        
+        <Toolbar items={toolbarItems} hint={toolbarHint} />
     </div>
 </MainPageLayout>
