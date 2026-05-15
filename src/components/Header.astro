@@ -47,40 +47,28 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
-            <div class="nav-link-inner">
-              <span class="nav-link-text">{t("header.home")}</span>
-              <span class="nav-link-tagline">{t("navTagline.home")}</span>
-            </div>
+            <span class="nav-link-text">{t("header.home")}</span>
         </a>
       <a href={ archivesPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === archivesPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
-            <div class="nav-link-inner">
-              <span class="nav-link-text">{t("header.archive")}</span>
-              <span class="nav-link-tagline">{t("navTagline.archive")}</span>
-            </div>
+            <span class="nav-link-text">{t("header.archive")}</span>
         </a>
         <a href={ aboutPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === aboutPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
-            <div class="nav-link-inner">
-              <span class="nav-link-text">{t("header.about")}</span>
-              <span class="nav-link-tagline">{t("navTagline.about")}</span>
-            </div>
+            <span class="nav-link-text">{t("header.about")}</span>
         </a>
         <a href={ toolsPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
           Astro.url.pathname === toolsPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
-          <div class="nav-link-inner">
-            <span class="nav-link-text">{t("header.tools")}</span>
-            <span class="nav-link-tagline">{t("navTagline.tools")}</span>
-          </div>
+          <span class="nav-link-text">{t("header.tools")}</span>
         </a>
       </div>
     </div>
@@ -247,13 +235,11 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
 }
 
 .nav-link-item:hover,
-.nav-link-item:focus-visible,
 .nav-link-item.is-active {
   color: var(--link-color);
 }
 
 .nav-link-item:hover::before,
-.nav-link-item:focus-visible::before,
 .nav-link-item.is-active::before {
   transform: scaleX(1);
 }
@@ -268,29 +254,8 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
 }
 
 .nav-link-item:hover .nav-link-text,
-.nav-link-item:focus-visible .nav-link-text,
 .nav-link-item.is-active .nav-link-text {
   color: inherit;
-}
-
-.nav-link-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1.2;
-}
-
-.nav-link-tagline {
-  font-size: 0.65rem;
-  font-weight: 400;
-  opacity: 0.55;
-  letter-spacing: 0.02em;
-  transition: opacity 0.24s ease;
-}
-
-.nav-link-item:hover .nav-link-tagline,
-.nav-link-item.is-active .nav-link-tagline {
-  opacity: 0.8;
 }
 
 .header-slice-text {
