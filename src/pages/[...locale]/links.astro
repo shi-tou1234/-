@@ -1,0 +1,48 @@
+---
+import MainPageLayout from '@layouts/MainPageLayout.astro'
+import Cover from '@components/Cover.astro'
+import Toolbar from '@components/Toolbar.astro';
+import type { ToolbarItem } from '@components/Toolbar.astro';
+
+import { siteConfig, friendLinkConfig } from '@/config'
+import i18nit from '@i18n/translation'
+
+import { i18n } from "astro:config/client";
+
+export async function getStaticPaths() {
+	return i18n?.locales.map(locale => ({ params: { locale: locale == i18n?.defaultLocale ? undefined : (locale as string) } }));
+}
+
+const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const t = i18nit(currentLang);
+
+const pageTitle = t("header.links") + " - " + siteConfig.title;
+
+const linkItems: ToolbarItem[] = friendLinkConfig.map((friend) => {
+  let iconName = 'fa6-solid:link';
+  try {
+    const friendUrl = new URL(friend.url);
+    if (/(^|\.)github\.com$/i.test(friendUrl.hostname)) {
+      iconName = 'fa6-brands:github';
+    } else if (/(^|\.)gitee\.com$/i.test(friendUrl.hostname)) {
+      iconName = 'simple-icons:gitee';
+    }
+  } catch {
+    iconName = 'fa6-solid:link';
+  }
+  return {
+    name: friend.name,
+    url: friend.url,
+    icon: iconName,
+    description: friend.description,
+  };
+});
+---
+
+<MainPageLayout title={pageTitle} lang={currentLang}>
+    <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
+        <Cover title={t("cover.title.links")} subTitle={t("cover.subTitle.links")} />
+
+        <Toolbar items={linkItems} />
+    </div>
+</MainPageLayout>

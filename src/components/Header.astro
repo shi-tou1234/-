@@ -22,8 +22,9 @@ const showLanguageSwitcher = locales.length > 1;
 
 const indexPage = getRelativeLocaleUrl(currentLang, "/");
 const archivesPage = getRelativeLocaleUrl(currentLang, "/archives/");
-const friendsPage = getRelativeLocaleUrl(currentLang, "/friends/");
 const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
+const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
+const linksPage = getRelativeLocaleUrl(currentLang, "/links/");
 ---
 
 <!-- header -->
@@ -56,19 +57,26 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
             }`}>
             <span class="nav-link-text">{t("header.archive")}</span>
         </a>
-      <a href={ aboutPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
+        <a href={ aboutPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === aboutPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
             <span class="nav-link-text">{t("header.about")}</span>
         </a>
-      <a href={ friendsPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
-            Astro.url.pathname === friendsPage
+        <a href={ toolsPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
+          Astro.url.pathname === toolsPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
             }`}>
-            <span class="nav-link-text">{t("header.friends")}</span>
+          <span class="nav-link-text">{t("header.tools")}</span>
+        </a>
+        <a href={ linksPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
+          Astro.url.pathname === linksPage
+            ? 'bg-[var(--button-hover-color)] is-active'
+            : 'hover:bg-[var(--button-hover-color)]'
+          }`}>
+          <span class="nav-link-text">{t("header.links")}</span>
         </a>
       </div>
     </div>
@@ -150,12 +158,18 @@ const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
                       ? 'bg-[var(--button-hover-color)]' 
                       : 'hover:bg-[var(--button-hover-color)]'
                   }`}>{t("header.about")}</a>
-                  
-                  <a href={ friendsPage } class={`mx-2 my-1 p-2 text-sm rounded ${
-                    Astro.url.pathname === friendsPage 
+
+                  <a href={ toolsPage } class={`mx-2 my-1 p-2 text-sm rounded ${
+                    Astro.url.pathname === toolsPage 
                       ? 'bg-[var(--button-hover-color)]' 
                       : 'hover:bg-[var(--button-hover-color)]'
-                  }`}>{t("header.friends")}</a>
+                  }`}>{t("header.tools")}</a>
+
+                  <a href={ linksPage } class={`mx-2 my-1 p-2 text-sm rounded ${
+                    Astro.url.pathname === linksPage 
+                      ? 'bg-[var(--button-hover-color)]' 
+                      : 'hover:bg-[var(--button-hover-color)]'
+                  }`}>{t("header.links")}</a>
                 </div>
               </div>
         </div>

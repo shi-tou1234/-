@@ -1,0 +1,43 @@
+---
+import MainPageLayout from '@layouts/MainPageLayout.astro'
+import Cover from '@components/Cover.astro'
+import Toolbar from '@components/Toolbar.astro';
+import type { ToolbarItem } from '@components/Toolbar.astro';
+
+import { siteConfig } from '@/config'
+import i18nit from '@i18n/translation'
+
+import { i18n } from "astro:config/client";
+
+export async function getStaticPaths() {
+	return i18n?.locales.map(locale => ({ params: { locale: locale == i18n?.defaultLocale ? undefined : (locale as string) } }));
+}
+
+const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const t = i18nit(currentLang);
+
+const pageTitle = t("header.tools") + " - " + siteConfig.title;
+
+const toolLinks: ToolbarItem[] = [
+  {
+    name: currentLang === 'zh-cn' ? '真值表' : 'Truth Table',
+    url: 'https://shi-tou1234.github.io/zhenzhibiao',
+    icon: 'fa6-solid:table',
+    description: currentLang === 'zh-cn' ? '逻辑真值表生成工具' : 'Logic truth table generator',
+  },
+  {
+    name: currentLang === 'zh-cn' ? '在线计算' : 'Calculator',
+    url: 'https://shi-tou1234.github.io/jisuan/',
+    icon: 'fa6-solid:calculator',
+    description: currentLang === 'zh-cn' ? '在线计算工具' : 'Online calculator',
+  },
+];
+---
+
+<MainPageLayout title={pageTitle} lang={currentLang}>
+    <div class="relative z-10 mx-auto w-full max-w-[var(--page-width)]">
+        <Cover title={t("cover.title.tools")} subTitle={t("cover.subTitle.tools")} />
+
+        <Toolbar items={toolLinks} />
+    </div>
+</MainPageLayout>

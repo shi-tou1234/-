@@ -6,7 +6,8 @@ const translation: Translation = {
         archive: "Archive",
         categories: "Categories",
         about: "About",
-        friends: "Friends",
+        tools: "Tools",
+        links: "Links",
     },
     cover: {
         title: {
@@ -14,7 +15,8 @@ const translation: Translation = {
             archive: "Archive",
             categories: "Categories",
             about: "About",
-            friends: "Friends",
+            tools: "Tools",
+            links: "Links",
             page404: "Secret",
         },
         subTitle: {
@@ -22,7 +24,8 @@ const translation: Translation = {
             archive: "Total of {count} articles",
             categories: "Total {count} categories",
             about: "",
-            friends: "Interesting Souls",
+            tools: "Quick access to useful tools",
+            links: "Curated sites for easy visits",
             page404: "Congratulations on finding a new world, this world is still under construction, please wait a bit longer."
         }
     },

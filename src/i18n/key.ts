@@ -4,7 +4,8 @@ export interface Translation {
         archive: string;
         categories: string;
         about: string;
-        friends: string;
+        tools: string;
+        links: string;
     };
     cover: {
         title: {
@@ -12,7 +13,8 @@ export interface Translation {
             archive: string;
             categories: string;
             about: string;
-            friends: string;
+            tools: string;
+            links: string;
             page404: string;
         };
         subTitle: {
@@ -20,7 +22,8 @@ export interface Translation {
             archive: string;
             categories: string;
             about: string;
-            friends: string;
+            tools: string;
+            links: string;
             page404: string;
         };
     };

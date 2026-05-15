@@ -1,4 +1,4 @@
-# Friend Links
+# Links
 
 You can submit an [`Issue`](https://github.com/Motues/motues.github.io/issues/1) using the format below to add a partner link.
 ```typescript

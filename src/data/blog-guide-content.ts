@@ -15,7 +15,7 @@ const blogGuideContent: BlogGuideContent = {
     subtitle: "首次访问自动弹出；你可以随时通过右上角问号按钮重新打开。",
     items: [
       "首页更新提示：发布新内容或更新旧文后，首页会弹出一次更新通知，可直达最新文章。",
-      "顶部导航：快速进入首页、归档、分类、关于、友链，移动端可通过菜单操作。",
+      "顶部导航：快速进入首页、归档、关于、工具栏、链接，移动端可通过菜单操作。",
       "全站搜索：支持标题与正文关键词检索，快捷键 / 或 Ctrl/Cmd + K 可快速唤起。",
       "主题与偏好：支持亮色/暗色主题切换，本地自动记忆你的选择。",
       "正文阅读：支持双击正文进入全屏阅读，再次双击退出；适合沉浸式长文阅读。",
@@ -29,7 +29,7 @@ const blogGuideContent: BlogGuideContent = {
     subtitle: "Shown automatically on first visit. Reopen anytime with the top-right help button.",
     items: [
       "Homepage update notice: after new posts or revisions, a one-time popup helps you jump to the latest update.",
-      "Top navigation: quickly access Home, Archives, Categories, About, and Friends, with mobile menu support.",
+      "Top navigation: quickly access Home, Archives, About, Tools, and Links, with mobile menu support.",
       "Global search: find content by title or body keywords, and open instantly with / or Ctrl/Cmd + K.",
       "Theme and preferences: switch between light/dark themes; your preference is stored locally.",
       "Article reading: double-click the main text to enter fullscreen reading, and double-click again to exit.",
