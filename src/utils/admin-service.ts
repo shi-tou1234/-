@@ -145,7 +145,13 @@ export function parseToolsLinksFromTs(content: string) {
     /const\s+toolsLinks:\s*ToolLink\[\]\s*=\s*(\[[\s\S]*?\])\s*\n\s*export\s+default\s+toolsLinks/,
   );
   if (!matched?.[1]) throw new Error("无法解析工具链接文件");
-  return JSON.parse(matched[1]);
+  const raw = matched[1];
+
+  const normalized = raw
+    .replace(/([\{,]\s*)([A-Za-z_$][A-Za-z0-9_$-]*)(\s*:)/g, '$1"$2"$3')
+    .replace(/,\s*([}\]])/g, '$1');
+
+  return JSON.parse(normalized);
 }
 
 export function buildToolsLinksTs(toolsLinks: unknown[]): string {
@@ -157,7 +163,10 @@ export function parseHeaderContactFromTs(content: string) {
     /const\s+headerContact:\s*HeaderContact\s*=\s*(\{[\s\S]*?\})\s*\n\s*export\s+default\s+headerContact/,
   );
   if (!matched?.[1]) throw new Error("无法解析联系方式文件");
-  return JSON.parse(matched[1]);
+  const raw = matched[1]
+    .replace(/([\{,]\s*)([A-Za-z_$][A-Za-z0-9_$-]*)(\s*:)/g, '$1"$2"$3')
+    .replace(/,\s*([}\]])/g, '$1');
+  return JSON.parse(raw);
 }
 
 export function buildHeaderContactTs(contact: {
@@ -207,7 +216,10 @@ export function parseAboutProfileFromTs(content: string) {
     /const\s+aboutProfile:\s*AboutProfile\s*=\s*(\{[\s\S]*?\})\s*\n\s*export\s+default\s+aboutProfile/,
   );
   if (!matched?.[1]) throw new Error("无法解析关于特质文件");
-  return JSON.parse(matched[1]);
+  const raw = matched[1]
+    .replace(/([\{,]\s*)([A-Za-z_$][A-Za-z0-9_$-]*)(\s*:)/g, '$1"$2"$3')
+    .replace(/,\s*([}\]])/g, '$1');
+  return JSON.parse(raw);
 }
 
 export function buildAboutProfileTs(profile: {
