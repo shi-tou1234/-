@@ -5,13 +5,6 @@ export interface Translation {
         categories: string;
         about: string;
         tools: string;
-        links: string;
-    };
-    navTagline: {
-        home: string;
-        archive: string;
-        about: string;
-        tools: string;
     };
     cover: {
         title: {
@@ -20,17 +13,12 @@ export interface Translation {
             categories: string;
             about: string;
             tools: string;
-            links: string;
-            page404: string;
         };
         subTitle: {
             home: string;
             archive: string;
-            categories: string;
             about: string;
             tools: string;
-            links: string;
-            page404: string;
         };
     };
     toc:string;

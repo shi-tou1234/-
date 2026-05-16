@@ -296,15 +296,15 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
           <div class="rounded border border-[var(--button-border-color)] p-4">
             <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-              <div class="text-sm font-semibold">友链（JSON）</div>
+              <div class="text-sm font-semibold">工具链接（JSON）</div>
               <div class="flex flex-wrap items-center gap-2">
-                <button id="insert-friend-template-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">一键插入格式</button>
-                <button id="load-friends-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
-                <button id="save-friends-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
+                <button id="insert-tools-link-template-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">一键插入格式</button>
+                <button id="load-tools-links-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
+                <button id="save-tools-links-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
               </div>
             </div>
-            <textarea id="friends-content" class="w-full min-h-[180px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder='请输入 JSON 数组，例如：[{"name":"GitHub","avatar":"...","url":"...","description":"..."}]'></textarea>
-            <p id="friends-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
+            <textarea id="tools-links-content" class="w-full min-h-[180px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder='请输入 JSON 数组，例如：[{"name":"工具名","url":"https://...","icon":"fa6-solid:table","description":"工具描述"}]'></textarea>
+            <p id="tools-links-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
           </div>
 
           <div class="rounded border border-[var(--button-border-color)] p-4">
@@ -377,6 +377,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     buildAboutPersonalTs,
     buildAboutProfileTs,
     buildFriendLinksTs,
+    buildToolsLinksTs,
     buildBlogGuideContentTs,
     buildHeaderContactTs,
     buildPostMarkdown,
@@ -386,6 +387,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     parseAboutPersonalFromTs,
     parseAboutProfileFromTs,
     parseFriendLinksFromTs,
+    parseToolsLinksFromTs,
     parseBlogGuideContentFromTs,
     parseHeaderContactFromTs,
     toIsoDateTime
@@ -1838,25 +1840,25 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
   
 
-  document.getElementById("insert-friend-template-btn")?.addEventListener("click", () => {
-    const msgEl = document.getElementById("friends-msg");
+  document.getElementById("insert-tools-link-template-btn")?.addEventListener("click", () => {
+    const msgEl = document.getElementById("tools-links-msg");
     try {
-      const textarea = document.getElementById("friends-content");
+      const textarea = document.getElementById("tools-links-content");
       const raw = (textarea?.value || "[]").trim();
       const links = raw ? JSON.parse(raw) : [];
-      if (!Array.isArray(links)) throw new Error("友链内容必须是 JSON 数组");
+      if (!Array.isArray(links)) throw new Error("工具链接内容必须是 JSON 数组");
 
       links.push({
-        name: "示例站点名称",
-        avatar: "https://example.com/avatar.png",
+        name: "示例工具名",
         url: "https://example.com",
-        description: "请填写一句话站点描述"
+        icon: "fa6-solid:link",
+        description: "请填写工具描述"
       });
 
       if (textarea) {
         textarea.value = JSON.stringify(links, null, 2);
       }
-      setMsg(msgEl, "已插入友链模板，请修改后点击保存");
+      setMsg(msgEl, "已插入工具链接模板，请修改后点击保存");
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }
@@ -1914,50 +1916,50 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     }
   });
 
-  document.getElementById("load-friends-btn")?.addEventListener("click", async () => {
-    const msgEl = document.getElementById("friends-msg");
+  document.getElementById("load-tools-links-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("tools-links-msg");
     try {
       const token = getToken();
       const branch = getBranch();
       if (!token) throw new Error("请先填写 GitHub Token");
 
-      const path = "src/data/friend-links.ts";
+      const path = "src/data/tools-links.ts";
       const meta = await getFileMeta(path, token, branch);
       const content = decodeFileContent(meta?.content || "");
-      const links = parseFriendLinksFromTs(content);
-      document.getElementById("friends-content").value = JSON.stringify(links, null, 2);
-      setMsg(msgEl, "友链加载成功");
+      const links = parseToolsLinksFromTs(content);
+      document.getElementById("tools-links-content").value = JSON.stringify(links, null, 2);
+      setMsg(msgEl, "工具链接加载成功");
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }
   });
 
-  document.getElementById("save-friends-btn")?.addEventListener("click", async () => {
-    const msgEl = document.getElementById("friends-msg");
+  document.getElementById("save-tools-links-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("tools-links-msg");
     try {
       const token = getToken();
       const branch = getBranch();
-      const raw = document.getElementById("friends-content")?.value || "[]";
+      const raw = document.getElementById("tools-links-content")?.value || "[]";
       if (!token) throw new Error("请先填写 GitHub Token");
 
       const links = JSON.parse(raw);
-      if (!Array.isArray(links)) throw new Error("友链内容必须是 JSON 数组");
+      if (!Array.isArray(links)) throw new Error("工具链接内容必须是 JSON 数组");
 
       links.forEach((item, index) => {
         if (
           typeof item?.name !== "string" ||
-          typeof item?.avatar !== "string" ||
           typeof item?.url !== "string" ||
+          typeof item?.icon !== "string" ||
           typeof item?.description !== "string"
         ) {
-          throw new Error(`第 ${index + 1} 条友链格式不正确`);
+          throw new Error(`第 ${index + 1} 条工具链接格式不正确`);
         }
       });
 
-      const path = "src/data/friend-links.ts";
-      const content = buildFriendLinksTs(links);
-      await upsertFile(path, content, "friends: update links", token, branch);
-      setMsg(msgEl, "友链保存成功");
+      const path = "src/data/tools-links.ts";
+      const content = buildToolsLinksTs(links);
+      await upsertFile(path, content, "tools: update links", token, branch);
+      setMsg(msgEl, "工具链接保存成功");
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }

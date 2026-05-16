@@ -4,9 +4,6 @@ import type {
     LicenseConfig
 } from "./types/config"
 
-import type { FriendLink } from "./types/friend"
-import friendLinks from "./data/friend-links"
-
 export const siteConfig: SiteConfig = {
     title: "cmchen的博客",
     subTitle: "记录技术与生活",
@@ -32,5 +29,3 @@ export const licenseConfig: LicenseConfig = {
 	name: "CC BY-NC-SA 4.0",
 	url: "https://creativecommons.org/licenses/by-nc-sa/4.0/",
 };
-
-export const friendLinkConfig: FriendLink[] = friendLinks

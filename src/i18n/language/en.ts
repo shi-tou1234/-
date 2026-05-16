@@ -7,13 +7,6 @@ const translation: Translation = {
         categories: "Categories",
         about: "About",
         tools: "Tools",
-        links: "Links",
-    },
-    navTagline: {
-        home: "Blog Home",
-        archive: "All Posts",
-        about: "About Me",
-        tools: "Tools & Links",
     },
     cover: {
         title: {
@@ -22,17 +15,12 @@ const translation: Translation = {
             categories: "Categories",
             about: "About",
             tools: "Tools",
-            links: "Links",
-            page404: "Secret",
         },
         subTitle: {
             home: "Life is colorful!",
             archive: "Total of {count} articles",
-            categories: "Total {count} categories",
             about: "",
             tools: "Quick access to useful tools and site links",
-            links: "Curated sites for easy visits",
-            page404: "Congratulations on finding a new world, this world is still under construction, please wait a bit longer."
         }
     },
     toc: "Contents",
