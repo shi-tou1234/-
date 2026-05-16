@@ -42,13 +42,6 @@ const toolsLinks: ToolLink[] = [
     description: "在线 Markdown 编辑与实时预览工具",
     color: "linear-gradient(-45deg, hsl(260, 25%, 56%) 0%, hsl(300, 22%, 52%) 100%)",
   },
-  {
-    name: "Markdown 预览器",
-    url: "https://shi-tou1234.github.io/yulan/",
-    icon: "fa6-solid:file-lines",
-    description: "在线 Markdown 编辑与实时预览工具",
-    color: "linear-gradient(-45deg, hsl(210, 45%, 48%) 0%, hsl(270, 40%, 42%) 100%)",
-  },
 ]
 
 export default toolsLinks
