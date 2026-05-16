@@ -233,6 +233,31 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         <h2 class="text-xl font-semibold mb-4">站点内容设置</h2>
 
         <div class="space-y-4">
+          <div class="rounded border border-[var(--button-border-color)] p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <div class="text-sm font-semibold">关于页面介绍文本（Markdown）</div>
+              <div class="flex flex-wrap items-center gap-2">
+                <select id="about-lang" class="rounded border border-[var(--button-border-color)] bg-transparent px-2 py-1.5 text-sm">
+                  <option value="zh-cn">中文（zh-cn）</option>
+                  <option value="en">English（en）</option>
+                </select>
+                <button id="load-about-markdown-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
+                <button id="save-about-markdown-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
+                <button id="preview-about-markdown-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">实时预览</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <div>
+                <textarea id="about-markdown-content" class="w-full min-h-[220px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2 font-mono text-sm" placeholder="在此编辑关于页面的介绍文本（支持 Markdown 语法）"></textarea>
+              </div>
+              <div id="about-markdown-preview" class="hidden rounded border border-[var(--button-border-color)] bg-[var(--bg-color)]/50 px-4 py-3 overflow-auto max-h-[300px]">
+                <div id="about-markdown-preview-content" class="markdown-content text-sm"></div>
+              </div>
+            </div>
+            <p class="text-xs mt-1 text-[var(--text-color)]/60">编辑的是关于页面顶部介绍区域的文本内容，支持 Markdown 语法。修改后需重新构建站点才能在前台看到更新。</p>
+            <p id="about-markdown-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
+          </div>
+
           <TravelMap editable={true} visitedCities={[]} storageInputId="about-personal-travel-cities" />
           <input type="hidden" id="about-personal-travel-cities" value="[]" />
               
@@ -1678,12 +1703,39 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const lang = (document.getElementById("about-lang")?.value || "zh-cn").trim();
       if (!token) throw new Error("请先填写 GitHub Token");
 
-      const content = document.getElementById("about-markdown-content")?.value || "";
+      const content = (document.getElementById("about-markdown-content")?.value || "").trim();
+      if (!content) throw new Error("内容不能为空，请输入关于页面的介绍文本");
+
       const path = `${ABOUT_SPEC_PATH_PREFIX}/${lang}.md`;
-      await upsertFile(path, content, `about: update markdown ${lang}`, token, branch);
+      await upsertFile(path, content + "\n", `about: update markdown ${lang}`, token, branch);
       setMsg(msgEl, `已保存 ${lang} 文本`);
     } catch (error) {
       setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("preview-about-markdown-btn")?.addEventListener("click", async () => {
+    const previewWrap = document.getElementById("about-markdown-preview");
+    const previewContent = document.getElementById("about-markdown-preview-content");
+    const content = (document.getElementById("about-markdown-content")?.value || "").trim();
+
+    if (!content) {
+      setMsg(document.getElementById("about-markdown-msg"), "请先输入内容后再预览", true);
+      return;
+    }
+
+    if (previewWrap && previewContent) {
+      previewWrap.classList.remove("hidden");
+      try {
+        const { marked } = await import("https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/lib/marked.esm.js");
+        const { default: DOMPurify } = await import("https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js");
+        const rawHtml = marked.parse(content);
+        previewContent.innerHTML = DOMPurify.sanitize(rawHtml);
+        setMsg(document.getElementById("about-markdown-msg"), "预览已更新");
+      } catch {
+        previewContent.textContent = content;
+        setMsg(document.getElementById("about-markdown-msg"), "Markdown 渲染库加载失败，显示纯文本预览");
+      }
     }
   });
 
