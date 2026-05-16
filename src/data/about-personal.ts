@@ -122,6 +122,10 @@ const aboutPersonal: AboutPersonal = {
     {
       "date": "2026.5.10",
       "content": "提升移动端体验，修复一系列bug，博客文章卡片增加封面图"
+    },
+    {
+      "date": "2026.5.15",
+      "content": "修改友链为工具栏，修改卡片样式，增加博客置顶功能"
     }
   ],
   "musicTracks": [
