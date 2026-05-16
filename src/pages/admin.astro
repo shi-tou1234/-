@@ -344,8 +344,25 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
                 <textarea id="blog-guide-en-items" class="w-full min-h-[140px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="One item per line"></textarea>
               </div>
             </div>
-            <p class="text-xs mt-2 text-[var(--text-color)]/65">提示：列表项按“每行一条”填写，保存后前台弹窗实时使用该内容。</p>
+            <p class="text-xs mt-2 text-[var(--text-color)]/65">提示：列表项按"每行一条"填写，保存后前台弹窗实时使用该内容。</p>
             <p id="blog-guide-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
+          </div>
+
+          <div class="rounded border border-[var(--button-border-color)] p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <div class="text-sm font-semibold">关于页面 Markdown 正文</div>
+              <div class="flex flex-wrap items-center gap-2">
+                <select id="about-lang" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-1.5 text-sm">
+                  <option value="zh-cn">中文（zh-cn）</option>
+                  <option value="en">English（en）</option>
+                </select>
+                <button id="load-about-markdown-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">加载</button>
+                <button id="save-about-markdown-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
+              </div>
+            </div>
+            <textarea id="about-markdown-content" class="w-full min-h-[280px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="关于页面的 Markdown 正文内容"></textarea>
+            <p class="text-xs mt-2 text-[var(--text-color)]/65">提示：编辑的是关于页面的正文 Markdown，支持标题、段落、列表等标准 Markdown 语法。切换语言可分别编辑中英文版本。</p>
+            <p id="about-markdown-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
           </div>
         </div>
       </div>
