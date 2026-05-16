@@ -303,7 +303,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
                 <button id="save-tools-links-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 hover:bg-[var(--button-hover-color)]">保存</button>
               </div>
             </div>
-            <textarea id="tools-links-content" class="w-full min-h-[180px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder='请输入 JSON 数组，例如：[{"name":"工具名","url":"https://...","icon":"fa6-solid:table","description":"工具描述"}]'></textarea>
+            <textarea id="tools-links-content" class="w-full min-h-[180px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder='请输入 JSON 数组，例如：[{"name":"工具名","url":"https://...","icon":"fa6-solid:table","description":"工具描述","color":"可选：自定义渐变或留空自动生成"}]'></textarea>
             <p id="tools-links-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
           </div>
 
@@ -1852,7 +1852,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         name: "示例工具名",
         url: "https://example.com",
         icon: "fa6-solid:link",
-        description: "请填写工具描述"
+        description: "请填写工具描述",
+        color: ""
       });
 
       if (textarea) {
@@ -1953,6 +1954,9 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
           typeof item?.description !== "string"
         ) {
           throw new Error(`第 ${index + 1} 条工具链接格式不正确`);
+        }
+        if (item.color !== undefined && typeof item.color !== "string") {
+          throw new Error(`第 ${index + 1} 条工具链接的 color 字段必须是字符串`);
         }
       });
 

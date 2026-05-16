@@ -6,7 +6,7 @@ export interface NavCardItem {
   url: string;
   icon: string;
   description: string;
-  gradient?: string;
+  color?: string;
 }
 
 interface Props {
@@ -34,7 +34,7 @@ function generateGradient(url: string): string {
 }
 
 const { item } = Astro.props;
-const gradient = item.gradient || generateGradient(item.url);
+const gradient = item.color || generateGradient(item.url);
 ---
 
 <a

@@ -3,6 +3,7 @@ export interface ToolLink {
   url: string
   icon: string
   description: string
+  color?: string
 }
 
 const toolsLinks: ToolLink[] = [
@@ -29,6 +30,13 @@ const toolsLinks: ToolLink[] = [
     url: "https://gitee.com/cmchen1234",
     icon: "simple-icons:gitee",
     description: "我的 Gitee 主页，国内代码托管平台",
+  },
+  {
+    name: "Markdown 预览器",
+    url: "https://shi-tou1234.github.io/admin-preview/index.html",
+    icon: "fa6-solid:file-lines",
+    description: "在线 Markdown 编辑与实时预览工具",
+    color: "linear-gradient(-45deg, hsl(210, 45%, 48%) 0%, hsl(270, 40%, 42%) 100%)",
   },
 ]
 

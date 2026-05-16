@@ -738,8 +738,7 @@ function initPagefind() {
       document.dispatchEvent(new CustomEvent('pagefindready'));
       // console.log('Pagefind initialized successfully');
     })
-    .catch((error) => {
-      console.error('Failed to load Pagefind:', error);
+    .catch(() => {
       window.pagefind = {
         search: () => Promise.resolve({ results: [] }),
         options: () => Promise.resolve(),
