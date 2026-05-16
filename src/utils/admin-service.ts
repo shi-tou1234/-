@@ -140,6 +140,18 @@ export function buildFriendLinksTs(friendLinks: unknown[]): string {
   return `import type { FriendLink } from "@/types/friend"\n\nconst friendLinks: FriendLink[] = ${JSON.stringify(friendLinks, null, 2)}\n\nexport default friendLinks\n`;
 }
 
+export function parseToolsLinksFromTs(content: string) {
+  const matched = content.match(
+    /const\s+toolsLinks:\s*ToolLink\[\]\s*=\s*(\[[\s\S]*?\])\s*\n\s*export\s+default\s+toolsLinks/,
+  );
+  if (!matched?.[1]) throw new Error("无法解析工具链接文件");
+  return JSON.parse(matched[1]);
+}
+
+export function buildToolsLinksTs(toolsLinks: unknown[]): string {
+  return `export interface ToolLink {\n  name: string\n  url: string\n  icon: string\n  description: string\n}\n\nconst toolsLinks: ToolLink[] = ${JSON.stringify(toolsLinks, null, 2)}\n\nexport default toolsLinks\n`;
+}
+
 export function parseHeaderContactFromTs(content: string) {
   const matched = content.match(
     /const\s+headerContact:\s*HeaderContact\s*=\s*(\{[\s\S]*?\})\s*\n\s*export\s+default\s+headerContact/,

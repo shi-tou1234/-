@@ -4,8 +4,9 @@ import Cover from '@components/Cover.astro'
 import NavCard from '@components/NavCard.astro';
 import type { NavCardItem } from '@components/NavCard.astro';
 
-import { siteConfig, friendLinkConfig } from '@/config'
+import { siteConfig } from '@/config'
 import i18nit from '@i18n/translation'
+import toolsLinks from '@/data/tools-links'
 
 import { i18n } from "astro:config/client";
 
@@ -19,36 +20,14 @@ const isZh = currentLang === 'zh-cn';
 
 const pageTitle = t("header.tools") + " - " + siteConfig.title;
 
-const navCards: NavCardItem[] = [
-  {
-    name: isZh ? '真值表' : 'Truth Table',
-    url: 'https://shi-tou1234.github.io/zhenzhibiao',
-    icon: 'fa6-solid:table',
-    description: isZh ? '逻辑真值表生成工具，支持多种逻辑运算' : 'Logic truth table generator with multiple operations',
-    gradient: 'linear-gradient(-45deg, #6b7db3 0%, #7b7298 100%)',
-  },
-  {
-    name: isZh ? '在线计算' : 'Calculator',
-    url: 'https://shi-tou1234.github.io/jisuan/',
-    icon: 'fa6-solid:calculator',
-    description: isZh ? '多功能在线计算工具，便捷实用' : 'Multi-function online calculator, convenient and practical',
-    gradient: 'linear-gradient(-45deg, #4a8c7c 0%, #5a9e78 100%)',
-  },
-  {
-    name: 'GitHub',
-    url: 'https://github.com/shi-tou1234',
-    icon: 'fa6-brands:github',
-    description: isZh ? '我的 GitHub 主页，开源项目与代码' : 'My GitHub profile, open source projects',
-    gradient: 'linear-gradient(-45deg, #4a4a4a 0%, #2a2a2a 100%)',
-  },
-  {
-    name: 'Gitee',
-    url: 'https://gitee.com/cmchen1234',
-    icon: 'simple-icons:gitee',
-    description: isZh ? '我的 Gitee 主页，国内代码托管平台' : 'My Gitee profile, domestic code hosting',
-    gradient: 'linear-gradient(-45deg, #c06040 0%, #c09848 100%)',
-  },
-];
+const navCards: NavCardItem[] = toolsLinks.map((link) => ({
+  name: link.name,
+  url: link.url,
+  icon: link.icon,
+  description: link.description,
+}));
+
+const previewerUrl = new URL('admin-preview/index.html', Astro.site || Astro.url).toString();
 ---
 
 <MainPageLayout title={pageTitle} lang={currentLang}>
@@ -57,6 +36,20 @@ const navCards: NavCardItem[] = [
 
         <div class="nav-card-grid">
             {navCards.map((card) => <NavCard item={card} />)}
+        </div>
+
+        <div class="flex justify-center pb-8">
+            <a
+                href={previewerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="previewer-link"
+            >
+                <span class="previewer-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </span>
+                {isZh ? 'Markdown 预览器' : 'Markdown Previewer'}
+            </a>
         </div>
     </div>
 </MainPageLayout>
@@ -68,5 +61,29 @@ const navCards: NavCardItem[] = [
     justify-content: center;
     gap: 1.5rem;
     padding: 1rem 1rem 2rem;
+  }
+
+  .previewer-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid var(--button-border-color);
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+
+  .previewer-link:hover {
+    background: var(--button-hover-color);
+    border-color: var(--text-color);
+  }
+
+  .previewer-icon {
+    display: flex;
+    align-items: center;
+    opacity: 0.7;
   }
 </style>
