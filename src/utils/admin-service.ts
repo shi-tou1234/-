@@ -149,7 +149,7 @@ export function parseToolsLinksFromTs(content: string) {
 }
 
 export function buildToolsLinksTs(toolsLinks: unknown[]): string {
-  return `export interface ToolLink {\n  name: string\n  url: string\n  icon: string\n  description: string\n}\n\nconst toolsLinks: ToolLink[] = ${JSON.stringify(toolsLinks, null, 2)}\n\nexport default toolsLinks\n`;
+  return `export interface ToolLink {\n  name: string\n  url: string\n  icon: string\n  description: string\n  color?: string\n}\n\nconst toolsLinks: ToolLink[] = ${JSON.stringify(toolsLinks, null, 2)}\n\nexport default toolsLinks\n`;
 }
 
 export function parseHeaderContactFromTs(content: string) {
