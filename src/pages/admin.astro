@@ -1123,12 +1123,11 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       var entries = preloadedEntries && preloadedEntries.length > 0
         ? preloadedEntries
         : await listBlogMarkdownEntries(token, branch).catch(function() { return []; });
-      var sampleEntries = entries.slice(0, CATEGORY_OPTIONS_LIMIT);
       var categorySet = new Set();
 
-      for (var i = 0; i < sampleEntries.length; i++) {
+      for (var i = 0; i < entries.length; i++) {
         try {
-          var meta = await getFileMeta(sampleEntries[i].path, token, branch, true);
+          var meta = await getFileMeta(entries[i].path, token, branch, true);
           var markdown = decodeFileContent(meta && meta.content ? meta.content : "");
           var cats = extractCategoriesFromMarkdown(markdown);
           for (var j = 0; j < cats.length; j++) {
