@@ -156,9 +156,22 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
               </details>
             </div>
 
+            <div class="rounded border border-[var(--button-border-color)] p-3">
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                <label class="text-sm font-medium whitespace-nowrap">分类</label>
+                <div class="flex-1 min-w-0 flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <input id="post-category" list="post-category-options" type="text" class="flex-1 min-w-0 rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="选择已有分类或输入新分类" />
+                  <datalist id="post-category-options"></datalist>
+                  <select id="post-category-select" class="flex-1 min-w-0 rounded border border-[var(--button-border-color)] bg-[var(--bg-color)] px-2 py-1.5 text-sm text-[var(--text-color)]">
+                    <option value="">手动输入新分类</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
             <details class="rounded border border-[var(--button-border-color)] p-3">
               <summary class="cursor-pointer text-sm">更多设置（可选）</summary>
-              <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
                 <div>
                   <label class="block text-sm mb-1">发布日期</label>
                   <input id="post-date" type="datetime-local" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
@@ -170,17 +183,6 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
                 <div>
                   <label class="block text-sm mb-1">封面路径</label>
                   <input id="post-cover" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="例如：./assets/cover.jpg" />
-                </div>
-                <div class="min-w-0">
-                  <label class="block text-sm mb-1">分类</label>
-                  <input id="post-category" list="post-category-options" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="可选择已有分类，也可直接输入新分类" />
-                  <datalist id="post-category-options"></datalist>
-                  <div class="mt-2 flex flex-col items-stretch gap-1 sm:flex-row sm:items-center sm:min-w-0">
-                    <label class="text-xs text-[var(--text-color)]/70 sm:shrink-0 sm:whitespace-nowrap">已有分类：</label>
-                    <select id="post-category-select" class="w-full min-w-0 flex-1 rounded border border-[var(--button-border-color)] bg-[var(--bg-color)] px-2 py-1.5 text-sm text-[var(--text-color)]">
-                      <option value="">手动输入新分类</option>
-                    </select>
-                  </div>
                 </div>
               </div>
               <div class="flex items-center gap-2 pt-1">
