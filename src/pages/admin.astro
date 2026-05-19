@@ -450,7 +450,9 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   const ABOUT_PERSONAL_PATH = "src/data/about-personal.ts";
   const ABOUT_SPEC_PATH_PREFIX = "src/content/spec/about";
   const BLOG_GUIDE_CONTENT_PATH = "src/data/blog-guide-content.ts";
-  const CATEGORY_OPTIONS_LIMIT = 120;
+  const CATEGORY_OPTIONS_LIMIT = 50;
+  const CATEGORY_CACHE_KEY = "cmchen_admin_category_cache";
+  const CATEGORY_CACHE_TTL = 3600000;
   const PREVIEW_TOOL_PATH = "admin-preview/index.html";
 
   const loginSection = document.getElementById("login-section");
@@ -1098,7 +1100,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     return String(content || "").replace(/!\[[^\]]*\]\(([^)]+)\)/g, (_matched, url) => `![](${url})`);
   }
 
-  async function loadCategoryOptions() {
+  async function loadCategoryOptions(preloadedEntries) {
     const token = getToken();
     const branch = getBranch();
     if (!token) {
@@ -1106,20 +1108,48 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       return;
     }
 
-    const entries = await listBlogMarkdownEntries(token, branch);
-    const sampleEntries = entries.slice(0, CATEGORY_OPTIONS_LIMIT);
-    const categorySet = new Set();
-
-    for (const entry of sampleEntries) {
-      try {
-        const meta = await getFileMeta(entry.path, token, branch, false);
-        const markdown = decodeFileContent(meta?.content || "");
-        extractCategoriesFromMarkdown(markdown).forEach((category) => categorySet.add(category));
-      } catch {
+    try {
+      var cached = localStorage.getItem(CATEGORY_CACHE_KEY);
+      if (cached) {
+        var cache = JSON.parse(cached);
+        if (cache && cache.branch === branch && (Date.now() - cache.ts) < CATEGORY_CACHE_TTL && cache.categories && cache.categories.length > 0) {
+          renderCategoryOptions(cache.categories);
+          return;
+        }
       }
-    }
+    } catch (e) {}
 
-    renderCategoryOptions(Array.from(categorySet));
+    try {
+      var entries = preloadedEntries && preloadedEntries.length > 0
+        ? preloadedEntries
+        : await listBlogMarkdownEntries(token, branch).catch(function() { return []; });
+      var sampleEntries = entries.slice(0, CATEGORY_OPTIONS_LIMIT);
+      var categorySet = new Set();
+
+      for (var i = 0; i < sampleEntries.length; i++) {
+        try {
+          var meta = await getFileMeta(sampleEntries[i].path, token, branch, true);
+          var markdown = decodeFileContent(meta && meta.content ? meta.content : "");
+          var cats = extractCategoriesFromMarkdown(markdown);
+          for (var j = 0; j < cats.length; j++) {
+            categorySet.add(cats[j]);
+          }
+        } catch (e) {}
+      }
+
+      var categories = Array.from(categorySet);
+      renderCategoryOptions(categories);
+
+      try {
+        localStorage.setItem(CATEGORY_CACHE_KEY, JSON.stringify({
+          branch: branch,
+          ts: Date.now(),
+          categories: categories
+        }));
+      } catch (e) {}
+    } catch (e) {
+      renderCategoryOptions([]);
+    }
   }
 
   function clearPostEditor() {
@@ -1218,12 +1248,12 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
     if (usedFallback) {
       setMsg(msgEl, `已加载 ${entries.length} 篇文章（回退模式：GitHub API 不可达）`);
-      await loadCategoryOptions().catch(() => {});
+      await loadCategoryOptions(entries).catch(() => {});
       return;
     }
 
     setMsg(msgEl, `已加载 ${entries.length} 篇文章`);
-    await loadCategoryOptions().catch(() => {});
+    await loadCategoryOptions(entries).catch(() => {});
   }
 
   async function exportPosts(format) {
@@ -2196,6 +2226,28 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 </script>
 
 <style is:global>
+  #admin-panel select,
+  #login-section select {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+
+  #admin-panel select option,
+  #login-section select option {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+
+  [data-theme="light"] #admin-panel select,
+  [data-theme="light"] #login-section select {
+    color-scheme: light;
+  }
+
+  [data-theme="dark"] #admin-panel select,
+  [data-theme="dark"] #login-section select {
+    color-scheme: dark;
+  }
+
   #post-category-select {
     appearance: auto;
   }
