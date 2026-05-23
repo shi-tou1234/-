@@ -1193,22 +1193,26 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     return matched?.[1] || "";
   }
 
+  function isTimestampFallbackSlug(slug) {
+    return /^post-\d{10,}$/.test(slug);
+  }
+
   function ensurePostSlug() {
     const slugInput = document.getElementById("post-slug");
     const title = (document.getElementById("post-title")?.value || "").trim();
+    const titleSlug = normalizeSlug(title);
     const currentSlug = normalizeSlug(slugInput?.value || "");
-    if (currentSlug) {
+    if (currentSlug && !(isTimestampFallbackSlug(currentSlug) && titleSlug)) {
       if (slugInput) slugInput.value = currentSlug;
       return currentSlug;
     }
 
     const selectedSlug = normalizeSlug(getSelectedPostSlug());
-    if (selectedSlug) {
+    if (selectedSlug && !(isTimestampFallbackSlug(selectedSlug) && titleSlug)) {
       if (slugInput) slugInput.value = selectedSlug;
       return selectedSlug;
     }
 
-    const titleSlug = normalizeSlug(title);
     const fallbackSlug = titleSlug || `post-${Date.now()}`;
     if (slugInput) slugInput.value = fallbackSlug;
     return fallbackSlug;
