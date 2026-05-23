@@ -191,6 +191,17 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
               </div>
             </details>
 
+            <div class="rounded border border-[var(--button-border-color)] p-3">
+              <div class="flex flex-wrap items-center gap-2">
+                <label class="text-sm font-medium whitespace-nowrap">封面图片</label>
+                <input id="post-cover-file" type="file" accept="image/*" class="hidden" />
+                <label for="post-cover-file" class="cursor-pointer rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">选择封面图片</label>
+                <span id="post-cover-filename" class="text-sm text-[var(--text-color)]/70">未选择</span>
+                <button id="upload-cover-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">上传封面</button>
+              </div>
+              <p class="text-xs mt-1 text-[var(--text-color)]/60">上传后将自动填入封面路径。留空则由系统自动匹配封面图片。</p>
+            </div>
+
             <div class="flex flex-wrap gap-2 items-center">
               <input id="post-files" type="file" multiple accept="image/*,video/*,.pdf,application/pdf" class="hidden" />
               <label for="post-files" class="cursor-pointer rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm font-medium text-[var(--text-color)] hover:bg-[var(--button-hover-color)]">选择文件</label>
@@ -1448,6 +1459,13 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     const count = files?.length || 0;
     countEl.textContent = count > 0 ? `已选择 ${count} 个文件` : "未选择文件";
   });
+  document.getElementById("post-cover-file")?.addEventListener("change", () => {
+    const files = document.getElementById("post-cover-file")?.files;
+    const nameEl = document.getElementById("post-cover-filename");
+    if (!nameEl) return;
+    const name = files?.[0]?.name || "";
+    nameEl.textContent = name || "未选择";
+  });
 
   document.getElementById("refresh-post-list-btn")?.addEventListener("click", loadPostList);
   categorySelect?.addEventListener("change", () => {
@@ -1562,6 +1580,40 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
   document.getElementById("export-markdown-btn")?.addEventListener("click", async () => {
     await exportPosts("markdown");
+  });
+
+  document.getElementById("upload-cover-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("post-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      const slug = ensurePostSlug();
+      const lang = (document.getElementById("post-lang")?.value || "zh-cn").trim();
+      const files = document.getElementById("post-cover-file")?.files;
+
+      if (!token) throw new Error("请先填写 GitHub Token");
+      if (!files || files.length === 0) throw new Error("请先选择封面图片");
+
+      const file = files[0];
+      if (!file.type.startsWith("image/")) throw new Error("请选择图片文件作为封面");
+
+      setMsg(msgEl, `正在上传封面图片...`);
+
+      const result = await uploadBlogAssetFile({ slug, lang, file, token, branch });
+
+      const coverPath = `./assets/${result.name}`;
+      const coverInput = document.getElementById("post-cover");
+      if (coverInput) coverInput.value = coverPath;
+
+      const fileInput = document.getElementById("post-cover-file");
+      if (fileInput) fileInput.value = "";
+      const nameEl = document.getElementById("post-cover-filename");
+      if (nameEl) nameEl.textContent = "未选择";
+
+      setMsg(msgEl, `封面图片上传成功：${result.name}（已自动填入封面路径）`);
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
   });
 
   document.getElementById("upload-files-btn")?.addEventListener("click", async () => {
