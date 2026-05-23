@@ -1,7 +1,7 @@
 ---
 title: 编码器和译码器补充
 pubDate: 2026-05-23T10:08:00.000Z
-updatedDate: 2026-05-23T10:26:53.147Z
+updatedDate: 2026-05-23T10:27:02.786Z
 draft: false
 description: 
 category: 数电
