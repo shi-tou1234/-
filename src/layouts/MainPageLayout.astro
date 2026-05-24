@@ -118,6 +118,14 @@ const navToolsLabel = isZh ? '工具栏' : 'Tools';
 
     <Footer />
     <Search />
+
+    <button id="backtop-global" title="回到顶部" class="fixed bottom-[8vh] right-6 w-10 h-10 rounded-full bg-[--bg-color] cursor-pointer items-center justify-center z-[1000] transition-all duration-300 opacity-90 border-0 hover:scale-110 active:scale-90 hover:shadow-[0_4px_15px_rgba(59,130,246,0.4)]" style="display:none">
+      <svg class="absolute top-0 left-0 w-full h-full -rotate-90" viewBox="0 0 48 48">
+        <circle id="circle-global" cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="2"></circle>
+        <circle id="progress-circle-global" cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="0 125.6" stroke-linecap="round"></circle>
+      </svg>
+      <svg class="relative z-10 w-4 h-4 text-[var(--text-color)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
   </div>
 </Layout>
 
@@ -575,6 +583,59 @@ const navToolsLabel = isZh ? '工具栏' : 'Tools';
   document.addEventListener("astro:after-swap", safeInitUpdateNotice);
 </script>
 
+<script>
+  (function() {
+    var _globalBackTopAbortController = null;
+
+    function initGlobalBackTop() {
+      if (_globalBackTopAbortController) {
+        _globalBackTopAbortController.abort();
+        _globalBackTopAbortController = null;
+      }
+
+      if (document.querySelector('.post-right-sidebar')) return;
+
+      var btn = document.getElementById('backtop-global');
+      var progressCircle = document.getElementById('progress-circle-global');
+      if (!btn || !progressCircle) return;
+
+      _globalBackTopAbortController = new AbortController();
+      var signal = _globalBackTopAbortController.signal;
+
+      btn.style.display = 'flex';
+
+      var handleScroll = function() {
+        var scrollTop = window.scrollY || document.documentElement.scrollTop;
+        var documentHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        var scrollPercent = documentHeight > 0 ? Math.min(100, Math.round((scrollTop / documentHeight) * 100)) : 0;
+
+        var circumference = 2 * Math.PI * 20;
+        var offset = circumference - (scrollPercent / 100) * circumference;
+        progressCircle.style.strokeDasharray = (circumference - offset) + ' ' + offset;
+      };
+
+      var scrollToTop = function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      window.addEventListener('scroll', handleScroll, { passive: true, signal: signal });
+      btn.addEventListener('click', scrollToTop, { signal: signal });
+      handleScroll();
+    }
+
+    document.addEventListener('astro:page-load', initGlobalBackTop);
+    document.addEventListener('astro:after-swap', initGlobalBackTop);
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('backtop-global')) initGlobalBackTop();
+      });
+    } else {
+      if (document.getElementById('backtop-global')) initGlobalBackTop();
+    }
+  })();
+</script>
+
 <style is:global>
 #blog-guide-modal #blog-guide-mask {
   opacity: 0;
@@ -709,6 +770,18 @@ html.post-reading-fullscreen .mobile-bottom-nav {
   html.post-reading-fullscreen ~ body {
     padding-bottom: 0;
   }
+}
+
+#backtop-global {
+  box-shadow: 0 2px 10px var(--shadow-color);
+}
+
+#progress-circle-global {
+  stroke: var(--text-color);
+}
+
+#circle-global {
+  stroke: var(--button-border-color);
 }
 </style>
 
