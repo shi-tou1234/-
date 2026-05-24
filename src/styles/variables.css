@@ -4,6 +4,9 @@
   --page-width: min(776px, 90vw);
   --toc-width: 240px;
   --toc-offset-left: calc(50vw + var(--page-width) / 2 + 3rem);
+
+  /* 字体大小缩放 */
+  --font-size-scale: 1;
 }
 
 

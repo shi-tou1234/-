@@ -3,6 +3,7 @@ import "@styles/global.css"
 import { Icon } from "astro-icon/components"
 import { profileConfig, siteConfig } from "@/config"
 import ThemeIcon from "./control/ThemeIcon.astro"
+import FontSizeControl from "./control/FontSizeControl.astro"
 import { baseUrl } from "@utils/url-utils"
 import headerContact from "@/data/header-contact"
 
@@ -81,6 +82,10 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
         </button>
         <!-- Dark Mode -->
         <ThemeIcon class="hide-on-tiny flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] rounded-lg hover:text-current active:scale-90 border border-[var(--button-border-color)] transition-all duration-300"/>
+        <!-- Font Size -->
+        <div class="relative">
+          <FontSizeControl class="hide-on-tiny flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] rounded-lg hover:text-current active:scale-90 border border-[var(--button-border-color)] transition-all duration-300" />
+        </div>
         <!-- Email Copy -->
         <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" class="hide-on-tiny copy-email-action hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
           <Icon name="fa6-solid:envelope" class="w-4 h-4" />
@@ -130,6 +135,7 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
                     <button class="copy-email-action px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]" data-email={headerContact.email}>邮箱</button>
                     <a href={getRelativeLocaleUrl("zh-cn", "/")} class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">中文</a>
                     <a href={getRelativeLocaleUrl("en", "/")} class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">EN</a>
+                    <button id="mobile-fontsize-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">字体</button>
                   </div>
                 </div>
                 <div class="flex flex-col py-1">
@@ -376,6 +382,8 @@ function initMobileNav() {
   const mobileGuideButton = document.getElementById('mobile-guide-btn');
   const themeToggleButton = document.getElementById('themeToggle');
   const guideOpenButton = document.getElementById('blog-guide-open-btn');
+  const fontSizeToggle = document.getElementById('fontSizeToggle');
+  const mobileFontSizeButton = document.getElementById('mobile-fontsize-btn');
   const languageMenu = document.getElementById('language-menu');
   let mobileMenuCloseTimer = null;
 
@@ -435,6 +443,27 @@ function initMobileNav() {
     mobileGuideButton.dataset.bound = 'true';
     mobileGuideButton.addEventListener('click', () => {
       guideOpenButton.click();
+      setMobileMenuOpen(false);
+    });
+  }
+
+  if (mobileFontSizeButton && mobileFontSizeButton.dataset.bound !== 'true') {
+    mobileFontSizeButton.dataset.bound = 'true';
+    mobileFontSizeButton.addEventListener('click', () => {
+      const fontSizeMenu = document.getElementById('font-size-menu');
+      if (fontSizeMenu) {
+        if (fontSizeMenu.classList.contains('hidden')) {
+          fontSizeMenu.classList.remove('hidden');
+          const slider = document.getElementById('font-size-slider');
+          const valueLabel = document.getElementById('font-size-value');
+          const saved = localStorage.getItem('blog-font-size');
+          const val = saved ? parseInt(saved, 10) : 100;
+          if (slider) slider.value = String(val);
+          if (valueLabel) valueLabel.textContent = val + '%';
+        } else {
+          fontSizeMenu.classList.add('hidden');
+        }
+      }
       setMobileMenuOpen(false);
     });
   }

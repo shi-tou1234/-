@@ -1,0 +1,136 @@
+---
+const className = Astro.props.class;
+import { Icon } from "astro-icon/components";
+---
+
+<button id="fontSizeToggle" title="调节字体大小" class={className}>
+    <Icon name="fa6-solid:text-height" class="w-4 h-4" />
+</button>
+
+<div id="font-size-menu" class="hidden absolute right-0 mt-2 bg-[var(--bg-color)] border border-[var(--button-border-color)] rounded-lg shadow-[0_8px_24px_var(--shadow-color)] z-50 p-4 w-[220px] max-w-[calc(100vw-1rem)]"></div>
+    <div class="flex items-center justify-between mb-2">
+        <span class="text-xs text-[var(--text-color)]/70">字体大小</span>
+        <span id="font-size-value" class="text-xs font-bold text-[var(--link-color)]">100%</span>
+    </div>
+    <div class="flex items-center gap-2">
+        <span class="text-xs text-[var(--text-color)]/60">A</span>
+        <input
+            type="range"
+            id="font-size-slider"
+            min="80"
+            max="150"
+            value="100"
+            step="5"
+            class="flex-1 h-1.5 rounded-full appearance-none bg-[var(--button-border-color)] cursor-pointer
+                   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4
+                   [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--link-color)]
+                   [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform
+                   [&::-webkit-slider-thumb]:duration-200 [&::-webkit-slider-thumb]:hover:scale-110
+                   [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full
+                   [&::-moz-range-thumb]:bg-[var(--link-color)] [&::-moz-range-thumb]:cursor-pointer
+                   [&::-moz-range-thumb]:border-none"
+        />
+        <span class="text-sm text-[var(--text-color)]/60">A</span>
+    </div>
+    <div class="flex justify-start mt-2">
+        <button id="font-size-reset" class="text-xs px-2 py-1 rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] transition-all duration-200">还原默认</button>
+    </div>
+</div>
+
+<script is:inline>
+if (typeof window !== 'undefined') {
+  const FONT_SIZE_KEY = 'blog-font-size';
+  const DEFAULT_SIZE = 100;
+
+  function initFontSizeControl() {
+    const htmlRoot = document.documentElement;
+    const fontSizeToggle = document.getElementById('fontSizeToggle');
+    const fontSizeMenu = document.getElementById('font-size-menu');
+    const fontSizeSlider = document.getElementById('font-size-slider');
+    const fontSizeValue = document.getElementById('font-size-value');
+    const fontSizeReset = document.getElementById('font-size-reset');
+
+    if (!fontSizeToggle || !fontSizeMenu || !fontSizeSlider) return;
+
+    const getFontSize = () => {
+      const saved = localStorage.getItem(FONT_SIZE_KEY);
+      const value = parseInt(saved, 10);
+      if (isNaN(value) || value < 80 || value > 150) return DEFAULT_SIZE;
+      return value;
+    };
+
+    const setFontSize = (value) => {
+      htmlRoot.style.setProperty('--font-size-scale', (value / 100).toFixed(2));
+      localStorage.setItem(FONT_SIZE_KEY, String(value));
+      if (fontSizeSlider) fontSizeSlider.value = String(value);
+      if (fontSizeValue) fontSizeValue.textContent = value + '%';
+    };
+
+    const applyFontSize = (value) => {
+      htmlRoot.style.setProperty('--font-size-scale', (value / 100).toFixed(2));
+      if (fontSizeSlider) fontSizeSlider.value = String(value);
+      if (fontSizeValue) fontSizeValue.textContent = value + '%';
+    };
+
+    const closeMenu = () => {
+      fontSizeMenu.classList.add('hidden');
+    };
+
+    const openMenu = () => {
+      fontSizeMenu.classList.remove('hidden');
+      const current = getFontSize();
+      applyFontSize(current);
+    };
+
+    const toggleMenu = (e) => {
+      e.stopPropagation();
+      if (fontSizeMenu.classList.contains('hidden')) {
+        openMenu();
+      } else {
+        closeMenu();
+      }
+    };
+
+    fontSizeToggle.addEventListener('click', toggleMenu);
+
+    fontSizeSlider.addEventListener('input', () => {
+      applyFontSize(parseInt(fontSizeSlider.value, 10));
+    });
+
+    fontSizeSlider.addEventListener('change', () => {
+      const value = parseInt(fontSizeSlider.value, 10);
+      setFontSize(value);
+    });
+
+    if (fontSizeReset) {
+      fontSizeReset.addEventListener('click', () => {
+        setFontSize(DEFAULT_SIZE);
+        closeMenu();
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!fontSizeToggle.contains(e.target) && !fontSizeMenu.contains(e.target)) {
+        closeMenu();
+      }
+    });
+
+    const currentSize = getFontSize();
+    applyFontSize(currentSize);
+  }
+
+  document.addEventListener('astro:page-load', initFontSizeControl);
+  document.addEventListener('astro:after-swap', initFontSizeControl);
+}
+</script>
+
+<style>
+@media (max-width: 379px) {
+  #font-size-menu {
+    position: fixed;
+    top: 4rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+</style>

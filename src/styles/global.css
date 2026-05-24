@@ -14,9 +14,11 @@
   body {
     @apply bg-[--bg-color] text-[--text-color];
     font-family: "Noto Serif SC", "Times New Roman", "STZhongsong", serif;
+    font-size: calc(1rem * var(--font-size-scale));
     overflow-y: scroll;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+    transition: font-size 0.3s ease;
   }
 
   html {
