@@ -38,90 +38,110 @@ import { Icon } from "astro-icon/components";
 </div>
 
 <script is:inline>
-if (typeof window !== 'undefined') {
+(function() {
   const FONT_SIZE_KEY = 'blog-font-size';
   const DEFAULT_SIZE = 100;
+  var _fontSizeAbortController = null;
+
+  function getFontSize() {
+    var saved = localStorage.getItem(FONT_SIZE_KEY);
+    var value = parseInt(saved, 10);
+    if (isNaN(value) || value < 80 || value > 150) return DEFAULT_SIZE;
+    return value;
+  }
+
+  function applyFontSize(value) {
+    document.documentElement.style.setProperty('--font-size-scale', (value / 100).toFixed(2));
+  }
 
   function initFontSizeControl() {
-    const htmlRoot = document.documentElement;
-    const fontSizeToggle = document.getElementById('fontSizeToggle');
-    const fontSizeMenu = document.getElementById('font-size-menu');
-    const fontSizeSlider = document.getElementById('font-size-slider');
-    const fontSizeValue = document.getElementById('font-size-value');
-    const fontSizeReset = document.getElementById('font-size-reset');
+    if (_fontSizeAbortController) {
+      _fontSizeAbortController.abort();
+      _fontSizeAbortController = null;
+    }
+
+    var htmlRoot = document.documentElement;
+    var fontSizeToggle = document.getElementById('fontSizeToggle');
+    var fontSizeMenu = document.getElementById('font-size-menu');
+    var fontSizeSlider = document.getElementById('font-size-slider');
+    var fontSizeValue = document.getElementById('font-size-value');
+    var fontSizeReset = document.getElementById('font-size-reset');
 
     if (!fontSizeToggle || !fontSizeMenu || !fontSizeSlider) return;
 
-    const getFontSize = () => {
-      const saved = localStorage.getItem(FONT_SIZE_KEY);
-      const value = parseInt(saved, 10);
-      if (isNaN(value) || value < 80 || value > 150) return DEFAULT_SIZE;
-      return value;
-    };
+    _fontSizeAbortController = new AbortController();
+    var signal = _fontSizeAbortController.signal;
 
-    const setFontSize = (value) => {
+    var currentSize = getFontSize();
+    applyFontSize(currentSize);
+    fontSizeSlider.value = String(currentSize);
+    if (fontSizeValue) fontSizeValue.textContent = currentSize + '%';
+
+    function setFontSize(value) {
       htmlRoot.style.setProperty('--font-size-scale', (value / 100).toFixed(2));
       localStorage.setItem(FONT_SIZE_KEY, String(value));
-      if (fontSizeSlider) fontSizeSlider.value = String(value);
+      fontSizeSlider.value = String(value);
       if (fontSizeValue) fontSizeValue.textContent = value + '%';
-    };
+    }
 
-    const applyFontSize = (value) => {
-      htmlRoot.style.setProperty('--font-size-scale', (value / 100).toFixed(2));
-      if (fontSizeSlider) fontSizeSlider.value = String(value);
-      if (fontSizeValue) fontSizeValue.textContent = value + '%';
-    };
-
-    const closeMenu = () => {
+    function closeMenu() {
       fontSizeMenu.classList.add('hidden');
-    };
+    }
 
-    const openMenu = () => {
+    function openMenu() {
       fontSizeMenu.classList.remove('hidden');
-      const current = getFontSize();
+      var current = getFontSize();
       applyFontSize(current);
-    };
+      fontSizeSlider.value = String(current);
+      if (fontSizeValue) fontSizeValue.textContent = current + '%';
+    }
 
-    const toggleMenu = (e) => {
+    fontSizeToggle.addEventListener('click', function(e) {
       e.stopPropagation();
       if (fontSizeMenu.classList.contains('hidden')) {
         openMenu();
       } else {
         closeMenu();
       }
-    };
+    }, { signal: signal });
 
-    fontSizeToggle.addEventListener('click', toggleMenu);
-
-    fontSizeSlider.addEventListener('input', () => {
+    fontSizeSlider.addEventListener('input', function() {
       applyFontSize(parseInt(fontSizeSlider.value, 10));
-    });
+    }, { signal: signal });
 
-    fontSizeSlider.addEventListener('change', () => {
-      const value = parseInt(fontSizeSlider.value, 10);
-      setFontSize(value);
-    });
+    fontSizeSlider.addEventListener('change', function() {
+      setFontSize(parseInt(fontSizeSlider.value, 10));
+    }, { signal: signal });
 
     if (fontSizeReset) {
-      fontSizeReset.addEventListener('click', () => {
+      fontSizeReset.addEventListener('click', function() {
         setFontSize(DEFAULT_SIZE);
         closeMenu();
-      });
+      }, { signal: signal });
     }
 
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', function(e) {
       if (!fontSizeToggle.contains(e.target) && !fontSizeMenu.contains(e.target)) {
         closeMenu();
       }
-    });
-
-    const currentSize = getFontSize();
-    applyFontSize(currentSize);
+    }, { signal: signal });
   }
 
   document.addEventListener('astro:page-load', initFontSizeControl);
   document.addEventListener('astro:after-swap', initFontSizeControl);
-}
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      if (document.getElementById('fontSizeToggle')) {
+        initFontSizeControl();
+      }
+    });
+  } else {
+    if (document.getElementById('fontSizeToggle')) {
+      initFontSizeControl();
+    }
+  }
+})();
 </script>
 
 <style>
