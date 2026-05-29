@@ -1,26 +1,23 @@
-# Hello 👋, this is cmchen collecting moments from life
+# Hello 👋 — these are life moments, gathered by cmchen
 
-Sometimes, I suddenly pause.
+There are moments when one simply stops.
 
-Like at dusk, after connecting the last wire, I look up and see that maple tree outside the window—its leaves have turned crimson without me noticing. Or scrolling through my phone album, stumbling upon a random sky photo, unable to recall why I took it that day, but remembering how gentle the breeze was.
+The last wire joined at dusk, and then — looking up — the maple beyond the window, its leaves turned entirely, deeply red; one cannot say when this happened, only that it has, quietly and without announcement. Or the afternoon of scrolling through photographs, finding a sky one had taken by one's own hand on some forgotten day — the reason dissolved entirely, yet the softness of the wind that day still present, hovering just at the edge of memory, patient and inexplicable.
 
-These moments—fragmented, tiny, nothing extraordinary. Yet they slip through the cracks of my repetitive days, like beams of light.
+Such moments. Small, scattered, unremarkable by any ordinary measure. And yet they come through — like light through the narrow seams between one day and the next, persistent, unhurried.
 
-I've wondered for a long time: why start this blog?
+I have wondered for a long time: why this blog? I have no grand vistas to parade before admiring eyes. No wisdom to distill into clean, transferable truths.
 
-No breathtaking scenery to show off, no profound philosophies to share.
+Only this: a place to hold the light that falls through cracks.
 
-I just want a place to gather these slivers of light from the cracks.
+The roads walked alone. The wind shared with friends on afternoons now half-dissolved into the past. The nights of returning with a body made heavy by tiredness. The dusks spent running circles on the track when a problem refused to yield. The old things that surface suddenly — their edges softened now, slightly blurred, and somehow still dear.
 
-The paths I've walked alone, the breezes shared with friends, the nights I dragged my weary body back to the dorm, the dusks when I ran laps on the track while wrestling with tough problems, those suddenly-remembered old memories that have grown a little fuzzy.
+These are the fragments of a life. Laid alongside one another, they compose, roughly, what I am at this present hour.
 
-They are fragments of my memory. Pieced together, they form who I am today.
+This space, then, shall be quiet. Updates will come slowly, or not at all for a while. The writing may wander without clear shape. But each piece will be true — not constructed, but grown, the way things grow, from the particular soil of one particular life.
 
-So this place will be quiet. Updates may be infrequent, writings may lack structure. But every post is genuine, grown from life itself.
+If you find yourself here, passing through, and something catches — some small and familiar thing — then good. That is quite enough.
 
-If you happen to wander by and find a passage that feels familiar—that's wonderful.
+I am cmchen. Still learning to keep company with difficulty. Still learning to chisel open crevices within the seamless turning of ordinary days.
 
-I'm cmchen, still learning to coexist with problems, and learning to carve out cracks in the cyclical routine.
-
-Welcome to my cracks.
-
+Come in. Welcome to my crevices.
