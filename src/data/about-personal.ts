@@ -126,6 +126,10 @@ const aboutPersonal: AboutPersonal = {
     {
       "date": "2026.5.15",
       "content": "修改友链为工具栏，修改卡片样式，增加博客置顶功能"
+    },
+    {
+      "date": "2026.5.29",
+      "content": "修复目录以及回弹按钮显示问题，增加字体大小调节按钮"
     }
   ],
   "musicTracks": [
