@@ -3,7 +3,6 @@ import { getRelativeLocaleUrl } from '@utils/url-utils';
 import type { BlogEntryWithLocaleStatus } from '@utils/content-utils';
 import {
   buildCategoriesMap,
-  buildCategoryRootMap,
   buildSubcategoriesByRoot,
   buildTopLevelCategoriesMap,
   getPostCategories,
@@ -25,20 +24,10 @@ const {
 const visiblePosts = posts.filter((post) => post.id !== 'welcome');
 const categoriesMap = buildCategoriesMap(visiblePosts, language);
 const topLevelCategoriesMap = buildTopLevelCategoriesMap(visiblePosts, language);
-const categoryRootMap = buildCategoryRootMap(visiblePosts, language);
 const subcategoriesByRoot = buildSubcategoriesByRoot(visiblePosts, language);
 const topLevelCategories = Object.keys(topLevelCategoriesMap).sort(
   (a, b) => topLevelCategoriesMap[b].length - topLevelCategoriesMap[a].length || a.localeCompare(b),
 );
-const currentRootCategory = categoryRootMap[initialCategory] || '';
-const sidebarCategories = currentRootCategory
-  ? [
-      currentRootCategory,
-      ...[...(subcategoriesByRoot[currentRootCategory] || new Set<string>())].sort(
-        (a, b) => categoriesMap[b].length - categoriesMap[a].length || a.localeCompare(b),
-      ),
-    ]
-  : topLevelCategories;
 
 const archiveTimeZone = language.toLowerCase().startsWith('zh') ? 'Asia/Shanghai' : 'UTC';
 const dateFormatter = new Intl.DateTimeFormat(language, {
@@ -66,9 +55,22 @@ const filterTitle = language.toLowerCase().startsWith('zh') ? '标签筛选' : '
 const filterHint = language.toLowerCase().startsWith('zh') ? '点击标签可筛选对应分类文章' : 'Use tags to filter posts by category';
 const emptyLabel = language.toLowerCase().startsWith('zh') ? '当前筛选下暂无文章' : 'No posts match this filter';
 const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Category';
+const backLabel = language.toLowerCase().startsWith('zh') ? '← 返回' : '← Back';
+
+const serializedTopLevelCategories = JSON.stringify(topLevelCategories);
+const serializedSubcategoriesByRoot = JSON.stringify(
+  Object.fromEntries(
+    Object.entries(subcategoriesByRoot).map(([k, v]) => [k, [...v]])
+  )
+);
+const serializedCategoryCounts = JSON.stringify(
+  Object.fromEntries(
+    Object.entries(categoriesMap).map(([k, v]) => [k, v.length])
+  )
+);
 ---
 
-<div class="archive-explorer grid gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,1fr)]" data-initial-category={initialCategory.toLowerCase()}>
+<div class="archive-explorer grid gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,1fr)]" data-initial-category={initialCategory.toLowerCase()} data-top-level-categories={serializedTopLevelCategories} data-subcategories-by-root={serializedSubcategoriesByRoot} data-category-counts={serializedCategoryCounts} data-lang={language}>
   <section class="min-w-0 space-y-8">
     {Object.keys(postsByYear).sort().reverse().map((year) => (
       <section class="space-y-4" data-archive-year>
@@ -125,19 +127,31 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
 
   <aside class="archive-explorer__sidebar lg:sticky lg:top-24 lg:self-start">
     <div class="rounded-3xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/72 p-4 shadow-sm backdrop-blur">
-      <h2 class="text-xl font-bold text-[var(--text-color)]"># {filterTitle.replace(/^标签筛选$|^Filter by tags$/,'分类')}</h2>
+      <h2 class="archive-explorer__title text-xl font-bold text-[var(--text-color)]"># {filterTitle.replace(/^标签筛选$|^Filter by tags$/,'分类')}</h2>
 
-      <div class="archive-explorer__chips mt-4 flex flex-wrap gap-2 lg:flex-col lg:items-stretch">
-        <button type="button" class="archive-explorer__chip" data-filter-category="">
-          <span>{allLabel}</span>
-          <span>{visiblePosts.length}</span>
-        </button>
-        {sidebarCategories.map((category) => (
-          <button type="button" class="archive-explorer__chip" data-filter-category={category.toLowerCase()}>
-            <span>{category}</span>
-            <span>{(currentRootCategory ? categoriesMap : topLevelCategoriesMap)[category].length}</span>
-          </button>
-        ))}
+      <div class="archive-explorer__view-container mt-4">
+        <div class="archive-explorer__top-view" data-view-state="active">
+          <div class="archive-explorer__chips flex flex-wrap gap-2 lg:flex-col lg:items-stretch">
+            <button type="button" class="archive-explorer__chip" data-filter-category="">
+              <span>{allLabel}</span>
+              <span>{visiblePosts.length}</span>
+            </button>
+            {topLevelCategories.map((category) => (
+              <button type="button" class="archive-explorer__chip archive-explorer__root-chip" data-root-category={category.toLowerCase()}>
+                <span>{category}</span>
+                <span>{topLevelCategoriesMap[category].length}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div class="archive-explorer__sub-view" data-view-state="inactive">
+          <div class="archive-explorer__chips archive-explorer__sub-chips flex flex-wrap gap-2 lg:flex-col lg:items-stretch">
+            <button type="button" class="archive-explorer__chip archive-explorer__back-btn">
+              <span>{backLabel}</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </aside>
@@ -158,14 +172,37 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
       root.dataset.motionOwner = ownerId;
 
       const buttons = [...root.querySelectorAll('[data-filter-category]')];
+      const rootChips = [...root.querySelectorAll('[data-root-category]')];
       const posts = [...root.querySelectorAll('[data-archive-post]')];
       const years = [...root.querySelectorAll('[data-archive-year]')];
       const emptyState = root.querySelector('[data-archive-empty]');
+      const topView = root.querySelector('.archive-explorer__top-view');
+      const subView = root.querySelector('.archive-explorer__sub-view');
+      const subChipsContainer = root.querySelector('.archive-explorer__sub-chips');
+      const backBtn = root.querySelector('.archive-explorer__back-btn');
+      const viewTitle = root.querySelector('.archive-explorer__title');
       const initialCategories = (root.dataset.initialCategory || '')
         .split(',')
         .map((value) => value.trim().toLowerCase())
         .filter(Boolean);
       const selectedCategories = new Set();
+
+      const topLevelCategoriesList = (() => {
+        try { return JSON.parse(root.dataset.topLevelCategories || '[]'); }
+        catch { return []; }
+      })();
+      const subcategoriesByRootData = (() => {
+        try { return JSON.parse(root.dataset.subcategoriesByRoot || '{}'); }
+        catch { return {}; }
+      })();
+      const categoryCountsData = (() => {
+        try { return JSON.parse(root.dataset.categoryCounts || '{}'); }
+        catch { return {}; }
+      })();
+
+      let viewState = 'top';
+      let activeRootCategory = '';
+      const pageLang = root.dataset.lang || 'zh-cn';
 
       const parseUrlCategories = () => {
         const params = new URLSearchParams(window.location.search);
@@ -423,7 +460,133 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
 
         applyFilter([...selectedCategories], true);
         syncUrlCategories();
+        updateSubcategoryActiveStates();
       };
+
+      const renderSubcategoryButtons = (subcategories) => {
+        if (!subChipsContainer) return;
+        const backBtnEl = subChipsContainer.querySelector('.archive-explorer__back-btn');
+        subChipsContainer.innerHTML = '';
+        if (backBtnEl) subChipsContainer.appendChild(backBtnEl);
+
+        if (!subcategories.length) {
+          const emptyMsg = document.createElement('div');
+          emptyMsg.className = 'archive-explorer__no-sub text-sm text-[var(--text-color)]/50 px-2 py-1';
+          emptyMsg.textContent = pageLang.startsWith('zh') ? '暂无子分类' : 'No subcategories';
+          subChipsContainer.appendChild(emptyMsg);
+          return;
+        }
+
+        subcategories.forEach((subcategory) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'archive-explorer__chip';
+          btn.dataset.filterCategory = subcategory.toLowerCase();
+          const count = categoryCountsData[subcategory] || 0;
+          btn.innerHTML = `<span>${subcategory}</span><span>${count}</span>`;
+          btn.addEventListener('click', () => {
+            if (!(btn instanceof HTMLElement)) return;
+            toggleCategory(btn.dataset.filterCategory || '');
+          });
+          subChipsContainer.appendChild(btn);
+        });
+      };
+
+      const updateSubcategoryActiveStates = () => {
+        if (!subChipsContainer) return;
+        subChipsContainer.querySelectorAll('[data-filter-category]').forEach((btn) => {
+          if (!(btn instanceof HTMLElement)) return;
+          const category = (btn.dataset.filterCategory || '').trim().toLowerCase();
+          const matched = category ? selectedCategories.has(category) : selectedCategories.size === 0;
+          btn.dataset.active = matched ? 'true' : 'false';
+          btn.setAttribute('aria-pressed', matched ? 'true' : 'false');
+        });
+      };
+
+      const animateViewSwitch = (fromView, toView, direction = 'forward') => {
+        if (!fromView || !toView) return;
+
+        if (prefersReducedMotion) {
+          fromView.dataset.viewState = 'inactive';
+          toView.dataset.viewState = 'active';
+          return;
+        }
+
+        const translateY = direction === 'forward' ? -8 : 8;
+        fromView.dataset.viewState = 'inactive';
+        fromView
+          .animate(
+            [
+              { opacity: 1, transform: 'translateY(0)' },
+              { opacity: 0, transform: `translateY(${translateY}px)` },
+            ],
+            { duration: 220, easing: 'ease', fill: 'both' },
+          )
+          .finished.then(() => {
+            toView.dataset.viewState = 'active';
+            toView
+              .animate(
+                [
+                  { opacity: 0, transform: `translateY(${-translateY}px)` },
+                  { opacity: 1, transform: 'translateY(0)' },
+                ],
+                { duration: 220, easing: 'ease', fill: 'both' },
+              )
+              .finished.finally(() => {
+                toView.style.opacity = '';
+                toView.style.transform = '';
+              });
+          });
+      };
+
+      const enterSubView = (rootCategory) => {
+        if (viewState === 'sub') return;
+        viewState = 'sub';
+        activeRootCategory = rootCategory;
+
+        selectedCategories.clear();
+        const subcategories = subcategoriesByRootData[rootCategory] || [];
+        renderSubcategoryButtons(subcategories);
+        applyFilter([], true);
+        syncUrlCategories();
+
+        if (viewTitle) {
+          const displayName = topLevelCategoriesList.find(
+            (cat) => cat.toLowerCase() === rootCategory
+          ) || rootCategory;
+          viewTitle.textContent = `# ${displayName}`;
+        }
+
+        animateViewSwitch(topView, subView, 'forward');
+      };
+
+      const exitSubView = () => {
+        if (viewState === 'top') return;
+        viewState = 'top';
+        activeRootCategory = '';
+
+        selectedCategories.clear();
+        applyFilter([], true);
+        syncUrlCategories();
+
+        if (viewTitle) {
+          viewTitle.textContent = `# ${pageLang.startsWith('zh') ? '分类' : 'Category'}`;
+        }
+
+        animateViewSwitch(subView, topView, 'backward');
+      };
+
+      rootChips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+          if (!(chip instanceof HTMLElement)) return;
+          const rootCategory = chip.dataset.rootCategory || '';
+          if (rootCategory) enterSubView(rootCategory);
+        });
+      });
+
+      if (backBtn) {
+        backBtn.addEventListener('click', exitSubView);
+      }
 
       buttons.forEach((button) => {
         button.addEventListener('click', () => {
@@ -435,12 +598,25 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
       const urlCategories = parseUrlCategories();
       if (urlCategories.length > 0) {
         setSelectedCategories(urlCategories, false, false);
+      } else if (initialCategories.length > 0) {
+        const firstInitial = initialCategories[0];
+        const hasSubcategories = subcategoriesByRootData[firstInitial] && subcategoriesByRootData[firstInitial].length > 0;
+        if (hasSubcategories) {
+          enterSubView(firstInitial);
+        } else {
+          setSelectedCategories(initialCategories, false, false);
+        }
       } else {
-        setSelectedCategories(initialCategories, false, false);
+        setSelectedCategories([], false, false);
       }
 
       const handlePopState = () => {
-        setSelectedCategories(parseUrlCategories(), false, false);
+        const urlCats = parseUrlCategories();
+        if (urlCats.length === 0 && viewState === 'sub') {
+          exitSubView();
+        } else {
+          setSelectedCategories(urlCats, false, false);
+        }
       };
 
       window.addEventListener('popstate', handlePopState);
@@ -518,6 +694,48 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
     background: #ffffff;
     color: color-mix(in srgb, var(--link-color) 78%, black 22%);
     border-color: rgba(255, 255, 255, 0.72);
+  }
+
+  .archive-explorer__view-container {
+    position: relative;
+    min-height: 3rem;
+  }
+
+  .archive-explorer__top-view,
+  .archive-explorer__sub-view {
+    transition: opacity 220ms ease, transform 220ms ease;
+  }
+
+  .archive-explorer__top-view[data-view-state='inactive'],
+  .archive-explorer__sub-view[data-view-state='inactive'] {
+    display: none;
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  .archive-explorer__top-view[data-view-state='active'],
+  .archive-explorer__sub-view[data-view-state='active'] {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .archive-explorer__back-btn {
+    justify-content: flex-start;
+    font-weight: 700;
+  }
+
+  .archive-explorer__back-btn:hover {
+    transform: translateX(-2px);
+  }
+
+  .archive-explorer__root-chip {
+    cursor: pointer;
+  }
+
+  .archive-explorer__no-sub {
+    text-align: center;
+    padding: 0.5rem 0;
   }
 
   .archive-explorer__post-tag {
