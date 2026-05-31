@@ -18,6 +18,14 @@ export function normalizeCategoryItems(categories: string[]): string[] {
   return unique;
 }
 
+export function getPrimaryCategoryFromItems(categories: string[]): string {
+  return normalizeCategoryItems(categories)[0] || '';
+}
+
+export function getSubcategoriesFromItems(categories: string[]): string[] {
+  return normalizeCategoryItems(categories).slice(1);
+}
+
 export function encodeCategoryParam(category: string): string {
   return `${CATEGORY_PARAM_PREFIX}${Buffer.from(category, 'utf-8').toString('base64url')}`;
 }
@@ -63,4 +71,55 @@ export function buildCategoriesMap(posts: BlogEntryWithLocaleStatus[], lang: str
     });
     return acc;
   }, {} as Record<string, BlogEntryWithLocaleStatus[]>);
+}
+
+export function buildTopLevelCategoriesMap(posts: BlogEntryWithLocaleStatus[], lang: string) {
+  return posts.reduce((acc, post) => {
+    const primaryCategory = getPostCategories(post, lang)[0];
+    if (!primaryCategory) return acc;
+
+    if (!acc[primaryCategory]) {
+      acc[primaryCategory] = [];
+    }
+    acc[primaryCategory].push(post);
+    return acc;
+  }, {} as Record<string, BlogEntryWithLocaleStatus[]>);
+}
+
+export function buildSubcategoriesByRoot(posts: BlogEntryWithLocaleStatus[], lang: string) {
+  return posts.reduce((acc, post) => {
+    const categories = getPostCategories(post, lang);
+    const rootCategory = categories[0];
+    const subcategories = categories.slice(1);
+    if (!rootCategory || subcategories.length === 0) return acc;
+
+    if (!acc[rootCategory]) {
+      acc[rootCategory] = new Set<string>();
+    }
+
+    subcategories.forEach((subcategory) => {
+      if (subcategory && subcategory !== rootCategory) {
+        acc[rootCategory].add(subcategory);
+      }
+    });
+
+    return acc;
+  }, {} as Record<string, Set<string>>);
+}
+
+export function buildCategoryRootMap(posts: BlogEntryWithLocaleStatus[], lang: string) {
+  return posts.reduce((acc, post) => {
+    const categories = getPostCategories(post, lang);
+    const rootCategory = categories[0];
+    if (!rootCategory) return acc;
+
+    acc[rootCategory] = rootCategory;
+    categories.slice(1).forEach((category) => {
+      if (category) {
+        acc[category] = rootCategory;
+      }
+    });
+
+    return acc;
+  }, {} as Record<string, string>);
 }

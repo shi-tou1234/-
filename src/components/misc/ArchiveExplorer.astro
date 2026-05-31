@@ -1,7 +1,13 @@
 ---
 import { getRelativeLocaleUrl } from '@utils/url-utils';
 import type { BlogEntryWithLocaleStatus } from '@utils/content-utils';
-import { buildCategoriesMap, getPostCategories } from '@utils/blog-taxonomy';
+import {
+  buildCategoriesMap,
+  buildCategoryRootMap,
+  buildSubcategoriesByRoot,
+  buildTopLevelCategoriesMap,
+  getPostCategories,
+} from '@utils/blog-taxonomy';
 import { buildPostPreview, truncateText } from '@utils/post-preview';
 
 interface Props {
@@ -18,9 +24,21 @@ const {
 
 const visiblePosts = posts.filter((post) => post.id !== 'welcome');
 const categoriesMap = buildCategoriesMap(visiblePosts, language);
-const categories = Object.keys(categoriesMap).sort(
-  (a, b) => categoriesMap[b].length - categoriesMap[a].length || a.localeCompare(b),
+const topLevelCategoriesMap = buildTopLevelCategoriesMap(visiblePosts, language);
+const categoryRootMap = buildCategoryRootMap(visiblePosts, language);
+const subcategoriesByRoot = buildSubcategoriesByRoot(visiblePosts, language);
+const topLevelCategories = Object.keys(topLevelCategoriesMap).sort(
+  (a, b) => topLevelCategoriesMap[b].length - topLevelCategoriesMap[a].length || a.localeCompare(b),
 );
+const currentRootCategory = categoryRootMap[initialCategory] || '';
+const sidebarCategories = currentRootCategory
+  ? [
+      currentRootCategory,
+      ...[...(subcategoriesByRoot[currentRootCategory] || new Set<string>())].sort(
+        (a, b) => categoriesMap[b].length - categoriesMap[a].length || a.localeCompare(b),
+      ),
+    ]
+  : topLevelCategories;
 
 const archiveTimeZone = language.toLowerCase().startsWith('zh') ? 'Asia/Shanghai' : 'UTC';
 const dateFormatter = new Intl.DateTimeFormat(language, {
@@ -114,10 +132,10 @@ const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Cate
           <span>{allLabel}</span>
           <span>{visiblePosts.length}</span>
         </button>
-        {categories.map((category) => (
+        {sidebarCategories.map((category) => (
           <button type="button" class="archive-explorer__chip" data-filter-category={category.toLowerCase()}>
             <span>{category}</span>
-            <span>{categoriesMap[category].length}</span>
+            <span>{(currentRootCategory ? categoriesMap : topLevelCategoriesMap)[category].length}</span>
           </button>
         ))}
       </div>

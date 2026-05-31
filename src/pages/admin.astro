@@ -171,7 +171,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                   <label class="text-sm font-medium whitespace-nowrap">小分类</label>
                   <div class="flex-1 min-w-0">
-                    <input id="post-subcategory" list="post-category-options" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="选择已有小分类或输入新分类" />
+                    <input id="post-subcategory" list="post-subcategory-options" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="选择已有小分类或输入新分类" />
+                    <datalist id="post-subcategory-options"></datalist>
                   </div>
                 </div>
                 <p class="text-xs text-[var(--text-color)]/60">大分类用于总归类，小分类用于细分；留空小分类时会只保留大分类。</p>
@@ -452,7 +453,11 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     parseHeaderContactFromTs,
     toIsoDateTime
   } from "@/utils/admin-service";
-  import { normalizeCategoryItems } from '@utils/blog-taxonomy';
+  import {
+    getPrimaryCategoryFromItems,
+    getSubcategoriesFromItems,
+    normalizeCategoryItems,
+  } from '@utils/blog-taxonomy';
 
   const SESSION_KEY = "cmchen_admin_ok";
   const ADMIN_GH_TOKEN_KEY = "cmchen_admin_gh_token";
@@ -480,7 +485,12 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
   const adminPanel = document.getElementById("admin-panel");
   const loginMsg = document.getElementById("login-msg");
   const categoryDatalist = document.getElementById("post-category-options");
+  const subcategoryDatalist = document.getElementById("post-subcategory-options");
   const categorySelect = document.getElementById("post-category-select");
+  let categoryOptionMeta = {
+    topLevelCategories: [],
+    subcategoriesByRoot: {}
+  };
 
   const savedApiUrl = localStorage.getItem(ADMIN_GH_API_URL_KEY) || GITHUB_API_DEFAULT;
 
@@ -1087,11 +1097,33 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     return normalizeCategoryItems(values);
   }
 
-  function renderCategoryOptions(categories) {
-    if (!(categoryDatalist instanceof HTMLDataListElement)) return;
-    const unique = [...new Set(categories.map((item) => String(item).trim()).filter(Boolean))]
+  function normalizeCategoryOptionList(categories) {
+    return [...new Set((categories || []).map((item) => String(item).trim()).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b, "zh-Hans-CN", { sensitivity: "base" }))
       .slice(0, CATEGORY_OPTIONS_LIMIT);
+  }
+
+  function renderSubcategoryOptions(rootCategory) {
+    if (!(subcategoryDatalist instanceof HTMLDataListElement)) return;
+    const subcategories = normalizeCategoryOptionList(categoryOptionMeta.subcategoriesByRoot[rootCategory] || []);
+    subcategoryDatalist.innerHTML = "";
+    subcategories.forEach((category) => {
+      const option = document.createElement("option");
+      option.value = category;
+      subcategoryDatalist.appendChild(option);
+    });
+  }
+
+  function syncSubcategoryOptions() {
+    const rootCategory = (document.getElementById("post-category")?.value || "").trim();
+    renderSubcategoryOptions(rootCategory);
+  }
+
+  function renderCategoryOptions(meta) {
+    if (!(categoryDatalist instanceof HTMLDataListElement)) return;
+    const nextMeta = meta || { topLevelCategories: [], subcategoriesByRoot: {} };
+    categoryOptionMeta = nextMeta;
+    const unique = normalizeCategoryOptionList(nextMeta.topLevelCategories);
 
     categoryDatalist.innerHTML = "";
     unique.forEach((category) => {
@@ -1115,6 +1147,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         categorySelect.appendChild(option);
       });
     }
+
+    syncSubcategoryOptions();
   }
 
   function sanitizeMarkdownImageAlt(content) {
@@ -1125,7 +1159,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     const token = getToken();
     const branch = getBranch();
     if (!token) {
-      renderCategoryOptions([]);
+      renderCategoryOptions({ topLevelCategories: [], subcategoriesByRoot: {} });
       return;
     }
 
@@ -1133,8 +1167,8 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       var cached = localStorage.getItem(CATEGORY_CACHE_KEY);
       if (cached) {
         var cache = JSON.parse(cached);
-        if (cache && cache.branch === branch && (Date.now() - cache.ts) < CATEGORY_CACHE_TTL && cache.categories && cache.categories.length > 0) {
-          renderCategoryOptions(cache.categories);
+        if (cache && cache.branch === branch && (Date.now() - cache.ts) < CATEGORY_CACHE_TTL && cache.topLevelCategories && cache.topLevelCategories.length > 0) {
+          renderCategoryOptions(cache);
           return;
         }
       }
@@ -1145,30 +1179,52 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         ? preloadedEntries
         : await listBlogMarkdownEntries(token, branch).catch(function() { return []; });
       var categorySet = new Set();
+      var subcategoriesByRoot = {};
 
       for (var i = 0; i < entries.length; i++) {
         try {
           var meta = await getFileMeta(entries[i].path, token, branch, true);
           var markdown = decodeFileContent(meta && meta.content ? meta.content : "");
           var cats = extractCategoriesFromMarkdown(markdown);
-          for (var j = 0; j < cats.length; j++) {
-            categorySet.add(cats[j]);
+          var rootCategory = getPrimaryCategoryFromItems(cats);
+          if (!rootCategory) {
+            continue;
+          }
+
+          categorySet.add(rootCategory);
+
+          var subcategories = getSubcategoriesFromItems(cats);
+          if (subcategories.length > 0) {
+            if (!subcategoriesByRoot[rootCategory]) {
+              subcategoriesByRoot[rootCategory] = new Set();
+            }
+            for (var j = 0; j < subcategories.length; j++) {
+              subcategoriesByRoot[rootCategory].add(subcategories[j]);
+            }
           }
         } catch (e) {}
       }
 
-      var categories = Array.from(categorySet);
-      renderCategoryOptions(categories);
+      var categoryMeta = {
+        topLevelCategories: Array.from(categorySet),
+        subcategoriesByRoot: Object.fromEntries(
+          Object.entries(subcategoriesByRoot).map(function([rootCategory, values]) {
+            return [rootCategory, Array.from(values)];
+          })
+        )
+      };
+      renderCategoryOptions(categoryMeta);
 
       try {
         localStorage.setItem(CATEGORY_CACHE_KEY, JSON.stringify({
           branch: branch,
           ts: Date.now(),
-          categories: categories
+          topLevelCategories: categoryMeta.topLevelCategories,
+          subcategoriesByRoot: categoryMeta.subcategoriesByRoot
         }));
       } catch (e) {}
     } catch (e) {
-      renderCategoryOptions([]);
+      renderCategoryOptions({ topLevelCategories: [], subcategoriesByRoot: {} });
     }
   }
 
@@ -1195,6 +1251,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     if (contentInput) contentInput.value = "";
     const pinnedCheckbox = document.getElementById("post-pinned");
     if (pinnedCheckbox instanceof HTMLInputElement) pinnedCheckbox.checked = false;
+    syncSubcategoryOptions();
   }
 
   function getSelectedPostSlug() {
@@ -1453,6 +1510,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
           categorySelect.value = "";
         }
       }
+      syncSubcategoryOptions();
     }
     if (contentInput) contentInput.value = (content || "").trim();
 
@@ -1492,6 +1550,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     const picked = (categorySelect.value || "").trim();
     const inputEl = document.getElementById("post-category");
     if (inputEl && picked) inputEl.value = picked;
+    syncSubcategoryOptions();
   });
   document.getElementById("post-category")?.addEventListener("input", () => {
     if (!(categorySelect instanceof HTMLSelectElement)) return;
@@ -1500,6 +1559,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     if (categorySelect.value !== value) {
       categorySelect.value = "";
     }
+    syncSubcategoryOptions();
   });
   document.getElementById("load-selected-post-btn")?.addEventListener("click", async () => {
     const msgEl = document.getElementById("post-msg");
