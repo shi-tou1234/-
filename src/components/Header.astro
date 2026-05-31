@@ -21,6 +21,22 @@ const desktopNavLinkPxClass = isEn ? 'px-2 lg:px-2.5' : 'px-2 lg:px-3';
 const locales = (i18n?.locales || []).map(locale => String(locale));
 const showLanguageSwitcher = locales.length > 1;
 
+const basePath = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
+const rawPath = Astro.url.pathname;
+let currentPagePath = rawPath;
+if (basePath && basePath !== "/" && currentPagePath.startsWith(basePath)) {
+  currentPagePath = currentPagePath.slice(basePath.length) || "/";
+}
+if (currentLang !== i18n!.defaultLocale) {
+  const localePrefix = `/${currentLang}`;
+  if (currentPagePath.startsWith(localePrefix + "/")) {
+    currentPagePath = currentPagePath.slice(localePrefix.length);
+  } else if (currentPagePath === localePrefix) {
+    currentPagePath = "/";
+  }
+}
+if (!currentPagePath.startsWith("/")) currentPagePath = "/" + currentPagePath;
+
 const indexPage = getRelativeLocaleUrl(currentLang, "/");
 const archivesPage = getRelativeLocaleUrl(currentLang, "/archives/");
 const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
@@ -76,10 +92,21 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
     
     <!-- tools -->
     <div class="shrink-0 flex flex-nowrap gap-2 pl-1 md:pl-2 py-2 justify-end z-30">
-        <!-- Search -->
-        <button id="search-button" class="hidden min-[380px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
-            <Icon name="fa6-solid:magnifying-glass" class="w-4 h-4" />
-        </button>
+        <!-- Search Input -->
+        <div class="search-input-container relative flex items-center group">
+          <input 
+            type="text" 
+            id="search-button"
+            class="header-search-input w-10 h-10 bg-transparent border border-[var(--button-border-color)] rounded-full cursor-pointer outline-none transition-all duration-500 text-[var(--text-color)] text-sm pl-10 pr-4 placeholder-transparent"
+            placeholder={t("search.placeholder") + "..."}
+            readonly
+            autocomplete="off"
+          />
+          <svg class="header-search-icon absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-[var(--text-color)] transition-all duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <span class="header-search-border absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-[var(--link-color)] transition-all duration-500 rounded-full"></span>
+        </div>
         <!-- Dark Mode -->
         <ThemeIcon class="hide-on-tiny flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] rounded-lg hover:text-current active:scale-90 border border-[var(--button-border-color)] transition-all duration-300"/>
         <!-- Font Size -->
@@ -109,7 +136,7 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
           <div id="language-menu" class="hidden absolute right-0 mt-2 w-30 bg-[var(--bg-color)] border border-[var(--button-border-color)] rounded-lg shadow-lg z-50">
               <div class="py-1 text-right">
                   {locales.map((locale) => (
-                    <a href={getRelativeLocaleUrl(locale, "/")} class={`block mx-2 my-1 p-2 text-sm rounded ${
+                    <a href={getRelativeLocaleUrl(locale, currentPagePath)} class={`block mx-2 my-1 p-2 text-sm rounded ${
                       currentLang === locale ? "bg-[var(--button-hover-color)]" : "hover:bg-[var(--button-hover-color)]"}`}>
                       {currentLang === locale ? <Icon name="fa6-solid:circle" class="w-2 h-2 inline mr-2" /> : ""}
                       {locale === "zh-cn" ? "简体中文" : (locale === "en" ? "English" : locale)}
@@ -133,8 +160,8 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
                     <button id="mobile-theme-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">主题</button>
                     <button id="mobile-guide-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">指南</button>
                     <button class="copy-email-action px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]" data-email={headerContact.email}>邮箱</button>
-                    <a href={getRelativeLocaleUrl("zh-cn", "/")} class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">中文</a>
-                    <a href={getRelativeLocaleUrl("en", "/")} class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">EN</a>
+                    <a href={getRelativeLocaleUrl("zh-cn", currentPagePath)} class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">中文</a>
+                    <a href={getRelativeLocaleUrl("en", currentPagePath)} class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">EN</a>
                     <button id="mobile-fontsize-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">字体</button>
                   </div>
                 </div>
@@ -270,37 +297,79 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
   color: var(--text-color);
   cursor: pointer;
   user-select: none;
-}
-
-.header-slice-text::before,
-.header-slice-text::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: transparent;
-  color: var(--text-color);
-  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  pointer-events: none;
+  transition: filter 0.5s ease, transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1.2), letter-spacing 0.5s ease, text-shadow 0.5s ease;
 }
 
 .header-slice-text::before {
-  clip-path: polygon(0 0, 100% 0, 100% 48%, 0 55%);
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: -30px;
+  right: -30px;
+  bottom: -20px;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.3s ease, transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.header-slice-text::after {
-  clip-path: polygon(0 55%, 100% 48%, 100% 100%, 0 100%);
+.header-slice-text:hover {
+  filter: blur(0.5px);
+  text-shadow: 
+    4px 0 8px rgba(59, 130, 246, 0.35),
+    -4px 0 8px rgba(59, 130, 246, 0.35),
+    0 4px 8px rgba(59, 130, 246, 0.25),
+    0 -4px 8px rgba(59, 130, 246, 0.25),
+    2px 2px 6px rgba(59, 130, 246, 0.2),
+    -2px -2px 6px rgba(59, 130, 246, 0.2);
+  letter-spacing: 0.08em;
+  transform: scale(1.04);
 }
 
 .header-slice-text:hover::before {
-  transform: translate(-10px, -3px);
+  opacity: 1;
+  transform: scale(1.8);
 }
 
-.header-slice-text:hover::after {
-  transform: translate(10px, 3px);
+.search-input-container {
+  display: none;
 }
+
+@media (min-width: 380px) {
+  .search-input-container {
+    display: flex;
+  }
+}
+
+.header-search-input {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.header-search-input:focus {
+  width: 12rem;
+  border-radius: 9999px;
+  cursor: text;
+  padding-right: 1rem;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+.header-search-input:focus ~ .header-search-border {
+  width: calc(100% - 1rem);
+}
+
+.header-search-input:focus ~ .header-search-icon {
+  color: var(--link-color);
+  transform: translateY(-50%) scale(0.85);
+}
+
+.header-search-input:not(:focus):hover {
+  background: var(--button-hover-color);
+  border-color: var(--text-color);
+}
+
 .tiny-only {
   display: none;
 }
