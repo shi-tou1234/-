@@ -1,14 +1,14 @@
 ---
 title: 竞争与冒险
 pubDate: 2026-05-31T12:22:00.000Z
-updatedDate: 2026-05-31T12:57:31.477Z
+updatedDate: 2026-05-31T13:02:39.832Z
 draft: false
 description: 
 category: 数电
 slugId: 竞争与冒险
 ---
 
-
+本文图片来自b站小牛老师
 
 ![](./assets/屏幕截图-2026-05-31-201900.png)
 竞争产生的原因：门的延迟
