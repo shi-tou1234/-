@@ -359,6 +359,8 @@ const serializedCategoryCounts = JSON.stringify(
           button.setAttribute('aria-pressed', matched ? 'true' : 'false');
         });
 
+        updateRootChipActiveStates();
+
         posts.forEach((post) => {
           if (!(post instanceof HTMLElement)) return;
           stopAnimations(post);
@@ -503,6 +505,16 @@ const serializedCategoryCounts = JSON.stringify(
         });
       };
 
+      const updateRootChipActiveStates = () => {
+        rootChips.forEach((chip) => {
+          if (!(chip instanceof HTMLElement)) return;
+          const cat = (chip.dataset.rootCategory || '').trim().toLowerCase();
+          const matched = cat ? selectedCategories.has(cat) : selectedCategories.size === 0;
+          chip.dataset.active = matched ? 'true' : 'false';
+          chip.setAttribute('aria-pressed', matched ? 'true' : 'false');
+        });
+      };
+
       const animateViewSwitch = (fromView, toView, direction = 'forward') => {
         if (!fromView || !toView) return;
 
@@ -580,7 +592,21 @@ const serializedCategoryCounts = JSON.stringify(
         chip.addEventListener('click', () => {
           if (!(chip instanceof HTMLElement)) return;
           const rootCategory = chip.dataset.rootCategory || '';
-          if (rootCategory) enterSubView(rootCategory);
+          if (!rootCategory) return;
+
+          const subcategories = subcategoriesByRootData[rootCategory] || [];
+          if (subcategories.length > 0) {
+            enterSubView(rootCategory);
+          } else {
+            if (selectedCategories.has(rootCategory)) {
+              selectedCategories.clear();
+            } else {
+              selectedCategories.clear();
+              selectedCategories.add(rootCategory);
+            }
+            applyFilter([...selectedCategories], true);
+            syncUrlCategories();
+          }
         });
       });
 
@@ -605,6 +631,7 @@ const serializedCategoryCounts = JSON.stringify(
           enterSubView(firstInitial);
         } else {
           setSelectedCategories(initialCategories, false, false);
+          updateRootChipActiveStates();
         }
       } else {
         setSelectedCategories([], false, false);
