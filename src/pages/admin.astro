@@ -157,15 +157,24 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
             </div>
 
             <div class="rounded border border-[var(--button-border-color)] p-3">
-              <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-                <label class="text-sm font-medium whitespace-nowrap">分类</label>
-                <div class="flex-1 min-w-0 flex flex-col gap-2 sm:flex-row sm:items-center">
-                  <input id="post-category" list="post-category-options" type="text" class="flex-1 min-w-0 rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="选择已有分类或输入新分类" />
-                  <datalist id="post-category-options"></datalist>
-                  <select id="post-category-select" class="flex-1 min-w-0 rounded border border-[var(--button-border-color)] bg-[var(--bg-color)] px-2 py-1.5 text-sm text-[var(--text-color)]">
-                    <option value="">手动输入新分类</option>
-                  </select>
+              <div class="space-y-3">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                  <label class="text-sm font-medium whitespace-nowrap">大分类</label>
+                  <div class="flex-1 min-w-0 flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <input id="post-category" list="post-category-options" type="text" class="flex-1 min-w-0 rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="选择已有大分类或输入新分类" />
+                    <datalist id="post-category-options"></datalist>
+                    <select id="post-category-select" class="flex-1 min-w-0 rounded border border-[var(--button-border-color)] bg-[var(--bg-color)] px-2 py-1.5 text-sm text-[var(--text-color)]">
+                      <option value="">手动输入新大分类</option>
+                    </select>
+                  </div>
                 </div>
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                  <label class="text-sm font-medium whitespace-nowrap">小分类</label>
+                  <div class="flex-1 min-w-0">
+                    <input id="post-subcategory" list="post-category-options" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="选择已有小分类或输入新分类" />
+                  </div>
+                </div>
+                <p class="text-xs text-[var(--text-color)]/60">大分类用于总归类，小分类用于细分；留空小分类时会只保留大分类。</p>
               </div>
             </div>
 
@@ -443,6 +452,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     parseHeaderContactFromTs,
     toIsoDateTime
   } from "@/utils/admin-service";
+  import { normalizeCategoryItems } from '@utils/blog-taxonomy';
 
   const SESSION_KEY = "cmchen_admin_ok";
   const ADMIN_GH_TOKEN_KEY = "cmchen_admin_gh_token";
@@ -1074,7 +1084,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         .forEach((item) => values.push(item));
     }
 
-    return [...new Set(values.filter(Boolean))];
+    return normalizeCategoryItems(values);
   }
 
   function renderCategoryOptions(categories) {
@@ -1170,6 +1180,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     const descInput = document.getElementById("post-desc");
     const coverInput = document.getElementById("post-cover");
     const categoryInput = document.getElementById("post-category");
+    const subcategoryInput = document.getElementById("post-subcategory");
     const contentInput = document.getElementById("post-content");
 
     if (titleInput) titleInput.value = "";
@@ -1179,6 +1190,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     if (descInput) descInput.value = "";
     if (coverInput) coverInput.value = "";
     if (categoryInput) categoryInput.value = "";
+    if (subcategoryInput) subcategoryInput.value = "";
     if (categorySelect instanceof HTMLSelectElement) categorySelect.value = "";
     if (contentInput) contentInput.value = "";
     const pinnedCheckbox = document.getElementById("post-pinned");
@@ -1342,13 +1354,14 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const csvRows = [["title", "slug", "lang", "date", "description", "category"]];
       for (const post of posts) {
         const { frontmatter } = parsePostMarkdown(post.markdown);
+        const categories = extractCategoriesFromMarkdown(post.markdown);
         const row = [
           escapeCsvField(frontmatter.title || ""),
           post.slug,
           post.lang,
           frontmatter.pubDate || "",
           escapeCsvField(frontmatter.description || ""),
-          escapeCsvField(frontmatter.category || ""),
+          escapeCsvField(categories.join(" / ")),
         ];
         csvRows.push(row);
 
@@ -1419,6 +1432,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     const descInput = document.getElementById("post-desc");
     const coverInput = document.getElementById("post-cover");
     const categoryInput = document.getElementById("post-category");
+    const subcategoryInput = document.getElementById("post-subcategory");
     const contentInput = document.getElementById("post-content");
 
     if (titleInput) titleInput.value = frontmatter.title || "";
@@ -1429,8 +1443,10 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     if (coverInput) coverInput.value = frontmatter.image || "";
     if (categoryInput) {
       const parsedCategories = extractCategoriesFromMarkdown(rawMarkdown);
-      const currentCategory = frontmatter.category || parsedCategories[0] || "";
+      const currentCategory = parsedCategories[0] || "";
+      const subCategory = parsedCategories[1] || "";
       categoryInput.value = currentCategory;
+      if (subcategoryInput) subcategoryInput.value = subCategory;
       if (categorySelect instanceof HTMLSelectElement) {
         categorySelect.value = currentCategory;
         if (categorySelect.value !== currentCategory) {
@@ -1685,6 +1701,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
       const description = (document.getElementById("post-desc")?.value || "").trim();
       const image = (document.getElementById("post-cover")?.value || "").trim();
       const category = (document.getElementById("post-category")?.value || "").trim();
+      const subCategory = (document.getElementById("post-subcategory")?.value || "").trim();
       const pinnedCheckbox = document.getElementById("post-pinned");
       const pinned = pinnedCheckbox instanceof HTMLInputElement ? pinnedCheckbox.checked : false;
       const contentInput = document.getElementById("post-content");
@@ -1709,6 +1726,7 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
         description,
         image,
         category,
+        subCategory,
         slugId: slug,
         content,
         pinned

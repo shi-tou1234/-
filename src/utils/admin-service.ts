@@ -3,6 +3,8 @@
 // 提供：密码验证、文件 CRUD、文章列表、友链/联系方式/关于 解析与构建
 // =====================================================================
 
+import { normalizeCategoryItems } from '@utils/blog-taxonomy';
+
 // ====== Types ======
 
 type SecurityConfig = {
@@ -286,15 +288,20 @@ export function buildPostMarkdown(data: {
   description: string;
   image: string;
   category: string;
+  subCategory?: string;
   slugId: string;
   content: string;
   pinned?: boolean;
 }): string {
   const imageLine = data.image ? `image: ${data.image}\n` : "";
-  const categoryLine = data.category ? `category: ${data.category}\n` : "";
+  const categories = normalizeCategoryItems([data.category, data.subCategory || ""]);
+  const categoryLine = categories[0] ? `category: ${categories[0]}\n` : "";
+  const categoriesLine = categories.length > 0
+    ? `categories:\n${categories.map((category) => `  - ${category}`).join("\n")}\n`
+    : "";
   const updatedDateLine = data.updatedDate ? `updatedDate: ${data.updatedDate}\n` : "";
   const pinnedLine = data.pinned ? `pinned: true\n` : "";
-  return `---\ntitle: ${data.title}\npubDate: ${data.date}\n${updatedDateLine}draft: false\n${pinnedLine}description: ${data.description}\n${imageLine}${categoryLine}slugId: ${data.slugId}\n---\n\n${data.content}\n`;
+  return `---\ntitle: ${data.title}\npubDate: ${data.date}\n${updatedDateLine}draft: false\n${pinnedLine}description: ${data.description}\n${imageLine}${categoryLine}${categoriesLine}slugId: ${data.slugId}\n---\n\n${data.content}\n`;
 }
 
 export function toIsoDateTime(dateTimeLocalValue: string): string {

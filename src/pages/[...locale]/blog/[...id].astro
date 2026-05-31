@@ -72,13 +72,18 @@ const wordCount = estimateWordCount(entry.body || '');
 const backButtonText = currentLang === 'zh-cn' ? '返回上一页' : 'Back to previous page';
 const backFallbackUrl = getRelativeLocaleUrl(currentLang, '/');
 const allBlogPosts = await getBlogEntrySort(currentLang);
-const activeCategory = currentCategories[0] || '';
+const rootCategory = currentCategories[0] || '';
+const activeCategory = currentCategories.length > 1 ? currentCategories[currentCategories.length - 1] : rootCategory;
+const categoryTrail = currentCategories.join(' / ');
 const sameCategoryPosts = activeCategory
     ? allBlogPosts
         .filter((post) => post.id !== entry.id && getPostCategories(post, currentLang).includes(activeCategory))
         .slice(0, 20)
     : [];
-const categoryPageUrl = getRelativeLocaleUrl(currentLang, `/categories/${encodeCategoryParam(activeCategory)}`);
+const rootCategoryPageUrl = rootCategory && rootCategory !== activeCategory
+    ? getRelativeLocaleUrl(currentLang, `/categories/${encodeCategoryParam(rootCategory)}`)
+    : '';
+const categoryPageUrl = activeCategory ? getRelativeLocaleUrl(currentLang, `/categories/${encodeCategoryParam(activeCategory)}`) : '';
 const homeLabel = currentLang === 'en' ? 'Home' : '首页';
 const updatedLabel = currentLang === 'en' ? 'Last updated on' : '最后更新于';
 const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf() > entry.data.pubDate.valueOf();
@@ -91,7 +96,7 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
                 <div class="post-left-sidebar-inner">
                     <CategoryPostNavi
                         language={currentLang}
-                        category={activeCategory}
+                        category={categoryTrail || activeCategory}
                         posts={sameCategoryPosts}
                         categoryPageUrl={categoryPageUrl}
                     />
@@ -102,10 +107,16 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
         <div id="post-reading-shell" class="post-content-column">
             <nav class="mb-4 text-sm text-[var(--text-color)]/65" aria-label={currentLang === 'en' ? 'Breadcrumb' : '面包屑导航'}>
                 <a href={getRelativeLocaleUrl(currentLang, '/')} class="hover:text-[var(--link-color)]">{homeLabel}</a>
-                {activeCategory && (
+                {rootCategory && (
                     <>
                         <span class="px-2">&gt;</span>
-                        <a href={categoryPageUrl} class="hover:text-[var(--link-color)]">{activeCategory}</a>
+                        <a href={rootCategoryPageUrl || categoryPageUrl} class="hover:text-[var(--link-color)]">{rootCategory}</a>
+                        {activeCategory && activeCategory !== rootCategory && (
+                            <>
+                                <span class="px-2">&gt;</span>
+                                <a href={categoryPageUrl} class="hover:text-[var(--link-color)]">{activeCategory}</a>
+                            </>
+                        )}
                     </>
                 )}
                 <span class="px-2">&gt;</span>
