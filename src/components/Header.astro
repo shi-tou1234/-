@@ -49,7 +49,10 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
     <!-- logo -->
     <div class="pr-3 md:pr-5 py-2 z-30 shrink-0 header-logo -ml-2 md:-ml-20 hidden md:block">
         <a href={ indexPage } >
-            <span class="header-slice-text text-3xl font-bold" data-text={siteConfig.title}>{ siteConfig.title }</span>
+            <span class="header-slice-text text-3xl font-bold" data-text={siteConfig.title} data-header-logo="true">
+              <span class="header-slice-text__base">{ siteConfig.title }</span>
+              <span class="header-slice-text__shards" aria-hidden="true"></span>
+            </span>
         </a>
       <p id="header-running-days" class="text-sm text-[var(--text-color)]/65 mt-1" data-running-since="2026-02-12" data-runtime-label={runtimeLabel} data-runtime-suffix={runtimeSuffix}>
         {runtimeLabel} 1 {runtimeSuffix}
@@ -282,94 +285,98 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
 
 .header-slice-text {
   position: relative;
-  display: inline-block;
+  display: inline-grid;
+  grid-template-areas: "stack";
   color: var(--text-color);
   cursor: pointer;
   user-select: none;
-  transition: filter 0.4s ease, transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1.2), letter-spacing 0.4s ease, text-shadow 0.4s ease;
+  isolation: isolate;
+  line-height: 1;
+  white-space: pre;
+  overflow: visible;
+  text-rendering: geometricPrecision;
+  --fracture-progress: 0;
+  --fracture-shift-x: 0;
+  --fracture-shift-y: 0;
+  --fracture-color: color-mix(in srgb, var(--text-color) 88%, var(--link-color) 12%);
 }
 
 .header-slice-text::before {
   content: '';
   position: absolute;
-  top: -40px;
-  left: -50px;
-  right: -50px;
-  bottom: -40px;
+  inset: -0.35rem -0.55rem;
   z-index: -1;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.1) 40%, transparent 70%);
-  opacity: 0;
-  transform: scale(0.3);
-  transition: opacity 0.25s ease, transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--link-color) 12%, transparent) 0%, transparent 70%);
+  filter: blur(10px);
+  opacity: calc(var(--fracture-progress) * 0.24);
+  transform: scale(calc(0.95 + var(--fracture-progress) * 0.1));
+  pointer-events: none;
 }
 
 .header-slice-text::after {
   content: '';
   position: absolute;
-  top: -30px;
-  left: -40px;
-  right: -40px;
-  bottom: -30px;
+  left: -0.1rem;
+  right: -0.1rem;
+  top: 50%;
+  height: 1.5px;
   z-index: -1;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 60%);
-  opacity: 0;
-  transform: scale(0.2);
-  transition: opacity 0.3s ease 0.08s, transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) 0.08s;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--link-color) 26%, transparent), transparent);
+  filter: blur(0.35px);
+  opacity: calc(var(--fracture-progress) * 0.3);
+  transform: translateY(-50%) scaleX(calc(0.78 + var(--fracture-progress) * 0.22));
+  pointer-events: none;
 }
 
-.header-slice-text:hover {
-  filter: blur(2px);
-  text-shadow: 
-    8px 0 12px rgba(59, 130, 246, 0.5),
-    -8px 0 12px rgba(59, 130, 246, 0.5),
-    0 6px 12px rgba(59, 130, 246, 0.4),
-    0 -6px 12px rgba(59, 130, 246, 0.4),
-    5px 5px 10px rgba(59, 130, 246, 0.3),
-    -5px -5px 10px rgba(59, 130, 246, 0.3),
-    10px -3px 14px rgba(59, 130, 246, 0.25),
-    -10px 3px 14px rgba(59, 130, 246, 0.25);
-  letter-spacing: 0.18em;
-  transform: scale(1.08);
+.header-slice-text__base,
+.header-slice-text__shards {
+  grid-area: stack;
 }
 
-@keyframes waterRipple {
-  0% {
-    text-shadow: 
-      8px 0 12px rgba(59, 130, 246, 0.5),
-      -8px 0 12px rgba(59, 130, 246, 0.5),
-      0 6px 12px rgba(59, 130, 246, 0.4),
-      0 -6px 12px rgba(59, 130, 246, 0.4);
-  }
-  50% {
-    text-shadow: 
-      14px 4px 18px rgba(59, 130, 246, 0.35),
-      -14px -4px 18px rgba(59, 130, 246, 0.35),
-      4px 10px 16px rgba(59, 130, 246, 0.3),
-      -4px -10px 16px rgba(59, 130, 246, 0.3);
-  }
-  100% {
-    text-shadow: 
-      8px 0 12px rgba(59, 130, 246, 0.5),
-      -8px 0 12px rgba(59, 130, 246, 0.5),
-      0 6px 12px rgba(59, 130, 246, 0.4),
-      0 -6px 12px rgba(59, 130, 246, 0.4);
-  }
+.header-slice-text__base {
+  position: relative;
+  z-index: 2;
+  white-space: pre;
+  transition: opacity 180ms ease, filter 180ms ease, transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), letter-spacing 220ms ease;
+  opacity: calc(1 - var(--fracture-progress) * 0.26);
+  filter: blur(calc(var(--fracture-progress) * 0.22px));
+  transform: translate3d(0, calc(var(--fracture-progress) * -0.7px), 0) scale(calc(1 + var(--fracture-progress) * 0.012));
+  letter-spacing: calc(var(--fracture-progress) * 0.025em);
 }
 
-.header-slice-text:hover {
-  animation: waterRipple 1.5s ease-in-out infinite;
+.header-slice-text__shards {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: var(--fracture-progress);
 }
 
-.header-slice-text:hover::before {
-  opacity: 1;
-  transform: scale(2);
+.header-slice-text__fragment {
+  position: absolute;
+  inset: 0;
+  display: block;
+  white-space: pre;
+  color: var(--fracture-color);
+  transform-origin: center center;
+  backface-visibility: hidden;
+  clip-path: var(--fragment-clip);
+  opacity: calc(var(--fracture-progress) * var(--fragment-opacity));
+  filter: blur(calc(var(--fracture-progress) * 0.18px));
+  transform:
+    translate3d(
+      calc(var(--fracture-progress) * (var(--fragment-dx) + var(--fracture-shift-x) * 3.5) * 1px),
+      calc(var(--fracture-progress) * (var(--fragment-dy) + var(--fracture-shift-y) * 3.5) * 1px),
+      0
+    )
+    rotate(calc(var(--fracture-progress) * var(--fragment-rot) * 1deg))
+    scale(calc(1 + var(--fracture-progress) * (var(--fragment-scale) - 1)));
+  will-change: transform, opacity, filter, clip-path;
 }
 
-.header-slice-text:hover::after {
-  opacity: 1;
-  transform: scale(1.6);
+.header-slice-text.is-fracturing {
+  filter: saturate(0.98) contrast(1.01);
 }
 
 .tiny-only {
@@ -442,6 +449,186 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
   }
 
 </style>
+
+<script>
+function initHeaderLogoFracture() {
+  const previousCleanup = window.__headerLogoFractureCleanup;
+  if (previousCleanup) {
+    previousCleanup();
+  }
+
+  const logo = document.querySelector('[data-header-logo="true"]');
+  if (!logo) return;
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!window.matchMedia('(pointer: fine)').matches) return;
+
+  const baseLayer = logo.querySelector('.header-slice-text__base');
+  const shardLayer = logo.querySelector('.header-slice-text__shards');
+  if (!baseLayer || !shardLayer) return;
+
+  const title = logo.getAttribute('data-text') || baseLayer.textContent || '';
+  const shardBands = [
+    { top: 0, bottom: 18, dx: -5.6, dy: -8.4, rot: -1.8, scale: 1.01, opacity: 0.42 },
+    { top: 15, bottom: 34, dx: 4.8, dy: -4.1, rot: 1.4, scale: 1.014, opacity: 0.46 },
+    { top: 32, bottom: 52, dx: -3.3, dy: 3.4, rot: -1.0, scale: 1.008, opacity: 0.52 },
+    { top: 50, bottom: 70, dx: 6.1, dy: 6.8, rot: 1.6, scale: 1.015, opacity: 0.48 },
+    { top: 68, bottom: 100, dx: -4.5, dy: 10.4, rot: -1.2, scale: 1.009, opacity: 0.4 },
+  ];
+
+  shardLayer.textContent = '';
+
+  shardBands.forEach((band, index) => {
+    const fragment = document.createElement('span');
+    fragment.className = 'header-slice-text__fragment';
+    fragment.setAttribute('aria-hidden', 'true');
+    fragment.textContent = title;
+
+    const bandShift = index % 2 === 0 ? -1.4 : 1.4;
+    fragment.style.setProperty('--fragment-clip', `inset(${band.top}% 0 ${100 - band.bottom}% 0)`);
+    fragment.style.setProperty('--fragment-dx', String(band.dx + bandShift));
+    fragment.style.setProperty('--fragment-dy', String(band.dy));
+    fragment.style.setProperty('--fragment-rot', String(band.rot));
+    fragment.style.setProperty('--fragment-scale', String(band.scale));
+    fragment.style.setProperty('--fragment-opacity', String(band.opacity));
+
+    shardLayer.appendChild(fragment);
+  });
+
+  let animationFrame = 0;
+  let progress = 0;
+  let target = 0;
+  let pointerX = 0;
+  let pointerY = 0;
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  const setProgress = (nextProgress) => {
+    progress = nextProgress;
+    logo.style.setProperty('--fracture-progress', progress.toFixed(4));
+    logo.classList.toggle('is-fracturing', progress > 0.015);
+  };
+
+  const sampleTarget = (clientX, clientY) => {
+    const rect = logo.getBoundingClientRect();
+    if (!rect.width || !rect.height) return 0;
+
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const haloX = Math.max(110, rect.width * 1.12);
+    const haloY = Math.max(72, rect.height * 1.5);
+    const distanceX = Math.abs(clientX - centerX) / haloX;
+    const distanceY = Math.abs(clientY - centerY) / haloY;
+    const distance = Math.hypot(distanceX, distanceY);
+
+    if (distance >= 1) return 0;
+
+    const proximity = 1 - distance;
+    return proximity * proximity * (3 - 2 * proximity);
+  };
+
+  const updateDirection = () => {
+    const rect = logo.getBoundingClientRect();
+    if (!rect.width || !rect.height) {
+      logo.style.setProperty('--fracture-shift-x', '0');
+      logo.style.setProperty('--fracture-shift-y', '0');
+      return;
+    }
+
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const shiftX = clamp((centerX - pointerX) / Math.max(rect.width, 1), -1, 1) * 0.85;
+    const shiftY = clamp((centerY - pointerY) / Math.max(rect.height, 1), -1, 1) * 0.85;
+
+    logo.style.setProperty('--fracture-shift-x', shiftX.toFixed(3));
+    logo.style.setProperty('--fracture-shift-y', shiftY.toFixed(3));
+  };
+
+  const stopAnimation = () => {
+    target = 0;
+    logo.style.setProperty('--fracture-shift-x', '0');
+    logo.style.setProperty('--fracture-shift-y', '0');
+    if (!animationFrame) {
+      animationFrame = window.requestAnimationFrame(step);
+    }
+  };
+
+  const step = () => {
+    animationFrame = 0;
+
+    const delta = target - progress;
+    if (Math.abs(delta) < 0.001) {
+      setProgress(target);
+    } else {
+      setProgress(progress + delta * 0.14);
+    }
+
+    if (target > 0.001 || progress > 0.001) {
+      animationFrame = window.requestAnimationFrame(step);
+    }
+  };
+
+  const schedule = () => {
+    if (!animationFrame) {
+      animationFrame = window.requestAnimationFrame(step);
+    }
+  };
+
+  const handlePointerMove = (event) => {
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+    target = sampleTarget(pointerX, pointerY);
+    updateDirection();
+    schedule();
+  };
+
+  const handlePointerOut = (event) => {
+    if (event.relatedTarget) return;
+    stopAnimation();
+  };
+
+  const handleVisibilityChange = () => {
+    if (document.hidden) {
+      stopAnimation();
+    }
+  };
+
+  const handleResize = () => {
+    if (target > 0 || progress > 0) {
+      updateDirection();
+      schedule();
+    }
+  };
+
+  window.addEventListener('pointermove', handlePointerMove, { passive: true });
+  document.addEventListener('mouseout', handlePointerOut);
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  window.addEventListener('blur', stopAnimation);
+  window.addEventListener('resize', handleResize, { passive: true });
+
+  window.__headerLogoFractureCleanup = () => {
+    window.removeEventListener('pointermove', handlePointerMove);
+    document.removeEventListener('mouseout', handlePointerOut);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+    window.removeEventListener('blur', stopAnimation);
+    window.removeEventListener('resize', handleResize);
+
+    if (animationFrame) {
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+    }
+  };
+
+  setProgress(0);
+}
+
+document.addEventListener('DOMContentLoaded', initHeaderLogoFracture);
+document.addEventListener('astro:page-load', initHeaderLogoFracture);
+document.addEventListener('astro:after-swap', initHeaderLogoFracture);
+if (document.readyState !== 'loading') {
+  initHeaderLogoFracture();
+}
+</script>
 
 <script>
 function initMobileNav() {
