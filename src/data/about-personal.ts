@@ -130,6 +130,10 @@ const aboutPersonal: AboutPersonal = {
     {
       "date": "2026.5.29",
       "content": "修复目录以及回弹按钮显示问题，增加字体大小调节按钮"
+    },
+    {
+      "date": "2026.6.1",
+      "content": "修改分类页面，增加大分类小分类，优化移动端体验"
     }
   ],
   "musicTracks": [
