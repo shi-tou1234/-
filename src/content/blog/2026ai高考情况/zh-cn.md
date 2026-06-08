@@ -1,7 +1,7 @@
 ---
 title: 2026AI高考情况
 pubDate: 2026-06-08T14:14:00.000Z
-updatedDate: 2026-06-08T14:18:44.992Z
+updatedDate: 2026-06-08T14:19:21.423Z
 draft: false
 description: 
 category: 随笔
@@ -13,7 +13,7 @@ slugId: 2026ai高考情况
 # 我关注的AI博主让12个AI去考了高考
 
 > 本文转载自「数字生命卡兹克」,如有转载一律，请联系我
-[链接标题](https://finance.sina.com.cn/cj/2026-06-08/doc-iniasfpu5655196.shtml)
+[原文链接](https://finance.sina.com.cn/cj/2026-06-08/doc-iniasfpu5655196.shtml)
 
 事情是这样的
 
