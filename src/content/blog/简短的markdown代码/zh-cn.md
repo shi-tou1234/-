@@ -1,7 +1,7 @@
 ---
 title: 简短的markdown代码
 pubDate: 2026-03-13T14:34:00.000Z
-updatedDate: 2026-06-09T14:41:54.694Z
+updatedDate: 2026-06-09T15:05:05.721Z
 draft: false
 description: 
 category: 课外学习
