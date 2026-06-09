@@ -78,8 +78,6 @@ int main() {
 
 [访问网站](https://example.com)
 
-![](./assets/example.png)
-
 
 ## 表格
 
