@@ -1,13 +1,13 @@
 ---
 title: 触发器
 pubDate: 2026-06-11T13:54:00.000Z
-updatedDate: 2026-06-11T13:59:28.133Z
+updatedDate: 2026-06-11T13:59:43.477Z
 draft: false
 description: 
 category: 学习笔记
 categories:
   - 学习笔记
-  - 高数
+  - 数电
 slugId: 触发器
 ---
 
