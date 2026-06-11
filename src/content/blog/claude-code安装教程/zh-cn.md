@@ -1,7 +1,7 @@
 ---
 title: Claude code安装教程
 pubDate: 2026-06-11T15:34:00.000Z
-updatedDate: 2026-06-11T15:34:31.913Z
+updatedDate: 2026-06-11T15:48:24.342Z
 draft: false
 description: 
 category: 工具使用
@@ -116,7 +116,7 @@ WinGet 是 Windows 官方的包管理器，可以理解为 Windows 版的 Homebr
 
     https://github.com/farion1231/cc-switch/releases
 
-> **注意**：进不去 GitHub 的话，公众号后台回复 `cc`，会自动发下载链接。下载后双击，一路 next 到底。
+> **注意**：进不去 GitHub 的话，安装watt tookit,我之前好用网站推荐里有
 
 ### 配置模型（Mac / Windows 通用）
 
