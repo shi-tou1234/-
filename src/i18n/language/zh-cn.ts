@@ -1,6 +1,9 @@
 import type { Translation } from "@i18n/key";
 
 const translation: Translation = {
+    site: {
+        title: "cmchen的博客",
+    },
     header: {
         home: "首页",
         archive: "归档",

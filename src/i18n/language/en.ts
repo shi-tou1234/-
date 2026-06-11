@@ -1,6 +1,9 @@
 import type { Translation } from "@i18n/key";
 
 const translation: Translation = {
+    site: {
+        title: "cmchen's Blog",
+    },
     header: {
         home: "Home",
         archive: "Archive",

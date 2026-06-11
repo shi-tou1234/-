@@ -1,4 +1,7 @@
 export interface Translation {
+    site: {
+        title: string;
+    };
     header: {
         home: string;
         archive: string;

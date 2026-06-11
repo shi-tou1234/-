@@ -1,7 +1,7 @@
 ---
 import "@styles/global.css"
 import { Icon } from "astro-icon/components"
-import { profileConfig, siteConfig } from "@/config"
+import { profileConfig } from "@/config"
 import ThemeIcon from "./control/ThemeIcon.astro"
 import FontSizeControl from "./control/FontSizeControl.astro"
 import { baseUrl } from "@utils/url-utils"
@@ -49,8 +49,8 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
     <!-- logo -->
     <div class="pr-3 md:pr-5 py-2 z-30 shrink-0 header-logo -ml-2 md:-ml-20 hidden md:block">
         <a href={ indexPage } >
-            <span class="header-slice-text text-3xl font-bold" data-text={siteConfig.title} data-header-logo="true">
-              <span class="header-slice-text__base">{ siteConfig.title }</span>
+            <span class="header-slice-text text-3xl font-bold" data-text={t("site.title")} data-header-logo="true">
+              <span class="header-slice-text__base">{ t("site.title") }</span>
               <span class="header-slice-text__shards" aria-hidden="true"></span>
             </span>
         </a>
