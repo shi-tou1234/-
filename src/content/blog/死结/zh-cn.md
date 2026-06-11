@@ -1,12 +1,12 @@
 ---
 title: 死结
 pubDate: 2026-06-11T15:28:00.000Z
-updatedDate: 2026-06-11T15:35:30.830Z
+updatedDate: 2026-06-11T15:35:43.559Z
 draft: false
 description: 
-category: 工具使用
+category: 写在这里
 categories:
-  - 工具使用
+  - 写在这里
 slugId: 死结
 ---
 
