@@ -442,6 +442,14 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
     }
 
     @media (max-width: 1023px) {
+        .post-right-sidebar {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: visible;
+            pointer-events: none;
+        }
+
         .post-right-sidebar-inner {
             position: fixed;
             left: auto;
@@ -454,6 +462,7 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
             align-items: center;
             gap: 0.5rem;
             padding: 0;
+            pointer-events: auto;
         }
 
         .post-right-sidebar .post-toc-root {
