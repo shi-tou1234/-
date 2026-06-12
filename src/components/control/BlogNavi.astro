@@ -32,7 +32,7 @@ function getPostUrl(id: string) {
                     <Icon name="fa6-solid:arrow-left" class="h-4 w-4" />
                     <span class="text-sm transition-colors group-hover:text-[var(--text-color)]">{t("blogNavi.prev")}</span>
                 </div>
-                <span class="transition-colors text-lg font-bold text-[var(--text-color)] group-hover:text-[var(--link-color)]">
+                <span class="transition-colors text-lg font-bold text-[var(--text-color)] group-hover:text-[var(--link-color)] line-clamp-2 break-words">
                     {prev.data.title}
                 </span>
             </a>
@@ -48,7 +48,7 @@ function getPostUrl(id: string) {
                     <span class="text-sm transition-colors group-hover:text-[var(--text-color)]">{t("blogNavi.next")}</span>
                     <Icon name="fa6-solid:arrow-right" class="h-4 w-4" />
                 </div>
-                <span class="transition-colors text-lg font-bold text-[var(--text-color)] group-hover:text-[var(--link-color)]">
+                <span class="transition-colors text-lg font-bold text-[var(--text-color)] group-hover:text-[var(--link-color)] line-clamp-2 break-words">
                     {next.data.title}
                 </span>
             </a>
