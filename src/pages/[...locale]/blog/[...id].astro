@@ -395,9 +395,9 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
     @media (max-width: 1199px) {
         .post-layout-wrapper {
             flex-direction: column;
-            align-items: center;
+            align-items: stretch;
             gap: 0;
-            padding: 1rem clamp(0.75rem, 1.5vw, 1.25rem) 0;
+            padding: 1rem 0 0;
         }
 
         .post-left-sidebar {
@@ -407,6 +407,8 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
         .post-content-column {
             width: 100%;
             max-width: 100%;
+            padding-left: clamp(0.75rem, 1.5vw, 1.25rem);
+            padding-right: clamp(0.75rem, 1.5vw, 1.25rem);
         }
 
         .post-right-sidebar {
