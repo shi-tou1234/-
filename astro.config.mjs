@@ -25,6 +25,11 @@ import svelte from "@astrojs/svelte";
 export default defineConfig({
   site: 'https://shi-tou1234.github.io',
   base: '/-/',
+  image: {
+    service: {
+      entrypoint: 'astro/assets/services/noop'
+    }
+  },
   i18n: {
     locales: ['zh-cn', 'en'],
     defaultLocale: 'zh-cn',

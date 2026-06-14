@@ -1,7 +1,7 @@
 ---
-// ImageModule 对应的 CSS 需要设置为 is::global 才能被正确应用
+// ImageModule - 图片组件
+// 使用 import.meta.glob 解析本地图片路径，直接输出 img 标签避免 sharp 处理耗时
 
-import { Image } from "astro:assets";
 import path from "path"
 
 interface Props {
@@ -20,27 +20,20 @@ const isLocal = !(
     src.startsWith("/") ||
     src.startsWith("http")
 );
-const isPublic = src.startsWith("/");
 
-let imageLoad;
+let imageSrc = src;
 if (isLocal) {
-    const images = import.meta.glob<ImageMetadata>("../../**/*", {import: "default" });
+    const images = import.meta.glob<ImageMetadata>(
+        "../../**/*.{png,jpg,jpeg,gif,webp,svg,avif}",
+        { import: "default", eager: true }
+    );
     let imagePath = path.normalize(path.join("../../", "/", src)).replace(/\\/g, "/");
-    const imageImporter = images[imagePath];
-    if(!imageImporter) {
+    const imageData = images[imagePath];
+    if (!imageData) {
         console.error(`\n[ERROR] Image file not found: ${imagePath.replace('../../', 'src/')}`);
     } else {
-        imageLoad = await imageImporter()
+        imageSrc = imageData.src;
     }
 }
 ---
-<!-- <div class={className}> -->
-    { 
-    isLocal && imageLoad && 
-    <Image src={imageLoad} alt={alt || ""}  id={id || ""} class={className || ""}/>
-    }
-    {
-    !isLocal &&
-    <img src={src} alt={alt || ""}  id={id || ""} class={className || ""}/>
-    }
-<!-- </div> -->
+<img src={imageSrc} alt={alt || ""} id={id || ""} class={className || ""} loading="lazy" decoding="async"/>
