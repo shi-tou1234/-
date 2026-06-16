@@ -509,7 +509,7 @@ export function initPostHandlers() {
   document.getElementById("apply-preview-content-btn")?.addEventListener("click", () => {
     const applied = applyPreviewResult();
     if (!applied) {
-      setMsg(document.getElementById("post-msg"), "未检测到预览回填内容，请先在预览页点击"返回发布"", true);
+      setMsg(document.getElementById("post-msg"), "未检测到预览回填内容，请先在预览页点击\u201C返回发布\u201D", true);
     }
   });
 

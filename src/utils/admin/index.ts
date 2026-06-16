@@ -8,4 +8,5 @@ export {
   applyPreviewResult,
   saveGitHubDraft,
   syncApiBase,
+  setMsg,
 } from "./core";
