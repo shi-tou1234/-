@@ -57,7 +57,7 @@ import TravelMap from '@/components/misc/TravelMap.astro';
         <textarea id="about-personal-travel-cities" class="w-full min-h-[80px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder='[{"province":"北京","city":"北京","visited":true}]'></textarea>
       </div>
       <div class="rounded border border-[var(--button-border-color)] p-3">
-        <TravelMap inputId="about-personal-travel-cities" />
+        <TravelMap editable={true} storageInputId="about-personal-travel-cities" />
       </div>
     </div>
     <p id="about-personal-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
