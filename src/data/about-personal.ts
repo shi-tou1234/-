@@ -134,6 +134,10 @@ const aboutPersonal: AboutPersonal = {
     {
       "date": "2026.6.1",
       "content": "修改分类页面，增加大分类小分类，优化移动端体验"
+    },
+    {
+      "date": "2026.6.14",
+      "content": "移除一些无用代码块，拆分大文件，优化部署速度，增加solgan,删除多余复制按钮"
     }
   ],
   "musicTracks": [
