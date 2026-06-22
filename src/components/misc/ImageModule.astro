@@ -21,6 +21,8 @@ const isLocal = !(
     src.startsWith("http")
 );
 
+const isExternal = src.startsWith("http");
+
 let imageSrc = src;
 if (isLocal) {
     const images = import.meta.glob<ImageMetadata>(
@@ -36,4 +38,4 @@ if (isLocal) {
     }
 }
 ---
-<img src={imageSrc} alt={alt || ""} id={id || ""} class={className || ""} loading="lazy" decoding="async"/>
+<img src={imageSrc} alt={alt || ""} id={id || ""} class={className || ""} loading="lazy" decoding="async" referrerpolicy={isExternal ? "no-referrer" : undefined}/>
