@@ -64,7 +64,7 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
     </div>
 
     <!-- nav_bar (desktop) -->
-    <div id="nav-bar" class={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center font-bold z-20 ${desktopNavTextClass}`}>
+    <div id="nav-bar" class={`hidden md:flex absolute left-[calc(50%+160px)] -translate-x-1/2 items-center justify-center font-bold z-20 ${desktopNavTextClass}`}>
       <div id="nav-bar-list" class="transition relative z-10 flex items-center justify-center rounded-outer p-2 overflow-x-auto whitespace-nowrap max-w-[min(48vw,640px)]">
       <a href={ indexPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === indexPage
