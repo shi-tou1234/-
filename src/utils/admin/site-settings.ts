@@ -19,6 +19,8 @@ import {
   buildBlogGuideContentTs,
   parseHeaderContactFromTs,
   buildHeaderContactTs,
+  parseSiteSloganFromTs,
+  buildSiteSloganTs,
 } from "./core";
 import {
   ABOUT_PERSONAL_PATH,
@@ -26,6 +28,7 @@ import {
   ABOUT_SPEC_PATH_PREFIX,
   BLOG_GUIDE_CONTENT_PATH,
   HEADER_CONTACT_PATH,
+  SITE_SLOGAN_PATH,
 } from "./constants";
 
 // ===== Data conversion helpers =====
@@ -588,6 +591,46 @@ export function initSiteSettingsHandlers() {
 
       await upsertFile(BLOG_GUIDE_CONTENT_PATH, content, "guide: update blog guide content", token, branch);
       setMsg(msgEl, "博客介绍弹窗内容保存成功");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  // Site slogan
+  document.getElementById("load-site-slogan-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("site-slogan-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      if (!token) throw new Error("请先填写 GitHub Token");
+
+      const meta = await getFileMeta(SITE_SLOGAN_PATH, token, branch);
+      const content = decodeFileContent(meta?.content || "");
+      const slogan = parseSiteSloganFromTs(content);
+
+      (document.getElementById("site-slogan-zh") as HTMLInputElement).value = slogan["zh-cn"] || "";
+      (document.getElementById("site-slogan-en") as HTMLInputElement).value = slogan.en || "";
+      setMsg(msgEl, "标语加载成功");
+    } catch (error) {
+      setMsg(msgEl, String(error), true);
+    }
+  });
+
+  document.getElementById("save-site-slogan-btn")?.addEventListener("click", async () => {
+    const msgEl = document.getElementById("site-slogan-msg");
+    try {
+      const token = getToken();
+      const branch = getBranch();
+      const zhSlogan = (document.getElementById("site-slogan-zh")?.value || "").trim();
+      const enSlogan = (document.getElementById("site-slogan-en")?.value || "").trim();
+
+      if (!token) throw new Error("请先填写 GitHub Token");
+      if (!zhSlogan) throw new Error("请填写中文标语");
+      if (!enSlogan) throw new Error("请填写英文标语");
+
+      const content = buildSiteSloganTs({ "zh-cn": zhSlogan, en: enSlogan });
+      await upsertFile(SITE_SLOGAN_PATH, content, "slogan: update site slogan", token, branch);
+      setMsg(msgEl, "标语保存成功");
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }

@@ -6,6 +6,7 @@ import ThemeIcon from "./control/ThemeIcon.astro"
 import FontSizeControl from "./control/FontSizeControl.astro"
 import { baseUrl } from "@utils/url-utils"
 import headerContact from "@/data/header-contact"
+import siteSlogan from "@/data/site-slogan"
 
 import { i18n } from "astro:config/client";
 import i18nit from '@i18n/translation'
@@ -58,7 +59,7 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
         {runtimeLabel} 1 {runtimeSuffix}
       </p>
       <p class="header-slogan mt-1.5 text-sm italic text-[var(--link-color)]/75 leading-relaxed">
-        {isEn ? 'Look forward to the beauty that hasn\'t happened yet.' : '去期待那些还未发生的美好'}
+        {isEn ? siteSlogan.en : siteSlogan['zh-cn']}
       </p>
     </div>
 
