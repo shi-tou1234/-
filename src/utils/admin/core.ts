@@ -329,6 +329,7 @@ export {
   buildToolsLinksTs,
   buildBlogGuideContentTs,
   buildHeaderContactTs,
+  buildPostMarkdown,
   buildSiteSloganTs,
   decodeFileContent,
   getNowDateTimeLocal,
