@@ -46,7 +46,7 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
 
 <!-- header -->
 <div id="main-header" class="fixed top-0 left-0 right-0 z-50 w-full overflow-visible transition-transform duration-300 ease-in-out">
-<div class="header-inner flex items-center pt-2 md:py-4 text-[var(--text-color)] max-w-[var(--header-width)] mx-auto">
+<div class="header-inner relative flex items-center pt-2 md:py-4 text-[var(--text-color)] max-w-[var(--header-width)] mx-auto">
     <!-- logo -->
     <div class="pr-3 md:pr-5 py-2 z-30 shrink-0 header-logo -ml-2 md:-ml-32 hidden md:block">
         <a href={ indexPage } >
@@ -64,8 +64,8 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
     </div>
 
     <!-- nav_bar (desktop) -->
-    <div id="nav-bar" class={`hidden md:flex flex-1 min-w-0 items-center justify-center font-bold z-20 ${desktopNavTextClass}`}>
-      <div id="nav-bar-list" class="transition relative z-10 flex items-center justify-center rounded-outer p-2 overflow-x-auto whitespace-nowrap max-w-[min(48vw,720px)] md:ml-32">
+    <div id="nav-bar" class={`hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center font-bold z-20 ${desktopNavTextClass}`}>
+      <div id="nav-bar-list" class="transition relative z-10 flex items-center justify-center rounded-outer p-2 overflow-x-auto whitespace-nowrap max-w-[min(48vw,640px)]">
       <a href={ indexPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === indexPage
                 ? 'bg-[var(--button-hover-color)] is-active'
@@ -98,7 +98,7 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
     </div>
     
     <!-- tools -->
-    <div class="shrink-0 flex flex-nowrap gap-2 pl-1 md:pl-2 py-2 justify-end z-30">
+    <div class="shrink-0 ml-auto flex flex-nowrap gap-2 pl-1 md:pl-2 py-2 justify-end z-30">
         <!-- Search -->
         <button id="search-button" class="hidden min-[380px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
             <Icon name="fa6-solid:magnifying-glass" class="w-4 h-4" />
