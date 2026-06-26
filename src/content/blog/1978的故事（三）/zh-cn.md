@@ -1,9 +1,12 @@
 ---
 title: 1978的故事（三）
 pubDate: 2026-06-26T08:13:00.000Z
-updatedDate: 2026-06-26T08:14:20.044Z
+updatedDate: 2026-06-26T08:14:32.549Z
 draft: false
 description: 
+category: 写在这里
+categories:
+  - 写在这里
 slugId: 1978的故事（三）
 ---
 
