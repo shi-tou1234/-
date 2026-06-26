@@ -1,5 +1,5 @@
 ---
-title: # 1978的故事（一）
+title: 1978的故事（一）
 pubDate: 2026-06-26T08:11:00.000Z
 updatedDate: 2026-06-26T08:12:41.825Z
 draft: false
