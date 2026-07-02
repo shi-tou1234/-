@@ -10,14 +10,6 @@ const indexPage = getRelativeLocaleUrl(currentLang, "/");
 const archivesPage = getRelativeLocaleUrl(currentLang, "/archives/");
 const aboutPage = getRelativeLocaleUrl(currentLang, "/about/");
 const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
-
-const basePath = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
-const rawPath = Astro.url.pathname;
-let currentPagePath = rawPath;
-if (basePath && basePath !== "/" && currentPagePath.startsWith(basePath)) {
-  currentPagePath = currentPagePath.slice(basePath.length) || "/";
-}
-if (!currentPagePath.startsWith("/")) currentPagePath = "/" + currentPagePath;
 ---
 
 <div class="relative md:hidden shrink-0">
@@ -34,7 +26,6 @@ if (!currentPagePath.startsWith("/")) currentPagePath = "/" + currentPagePath;
         <button id="mobile-theme-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">主题</button>
         <button id="mobile-guide-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">指南</button>
         <button class="copy-email-action px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]" data-email={headerContact.email}>邮箱</button>
-        <a href={getRelativeLocaleUrl(currentLang, currentPagePath)} class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">中文</a>
         <button id="mobile-fontsize-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">字体</button>
       </div>
     </div>
