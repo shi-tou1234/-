@@ -138,6 +138,10 @@ const aboutPersonal: AboutPersonal = {
     {
       "date": "2026.6.14",
       "content": "移除一些无用代码块，拆分大文件，优化部署速度，增加solgan,删除多余复制按钮"
+    },
+    {
+      "date": "2026.7.2",
+      "content": "清理锁文件、移除英文、拆分组件、按需图标、解除反爬限制、加快部署，启用图片压缩"
     }
   ],
   "musicTracks": [
