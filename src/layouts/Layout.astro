@@ -3,7 +3,6 @@ import { siteConfig } from '@/config';
 import "@styles/global.css"
 import 'katex/dist/katex.min.css';
 import 'aos/dist/aos.css';
-import { i18n } from "astro:config/client";
 import { ClientRouter } from "astro:transitions";
 
 interface Props {
@@ -13,7 +12,7 @@ interface Props {
 const { title, lang } = Astro.props;
 
 const pageTitle = title;
-const pageLang = lang || i18n?.defaultLocale || "zh-cn";
+const pageLang = lang || "zh-cn";
 ---
 
 <!DOCTYPE html>
@@ -185,12 +184,6 @@ const pageLang = lang || i18n?.defaultLocale || "zh-cn";
           if (shouldBlockAutomation()) {
             blockPage();
           }
-
-          document.addEventListener('contextmenu', (e) => e.preventDefault(), { capture: true });
-          document.addEventListener('copy', (e) => e.preventDefault(), { capture: true });
-          document.addEventListener('cut', (e) => e.preventDefault(), { capture: true });
-          document.addEventListener('dragstart', (e) => e.preventDefault(), { capture: true });
-          document.addEventListener('selectstart', (e) => e.preventDefault(), { capture: true });
 
           document.addEventListener('keydown', (e) => {
             if (

@@ -16,13 +16,13 @@ export function truncateText(input: string, limit: number): string {
   return text.length > limit ? `${text.slice(0, limit).trim()}...` : text;
 }
 
-export function buildPostPreview(description: string, body: string, lang: string, limit = 80): string {
+export function buildPostPreview(description: string, body: string, limit = 80): string {
   const desc = String(description || "").trim();
   if (desc) return truncateText(desc, limit);
 
   const cleaned = cleanPostText(body || "");
   if (!cleaned) {
-    return lang === "en" ? "Open this post for details." : "点击查看文章详情内容。";
+    return "点击查看文章详情内容。";
   }
 
   return truncateText(cleaned, limit);

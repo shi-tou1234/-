@@ -1,5 +1,4 @@
 ---
-import { i18n } from "astro:config/client";
 import i18nit from '@i18n/translation';
 import { getRelativeLocaleUrl } from '@utils/url-utils';
 
@@ -40,7 +39,7 @@ const buildPageItems = (current, total) => {
 
 const pageItems = buildPageItems(currentPage, totalPages);
 
-const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const currentLang = 'zh-cn';
 const t = i18nit(currentLang);
 
 ---

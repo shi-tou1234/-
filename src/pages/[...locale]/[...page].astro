@@ -6,7 +6,6 @@ import Navi from '@components/control/Navi.astro';
 
 import { getBlogEntrySort } from '@utils/content-utils'
 import { siteConfig } from '@/config';
-import { i18n } from "astro:config/client";
 import type { GetStaticPaths } from 'astro';
 import { getRelativeLocaleUrl } from '@utils/url-utils';
 
@@ -14,54 +13,36 @@ import i18nit from '@i18n/translation'
 
 // 所有分页数据都在 "page" 参数中传递
 const { page } = Astro.props;
-const { locale = i18n!.defaultLocale } = Astro.params;
-
-const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const currentLang = 'zh-cn';
 const t = i18nit(currentLang);
-const coverSignatures = currentLang === 'en'
-  ? [
-      'Exploring the endless possibilities of AI 🤖',
-      'Sharing study notes and practical insights ✍️',
-      'A colorful life, a lifelong learner 🌟',
-    ]
-  : [
-      '探索AI技术的无限可能 🤖',
-      '分享学习笔记与心得 ✍️',
-      '生活多彩，学无止境 🌟',
-    ];
+const coverSignatures = [
+  '探索AI技术的无限可能 🤖',
+  '分享学习笔记与心得 ✍️',
+  '生活多彩，学无止境 🌟',
+];
 
 export const getStaticPaths = (async ({ paginate }) => {
 
-  // 如果启用了国际化，为每个语言环境生成分页路径
-  const paths = [];
-  for (const locale of i18n.locales) {
-    const localeCode = typeof locale === 'string' ? locale : locale.path;
-    const localeParam = localeCode === i18n.defaultLocale ? undefined : localeCode;
-    const blogEntries = await getBlogEntrySort(localeParam);
-    const sortedBlogEntries = [...blogEntries].sort((a, b) => {
+  const blogEntries = await getBlogEntrySort();
+  const sortedBlogEntries = [...blogEntries].sort((a, b) => {
     const aPinned = a.data.pinned ? 1 : 0;
     const bPinned = b.data.pinned ? 1 : 0;
     if (aPinned !== bPinned) return bPinned - aPinned;
     return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
   });
-    const paginatedPaths = paginate(sortedBlogEntries, { 
-      pageSize: siteConfig.pageSize,
-      params: { locale: localeParam }
-    });
-    
-    // 将生成的路径添加到总路径列表中
-    paths.push(...paginatedPaths);
-  }
+  const paginatedPaths = paginate(sortedBlogEntries, { 
+    pageSize: siteConfig.pageSize,
+    params: { locale: undefined }
+  });
   
-  return paths;
+  return paginatedPaths;
 }) satisfies GetStaticPaths
 
 
 
-const indexPage = getRelativeLocaleUrl(locale, '/');
+const indexPage = getRelativeLocaleUrl(currentLang, '/');
 const pageTitle = `${siteConfig.title} - ${siteConfig.subTitle}`;
-const localeParam = locale === i18n!.defaultLocale ? undefined : locale;
-const allEntries = await getBlogEntrySort(localeParam);
+const allEntries = await getBlogEntrySort();
 const latestUpdatedEntry = allEntries.reduce((latest, current) => {
   if (!current.data.updatedDate) return latest;
   if (!latest) return current;
@@ -71,7 +52,7 @@ const latestUpdatedEntry = allEntries.reduce((latest, current) => {
 const updateNotice = latestUpdatedEntry && latestUpdatedEntry.data.updatedDate
   ? {
       title: latestUpdatedEntry.data.title,
-      url: getRelativeLocaleUrl(locale, `/blog/${latestUpdatedEntry.id}`),
+      url: getRelativeLocaleUrl(currentLang, `/blog/${latestUpdatedEntry.id}`),
       updatedAt: latestUpdatedEntry.data.updatedDate.toISOString(),
       version: `${latestUpdatedEntry.id}::${latestUpdatedEntry.data.updatedDate.toISOString()}`,
     }

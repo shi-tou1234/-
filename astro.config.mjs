@@ -27,11 +27,11 @@ export default defineConfig({
   base: '/-/',
   image: {
     service: {
-      entrypoint: 'astro/assets/services/noop'
+      entrypoint: 'astro/assets/services/sharp'
     }
   },
   i18n: {
-    locales: ['zh-cn', 'en'],
+    locales: ['zh-cn'],
     defaultLocale: 'zh-cn',
     routing: {
       prefixDefaultLocale: false,
@@ -40,11 +40,10 @@ export default defineConfig({
   },
   integrations: [icon({
     include: {
-      "fa6-brands": ["*"],
-      "fa6-solid": ["*"],
-      "simple-icons": ["*"],
-      "vscode-icons": ["*"],
-      "material-symbols": ["*"]
+      "fa6-brands": ["creative-commons", "github"],
+      "fa6-solid": ["align-justify", "arrow-left", "arrow-right", "arrow-up", "calculator", "circle", "circle-question", "envelope", "file-lines", "globe", "magnifying-glass", "table", "text-height"],
+      "material-symbols": ["dark-mode-outline-rounded", "radio-button-partial-outline", "wb-sunny-outline-rounded"],
+      "simple-icons": ["astro", "github", "gitee", "svelte", "tailwindcss"]
     }
   }), svelte()],
   markdown: {

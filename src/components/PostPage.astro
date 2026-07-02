@@ -41,7 +41,7 @@ const resolvedCovers = await Promise.all(
         {
             blogEntries.map((entry, index) => {
                 const categories = getPostCategories(entry, currentLang);
-                const preview = buildPostPreview(entry.data.description || '', entry.body || '', currentLang, 80);
+                const preview = buildPostPreview(entry.data.description || '', entry.body || '', 80);
                 const readingMinutes = estimateReadingMinutes(entry.body || '');
                 const resolved = resolvedCovers[index];
 

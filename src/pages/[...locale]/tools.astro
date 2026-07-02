@@ -8,13 +8,12 @@ import { siteConfig } from '@/config'
 import i18nit from '@i18n/translation'
 import toolsLinks from '@/data/tools-links'
 
-import { i18n } from "astro:config/client";
 
 export async function getStaticPaths() {
-	return i18n?.locales.map(locale => ({ params: { locale: locale == i18n?.defaultLocale ? undefined : (locale as string) } }));
+	return [{ params: { locale: undefined } }];
 }
 
-const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const currentLang = 'zh-cn';
 const t = i18nit(currentLang);
 
 const pageTitle = t("header.tools") + " - " + siteConfig.title;

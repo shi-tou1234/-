@@ -81,7 +81,7 @@ const serializedCategoryCounts = JSON.stringify(
         <div class="space-y-2">
           {postsByYear[year].map((post) => {
             const postCategories = getPostCategories(post, language);
-            const postSummary = buildPostPreview(post.data.description || '', post.body || '', language, 80);
+            const postSummary = buildPostPreview(post.data.description || '', post.body || '', 80);
             const shortSummary = truncateText(postSummary, 30);
             return (
               <a

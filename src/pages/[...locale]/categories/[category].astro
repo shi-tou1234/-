@@ -7,31 +7,24 @@ import { siteConfig } from '@/config'
 import { getBlogEntrySort } from '@utils/content-utils'
 import i18nit from '@i18n/translation'
 
-import { i18n } from "astro:config/client";
 import { decodeCategoryParam, buildCategoriesMap } from '@utils/blog-taxonomy';
 
-const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const currentLang = 'zh-cn';
 const t = i18nit(currentLang);
 
 export async function getStaticPaths() {
-  const locales = i18n?.locales || [i18n?.defaultLocale];
+  const posts = await getBlogEntrySort();
+  const categorySet = new Set<string>(Object.keys(buildCategoriesMap(posts.filter((post) => post.id !== 'welcome'), 'zh-cn')));
   const paths = [];
 
-  for (const locale of locales) {
-    const localeCode = typeof locale === 'string' ? locale : locale.path;
-    const localeParam = localeCode === i18n?.defaultLocale ? undefined : localeCode;
-    const posts = await getBlogEntrySort(localeCode);
-    const categorySet = new Set<string>(Object.keys(buildCategoriesMap(posts.filter((post) => post.id !== 'welcome'), localeCode)));
-
-    categorySet.forEach((categoryName) => {
-      paths.push({
-        params: {
-          locale: localeParam,
-          category: `b64-${Buffer.from(categoryName, 'utf-8').toString('base64url')}`
-        }
-      });
+  categorySet.forEach((categoryName) => {
+    paths.push({
+      params: {
+        locale: undefined,
+        category: `b64-${Buffer.from(categoryName, 'utf-8').toString('base64url')}`
+      }
     });
-  }
+  });
 
   return paths;
 }
@@ -39,7 +32,7 @@ export async function getStaticPaths() {
 const currentCategoryParam = Astro.params.category || '';
 const currentCategory = decodeCategoryParam(currentCategoryParam);
 
-const allBlogPosts = await getBlogEntrySort(currentLang);
+const allBlogPosts = await getBlogEntrySort();
 const categoryCount = currentCategory
   ? (buildCategoriesMap(allBlogPosts.filter((post) => post.id !== 'welcome'), currentLang)[currentCategory] || []).length
   : allBlogPosts.filter((post) => post.id !== 'welcome').length;

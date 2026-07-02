@@ -1,6 +1,5 @@
 ---
-import { i18n } from "astro:config/client";
-import { Icon } from "astro-icon/components";
+import { Icon } from "astro-icon/components"
 import i18nit from '@i18n/translation'
 import { getRelativeLocaleUrl } from '@utils/url-utils';
 
@@ -11,7 +10,7 @@ interface Props {
 
 const { prev, next } = Astro.props;
 
-const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const currentLang = 'zh-cn';
 const t = i18nit(currentLang);
 
 // 辅助函数：根据文章 id 和当前语言生成正确的 URL

@@ -3,7 +3,6 @@ import type { LicenseConfig } from '@/types/config';
 import { licenseConfig, profileConfig } from '@/config';
 
 import { Icon } from "astro-icon/components"
-import { i18n } from "astro:config/client";
 import i18nit from "@i18n/translation";
 import { formatFullDate } from '@/utils/time'
 
@@ -20,7 +19,7 @@ interface Props {
 const { title, pubDate, author, url, license } = Astro.props;
 const className = Astro.props.class;
 
-const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const currentLang = 'zh-cn';
 const t = i18nit(currentLang);
 
 const postUrl = url ?? decodeURIComponent(Astro.url.toString());

@@ -2,12 +2,11 @@
 import type { SearchResult } from "@/global"
 import { baseUrl } from "@utils/url-utils";
 import { getEntry, render } from 'astro:content'
-import { i18n } from "astro:config/client";
 import i18nit from "@i18n/translation";
 
 
 
-const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const currentLang = 'zh-cn';
 const t = i18nit(currentLang);
 
 const translations = {
@@ -18,14 +17,12 @@ const translations = {
 };
 
 const searchHistoryKey = 'cmchen_search_history_v1';
-const searchRecommendationsTitle = currentLang === 'en' ? 'Suggestions' : '推荐搜索';
-const searchRecentLabel = currentLang === 'en' ? 'Recent' : '最近搜索';
-const searchHotLabel = currentLang === 'en' ? 'Popular' : '热门搜索';
-const searchClearLabel = currentLang === 'en' ? 'Clear' : '清空';
-const searchEmptyHistoryLabel = currentLang === 'en' ? 'No recent searches' : '暂无搜索记录';
-const hotSearches = currentLang === 'en'
-  ? ['AI tools', 'study notes', 'archive', 'blog guide', 'travel log']
-  : ['AI 工具', '学习笔记', '归档', '博客指南', '生活记录'];
+const searchRecommendationsTitle = '推荐搜索';
+const searchRecentLabel = '最近搜索';
+const searchHotLabel = '热门搜索';
+const searchClearLabel = '清空';
+const searchEmptyHistoryLabel = '暂无搜索记录';
+const hotSearches = ['AI 工具', '学习笔记', '归档', '博客指南', '生活记录'];
 
 const fakeResult: SearchResult[] = [
 	{

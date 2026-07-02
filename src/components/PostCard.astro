@@ -5,7 +5,6 @@ import ImageModule from "./misc/ImageModule.astro";
 import { getRelativeLocaleUrl } from '@utils/url-utils';
 import { formatFullDate } from '@/utils/time'
 
-import { i18n } from "astro:config/client";
 
 interface Props {
     title: string;
@@ -45,11 +44,11 @@ const {
 
 
 
-const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const currentLang = 'zh-cn';
 
-const readingLabel = currentLang === 'en' ? `${readingMinutes} min read` : `${readingMinutes} 分钟阅读`;
+const readingLabel = `${readingMinutes} 分钟阅读`;
 const previewText = String(preview || description || '').trim();
-const cardLabel = currentLang === 'en' ? `Read article: ${title}` : `阅读文章：${title}`;
+const cardLabel = `阅读文章：${title}`;
 
 function hashString(input: string): number {
     let hash = 0;
@@ -157,7 +156,7 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
             {title}
             {
                 fallback && (
-                <span class="self-center px-1 ml-2 text-xs text-[var(--text-color)]/70 font-mono uppercase bg-[var(--button-hover-color)] rounded border border-[var(--button-border-color)]">{i18n!.defaultLocale}</span>
+                <span class="self-center px-1 ml-2 text-xs text-[var(--text-color)]/70 font-mono uppercase bg-[var(--button-hover-color)] rounded border border-[var(--button-border-color)]">zh-cn</span>
                 )
             }
         </h2>
@@ -167,7 +166,7 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
             {updatedDate && updatedDate.valueOf() > pubDate.valueOf() && (
                 <>
                     <span class="text-[var(--text-color)]/35">•</span>
-                    <span>{currentLang === 'en' ? `Last updated on ${formatFullDate(updatedDate, currentLang)}` : `最后更新于 ${formatFullDate(updatedDate, currentLang)}`}</span>
+                    <span>{`最后更新于 ${formatFullDate(updatedDate, currentLang)}`}</span>
                 </>
             )}
             <span class="text-[var(--text-color)]/35">•</span>

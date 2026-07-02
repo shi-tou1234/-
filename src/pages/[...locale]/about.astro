@@ -11,7 +11,6 @@ import aboutPersonal from '@/data/about-personal';
 import { siteConfig } from '@/config';
 import i18nit from '@i18n/translation';
 import { render } from 'astro:content';
-import { i18n } from 'astro:config/client';
 import { execSync } from 'node:child_process';
 
 type TravelInput = {
@@ -22,15 +21,13 @@ type TravelInput = {
 };
 
 export async function getStaticPaths() {
-  return i18n?.locales.map((locale) => ({
-    params: { locale: locale == i18n?.defaultLocale ? undefined : (locale as string) },
-  }));
+  return [{ params: { locale: undefined } }];
 }
 
-const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const currentLang = 'zh-cn';
 const t = i18nit(currentLang);
 
-const aboutPost = await getSpec(currentLang, 'about');
+const aboutPost = await getSpec('about');
 if (!aboutPost) {
   throw new Error('No about post found');
 }
@@ -119,52 +116,29 @@ for (let index = 0; index < heatmapCells.length; index += 7) {
   heatmapWeeks.push(week);
 }
 
-const weekdayLabels = currentLang === 'zh-cn' ? ['日', '一', '二', '三', '四', '五', '六'] : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const weekdayLabels = ['日', '一', '二', '三', '四', '五', '六'];
 
-const labels =
-  currentLang === 'zh-cn'
-    ? {
-        traitTitle: '关于我的特质',
-        mbti: 'MBTI',
-        major: '所学专业',
-        mbtiIntro: '查看 MBTI 介绍',
-        majorIntro: '查看专业百科',
-        recentDoing: '最近在做',
-        recentReading: '最近读书',
-        heatmapTitle: 'Git 提交频率',
-        heatmapSubtitle: `过去 ${HEATMAP_DAYS} 天 · 共 ${totalCommits} 次提交`,
-        legendLow: '低',
-        legendHigh: '高',
-        noUpdate: '暂无提交',
-        introTitle: '关于我的一些事情',
-        musicTitle: '音乐播放器',
-        siteRecordTitle: '网站记录',
-        currentPlaying: '正在播放',
-        noTrack: '未开始播放',
-        viewAllTimeline: '查看完整记录',
-        collapseTimeline: '收起历史记录',
-      }
-    : {
-        traitTitle: 'My Traits',
-        mbti: 'MBTI',
-        major: 'Major',
-        mbtiIntro: 'View MBTI intro',
-        majorIntro: 'View major wiki',
-        recentDoing: 'Recent Focus',
-        recentReading: 'Recent Reading',
-        heatmapTitle: 'Git Commit Activity',
-        heatmapSubtitle: `Last ${HEATMAP_DAYS} days · ${totalCommits} commits`,
-        legendLow: 'Low',
-        legendHigh: 'High',
-        noUpdate: 'No commits',
-        introTitle: 'About Me',
-        musicTitle: 'Music Player',
-        siteRecordTitle: 'Site Timeline',
-        currentPlaying: 'Now Playing',
-        noTrack: 'Not playing',
-        viewAllTimeline: 'View full history',
-        collapseTimeline: 'Collapse history',
-      };
+const labels = {
+  traitTitle: '关于我的特质',
+  mbti: 'MBTI',
+  major: '所学专业',
+  mbtiIntro: '查看 MBTI 介绍',
+  majorIntro: '查看专业百科',
+  recentDoing: '最近在做',
+  recentReading: '最近读书',
+  heatmapTitle: 'Git 提交频率',
+  heatmapSubtitle: `过去 ${HEATMAP_DAYS} 天 · 共 ${totalCommits} 次提交`,
+  legendLow: '低',
+  legendHigh: '高',
+  noUpdate: '暂无提交',
+  introTitle: '关于我的一些事情',
+  musicTitle: '音乐播放器',
+  siteRecordTitle: '网站记录',
+  currentPlaying: '正在播放',
+  noTrack: '未开始播放',
+  viewAllTimeline: '查看完整记录',
+  collapseTimeline: '收起历史记录',
+};
 
 const timelineItems = [...aboutPersonal.siteTimeline];
 const timelineRecent = timelineItems.slice(-3).reverse();
@@ -254,11 +228,10 @@ function getIntensityLevel(count: number, maxCount: number): number {
             id="about-heatmap-subtitle"
             data-days={HEATMAP_DAYS}
             data-total={totalCommits}
-            data-lang={currentLang}
             class="text-sm text-[var(--text-color)]/65"
           >{labels.heatmapSubtitle}</p>
           <p class="mt-1 text-xs text-[var(--text-color)]/60">
-            <span id="about-commit-total">{totalCommits} {currentLang === 'zh-cn' ? '次提交' : 'commits'}</span>
+            <span id="about-commit-total">{totalCommits} 次提交</span>
           </p>
         </div>
         <div class="flex items-center gap-2 text-xs text-[var(--text-color)]/65">
@@ -290,7 +263,7 @@ function getIntensityLevel(count: number, maxCount: number): number {
                 {week.map((cell) => (
                   cell ? (
                     <span
-                      title={`${cell.key} · ${cell.count} ${currentLang === 'zh-cn' ? '次提交' : 'commits'}`}
+                      title={`${cell.key} · ${cell.count} 次提交`}
                       data-commit-cell="1"
                       data-date={cell.key}
                       class="block h-[19px] w-6 rounded-sm border border-[var(--button-border-color)]"
@@ -400,11 +373,7 @@ function getIntensityLevel(count: number, maxCount: number): number {
     if (!subtitleEl) return;
     const days = Number(subtitleEl.getAttribute('data-days') || '140');
     const total = Number(subtitleEl.getAttribute('data-total') || '0');
-    const lang = subtitleEl.getAttribute('data-lang') || 'en';
-
-    subtitleEl.textContent = lang === 'zh-cn'
-      ? `过去 ${days} 天 · 共 ${total} 次提交`
-      : `Last ${days} days · ${total} commits`;
+    subtitleEl.textContent = `过去 ${days} 天 · 共 ${total} 次提交`;
   }
 
   function getCellStyle(level) {
@@ -466,13 +435,12 @@ function getIntensityLevel(count: number, maxCount: number): number {
         const count = countMap.get(key) || 0;
         const level = getClientIntensityLevel(count, maxCount);
         cell.setAttribute('style', getCellStyle(level));
-        cell.setAttribute('title', `${key} · ${count} ${document.documentElement.lang === 'zh-cn' ? '次提交' : 'commits'}`);
+        cell.setAttribute('title', `${key} · ${count} 次提交`);
       });
 
       const totalEl = document.getElementById('about-commit-total');
       if (totalEl) {
-        const label = document.documentElement.lang === 'zh-cn' ? '次提交' : 'commits';
-        totalEl.textContent = `${total} ${label}`;
+        totalEl.textContent = `${total} 次提交`;
       }
 
       const subtitleEl = document.getElementById('about-heatmap-subtitle');

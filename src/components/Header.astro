@@ -4,39 +4,21 @@ import { Icon } from "astro-icon/components"
 import { profileConfig } from "@/config"
 import ThemeIcon from "./control/ThemeIcon.astro"
 import FontSizeControl from "./control/FontSizeControl.astro"
-import { baseUrl } from "@utils/url-utils"
 import headerContact from "@/data/header-contact"
 import siteSlogan from "@/data/site-slogan"
+import HeaderLogoFracture from "./header/HeaderLogoFracture.astro"
+import MobileMenu from "./header/MobileMenu.astro"
+import GuideModal from "./header/GuideModal.astro"
+import CopyEmail from "./header/CopyEmail.astro"
+import RunningDays from "./header/RunningDays.astro"
+import HeaderScroll from "./header/HeaderScroll.astro"
+import PagefindLoader from "./header/PagefindLoader.astro"
 
-import { i18n } from "astro:config/client";
 import i18nit from '@i18n/translation'
 import { getRelativeLocaleUrl } from '@utils/url-utils';
 
-const currentLang = Astro.currentLocale || i18n!.defaultLocale;
+const currentLang = 'zh-cn';
 const t = i18nit(currentLang);
-const isEn = currentLang === 'en';
-const runtimeLabel = currentLang === 'en' ? 'Running' : '已运行';
-const runtimeSuffix = currentLang === 'en' ? 'days' : '天';
-const desktopNavTextClass = isEn ? 'text-sm lg:text-base' : 'text-base lg:text-lg';
-const desktopNavLinkPxClass = isEn ? 'px-2 lg:px-2.5' : 'px-2 lg:px-3';
-const locales = (i18n?.locales || []).map(locale => String(locale));
-const showLanguageSwitcher = locales.length > 1;
-
-const basePath = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
-const rawPath = Astro.url.pathname;
-let currentPagePath = rawPath;
-if (basePath && basePath !== "/" && currentPagePath.startsWith(basePath)) {
-  currentPagePath = currentPagePath.slice(basePath.length) || "/";
-}
-if (currentLang !== i18n!.defaultLocale) {
-  const localePrefix = `/${currentLang}`;
-  if (currentPagePath.startsWith(localePrefix + "/")) {
-    currentPagePath = currentPagePath.slice(localePrefix.length);
-  } else if (currentPagePath === localePrefix) {
-    currentPagePath = "/";
-  }
-}
-if (!currentPagePath.startsWith("/")) currentPagePath = "/" + currentPagePath;
 
 const indexPage = getRelativeLocaleUrl(currentLang, "/");
 const archivesPage = getRelativeLocaleUrl(currentLang, "/archives/");
@@ -55,43 +37,41 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
               <span class="header-slice-text__shards" aria-hidden="true"></span>
             </span>
         </a>
-      <p id="header-running-days" class="text-sm text-[var(--text-color)]/65 mt-1" data-running-since="2026-02-12" data-runtime-label={runtimeLabel} data-runtime-suffix={runtimeSuffix}>
-        {runtimeLabel} 1 {runtimeSuffix}
-      </p>
+      <RunningDays />
       <p class="header-slogan mt-1.5 text-sm italic text-[var(--link-color)]/75 leading-relaxed">
-        {isEn ? siteSlogan.en : siteSlogan['zh-cn']}
+        {siteSlogan['zh-cn']}
       </p>
     </div>
 
     <!-- nav_bar (desktop) -->
-    <div id="nav-bar" class={`hidden md:flex absolute left-[calc(50%-30px)] -translate-x-1/2 items-center justify-center font-bold z-20 ${desktopNavTextClass}`}>
+    <div id="nav-bar" class="hidden md:flex absolute left-[calc(50%-30px)] -translate-x-1/2 items-center justify-center font-bold z-20 text-base lg:text-lg">
       <div id="nav-bar-list" class="transition relative z-10 flex items-center justify-center rounded-outer p-2 overflow-x-auto whitespace-nowrap max-w-[min(58vw,860px)]">
-      <a href={ indexPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
+      <a href={ indexPage } class="nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === indexPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
-            }`}>
+            }">
             <span class="nav-link-text">{t("header.home")}</span>
         </a>
-      <a href={ archivesPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
+      <a href={ archivesPage } class="nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === archivesPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
-            }`}>
+            }">
             <span class="nav-link-text">{t("header.archive")}</span>
         </a>
-        <a href={ aboutPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
+        <a href={ aboutPage } class="nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === aboutPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
-            }`}>
+            }">
             <span class="nav-link-text">{t("header.about")}</span>
         </a>
-        <a href={ toolsPage } class={`nav-link-item transition-colors rounded-lg ${desktopNavLinkPxClass} py-1 mx-1 hover:text-current shrink-0 ${
+        <a href={ toolsPage } class="nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
           Astro.url.pathname === toolsPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
-            }`}>
+            }">
           <span class="nav-link-text">{t("header.tools")}</span>
         </a>
       </div>
@@ -117,73 +97,7 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
         <button id="blog-guide-open-btn" type="button" title="博客功能说明" aria-label="博客功能说明" class="hide-on-tiny inline-flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
           <Icon name="fa6-solid:circle-question" class="w-4 h-4" />
         </button>
-        <!-- Language Switcher -->
-        {showLanguageSwitcher && (
-        <div class="relative hide-on-tiny">
-            <button id="language-button" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
-                <Icon name="fa6-solid:globe" class="w-4 h-4" />
-            </button>
-            
-          <!-- Language Dropdown Menu -->
-          <div id="language-menu" class="hidden absolute right-0 mt-2 w-30 bg-[var(--bg-color)] border border-[var(--button-border-color)] rounded-lg shadow-lg z-50">
-              <div class="py-1 text-right">
-                  {locales.map((locale) => (
-                    <a href={getRelativeLocaleUrl(locale, currentPagePath)} class={`block mx-2 my-1 p-2 text-sm rounded ${
-                      currentLang === locale ? "bg-[var(--button-hover-color)]" : "hover:bg-[var(--button-hover-color)]"}`}>
-                      {currentLang === locale ? <Icon name="fa6-solid:circle" class="w-2 h-2 inline mr-2" /> : ""}
-                      {locale === "zh-cn" ? "简体中文" : (locale === "en" ? "English" : locale)}
-                    </a>
-                  ))}
-              </div>
-          </div>
-        </div>
-        )}
-        <div class="relative md:hidden shrink-0">
-          <!-- Mobile Menu -->
-            <button id="mobile-menu-button" aria-expanded="false" aria-controls="mobile-menu" class="flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
-              <Icon name="fa6-solid:align-justify" class="w-5 h-5" />
-          </button>
-              <!-- Mobile Menu -->
-              <div id="mobile-menu" aria-hidden="true" class="hidden fixed right-2 top-16 w-36 bg-[var(--bg-color)]/95 backdrop-blur border border-[var(--button-border-color)] rounded-lg shadow-[0_8px_24px_var(--shadow-color)] z-[1200] text-[var(--text-color)]">
-                <div class="tiny-only px-2 py-2 border-b border-[var(--button-border-color)] space-y-2">
-                  <p class="text-[11px] leading-4 text-[var(--text-color)]/75 px-1">建议使用浏览器或电脑打开，以获得最佳显示效果。</p>
-                  <div class="grid grid-cols-3 gap-2">
-                    <button id="mobile-search-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">搜索</button>
-                    <button id="mobile-theme-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">主题</button>
-                    <button id="mobile-guide-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">指南</button>
-                    <button class="copy-email-action px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]" data-email={headerContact.email}>邮箱</button>
-                    <a href={getRelativeLocaleUrl("zh-cn", currentPagePath)} class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">中文</a>
-                    <a href={getRelativeLocaleUrl("en", currentPagePath)} class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] text-center">EN</a>
-                    <button id="mobile-fontsize-btn" class="px-2 py-1 text-xs rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">字体</button>
-                  </div>
-                </div>
-                <div class="flex flex-col py-1">
-                  <a href={ indexPage } class={`mx-2 my-1 p-2 text-sm rounded ${
-                    Astro.url.pathname === indexPage 
-                      ? 'bg-[var(--button-hover-color)]' 
-                      : 'hover:bg-[var(--button-hover-color)]'
-                  }`}>{t("header.home")}</a>
-                  
-                  <a href={ archivesPage } class={`mx-2 my-1 p-2 text-sm rounded ${
-                    Astro.url.pathname === archivesPage 
-                      ? 'bg-[var(--button-hover-color)]' 
-                      : 'hover:bg-[var(--button-hover-color)]'
-                  }`}>{t("header.archive")}</a>
-
-                  <a href={ aboutPage } class={`mx-2 my-1 p-2 text-sm rounded ${
-                    Astro.url.pathname === aboutPage 
-                      ? 'bg-[var(--button-hover-color)]' 
-                      : 'hover:bg-[var(--button-hover-color)]'
-                  }`}>{t("header.about")}</a>
-
-                  <a href={ toolsPage } class={`mx-2 my-1 p-2 text-sm rounded ${
-                    Astro.url.pathname === toolsPage 
-                      ? 'bg-[var(--button-hover-color)]' 
-                      : 'hover:bg-[var(--button-hover-color)]'
-                  }`}>{t("header.tools")}</a>
-                </div>
-              </div>
-        </div>
+        <MobileMenu />
     </div>
 </div>
 </div>
@@ -450,599 +364,8 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
 
 </style>
 
-<script>
-function initHeaderLogoFracture() {
-  const previousCleanup = window.__headerLogoFractureCleanup;
-  if (previousCleanup) {
-    previousCleanup();
-  }
-
-  const logo = document.querySelector('[data-header-logo="true"]');
-  if (!logo) return;
-
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if (!window.matchMedia('(pointer: fine)').matches) return;
-
-  const baseLayer = logo.querySelector('.header-slice-text__base');
-  const shardLayer = logo.querySelector('.header-slice-text__shards');
-  if (!baseLayer || !shardLayer) return;
-
-  const title = logo.getAttribute('data-text') || baseLayer.textContent || '';
-  const shardBands = [
-    { top: 0, bottom: 18, dx: -5.6, dy: -8.4, rot: -1.8, scale: 1.01, opacity: 0.42 },
-    { top: 15, bottom: 34, dx: 4.8, dy: -4.1, rot: 1.4, scale: 1.014, opacity: 0.46 },
-    { top: 32, bottom: 52, dx: -3.3, dy: 3.4, rot: -1.0, scale: 1.008, opacity: 0.52 },
-    { top: 50, bottom: 70, dx: 6.1, dy: 6.8, rot: 1.6, scale: 1.015, opacity: 0.48 },
-    { top: 68, bottom: 100, dx: -4.5, dy: 10.4, rot: -1.2, scale: 1.009, opacity: 0.4 },
-  ];
-
-  shardLayer.textContent = '';
-
-  shardBands.forEach((band, index) => {
-    const fragment = document.createElement('span');
-    fragment.className = 'header-slice-text__fragment';
-    fragment.setAttribute('aria-hidden', 'true');
-    fragment.textContent = title;
-
-    const bandShift = index % 2 === 0 ? -1.4 : 1.4;
-    fragment.style.setProperty('--fragment-clip', `inset(${band.top}% 0 ${100 - band.bottom}% 0)`);
-    fragment.style.setProperty('--fragment-dx', String(band.dx + bandShift));
-    fragment.style.setProperty('--fragment-dy', String(band.dy));
-    fragment.style.setProperty('--fragment-rot', String(band.rot));
-    fragment.style.setProperty('--fragment-scale', String(band.scale));
-    fragment.style.setProperty('--fragment-opacity', String(band.opacity));
-
-    shardLayer.appendChild(fragment);
-  });
-
-  let animationFrame = 0;
-  let progress = 0;
-  let target = 0;
-  let pointerX = 0;
-  let pointerY = 0;
-
-  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-
-  const setProgress = (nextProgress) => {
-    progress = nextProgress;
-    logo.style.setProperty('--fracture-progress', progress.toFixed(4));
-    logo.classList.toggle('is-fracturing', progress > 0.015);
-  };
-
-  const sampleTarget = (clientX, clientY) => {
-    const rect = logo.getBoundingClientRect();
-    if (!rect.width || !rect.height) return 0;
-
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const haloX = Math.max(110, rect.width * 1.12);
-    const haloY = Math.max(72, rect.height * 1.5);
-    const distanceX = Math.abs(clientX - centerX) / haloX;
-    const distanceY = Math.abs(clientY - centerY) / haloY;
-    const distance = Math.hypot(distanceX, distanceY);
-
-    if (distance >= 1) return 0;
-
-    const proximity = 1 - distance;
-    return proximity * proximity * (3 - 2 * proximity);
-  };
-
-  const updateDirection = () => {
-    const rect = logo.getBoundingClientRect();
-    if (!rect.width || !rect.height) {
-      logo.style.setProperty('--fracture-shift-x', '0');
-      logo.style.setProperty('--fracture-shift-y', '0');
-      return;
-    }
-
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const shiftX = clamp((centerX - pointerX) / Math.max(rect.width, 1), -1, 1) * 0.85;
-    const shiftY = clamp((centerY - pointerY) / Math.max(rect.height, 1), -1, 1) * 0.85;
-
-    logo.style.setProperty('--fracture-shift-x', shiftX.toFixed(3));
-    logo.style.setProperty('--fracture-shift-y', shiftY.toFixed(3));
-  };
-
-  const stopAnimation = () => {
-    target = 0;
-    logo.style.setProperty('--fracture-shift-x', '0');
-    logo.style.setProperty('--fracture-shift-y', '0');
-    if (!animationFrame) {
-      animationFrame = window.requestAnimationFrame(step);
-    }
-  };
-
-  const step = () => {
-    animationFrame = 0;
-
-    const delta = target - progress;
-    if (Math.abs(delta) < 0.001) {
-      setProgress(target);
-    } else {
-      setProgress(progress + delta * 0.14);
-    }
-
-    if (target > 0.001 || progress > 0.001) {
-      animationFrame = window.requestAnimationFrame(step);
-    }
-  };
-
-  const schedule = () => {
-    if (!animationFrame) {
-      animationFrame = window.requestAnimationFrame(step);
-    }
-  };
-
-  const handlePointerMove = (event) => {
-    pointerX = event.clientX;
-    pointerY = event.clientY;
-    target = sampleTarget(pointerX, pointerY);
-    updateDirection();
-    schedule();
-  };
-
-  const handlePointerOut = (event) => {
-    if (event.relatedTarget) return;
-    stopAnimation();
-  };
-
-  const handleVisibilityChange = () => {
-    if (document.hidden) {
-      stopAnimation();
-    }
-  };
-
-  const handleResize = () => {
-    if (target > 0 || progress > 0) {
-      updateDirection();
-      schedule();
-    }
-  };
-
-  window.addEventListener('pointermove', handlePointerMove, { passive: true });
-  document.addEventListener('mouseout', handlePointerOut);
-  document.addEventListener('visibilitychange', handleVisibilityChange);
-  window.addEventListener('blur', stopAnimation);
-  window.addEventListener('resize', handleResize, { passive: true });
-
-  window.__headerLogoFractureCleanup = () => {
-    window.removeEventListener('pointermove', handlePointerMove);
-    document.removeEventListener('mouseout', handlePointerOut);
-    document.removeEventListener('visibilitychange', handleVisibilityChange);
-    window.removeEventListener('blur', stopAnimation);
-    window.removeEventListener('resize', handleResize);
-
-    if (animationFrame) {
-      window.cancelAnimationFrame(animationFrame);
-      animationFrame = 0;
-    }
-  };
-
-  setProgress(0);
-}
-
-document.addEventListener('DOMContentLoaded', initHeaderLogoFracture);
-document.addEventListener('astro:page-load', initHeaderLogoFracture);
-document.addEventListener('astro:after-swap', initHeaderLogoFracture);
-if (document.readyState !== 'loading') {
-  initHeaderLogoFracture();
-}
-</script>
-
-<script>
-function initMobileNav() {
-  const menuButton = document.getElementById('mobile-menu-button');
-  const mobileMenu = document.getElementById('mobile-menu');
-  const searchButton = document.getElementById('search-button');
-  const mobileSearchButton = document.getElementById('mobile-search-btn');
-  const mobileThemeButton = document.getElementById('mobile-theme-btn');
-  const mobileGuideButton = document.getElementById('mobile-guide-btn');
-  const themeToggleButton = document.getElementById('themeToggle');
-  const guideOpenButton = document.getElementById('blog-guide-open-btn');
-  const fontSizeToggle = document.getElementById('fontSizeToggle');
-  const mobileFontSizeButton = document.getElementById('mobile-fontsize-btn');
-  const languageMenu = document.getElementById('language-menu');
-  let mobileMenuCloseTimer = null;
-
-  if (!menuButton) return;
-
-  const setMobileMenuOpen = (open) => {
-    if (!mobileMenu) return;
-
-    if (mobileMenuCloseTimer) {
-      clearTimeout(mobileMenuCloseTimer);
-      mobileMenuCloseTimer = null;
-    }
-
-    if (open) {
-      mobileMenu.classList.remove('hidden');
-      mobileMenu.setAttribute('aria-hidden', 'false');
-      menuButton.setAttribute('aria-expanded', 'true');
-      requestAnimationFrame(() => {
-        mobileMenu.classList.add('is-open');
-      });
-      return;
-    }
-
-    mobileMenu.classList.remove('is-open');
-    mobileMenu.setAttribute('aria-hidden', 'true');
-    menuButton.setAttribute('aria-expanded', 'false');
-    mobileMenuCloseTimer = window.setTimeout(() => {
-      if (!mobileMenu.classList.contains('is-open')) {
-        mobileMenu.classList.add('hidden');
-      }
-    }, 240);
-  };
-
-  menuButton.onclick = (e) => {
-    e.stopPropagation();
-    languageMenu?.classList.add('hidden');
-    setMobileMenuOpen(!(mobileMenu && mobileMenu.classList.contains('is-open')));
-  };
-
-  if (mobileSearchButton && searchButton && mobileSearchButton.dataset.bound !== 'true') {
-    mobileSearchButton.dataset.bound = 'true';
-    mobileSearchButton.addEventListener('click', () => {
-      searchButton.click();
-      setMobileMenuOpen(false);
-    });
-  }
-
-  if (mobileThemeButton && themeToggleButton && mobileThemeButton.dataset.bound !== 'true') {
-    mobileThemeButton.dataset.bound = 'true';
-    mobileThemeButton.addEventListener('click', () => {
-      themeToggleButton.click();
-      setMobileMenuOpen(false);
-    });
-  }
-
-  if (mobileGuideButton && guideOpenButton && mobileGuideButton.dataset.bound !== 'true') {
-    mobileGuideButton.dataset.bound = 'true';
-    mobileGuideButton.addEventListener('click', () => {
-      guideOpenButton.click();
-      setMobileMenuOpen(false);
-    });
-  }
-
-  if (mobileFontSizeButton && mobileFontSizeButton.dataset.bound !== 'true') {
-    mobileFontSizeButton.dataset.bound = 'true';
-    mobileFontSizeButton.addEventListener('click', () => {
-      const fontSizeMenu = document.getElementById('font-size-menu');
-      if (fontSizeMenu) {
-        if (fontSizeMenu.classList.contains('hidden')) {
-          fontSizeMenu.classList.remove('hidden');
-          const slider = document.getElementById('font-size-slider');
-          const valueLabel = document.getElementById('font-size-value');
-          const saved = localStorage.getItem('blog-font-size');
-          const val = saved ? parseInt(saved, 10) : 100;
-          if (slider) slider.value = String(val);
-          if (valueLabel) valueLabel.textContent = val + '%';
-        } else {
-          fontSizeMenu.classList.add('hidden');
-        }
-      }
-      setMobileMenuOpen(false);
-    });
-  }
-
-  const tinyMedia = window.matchMedia('(max-width: 379px)');
-  const applyTinyScreenMode = () => {
-    mobileMenu?.classList.toggle('is-tiny-screen', tinyMedia.matches);
-  };
-  applyTinyScreenMode();
-
-  const oldTinyScreenHandler = window.__headerTinyScreenHandler;
-  if (oldTinyScreenHandler) {
-    tinyMedia.removeEventListener('change', oldTinyScreenHandler);
-  }
-  tinyMedia.addEventListener('change', applyTinyScreenMode);
-  window.__headerTinyScreenHandler = applyTinyScreenMode;
-
-  const oldDocClickHandler = window.__headerMobileOutsideClickHandler;
-  if (oldDocClickHandler) {
-    document.removeEventListener('click', oldDocClickHandler);
-  }
-  const handleDocClick = (event) => {
-    if (
-      menuButton &&
-      mobileMenu &&
-      !menuButton.contains(event.target) &&
-      !mobileMenu.contains(event.target)
-    ) {
-      setMobileMenuOpen(false);
-    }
-  };
-  document.addEventListener('click', handleDocClick);
-  window.__headerMobileOutsideClickHandler = handleDocClick;
-
-  if (mobileMenu && mobileMenu.dataset.linksBound !== 'true') {
-    mobileMenu.dataset.linksBound = 'true';
-    mobileMenu.querySelectorAll('a[href]').forEach((link) => {
-      link.addEventListener('click', () => {
-        setMobileMenuOpen(false);
-      });
-    });
-  }
-
-  mobileMenu?.classList.remove('is-open');
-  mobileMenu?.classList.add('hidden');
-  mobileMenu?.setAttribute('aria-hidden', 'true');
-  menuButton.setAttribute('aria-expanded', 'false');
-
-}
-
-document.addEventListener('DOMContentLoaded', initMobileNav);
-document.addEventListener('astro:page-load', initMobileNav);
-document.addEventListener('astro:after-swap', initMobileNav);
-if (document.readyState !== 'loading') {
-  initMobileNav();
-}
-</script>
-
-<script>
-function initGuideModalFallback() {
-  const openButton = document.getElementById('blog-guide-open-btn');
-  const modal = document.getElementById('blog-guide-modal');
-  const closeButton = document.getElementById('blog-guide-close-btn');
-  const mask = document.getElementById('blog-guide-mask');
-
-  if (!openButton || !modal || !closeButton || !mask) return;
-
-  const lockScroll = () => {
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
-  };
-
-  const unlockScroll = () => {
-    document.documentElement.style.overflow = '';
-    document.body.style.overflow = '';
-    document.body.style.touchAction = '';
-  };
-
-  const openGuide = () => {
-    modal.classList.remove('hidden');
-    requestAnimationFrame(() => {
-      modal.classList.add('is-open');
-    });
-    lockScroll();
-  };
-
-  const closeGuide = () => {
-    modal.classList.remove('is-open');
-    window.setTimeout(() => {
-      if (!modal.classList.contains('is-open')) {
-        modal.classList.add('hidden');
-      }
-    }, 260);
-    unlockScroll();
-  };
-
-  if (openButton.dataset.fallbackBound !== 'true') {
-    openButton.dataset.fallbackBound = 'true';
-    openButton.addEventListener('click', openGuide);
-  }
-
-  if (closeButton.dataset.fallbackBound !== 'true') {
-    closeButton.dataset.fallbackBound = 'true';
-    closeButton.addEventListener('click', closeGuide);
-  }
-
-  if (mask.dataset.fallbackBound !== 'true') {
-    mask.dataset.fallbackBound = 'true';
-    mask.addEventListener('click', closeGuide);
-  }
-}
-
-document.addEventListener('DOMContentLoaded', initGuideModalFallback);
-document.addEventListener('astro:page-load', initGuideModalFallback);
-document.addEventListener('astro:after-swap', initGuideModalFallback);
-if (document.readyState !== 'loading') {
-  initGuideModalFallback();
-}
-</script>
-<script>
-function initLanguageMenu() {
-  const languageButton = document.getElementById('language-button');
-  const languageMenu = document.getElementById('language-menu');
-  const mobileMenu = document.getElementById('mobile-menu'); // 添加移动端菜单引用
-
-  if (!languageButton) return;
-
-  languageButton.onclick = (e) => {
-    e.stopPropagation();
-    mobileMenu?.classList.add('hidden');
-    languageMenu?.classList.toggle('hidden');
-  };
-
-  const oldDocClickHandler = window.__headerLanguageOutsideClickHandler;
-  if (oldDocClickHandler) {
-    document.removeEventListener('click', oldDocClickHandler);
-  }
-
-  const handleDocClick = (event) => {
-    if (
-      languageButton &&
-      languageMenu &&
-      !languageButton.contains(event.target) &&
-      !languageMenu.contains(event.target)
-    ) {
-      languageMenu.classList.add('hidden');
-    }
-  };
-
-  document.addEventListener('click', handleDocClick);
-  window.__headerLanguageOutsideClickHandler = handleDocClick;
-}
-document.addEventListener('astro:page-load', initLanguageMenu);
-document.addEventListener('astro:after-swap', initLanguageMenu);
-</script>
-
-<script>
-let copyToastTimer = null;
-
-function ensureCopyToast() {
-  let toast = document.getElementById('copy-email-toast');
-  if (toast) return toast;
-
-  toast = document.createElement('div');
-  toast.id = 'copy-email-toast';
-  toast.className = 'fixed top-20 right-6 z-[1200] px-3 py-2 rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)] text-[var(--text-color)] shadow-[0_4px_12px_var(--shadow-color)] text-sm opacity-0 pointer-events-none transition-opacity duration-200';
-  document.body.appendChild(toast);
-  return toast;
-}
-
-function showCopyToast(message) {
-  const toast = ensureCopyToast();
-  toast.textContent = message;
-  toast.classList.remove('opacity-0');
-
-  if (copyToastTimer) {
-    clearTimeout(copyToastTimer);
-  }
-
-  copyToastTimer = setTimeout(() => {
-    toast.classList.add('opacity-0');
-  }, 1400);
-}
-
-function initHeaderContactCopy() {
-  const copyButtons = Array.from(document.querySelectorAll('[data-email].copy-email-action, #copy-email-btn'));
-
-  copyButtons.forEach((button) => {
-    if (button.dataset.bound === 'true') return;
-    button.dataset.bound = 'true';
-
-    button.addEventListener('click', async () => {
-      const email = button.getAttribute('data-email') || '';
-      if (!email) return;
-      try {
-        await navigator.clipboard.writeText(email);
-        button.setAttribute('title', '已复制邮箱');
-        showCopyToast('邮箱已复制');
-        setTimeout(() => button.setAttribute('title', '复制邮箱'), 1500);
-      } catch (_error) {
-        button.setAttribute('title', '复制失败');
-        showCopyToast('复制失败，请手动复制');
-        setTimeout(() => button.setAttribute('title', '复制邮箱'), 1500);
-      }
-    });
-  });
-}
-
-document.addEventListener('DOMContentLoaded', initHeaderContactCopy);
-document.addEventListener('astro:page-load', initHeaderContactCopy);
-document.addEventListener('astro:after-swap', initHeaderContactCopy);
-</script>
-
-<script>
-function updateHeaderRunningDays() {
-  const node = document.getElementById('header-running-days');
-  if (!node) return;
-
-  const startRaw = node.getAttribute('data-running-since');
-  const label = node.getAttribute('data-runtime-label') || '已运行';
-  const suffix = node.getAttribute('data-runtime-suffix') || '天';
-  if (!startRaw) return;
-
-  const startDate = new Date(`${startRaw}T00:00:00`);
-  const now = new Date();
-  if (Number.isNaN(startDate.getTime())) return;
-
-  const msPerDay = 24 * 60 * 60 * 1000;
-  const startUtc = Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-  const nowUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-  const days = Math.max(1, Math.floor((nowUtc - startUtc) / msPerDay) + 1);
-
-  node.textContent = `${label} ${days} ${suffix}`;
-}
-
-document.addEventListener('DOMContentLoaded', updateHeaderRunningDays);
-document.addEventListener('astro:page-load', updateHeaderRunningDays);
-document.addEventListener('astro:after-swap', updateHeaderRunningDays);
-if (document.readyState !== 'loading') {
-  updateHeaderRunningDays();
-}
-</script>
-
-<script>
-  function initHeaderScroll() {
-    const header = document.getElementById('main-header');
-    if (!header) return;
-
-    let ticking = false;
-
-    function updateHeader() {
-      const currentScrollY = window.scrollY;
-      header.classList.toggle('header-scrolled', currentScrollY > 4);
-      ticking = false;
-    }
-
-    function onScroll() {
-      if (!ticking) {
-        window.requestAnimationFrame(updateHeader);
-        ticking = true;
-      }
-    }
-
-    const oldHeaderScrollHandler = window.__headerScrollHandler;
-    if (oldHeaderScrollHandler) {
-      window.removeEventListener('scroll', oldHeaderScrollHandler);
-    }
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.__headerScrollHandler = onScroll;
-    onScroll();
-  }
-
-  document.addEventListener('astro:page-load', initHeaderScroll);
-  document.addEventListener('astro:after-swap', initHeaderScroll);
-</script>
-
-
-{import.meta.env.PROD && 
-<script is:inline define:vars={{ scriptUrl: baseUrl('/pagefind/pagefind.js') }}>
-if (window.__headerPagefindBindingDone !== true) {
-function initPagefind() {
-  if (window.pagefind && typeof window.pagefind.search === 'function') {
-    document.dispatchEvent(new CustomEvent('pagefindready'));
-    return;
-  }
-  if (window.pagefindLoading) return;
-  window.pagefindLoading = true;
-
-  // 加载 Pagefind
-  fetch(scriptUrl, { method: 'HEAD' })
-    .then((response) => {
-      if (!response.ok) throw new Error(`Pagefind script not found: ${response.status}`);
-      return import(scriptUrl);
-    })
-    .then(async (pagefind) => {
-      await pagefind.options({ 
-        excerptLength: 20
-     });
-      window.pagefind = pagefind;
-      document.dispatchEvent(new CustomEvent('pagefindready'));
-      // console.log('Pagefind initialized successfully');
-    })
-    .catch(() => {
-      window.pagefind = {
-        search: () => Promise.resolve({ results: [] }),
-        options: () => Promise.resolve(),
-      };
-      document.dispatchEvent(new CustomEvent('pagefindloaderror'));
-    });
-    // console.log('Pagefind loading...');
-}
-document.addEventListener('astro:page-load', initPagefind);
-
-document.addEventListener('astro:after-swap', initPagefind);
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initPagefind);
-} else {
-  initPagefind();
-}
-window.__headerPagefindBindingDone = true;
-}
-</script>
-}
+<HeaderLogoFracture />
+<GuideModal />
+<CopyEmail />
+<HeaderScroll />
+<PagefindLoader />
