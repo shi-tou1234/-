@@ -46,32 +46,32 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
     <!-- nav_bar (desktop) -->
     <div id="nav-bar" class="hidden md:flex absolute left-[calc(50%-30px)] -translate-x-1/2 items-center justify-center font-bold z-20 text-base lg:text-lg">
       <div id="nav-bar-list" class="transition relative z-10 flex items-center justify-center rounded-outer p-2 overflow-x-auto whitespace-nowrap max-w-[min(58vw,860px)]">
-      <a href={ indexPage } class="nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
+      <a href={ indexPage } class={`nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === indexPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
-            }">
+            }`}>
             <span class="nav-link-text">{t("header.home")}</span>
         </a>
-      <a href={ archivesPage } class="nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
+      <a href={ archivesPage } class={`nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === archivesPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
-            }">
+            }`}>
             <span class="nav-link-text">{t("header.archive")}</span>
         </a>
-        <a href={ aboutPage } class="nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
+        <a href={ aboutPage } class={`nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === aboutPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
-            }">
+            }`}>
             <span class="nav-link-text">{t("header.about")}</span>
         </a>
-        <a href={ toolsPage } class="nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
+        <a href={ toolsPage } class={`nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
           Astro.url.pathname === toolsPage
                 ? 'bg-[var(--button-hover-color)] is-active'
                 : 'hover:bg-[var(--button-hover-color)]'
-            }">
+            }`}>
           <span class="nav-link-text">{t("header.tools")}</span>
         </a>
       </div>

@@ -26,7 +26,19 @@ export async function getBlogEntrySort(
   };
 
   const blogEntries = await getCollection('blog', filter || defaultFilter);
-  return blogEntries.sort(sort || defaultSort);
+
+  // Group entries by directory, strip locale suffix from ID
+  const grouped = new Map<string, CollectionEntry<'blog'>>();
+  for (const post of blogEntries) {
+    const parts = post.id.split('/');
+    if (parts.length < 2) continue;
+    const dir = parts.slice(0, -1).join('/');
+    if (!grouped.has(dir)) {
+      grouped.set(dir, { ...post, id: dir });
+    }
+  }
+
+  return Array.from(grouped.values()).sort(sort || defaultSort);
 }
 
 export async function getSpec(
