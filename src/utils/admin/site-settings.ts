@@ -33,24 +33,42 @@ import {
 
 // ===== Data conversion helpers =====
 
-function timelineToTextarea(items: { date?: string; content?: string }[]) {
+function timelineToTextarea(items: { date?: string; content?: string[] }[]) {
   if (!Array.isArray(items)) return "";
-  return items
-    .map((item) => `${String(item?.date || "").trim()}|${String(item?.content || "").trim()}`)
-    .filter((line) => !line.startsWith("|"))
-    .join("\n");
+  const lines: string[] = [];
+  for (const item of items) {
+    const date = String(item?.date || "").trim();
+    const contents = Array.isArray(item?.content) ? item!.content : [String(item?.content || "").trim()];
+    for (const c of contents) {
+      const text = String(c || "").trim();
+      if (date && text) lines.push(`${date}|${text}`);
+    }
+  }
+  return lines.join("\n");
 }
 
 function textareaToTimeline(raw: string) {
-  return String(raw || "")
+  const lines = String(raw || "")
     .split(/\r?\n/)
     .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [date, ...rest] = line.split("|");
-      return { date: String(date || "").trim(), content: rest.join("|").trim() };
-    })
-    .filter((item) => item.date && item.content);
+    .filter(Boolean);
+
+  const grouped = new Map<string, string[]>();
+  const order: string[] = [];
+
+  for (const line of lines) {
+    const [date, ...rest] = line.split("|");
+    const d = String(date || "").trim();
+    const c = rest.join("|").trim();
+    if (!d || !c) continue;
+    if (!grouped.has(d)) {
+      grouped.set(d, []);
+      order.push(d);
+    }
+    grouped.get(d)!.push(c);
+  }
+
+  return order.map((date) => ({ date, content: grouped.get(date)! }));
 }
 
 function musicToTextarea(items: { title?: string; artist?: string; url?: string }[]) {

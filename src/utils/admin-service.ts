@@ -280,11 +280,11 @@ export function parseAboutPersonalFromTs(content: string) {
 
 export function buildAboutPersonalTs(content: {
   intro: string;
-  siteTimeline: Array<{ date: string; content: string }>;
+  siteTimeline: Array<{ date: string; content: string[] }>;
   musicTracks: Array<{ title: string; artist: string; url: string }>;
   travelCities: Array<{ province: string; city: string; visited: boolean; lat?: number; lng?: number }>;
 }) {
-  return `export type SiteTimelineItem = {\n  date: string;\n  content: string;\n};\n\nexport type MusicTrack = {\n  title: string;\n  artist: string;\n  url: string;\n};\n\nexport type TravelProvince = {\n  province: string;\n  city: string;\n  visited: boolean;\n  lat?: number;\n  lng?: number;\n};\n\nexport type AboutPersonal = {\n  intro: string;\n  siteTimeline: SiteTimelineItem[];\n  musicTracks: MusicTrack[];\n  travelCities: TravelProvince[];\n};\n\nconst aboutPersonal: AboutPersonal = ${JSON.stringify(content, null, 2)};\n\nexport default aboutPersonal;\n`;
+  return `export type SiteTimelineItem = {\n  date: string;\n  content: string[];\n};\n\nexport type MusicTrack = {\n  title: string;\n  artist: string;\n  url: string;\n};\n\nexport type TravelProvince = {\n  province: string;\n  city: string;\n  visited: boolean;\n  lat?: number;\n  lng?: number;\n};\n\nexport type AboutPersonal = {\n  intro: string;\n  siteTimeline: SiteTimelineItem[];\n  musicTracks: MusicTrack[];\n  travelCities: TravelProvince[];\n};\n\nconst aboutPersonal: AboutPersonal = ${JSON.stringify(content, null, 2)};\n\nexport default aboutPersonal;\n`;
 }
 
 // ====== Slug & Date Helpers ======
