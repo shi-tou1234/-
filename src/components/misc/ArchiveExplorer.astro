@@ -8,6 +8,7 @@ import {
   getPostCategories,
 } from '@utils/blog-taxonomy';
 import { buildPostPreview, truncateText } from '@utils/post-preview';
+import { estimateReadingMinutes } from '@utils/reading-time';
 
 interface Props {
   posts: BlogEntryWithLocaleStatus[];
@@ -41,14 +42,43 @@ const yearFormatter = new Intl.DateTimeFormat('en-CA', {
   timeZone: archiveTimeZone,
 });
 
-const postsByYear = visiblePosts.reduce((acc, post) => {
-  const year = yearFormatter.format(post.data.pubDate);
-  if (!acc[year]) {
-    acc[year] = [];
+const monthNumericFormatter = new Intl.DateTimeFormat('en-CA', {
+  month: '2-digit',
+  timeZone: archiveTimeZone,
+});
+
+const monthLabelFormatter = new Intl.DateTimeFormat(language, {
+  month: language.toLowerCase().startsWith('zh') ? 'long' : 'long',
+  timeZone: archiveTimeZone,
+});
+
+// 分类配色：根据分类名哈希到 0-7 的色相槽，保证同分类同色
+const categoryColorSlots = new Map<string, number>();
+let nextColorSlot = 0;
+function getCategoryColorSlot(category: string): number {
+  const key = category.toLowerCase();
+  if (!categoryColorSlots.has(key)) {
+    categoryColorSlots.set(key, nextColorSlot % 8);
+    nextColorSlot++;
   }
-  acc[year].push(post);
+  return categoryColorSlots.get(key)!;
+}
+
+// 按年 -> 月 -> 文章 三级分组
+const postsByYearMonth = visiblePosts.reduce((acc, post) => {
+  const year = yearFormatter.format(post.data.pubDate);
+  const monthKey = monthNumericFormatter.format(post.data.pubDate);
+  if (!acc[year]) acc[year] = {};
+  if (!acc[year][monthKey]) acc[year][monthKey] = { label: monthLabelFormatter.format(post.data.pubDate), posts: [] };
+  acc[year][monthKey].posts.push(post);
   return acc;
-}, {} as Record<string, BlogEntryWithLocaleStatus[]>);
+}, {} as Record<string, Record<string, { label: string; posts: BlogEntryWithLocaleStatus[] }>>);
+
+// 每年总文章数
+const yearPostCounts: Record<string, number> = {};
+for (const [year, months] of Object.entries(postsByYearMonth)) {
+  yearPostCounts[year] = Object.values(months).reduce((sum, m) => sum + m.posts.length, 0);
+}
 
 const allLabel = language.toLowerCase().startsWith('zh') ? '全部文章' : 'All posts';
 const filterTitle = language.toLowerCase().startsWith('zh') ? '标签筛选' : 'Filter by tags';
@@ -56,6 +86,9 @@ const filterHint = language.toLowerCase().startsWith('zh') ? '点击标签可筛
 const emptyLabel = language.toLowerCase().startsWith('zh') ? '当前筛选下暂无文章' : 'No posts match this filter';
 const categoryLabel = language.toLowerCase().startsWith('zh') ? '分类' : 'Category';
 const backLabel = language.toLowerCase().startsWith('zh') ? '← 返回' : '← Back';
+const minLabel = language.toLowerCase().startsWith('zh') ? '分钟' : 'min';
+const postsLabel = language.toLowerCase().startsWith('zh') ? '篇' : 'posts';
+const collapseHint = language.toLowerCase().startsWith('zh') ? '点击折叠/展开' : 'Click to fold/unfold';
 
 const serializedTopLevelCategories = JSON.stringify(topLevelCategories);
 const serializedSubcategoriesByRoot = JSON.stringify(
@@ -72,48 +105,89 @@ const serializedCategoryCounts = JSON.stringify(
 
 <div class="archive-explorer grid gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,1fr)]" data-initial-category={initialCategory.toLowerCase()} data-top-level-categories={serializedTopLevelCategories} data-subcategories-by-root={serializedSubcategoriesByRoot} data-category-counts={serializedCategoryCounts} data-lang={language}>
   <section class="min-w-0 space-y-8">
-    {Object.keys(postsByYear).sort().reverse().map((year) => (
-      <section class="space-y-4" data-archive-year>
-        <div class="archive-explorer__year-title sticky top-20 z-10 inline-flex border-l-4 border-[var(--link-color)] pl-3 text-2xl font-bold text-[var(--text-color)] backdrop-blur">
-          {year}
-        </div>
+    {Object.keys(postsByYearMonth).sort().reverse().map((year) => (
+      <section class="archive-explorer__year space-y-3" data-archive-year>
+        <button
+          type="button"
+          class="archive-explorer__year-header sticky top-20 z-10 inline-flex items-center gap-2 border-l-4 border-[var(--link-color)] pl-3 text-2xl font-bold text-[var(--text-color)] backdrop-blur"
+          data-archive-year-toggle
+          title={collapseHint}
+          aria-expanded="true"
+        >
+          <span class="archive-explorer__fold-icon" data-fold-icon aria-hidden="true">▾</span>
+          <span>{year}</span>
+          <span class="archive-explorer__year-count text-sm font-normal text-[var(--text-color)]/55">{yearPostCounts[year]} {postsLabel}</span>
+        </button>
 
-        <div class="space-y-2">
-          {postsByYear[year].map((post) => {
-            const postCategories = getPostCategories(post, language);
-            const postSummary = buildPostPreview(post.data.description || '', post.body || '', 80);
-            const shortSummary = truncateText(postSummary, 30);
+        <div class="archive-explorer__year-content space-y-4" data-archive-year-content>
+          {Object.keys(postsByYearMonth[year]).sort().reverse().map((monthKey) => {
+            const monthData = postsByYearMonth[year][monthKey];
             return (
-              <a
-                href={getRelativeLocaleUrl(language, `/blog/${post.id}`)}
-                class="archive-explorer__post group block rounded-xl px-3 py-3 text-[var(--text-color)] transition-all duration-200 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)]"
-                data-archive-post
-                data-categories={postCategories.map((category) => category.toLowerCase()).join('||')}
-              >
-                <div class="grid items-center gap-3 md:grid-cols-[6.5rem_minmax(0,1fr)_8rem]">
-                  <div class="shrink-0 text-lg text-[var(--text-color)]/72">
-                    {dateFormatter.format(post.data.pubDate)}
-                  </div>
+              <section class="archive-explorer__month space-y-2" data-archive-month>
+                <button
+                  type="button"
+                  class="archive-explorer__month-header inline-flex items-center gap-2 rounded-lg px-2 py-1 text-base font-semibold text-[var(--text-color)]/80 transition-colors hover:bg-[var(--button-hover-color)] hover:text-[var(--text-color)]"
+                  data-archive-month-toggle
+                  title={collapseHint}
+                  aria-expanded="true"
+                >
+                  <span class="archive-explorer__fold-icon archive-explorer__fold-icon--sm" data-fold-icon aria-hidden="true">▸</span>
+                  <span>{monthData.label}</span>
+                  <span class="archive-explorer__month-count text-xs font-normal text-[var(--text-color)]/45">{monthData.posts.length} {postsLabel}</span>
+                </button>
 
-                  <div class="min-w-0">
-                    <div class="flex flex-wrap items-center gap-2">
-                      <h3 class="archive-explorer__post-title truncate text-2xl font-medium tracking-[0.01em]" data-summary-short={shortSummary}>{post.data.title}</h3>
-                      {post.isFallback && (
-                        <span class="rounded border border-[var(--button-border-color)] bg-[var(--button-hover-color)] px-1.5 py-0.5 text-xs text-[var(--text-color)]/70">fallback</span>
-                      )}
-                    </div>
-                    <p class="archive-explorer__post-summary mt-2 text-sm text-[var(--text-color)]/65">{postSummary}</p>
-                  </div>
+                <div class="archive-explorer__month-content space-y-2" data-archive-month-content>
+                  {monthData.posts.map((post) => {
+                    const postCategories = getPostCategories(post, language);
+                    const postSummary = buildPostPreview(post.data.description || '', post.body || '', 80);
+                    const shortSummary = truncateText(postSummary, 30);
+                    const readingMinutes = estimateReadingMinutes(post.body || '');
+                    return (
+                      <a
+                        href={getRelativeLocaleUrl(language, `/blog/${post.id}`)}
+                        class="archive-explorer__post group block rounded-xl px-3 py-3 text-[var(--text-color)] transition-all duration-200 hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)]"
+                        data-archive-post
+                        data-categories={postCategories.map((category) => category.toLowerCase()).join('||')}
+                      >
+                        <div class="grid items-center gap-3 md:grid-cols-[6.5rem_minmax(0,1fr)_8rem]">
+                          <div class="flex flex-col gap-1 shrink-0">
+                            <div class="text-lg text-[var(--text-color)]/72">
+                              {dateFormatter.format(post.data.pubDate)}
+                            </div>
+                            <div class="archive-explorer__reading-time inline-flex items-center gap-1 text-xs text-[var(--text-color)]/45">
+                              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                              </svg>
+                              <span>{readingMinutes} {minLabel}</span>
+                            </div>
+                          </div>
 
-                  <div class="flex flex-wrap justify-start gap-2 text-sm text-[var(--text-color)]/65 md:justify-end">
-                    {postCategories.map((category) => (
-                      <span class="archive-explorer__post-tag">
-                        #{category}
-                      </span>
-                    ))}
-                  </div>
+                          <div class="min-w-0">
+                            <div class="flex flex-wrap items-center gap-2">
+                              <h3 class="archive-explorer__post-title truncate text-2xl font-medium tracking-[0.01em]" data-summary-short={shortSummary}>{post.data.title}</h3>
+                              {post.isFallback && (
+                                <span class="rounded border border-[var(--button-border-color)] bg-[var(--button-hover-color)] px-1.5 py-0.5 text-xs text-[var(--text-color)]/70">fallback</span>
+                              )}
+                            </div>
+                            <p class="archive-explorer__post-summary mt-2 text-sm text-[var(--text-color)]/65">{postSummary}</p>
+                          </div>
+
+                          <div class="flex flex-wrap justify-start gap-2 text-sm text-[var(--text-color)]/65 md:justify-end">
+                            {postCategories.map((category) => (
+                              <span
+                                class="archive-explorer__post-tag"
+                                style={`--cat-slot: ${getCategoryColorSlot(category)}`}
+                              >
+                                #{category}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </a>
+                    );
+                  })}
                 </div>
-              </a>
+              </section>
             );
           })}
         </div>
@@ -175,6 +249,7 @@ const serializedCategoryCounts = JSON.stringify(
       const rootChips = [...root.querySelectorAll('[data-root-category]')];
       const posts = [...root.querySelectorAll('[data-archive-post]')];
       const years = [...root.querySelectorAll('[data-archive-year]')];
+      const months = [...root.querySelectorAll('[data-archive-month]')];
       const emptyState = root.querySelector('[data-archive-empty]');
       const topView = root.querySelector('.archive-explorer__top-view');
       const subView = root.querySelector('.archive-explorer__sub-view');
@@ -341,13 +416,17 @@ const serializedCategoryCounts = JSON.stringify(
 
         const firstRects = captureRects([
           ...years.filter((year) => year instanceof HTMLElement && !year.hidden),
+          ...months.filter((month) => month instanceof HTMLElement && !month.hidden),
           ...posts.filter((post) => post instanceof HTMLElement && !post.hidden),
         ]);
 
         const nextPostVisibility = new Map();
+        const nextMonthVisibility = new Map();
         const nextYearVisibility = new Map();
         const enteringPosts = [];
         const exitingPosts = [];
+        const enteringMonths = [];
+        const exitingMonths = [];
         const enteringYears = [];
         const exitingYears = [];
 
@@ -376,18 +455,33 @@ const serializedCategoryCounts = JSON.stringify(
           if (matched) visibleCount += 1;
         });
 
-        years.forEach((year) => {
-          if (!(year instanceof HTMLElement)) return;
-          stopAnimations(year);
+        months.forEach((month) => {
+          if (!(month instanceof HTMLElement)) return;
+          stopAnimations(month);
 
-          const hasVisiblePost = [...year.querySelectorAll('[data-archive-post]')].some((post) => {
+          const hasVisiblePost = [...month.querySelectorAll('[data-archive-post]')].some((post) => {
             if (!(post instanceof HTMLElement)) return false;
             return nextPostVisibility.get(post) === true;
           });
 
-          nextYearVisibility.set(year, hasVisiblePost);
-          if (hasVisiblePost && year.hidden) enteringYears.push(year);
-          if (!hasVisiblePost && !year.hidden) exitingYears.push(year);
+          nextMonthVisibility.set(month, hasVisiblePost);
+          if (hasVisiblePost && month.hidden) enteringMonths.push(month);
+          if (!hasVisiblePost && !month.hidden) exitingMonths.push(month);
+        });
+
+        years.forEach((year) => {
+          if (!(year instanceof HTMLElement)) return;
+          stopAnimations(year);
+
+          const yearMonths = [...year.querySelectorAll('[data-archive-month]')];
+          const hasVisibleMonth = yearMonths.some((month) => {
+            if (!(month instanceof HTMLElement)) return false;
+            return nextMonthVisibility.get(month) === true;
+          });
+
+          nextYearVisibility.set(year, hasVisibleMonth);
+          if (hasVisibleMonth && year.hidden) enteringYears.push(year);
+          if (!hasVisibleMonth && !year.hidden) exitingYears.push(year);
         });
 
         if (animate) {
@@ -395,10 +489,16 @@ const serializedCategoryCounts = JSON.stringify(
           exitingPosts.forEach((post) => {
             createGhost(post);
           });
+          exitingMonths.forEach((month) => {
+            const monthHeader = month.querySelector('.archive-explorer__month-header');
+            if (monthHeader instanceof HTMLElement) {
+              createGhost(monthHeader);
+            }
+          });
           exitingYears.forEach((year) => {
-            const yearTitle = year.querySelector('.archive-explorer__year-title');
-            if (yearTitle instanceof HTMLElement) {
-              createGhost(yearTitle);
+            const yearHeader = year.querySelector('.archive-explorer__year-header');
+            if (yearHeader instanceof HTMLElement) {
+              createGhost(yearHeader);
             }
           });
         }
@@ -406,6 +506,11 @@ const serializedCategoryCounts = JSON.stringify(
         posts.forEach((post) => {
           if (!(post instanceof HTMLElement)) return;
           post.hidden = !(nextPostVisibility.get(post) === true);
+        });
+
+        months.forEach((month) => {
+          if (!(month instanceof HTMLElement)) return;
+          month.hidden = !(nextMonthVisibility.get(month) === true);
         });
 
         years.forEach((year) => {
@@ -420,12 +525,17 @@ const serializedCategoryCounts = JSON.stringify(
         if (animate) {
           const visibleElements = [
             ...years.filter((year) => year instanceof HTMLElement && !year.hidden),
+            ...months.filter((month) => month instanceof HTMLElement && !month.hidden),
             ...posts.filter((post) => post instanceof HTMLElement && !post.hidden),
           ];
           playFlip(visibleElements, firstRects);
 
           enteringYears.forEach((year, index) => {
             animateEnter(year, index, 8);
+          });
+
+          enteringMonths.forEach((month, index) => {
+            animateEnter(month, index, 8);
           });
 
           enteringPosts.forEach((post, index) => {
@@ -621,6 +731,98 @@ const serializedCategoryCounts = JSON.stringify(
         });
       });
 
+      // ===== 折叠/展开：年 =====
+      years.forEach((year) => {
+        if (!(year instanceof HTMLElement)) return;
+        const toggle = year.querySelector('[data-archive-year-toggle]');
+        const content = year.querySelector('[data-archive-year-content]');
+        if (!toggle || !content) return;
+        if (toggle.dataset.bound === 'true') return;
+        toggle.dataset.bound = 'true';
+
+        toggle.addEventListener('click', () => {
+          const collapsed = year.dataset.collapsed === 'true';
+          year.dataset.collapsed = collapsed ? 'false' : 'true';
+          toggle.setAttribute('aria-expanded', collapsed ? 'true' : 'false');
+          if (prefersReducedMotion) {
+            content.classList.toggle('archive-explorer__hidden', !collapsed);
+          } else {
+            if (collapsed) {
+              content.classList.remove('archive-explorer__hidden');
+              content.animate(
+                [
+                  { opacity: 0, maxHeight: 0 },
+                  { opacity: 1, maxHeight: '9999px' },
+                ],
+                { duration: 280, easing: 'ease', fill: 'both' }
+              ).finished.finally(() => {
+                content.style.opacity = '';
+                content.style.maxHeight = '';
+              });
+            } else {
+              const anim = content.animate(
+                [
+                  { opacity: 1, maxHeight: content.scrollHeight + 'px' },
+                  { opacity: 0, maxHeight: 0 },
+                ],
+                { duration: 280, easing: 'ease', fill: 'both' }
+              );
+              anim.finished.finally(() => {
+                content.classList.add('archive-explorer__hidden');
+                content.style.opacity = '';
+                content.style.maxHeight = '';
+              });
+            }
+          }
+        });
+      });
+
+      // ===== 折叠/展开：月 =====
+      months.forEach((month) => {
+        if (!(month instanceof HTMLElement)) return;
+        const toggle = month.querySelector('[data-archive-month-toggle]');
+        const content = month.querySelector('[data-archive-month-content]');
+        if (!toggle || !content) return;
+        if (toggle.dataset.bound === 'true') return;
+        toggle.dataset.bound = 'true';
+
+        toggle.addEventListener('click', () => {
+          const collapsed = month.dataset.collapsed === 'true';
+          month.dataset.collapsed = collapsed ? 'false' : 'true';
+          toggle.setAttribute('aria-expanded', collapsed ? 'true' : 'false');
+          if (prefersReducedMotion) {
+            content.classList.toggle('archive-explorer__hidden', !collapsed);
+          } else {
+            if (collapsed) {
+              content.classList.remove('archive-explorer__hidden');
+              content.animate(
+                [
+                  { opacity: 0, transform: 'translateY(-4px)' },
+                  { opacity: 1, transform: 'translateY(0)' },
+                ],
+                { duration: 200, easing: 'ease', fill: 'both' }
+              ).finished.finally(() => {
+                content.style.opacity = '';
+                content.style.transform = '';
+              });
+            } else {
+              const anim = content.animate(
+                [
+                  { opacity: 1, transform: 'translateY(0)' },
+                  { opacity: 0, transform: 'translateY(-4px)' },
+                ],
+                { duration: 200, easing: 'ease', fill: 'both' }
+              );
+              anim.finished.finally(() => {
+                content.classList.add('archive-explorer__hidden');
+                content.style.opacity = '';
+                content.style.transform = '';
+              });
+            }
+          }
+        });
+      });
+
       const urlCategories = parseUrlCategories();
       if (urlCategories.length > 0) {
         setSelectedCategories(urlCategories, false, false);
@@ -766,8 +968,22 @@ const serializedCategoryCounts = JSON.stringify(
   }
 
   .archive-explorer__post-tag {
-    color: color-mix(in srgb, var(--text-color) 72%, transparent);
-    transition: color 0.2s ease, transform 0.2s ease;
+    --cat-slot: 0;
+    --cat-hue: calc(var(--cat-slot) * 45);
+    color: hsl(var(--cat-hue), 65%, 42%);
+    background: hsla(var(--cat-hue), 65%, 50%, 0.1);
+    border: 1px solid hsla(var(--cat-hue), 65%, 50%, 0.28);
+    border-radius: 999px;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    transition: color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+  }
+
+  [data-theme='dark'] .archive-explorer__post-tag {
+    color: hsl(var(--cat-hue), 65%, 68%);
+    background: hsla(var(--cat-hue), 65%, 50%, 0.16);
+    border-color: hsla(var(--cat-hue), 65%, 50%, 0.36);
   }
 
   .archive-explorer__post-title {
@@ -836,14 +1052,67 @@ const serializedCategoryCounts = JSON.stringify(
   }
 
   .archive-explorer__post:hover .archive-explorer__post-tag {
-    color: var(--link-color);
     transform: translateX(-0.15rem);
   }
 
   .archive-explorer__post[hidden],
   [data-archive-year][hidden],
+  [data-archive-month][hidden],
   .archive-explorer__empty[hidden] {
     display: none !important;
+  }
+
+  /* 折叠/展开 */
+  .archive-explorer__year-header,
+  .archive-explorer__month-header {
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    width: 100%;
+    text-align: left;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .archive-explorer__year-header {
+    background: color-mix(in srgb, var(--bg-color) 72%, transparent);
+    border-radius: 0.5rem;
+  }
+
+  .archive-explorer__year-header:hover,
+  .archive-explorer__month-header:hover {
+    color: var(--link-color);
+  }
+
+  .archive-explorer__fold-icon {
+    display: inline-block;
+    transition: transform 0.22s ease;
+    font-size: 0.8em;
+    color: var(--text-color);
+    opacity: 0.55;
+  }
+
+  .archive-explorer__fold-icon--sm {
+    font-size: 0.7em;
+  }
+
+  .archive-explorer__year[data-collapsed='true'] .archive-explorer__fold-icon,
+  .archive-explorer__month[data-collapsed='true'] .archive-explorer__fold-icon {
+    transform: rotate(-90deg);
+  }
+
+  .archive-explorer__year[data-collapsed='true'] .archive-explorer__year-content,
+  .archive-explorer__month[data-collapsed='true'] .archive-explorer__month-content {
+    display: none;
+  }
+
+  .archive-explorer__hidden {
+    display: none !important;
+  }
+
+  .archive-explorer__reading-time {
+    pointer-events: none;
   }
 
   @media (max-width: 1024px) {
@@ -855,7 +1124,9 @@ const serializedCategoryCounts = JSON.stringify(
   @media (prefers-reduced-motion: reduce) {
     .archive-explorer__chip,
     .archive-explorer__post,
-    .archive-explorer__year-title {
+    .archive-explorer__year-header,
+    .archive-explorer__month-header,
+    .archive-explorer__fold-icon {
       transition: none !important;
     }
   }

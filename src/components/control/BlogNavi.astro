@@ -23,9 +23,11 @@ function getPostUrl(id: string) {
     <div class="flex flex-row items-stretch gap-2 sm:gap-4">
         <div class="flex-1 min-w-0">
             {prev && (
-            <a 
-                href={getPostUrl(prev.id)} 
+            <a
+                href={getPostUrl(prev.id)}
                 class="group flex h-full flex-col gap-1 rounded-lg p-3 no-underline transition-all hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)] sm:p-4"
+                data-navi-prev-post
+                rel="prev"
             >
                 <div class="flex items-center gap-1.5 text-[var(--text-color)]/70">
                     <Icon name="fa6-solid:arrow-left" class="h-4 w-4" />
@@ -39,9 +41,11 @@ function getPostUrl(id: string) {
         </div>
         <div class="flex-1 min-w-0">
             {next && (
-            <a 
-                href={getPostUrl(next.id)} 
+            <a
+                href={getPostUrl(next.id)}
                 class="group flex h-full flex-col items-end gap-1 rounded-lg p-3 text-right no-underline transition-all hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)] sm:p-4"
+                data-navi-next-post
+                rel="next"
             >
                 <div class="flex items-center gap-1.5 text-[var(--text-color)]/70">
                     <span class="text-sm transition-colors group-hover:text-[var(--text-color)]">{t("blogNavi.next")}</span>

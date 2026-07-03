@@ -10,6 +10,7 @@ import CategoryPostNavi from '@components/control/CategoryPostNavi.astro'
 import LicenseCard from '@components/misc/LicenseCard.astro'
 import BlogNavi from '@components/control/BlogNavi.astro'
 import ReadingTime from '@components/misc/ReadingTime.astro'
+import Comments from '@components/misc/Comments.astro'
 
 import { getCollection, render } from 'astro:content'
 import i18nit from '@i18n/translation'
@@ -155,6 +156,7 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
                 siteConfig.blogNavi.enable &&
                 <BlogNavi prev={prev} next={next}/>
             }
+            <Comments mapping="pathname" title={entry.data.title} />
         </div>
 
         <aside class="post-right-sidebar" aria-label={t('toc')}>
