@@ -101,6 +101,7 @@ for (let index = 0; index < HEATMAP_DAYS; index += 1) {
 }
 
 const totalCommits = daySeries.reduce((sum, item) => sum + item.count, 0);
+const maxCount = Math.max(...daySeries.map((item) => item.count), 1);
 const leadingPadCount = startDate.getDay();
 
 const heatmapCells = [
@@ -158,9 +159,9 @@ const travelPlaces = (aboutPersonal.travelCities || [])
 
 const pageTitle = `${t('header.about')} - ${siteConfig.title}`;
 
-function getIntensityLevel(count: number): number {
+function getIntensityLevel(count: number, maxCount: number): number {
   if (count <= 0) return 0;
-  const ratio = count / 10000;
+  const ratio = count / maxCount;
   if (ratio < 0.25) return 1;
   if (ratio < 0.5) return 2;
   if (ratio < 0.75) return 3;
@@ -267,7 +268,7 @@ function getIntensityLevel(count: number): number {
                       data-date={cell.key}
                       class="block h-[19px] w-6 rounded-sm border border-[var(--button-border-color)]"
                       style={(() => {
-                        const level = getIntensityLevel(cell.count);
+                        const level = getIntensityLevel(cell.count, maxCount);
                         return level === 0
                           ? 'background: var(--button-hover-color);'
                           : `background: color-mix(in srgb, var(--link-color) ${20 + level * 18}%, var(--button-hover-color));`;
@@ -384,9 +385,9 @@ function getIntensityLevel(count: number): number {
     return `background: color-mix(in srgb, var(--link-color) ${20 + level * 18}%, var(--button-hover-color));`;
   }
 
-  function getClientIntensityLevel(count) {
+  function getClientIntensityLevel(count, maxCount) {
     if (count <= 0) return 0;
-    const ratio = count / 10000;
+    const ratio = count / Math.max(maxCount, 1);
     if (ratio < 0.25) return 1;
     if (ratio < 0.5) return 2;
     if (ratio < 0.75) return 3;
@@ -426,15 +427,17 @@ function getIntensityLevel(count: number): number {
       }
 
       let total = 0;
+      let maxCount = 1;
       for (const value of countMap.values()) {
         total += value;
+        if (value > maxCount) maxCount = value;
       }
 
       cells.forEach((cell) => {
         const key = cell.getAttribute('data-date');
         if (!key) return;
         const count = countMap.get(key) || 0;
-        const level = getClientIntensityLevel(count);
+        const level = getClientIntensityLevel(count, maxCount);
         cell.setAttribute('style', getCellStyle(level));
         cell.setAttribute('title', `${key} · ${count} 次提交`);
       });
