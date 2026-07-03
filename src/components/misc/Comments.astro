@@ -17,6 +17,10 @@
 <script>
   // 动态加载 Giscus 评论系统
   // 使用普通 script（非 is:inline），Astro 会打包处理并确保在每次页面加载/切换后执行
+
+  // 防止重复初始化（astro:page-load 首次加载也会触发，与模块执行重复）
+  let _initialized = false;
+
   const GISCUS_CONFIG = {
     repo: 'shi-tou1234/-',
     repoId: 'R_kgDORRKvYA',
@@ -74,7 +78,12 @@
   }
 
   function init() {
+    // 防止重复调用导致 Giscus 初始化被中断
+    if (_initialized) return;
+    _initialized = true;
+
     loadGiscus();
+
     // 监听主题变化（只注册一次）
     if (!window.__giscusThemeObserver) {
       window.__giscusThemeObserver = new MutationObserver(syncGiscusTheme);
@@ -85,9 +94,14 @@
     }
   }
 
-  // 首次加载 + View Transitions 页面切换后重新加载
+  // 首次加载（模块脚本自动执行）
   init();
-  document.addEventListener('astro:page-load', init);
+
+  // View Transitions 页面切换后重新加载（重置标记，允许重新初始化）
+  document.addEventListener('astro:page-load', () => {
+    _initialized = false;
+    init();
+  });
 </script>
 
 <style is:global>
