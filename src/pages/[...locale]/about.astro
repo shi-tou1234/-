@@ -50,7 +50,7 @@ async function fetchCommitsFromGitHub() {
   const headers = { Accept: 'application/vnd.github+json' };
 
   try {
-    for (let page = 1; page <= 10; page += 1) {
+    for (let page = 1; page <= 100; page += 1) {
       const url = `https://api.github.com/repos/shi-tou1234/-/commits?sha=main&since=${encodeURIComponent(sinceIso)}&until=${encodeURIComponent(untilIso)}&per_page=100&page=${page}`;
       const response = await fetch(url, { headers });
       if (!response.ok) break;
@@ -408,7 +408,7 @@ function getIntensityLevel(count: number): number {
     const countMap = new Map();
 
     try {
-      for (let page = 1; page <= 10; page += 1) {
+      for (let page = 1; page <= 100; page += 1) {
         const url = `https://api.github.com/repos/shi-tou1234/-/commits?sha=main&since=${encodeURIComponent(since)}&until=${encodeURIComponent(until)}&per_page=100&page=${page}`;
         const response = await fetch(url, { headers: { Accept: 'application/vnd.github+json' } });
         if (!response.ok) break;
