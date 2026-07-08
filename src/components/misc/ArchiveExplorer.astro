@@ -977,8 +977,7 @@ const serializedCategoryCounts = JSON.stringify(
     padding: 0.1rem 0.5rem;
     font-size: 0.72rem;
     font-weight: 600;
-    transition: color 0.32s cubic-bezier(0.23, 1, 0.320, 1), transform 0.32s cubic-bezier(0.23, 1, 0.320, 1), background 0.32s cubic-bezier(0.23, 1, 0.320, 1), border-color 0.32s cubic-bezier(0.23, 1, 0.320, 1);
-    will-change: transform;
+    transition: color 0.2s ease, transform 0.2s ease, background 0.2s ease;
   }
 
   [data-theme='dark'] .archive-explorer__post-tag {
@@ -989,9 +988,7 @@ const serializedCategoryCounts = JSON.stringify(
 
   .archive-explorer__post-title {
     position: relative;
-    transition: color 0.32s cubic-bezier(0.23, 1, 0.320, 1), transform 0.32s cubic-bezier(0.23, 1, 0.320, 1);
-    transform-origin: left center;
-    will-change: transform, color;
+    transition: color 0.2s ease, transform 0.2s ease, padding-left 0.2s ease, font-weight 0.2s ease;
   }
 
   .archive-explorer__post-summary {
@@ -1001,14 +998,13 @@ const serializedCategoryCounts = JSON.stringify(
     overflow: hidden;
     max-height: 0;
     opacity: 0;
-    transform: translateY(-6px);
-    transition: max-height 0.32s cubic-bezier(0.23, 1, 0.320, 1), opacity 0.32s cubic-bezier(0.23, 1, 0.320, 1), transform 0.32s cubic-bezier(0.23, 1, 0.320, 1);
-    will-change: transform, opacity, max-height;
+    transform: translateY(-3px);
+    transition: max-height 0.24s ease, opacity 0.2s ease, transform 0.2s ease;
   }
 
   .archive-explorer__post:hover .archive-explorer__post-summary,
   .archive-explorer__post:focus-visible .archive-explorer__post-summary {
-    max-height: 3.6rem;
+    max-height: 3.2rem;
     opacity: 1;
     transform: translateY(0);
   }
@@ -1020,7 +1016,7 @@ const serializedCategoryCounts = JSON.stringify(
     top: calc(100% + 0.4rem);
     pointer-events: none;
     opacity: 0;
-    transform: translateY(-6px) scale(0.96);
+    transform: translateY(-3px);
     background: color-mix(in srgb, var(--bg-color) 94%, var(--button-hover-color));
     border: 1px solid var(--button-border-color);
     border-radius: 0.5rem;
@@ -1031,14 +1027,13 @@ const serializedCategoryCounts = JSON.stringify(
     max-width: min(28rem, 80vw);
     box-shadow: 0 8px 18px color-mix(in srgb, var(--shadow-color) 60%, transparent);
     z-index: 20;
-    transition: opacity 0.32s cubic-bezier(0.23, 1, 0.320, 1), transform 0.32s cubic-bezier(0.23, 1, 0.320, 1);
-    will-change: transform, opacity;
+    transition: opacity 0.18s ease, transform 0.18s ease;
   }
 
   .archive-explorer__post-title:hover::after,
   .archive-explorer__post-title:focus-visible::after {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 
   .archive-explorer__ghost {
@@ -1051,23 +1046,17 @@ const serializedCategoryCounts = JSON.stringify(
   }
 
   .archive-explorer__post {
-    transition: background-color 0.32s cubic-bezier(0.23, 1, 0.320, 1), color 0.32s cubic-bezier(0.23, 1, 0.320, 1), transform 0.32s cubic-bezier(0.23, 1, 0.320, 1), box-shadow 0.32s cubic-bezier(0.23, 1, 0.320, 1);
-    will-change: transform;
-  }
-
-  .archive-explorer__post:hover,
-  .archive-explorer__post:focus-visible {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px color-mix(in srgb, var(--shadow-color) 40%, transparent);
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   .archive-explorer__post:hover .archive-explorer__post-title {
     color: var(--link-color);
-    transform: translateX(0.4rem);
+    padding-left: 0.5rem;
+    font-weight: 700;
   }
 
   .archive-explorer__post:hover .archive-explorer__post-tag {
-    transform: translateX(-0.3rem);
+    transform: translateX(-0.15rem);
   }
 
   .archive-explorer__post[hidden],
@@ -1139,20 +1128,10 @@ const serializedCategoryCounts = JSON.stringify(
   @media (prefers-reduced-motion: reduce) {
     .archive-explorer__chip,
     .archive-explorer__post,
-    .archive-explorer__post-title,
-    .archive-explorer__post-summary,
-    .archive-explorer__post-tag,
     .archive-explorer__year-header,
     .archive-explorer__month-header,
     .archive-explorer__fold-icon {
       transition: none !important;
-    }
-    .archive-explorer__post:hover,
-    .archive-explorer__post:focus-visible,
-    .archive-explorer__post:hover .archive-explorer__post-title,
-    .archive-explorer__post:hover .archive-explorer__post-tag,
-    .archive-explorer__post:hover .archive-explorer__post-summary {
-      transform: none !important;
     }
   }
 
