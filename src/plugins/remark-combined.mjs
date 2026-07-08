@@ -1,4 +1,5 @@
 import { visit } from 'unist-util-visit';
+import { escapeHtml } from './plugin-utils.mjs';
 
 export function remarkCombined() {
   // 将正则定义移入 processText 内部，或者在每次使用前创建新实例
@@ -19,27 +20,22 @@ export function remarkCombined() {
 
       if (match[1] && match[2]) {
         // --- Ruby 逻辑 ---
-        // 对基础文本也进行递归解析，支持 {!!模糊!!}(pinyin)
-        const baseTextNodes = processText(match[1]); 
         const readingText = match[2];
-        
-        // 渲染 Ruby 时，由于需要拼接 HTML 字符串，这里处理逻辑稍有不同
-        // 如果 Ruby 内部包含复杂嵌套，我们通常将其 base 部分转为 HTML
+
         let rubyInnerHtml = '';
-        
-        // 注意：这里为了保持简单，假定 Ruby 的拼音部分阅读文本 (rt) 不再嵌套
+
         if (readingText.includes('|')) {
           const baseChars = Array.from(match[1]);
           const readings = readingText.split('|');
           const maxLength = Math.max(baseChars.length, readings.length);
 
           for (let i = 0; i < maxLength; i++) {
-            const char = baseChars[i] || '';
-            const rt = readings[i] || '';
+            const char = escapeHtml(baseChars[i] || '');
+            const rt = escapeHtml(readings[i] || '');
             rubyInnerHtml += `${char}<rt>${rt}</rt>`;
           }
         } else {
-          rubyInnerHtml = `${match[1]}<rt>${readingText}</rt>`;
+          rubyInnerHtml = `${escapeHtml(match[1])}<rt>${escapeHtml(readingText)}</rt>`;
         }
         nodes.push({ type: 'html', value: `<ruby>${rubyInnerHtml}</ruby>` });
 

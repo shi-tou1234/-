@@ -1,4 +1,5 @@
 import { visit } from 'unist-util-visit';
+import { shouldSkipParent } from './plugin-utils.mjs';
 
 const BRACKET_PAIRS = [
   ['(', ')'],
@@ -13,19 +14,6 @@ const PAIR_MAP = new Map(BRACKET_PAIRS);
 const LATEX_COMMAND_PATTERN = /\\[A-Za-z]+/;
 const MATH_SYMBOL_PATTERN = /[=^_]|\\[A-Za-z]+|[∑∫√π∞≤≥≠]/;
 const LETTER_OR_NUMBER_PATTERN = /[A-Za-z0-9]/;
-
-function shouldSkipParent(parentType) {
-  return new Set([
-    'inlineCode',
-    'code',
-    'math',
-    'inlineMath',
-    'html',
-    'link',
-    'linkReference',
-    'definition',
-  ]).has(parentType);
-}
 
 function looksLikeMathExpression(value) {
   const text = value.trim();

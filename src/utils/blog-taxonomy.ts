@@ -4,6 +4,23 @@ const CATEGORY_PARAM_PREFIX = 'b64-';
 export const STUDY_NOTE_CATEGORY = '学习笔记';
 const STUDY_NOTE_SUBCATEGORIES = new Set(['电路', '高数', '数电', '大物', '复变函数', '英语笔记']);
 
+// 浏览器兼容的 base64url 编解码（不依赖 Node 的 Buffer）
+function toBase64Url(input: string): string {
+  const bytes = new TextEncoder().encode(input);
+  let binary = '';
+  bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function fromBase64Url(input: string): string {
+  let base64 = input.replace(/-/g, '+').replace(/_/g, '/');
+  while (base64.length % 4) base64 += '=';
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
 export function getUncategorizedLabel(lang: string): string {
   return lang.toLowerCase().startsWith('zh') ? '未分类' : 'Uncategorized';
 }
@@ -27,7 +44,7 @@ export function getSubcategoriesFromItems(categories: string[]): string[] {
 }
 
 export function encodeCategoryParam(category: string): string {
-  return `${CATEGORY_PARAM_PREFIX}${Buffer.from(category, 'utf-8').toString('base64url')}`;
+  return `${CATEGORY_PARAM_PREFIX}${toBase64Url(category)}`;
 }
 
 export function decodeCategoryParam(categoryParam: string): string {
@@ -37,8 +54,9 @@ export function decodeCategoryParam(categoryParam: string): string {
     const encoded = categoryParam.slice(CATEGORY_PARAM_PREFIX.length);
     if (encoded) {
       try {
-        return Buffer.from(encoded, 'base64url').toString('utf-8');
+        return fromBase64Url(encoded);
       } catch {
+        console.warn('[blog-taxonomy] base64url 解码失败:', encoded);
       }
     }
   }

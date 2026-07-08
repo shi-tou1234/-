@@ -13,8 +13,6 @@ export type TravelProvince = {
   province: string;
   city: string;
   visited: boolean;
-  lat?: number;
-  lng?: number;
 };
 
 export type AboutPersonal = {

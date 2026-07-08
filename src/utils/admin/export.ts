@@ -7,6 +7,7 @@ import {
   listBlogMarkdownEntries,
   listBlogMarkdownEntriesByRssFallback,
   decodeFileContent,
+  normalizeCategoryItems,
 } from "./core";
 
 function parsePostMarkdown(markdown: string) {
@@ -41,7 +42,7 @@ function extractCategoriesFromMarkdown(markdown: string) {
     blockCategories.split("\n").map((line) => line.trim()).filter((line) => /^-\s+/.test(line)).map((line) => line.replace(/^-\s+/, "").trim().replace(/^['"]|['"]$/g, "")).filter(Boolean).forEach((item) => values.push(item));
   }
 
-  return values;
+  return normalizeCategoryItems(values);
 }
 
 function escapeCsvField(value: string) {

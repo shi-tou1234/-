@@ -33,7 +33,7 @@ export function blogCoverUrl(contentPath: string, blogName: string): string {
     return joinUrl("content/blog/", blogName, normalizedPath)
 }
 
-export function getRelativeLocaleUrl(lang: string, path: string): string {
+export function getRelativeLocaleUrl(_lang: string, path: string): string {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   return joinUrl("", import.meta.env.BASE_URL, normalizedPath);
 }

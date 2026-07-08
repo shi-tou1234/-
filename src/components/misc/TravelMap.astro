@@ -6,8 +6,6 @@ type TravelCityInput =
       city?: string;
       name?: string;
       visited?: boolean;
-      lat?: number;
-      lng?: number;
     };
 
 export interface Props {
@@ -431,10 +429,11 @@ const {
 
 <script>
   import * as echarts from "echarts";
+  import { externalUrlsConfig } from "../../config";
 
   (function setupTravelMap() {
-    const GEO_BASE = "https://geo.datav.aliyun.com/areas_v3/bound";
-    const GEO_BASE_LEGACY = "https://geo.datav.aliyun.com/areas/bound";
+    const GEO_BASE = externalUrlsConfig.geoDataVBase;
+    const GEO_BASE_LEGACY = externalUrlsConfig.geoDataVBaseLegacy;
     const BASE_URL = import.meta.env.BASE_URL || "/";
     const BASE_PREFIX = BASE_URL.endsWith("/") ? BASE_URL : `${BASE_URL}/`;
     const LOCAL_CHINA_MAP_URL = `${BASE_PREFIX}maps/china.full.json`;

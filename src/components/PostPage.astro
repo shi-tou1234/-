@@ -59,7 +59,6 @@ const resolvedCovers = await Promise.all(
                         updatedDate={entry.data.updatedDate}
                         aosDelay={index * 95}
                         externalImage={resolved.source !== 'user' ? resolved.imageUrl : ''}
-                        imageSource={resolved.source}
                         photographer={resolved.photographer}
                         photographerUrl={resolved.photographerUrl}
                     />

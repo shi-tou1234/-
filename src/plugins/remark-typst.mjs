@@ -1,6 +1,7 @@
 // remark-typst.mjs
 import { visit } from 'unist-util-visit';
 import { NodeCompiler } from '@myriaddreamin/typst-ts-node-compiler';
+import { escapeHtml } from './plugin-utils.mjs';
 
 // 初始化编译器（建议单例模式以提高性能）
 const compiler = NodeCompiler.create();
@@ -20,7 +21,9 @@ export function remarkTypst() {
     for (const { node, index, parent } of instances) {
       try {
         const title = node.meta ? node.meta.trim() : '';
-        const formattedTitle = title.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        // 先转义 HTML 特殊字符，再处理 *斜体* 标记
+        const escapedTitle = escapeHtml(title);
+        const formattedTitle = escapedTitle.replace(/\*(.*?)\*/g, '<em>$1</em>');
         // 编译为 SVG 字符串
         const svg = await compiler.svg({
           mainFileContent: node.value,

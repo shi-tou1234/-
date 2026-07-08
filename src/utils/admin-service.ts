@@ -71,6 +71,9 @@ export class GitHubApiError extends Error {
 
 // ====== Constants ======
 
+// PBKDF2 迭代次数：OWASP 2023 建议 PBKDF2-SHA256 至少 600,000 次
+const PBKDF2_ITERATIONS = 600000;
+
 const DEFAULT_SECURITY: SecurityConfig = {
   algorithm: "PBKDF2-SHA256",
   iterations: 150000,
@@ -121,26 +124,15 @@ async function hashPassword(
 }
 
 function utf8ToBase64(content: string): string {
-  return btoa(unescape(encodeURIComponent(content)));
+  return toBase64(new TextEncoder().encode(content));
 }
 
 export function decodeFileContent(raw: string): string {
-  return decodeURIComponent(escape(atob((raw || "").replace(/\n/g, ""))));
+  const base64 = (raw || "").replace(/\n/g, "");
+  return new TextDecoder().decode(fromBase64(base64));
 }
 
 // ====== Content Parsers & Builders ======
-
-export function parseFriendLinksFromTs(content: string) {
-  const matched = content.match(
-    /const\s+friendLinks:\s*FriendLink\[\]\s*=\s*(\[[\s\S]*?\])\s*\n\s*export\s+default\s+friendLinks/,
-  );
-  if (!matched?.[1]) throw new Error("无法解析友链文件");
-  return JSON.parse(matched[1]);
-}
-
-export function buildFriendLinksTs(friendLinks: unknown[]): string {
-  return `import type { FriendLink } from "@/types/friend"\n\nconst friendLinks: FriendLink[] = ${JSON.stringify(friendLinks, null, 2)}\n\nexport default friendLinks\n`;
-}
 
 export function parseToolsLinksFromTs(content: string) {
   const matched = content.match(
@@ -472,7 +464,8 @@ export class AdminService {
       if (!json?.salt || !json?.hash || !json?.iterations)
         throw new Error("invalid config");
       this.security = json;
-    } catch {
+    } catch (err) {
+      console.warn("[admin] 安全配置加载失败，已回退到默认配置（可能使用公开默认密码）：", err);
       this.security = this.fallbackSecurity;
     }
   }
@@ -497,9 +490,9 @@ export class AdminService {
     const salt = toBase64(saltBytes);
     const nextSecurity: SecurityConfig = {
       algorithm: "PBKDF2-SHA256",
-      iterations: 180000,
+      iterations: PBKDF2_ITERATIONS,
       salt,
-      hash: await hashPassword(input.newPassword.trim(), salt, 180000),
+      hash: await hashPassword(input.newPassword.trim(), salt, PBKDF2_ITERATIONS),
     };
 
     await this.upsertFile(
@@ -678,16 +671,16 @@ export class AdminService {
     try {
       const files = await this.listByTreeApi(prefix, token, branch);
       if (files.length > 0) return files;
-    } catch {
-      /* fallthrough */
+    } catch (err) {
+      console.warn("[admin] listFilesByPrefix: Trees API 失败，尝试下一策略:", err);
     }
 
     // 策略 2: Contents API
     try {
       const files = await this.listByContentsApi(prefix, token, branch);
       if (files.length > 0) return files;
-    } catch {
-      /* fallthrough */
+    } catch (err) {
+      console.warn("[admin] listFilesByPrefix: Contents API 失败，尝试 CDN:", err);
     }
 
     // 策略 3: CDN
@@ -775,7 +768,8 @@ export class AdminService {
             typeof name === "string" && name.startsWith(`/${prefix}`),
         )
         .map((name: string) => name.slice(1));
-    } catch {
+    } catch (err) {
+      console.warn("[admin] listByCdn: CDN 列表获取失败:", err);
       return [];
     }
   }
@@ -797,7 +791,8 @@ export class AdminService {
         const response = await fetch(endpoint, { cache: "no-store" });
         if (!response.ok) continue;
         return await response.text();
-      } catch {
+      } catch (err) {
+        console.warn("[admin] fetchRawContent: CDN 端点失败:", endpoint, err);
         continue;
       }
     }

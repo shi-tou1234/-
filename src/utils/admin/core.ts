@@ -49,7 +49,7 @@ export let categoryOptionMeta = {
   subcategoriesByRoot: {} as Record<string, string[]>,
 };
 
-export let aboutPersonalDraft: Record<string, any> | null = null;
+let aboutPersonalDraft: Record<string, any> | null = null;
 
 export function setCategoryOptionMeta(meta: typeof categoryOptionMeta) {
   categoryOptionMeta = meta;

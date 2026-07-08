@@ -4,6 +4,7 @@ import ImageModule from "./misc/ImageModule.astro";
 
 import { getRelativeLocaleUrl } from '@utils/url-utils';
 import { formatFullDate } from '@/utils/time'
+import { hashString } from '@utils/hash';
 
 
 interface Props {
@@ -19,7 +20,6 @@ interface Props {
     readingMinutes?: number;
     aosDelay?: number;
     externalImage?: string;
-    imageSource?: 'user' | 'api' | 'fallback' | 'none';
     photographer?: string;
     photographerUrl?: string;
 }
@@ -37,7 +37,6 @@ const {
     readingMinutes = 1,
     aosDelay = 0,
     externalImage = '',
-    imageSource = 'none',
     photographer = '',
     photographerUrl = '',
 } = Astro.props;
@@ -49,14 +48,6 @@ const currentLang = 'zh-cn';
 const readingLabel = `${readingMinutes} 分钟阅读`;
 const previewText = String(preview || description || '').trim();
 const cardLabel = `阅读文章：${title}`;
-
-function hashString(input: string): number {
-    let hash = 0;
-    for (let i = 0; i < input.length; i += 1) {
-        hash = (hash * 31 + input.charCodeAt(i)) | 0;
-    }
-    return Math.abs(hash);
-}
 
 const decorativeSvgPool = [
     `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><rect width="140" height="140" rx="24" fill="#fdf2f8"/><rect x="16" y="16" width="108" height="108" rx="18" fill="#ffffff" stroke="#f9a8d4"/><circle cx="50" cy="52" r="18" fill="#fbcfe8"/><circle cx="88" cy="88" r="14" fill="#f9a8d4"/></svg>')}`,

@@ -1,21 +1,9 @@
 import { visit } from 'unist-util-visit';
+import { shouldSkipParent } from './plugin-utils.mjs';
 
 const LINK_PATTERN = /\[([^\]]+)]\s*[（(]\s*(https?:\/\/[^\s）)]+)\s*[）)]/g;
 const LABEL_PREFIX_PATTERN = /\[([^\]]+)]\s*[（(]\s*$/;
 const TRAILING_PUNCTUATION_PATTERN = /[\s）)】】》》。！？；，、]+$/;
-
-function shouldSkipParent(parentType) {
-  return new Set([
-    'inlineCode',
-    'code',
-    'math',
-    'inlineMath',
-    'html',
-    'link',
-    'linkReference',
-    'definition',
-  ]).has(parentType);
-}
 
 function splitTextWithLinks(value) {
   const nodes = [];

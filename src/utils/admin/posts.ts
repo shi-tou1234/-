@@ -179,7 +179,7 @@ async function loadCategoryOptions(preloadedEntries: { path: string; slug: strin
         return;
       }
     }
-  } catch {}
+  } catch (err) { console.warn("[admin] 分类缓存读取失败:", err); }
 
   try {
     const entries = preloadedEntries && preloadedEntries.length > 0
@@ -201,7 +201,7 @@ async function loadCategoryOptions(preloadedEntries: { path: string; slug: strin
           if (!subcategoriesByRoot[rootCategory]) subcategoriesByRoot[rootCategory] = new Set();
           for (const sub of subcategories) subcategoriesByRoot[rootCategory].add(sub);
         }
-      } catch {}
+      } catch (err) { console.warn("[admin] 单篇文章分类提取失败:", entry?.path, err); }
     }
 
     const categoryMeta = {
@@ -219,8 +219,9 @@ async function loadCategoryOptions(preloadedEntries: { path: string; slug: strin
         topLevelCategories: categoryMeta.topLevelCategories,
         subcategoriesByRoot: categoryMeta.subcategoriesByRoot,
       }));
-    } catch {}
-  } catch {
+    } catch (err) { console.warn("[admin] 分类缓存写入失败:", err); }
+  } catch (err) {
+    console.warn("[admin] 加载分类选项失败:", err);
     renderCategoryOptions({ topLevelCategories: [], subcategoriesByRoot: {} });
   }
 }
@@ -303,7 +304,16 @@ export async function loadPostList() {
   let usedFallback = false;
   try {
     entries = await listBlogMarkdownEntries(token, branch);
-  } catch {
+  } catch (err: any) {
+    // 鉴权类错误（401/403）不应静默回退，需提示用户重新登录
+    const status = err?.status || err?.response?.status;
+    if (status === 401 || status === 403) {
+      console.warn("[admin] token 已失效或无权限，请重新登录:", err);
+      setMsg(msgEl, "登录已失效，请重新登录", "error");
+      if (selectEl) selectEl.innerHTML = "";
+      return;
+    }
+    console.warn("[admin] 文章列表加载失败，回退到 RSS:", err);
     entries = await listBlogMarkdownEntriesByRssFallback();
     usedFallback = true;
   }

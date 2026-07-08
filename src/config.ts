@@ -1,7 +1,8 @@
 import type {
     SiteConfig,
     ProfileConfig,
-    LicenseConfig
+    LicenseConfig,
+    ExternalUrlsConfig
 } from "./types/config"
 
 export const siteConfig: SiteConfig = {
@@ -28,4 +29,12 @@ export const licenseConfig: LicenseConfig = {
 	enable: true,
 	name: "CC BY-NC-SA 4.0",
 	url: "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+};
+
+export const externalUrlsConfig: ExternalUrlsConfig = {
+	githubApi: "https://api.github.com",
+	githubRepo: "shi-tou1234/-",
+	giscusRepoId: "R_kgDORRKvYA",
+	geoDataVBase: "https://geo.datav.aliyun.com/areas_v3/bound",
+	geoDataVBaseLegacy: "https://geo.datav.aliyun.com/areas/bound",
 };

@@ -477,9 +477,6 @@ function renderMarkdown(markdown) {
         marked.setOptions({
             breaks: true,
             gfm: true,
-            headerIds: true,
-            mangle: false,
-            sanitize: false,
             smartLists: true,
             smartypants: true,
             xhtml: false
@@ -822,7 +819,24 @@ function returnToAdmin() {
         alert('内容已回填到后台，请返回后台页面点击「从预览回填」。');
         
         if (adminReturnUrl) {
-            window.location.href = adminReturnUrl;
+            // 只允许相对路径或同源 URL，防止开放重定向
+            if (/^\/[^/]/.test(adminReturnUrl) || /^https?:\/\//.test(adminReturnUrl) === false && adminReturnUrl.indexOf('//') !== 0) {
+                window.location.href = adminReturnUrl;
+            } else {
+                // 绝对 URL 需校验同源
+                try {
+                    var target = new URL(adminReturnUrl, window.location.origin);
+                    if (target.origin === window.location.origin) {
+                        window.location.href = adminReturnUrl;
+                    } else {
+                        console.warn('[admin-preview] 拒绝跳转到外部地址:', adminReturnUrl);
+                        window.close();
+                    }
+                } catch (e) {
+                    console.warn('[admin-preview] 无效的返回地址:', adminReturnUrl);
+                    window.close();
+                }
+            }
         } else {
             window.close();
         }

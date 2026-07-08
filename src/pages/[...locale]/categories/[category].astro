@@ -7,7 +7,7 @@ import { siteConfig } from '@/config'
 import { getBlogEntrySort } from '@utils/content-utils'
 import i18nit from '@i18n/translation'
 
-import { decodeCategoryParam, buildCategoriesMap } from '@utils/blog-taxonomy';
+import { decodeCategoryParam, encodeCategoryParam, buildCategoriesMap } from '@utils/blog-taxonomy';
 
 const currentLang = 'zh-cn';
 const t = i18nit(currentLang);
@@ -21,7 +21,7 @@ export async function getStaticPaths() {
     paths.push({
       params: {
         locale: undefined,
-        category: `b64-${Buffer.from(categoryName, 'utf-8').toString('base64url')}`
+        category: encodeCategoryParam(categoryName)
       }
     });
   });

@@ -8,7 +8,7 @@ import remarkDirective from 'remark-directive';
 import rehypeComponents from "rehype-components";
 
 import { AdmonitionComponent } from "./src/plugins/rehype-component-admonition.mjs";
-import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.js";
+import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.mjs";
 import { MusicCardComponent } from "./src/plugins/rehype-component-music-card.mjs";
 import { GithubCardComponent } from './src/plugins/rehype-component-github-card.mjs';
 import { QuoteComponent } from "./src/plugins/rehype-component-quote.mjs"
@@ -49,7 +49,6 @@ export default defineConfig({
   markdown: {
     shikiConfig: {
       theme: 'one-dark-pro', // code theme
-      // theme: 'github-dark',
       wrap: false
     },
     remarkPlugins: [

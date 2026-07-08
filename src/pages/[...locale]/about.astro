@@ -8,7 +8,7 @@ import { getSpec } from '@utils/content-utils';
 import aboutProfile from '@/data/about-profile';
 import aboutPersonal from '@/data/about-personal';
 
-import { siteConfig } from '@/config';
+import { siteConfig, externalUrlsConfig } from '@/config';
 import i18nit from '@i18n/translation';
 import { render } from 'astro:content';
 import { execSync } from 'node:child_process';
@@ -51,7 +51,7 @@ async function fetchCommitsFromGitHub() {
 
   try {
     for (let page = 1; page <= 100; page += 1) {
-      const url = `https://api.github.com/repos/shi-tou1234/-/commits?sha=main&since=${encodeURIComponent(sinceIso)}&until=${encodeURIComponent(untilIso)}&per_page=100&page=${page}`;
+      const url = `${externalUrlsConfig.githubApi}/repos/${externalUrlsConfig.githubRepo}/commits?sha=main&since=${encodeURIComponent(sinceIso)}&until=${encodeURIComponent(untilIso)}&per_page=100&page=${page}`;
       const response = await fetch(url, { headers });
       if (!response.ok) break;
       const commits = await response.json();
@@ -372,6 +372,7 @@ function getIntensityLevel(count: number, maxCount: number): number {
 </MainPageLayout>
 
 <script>
+  import { externalUrlsConfig } from '@/config';
   function renderHeatmapSubtitle() {
     const subtitleEl = document.getElementById('about-heatmap-subtitle');
     if (!subtitleEl) return;
@@ -410,7 +411,7 @@ function getIntensityLevel(count: number, maxCount: number): number {
 
     try {
       for (let page = 1; page <= 100; page += 1) {
-        const url = `https://api.github.com/repos/shi-tou1234/-/commits?sha=main&since=${encodeURIComponent(since)}&until=${encodeURIComponent(until)}&per_page=100&page=${page}`;
+        const url = `${externalUrlsConfig.githubApi}/repos/${externalUrlsConfig.githubRepo}/commits?sha=main&since=${encodeURIComponent(since)}&until=${encodeURIComponent(until)}&per_page=100&page=${page}`;
         const response = await fetch(url, { headers: { Accept: 'application/vnd.github+json' } });
         if (!response.ok) break;
         const commits = await response.json();

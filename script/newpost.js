@@ -14,7 +14,7 @@ const folderPath = args[0];
 const lang = args[1] || 'zh-cn'; // 如果没有提供语言参数，默认使用 zh-cn
 
 // 确保语言参数有效
-const validLangs = ['en', 'zh-cn'];
+const validLangs = ['zh-cn'];
 if (!validLangs.includes(lang)) {
     console.error(`Invalid language: ${lang}. Valid options are: ${validLangs.join(', ')}`);
     process.exit(1);
@@ -40,11 +40,11 @@ try {
 // 默认的 Markdown 内容
 const defaultContent = `---
 title: new post
-date: ${new Date().toISOString().split('T')[0]}
+pubDate: ${new Date().toISOString()}
 description: Some description here
 image: ""
 draft: false
-slug: ${folderPath}
+slugId: ${folderPath}
 ---
 
 ## Title

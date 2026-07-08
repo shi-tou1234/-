@@ -1,5 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
+import { hashString } from "@utils/hash";
 
 export interface NavCardItem {
   name: string;
@@ -11,16 +12,6 @@ export interface NavCardItem {
 
 interface Props {
   item: NavCardItem;
-}
-
-function hashString(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return Math.abs(hash);
 }
 
 function generateGradient(url: string): string {
