@@ -12,6 +12,8 @@ import {
 export function initGitHubConnectionHandlers() {
   document.getElementById("gh-token")?.addEventListener("change", saveGitHubDraft);
   document.getElementById("gh-branch")?.addEventListener("change", saveGitHubDraft);
+  // 切换"记住 Token"时立即迁移存储位置
+  document.getElementById("gh-remember-token")?.addEventListener("change", saveGitHubDraft);
 
   document.getElementById("gh-api-endpoint")?.addEventListener("change", (e) => {
     const customWrap = document.getElementById("custom-api-url-wrap");

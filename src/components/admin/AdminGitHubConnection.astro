@@ -7,6 +7,10 @@ import { externalUrlsConfig } from "../../config";
     <div>
       <label class="block text-sm mb-2">GitHub Token（repo 权限）</label>
       <input id="gh-token" type="password" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="ghp_xxx 或 github_pat_xxx" />
+      <label class="flex items-center gap-1.5 mt-1.5 text-xs text-[var(--text-color)]/70 cursor-pointer select-none">
+        <input id="gh-remember-token" type="checkbox" class="cursor-pointer" />
+        记住 Token（勾选后长期保留，不勾选关闭标签即清除）
+      </label>
     </div>
     <div>
       <label class="block text-sm mb-2">分支</label>

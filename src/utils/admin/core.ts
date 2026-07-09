@@ -14,6 +14,7 @@ import {
 import {
   SESSION_KEY,
   ADMIN_GH_TOKEN_KEY,
+  ADMIN_GH_TOKEN_REMEMBER_KEY,
   ADMIN_GH_BRANCH_KEY,
   ADMIN_GH_API_URL_KEY,
   ADMIN_PREVIEW_DRAFT_KEY,
@@ -100,8 +101,16 @@ export function syncApiBase() {
 export function loadGitHubDraft() {
   const tokenInput = document.getElementById("gh-token");
   const branchInput = document.getElementById("gh-branch");
-  // Token 改用 sessionStorage，关闭标签即清除，降低 XSS 窃取仓库写权限的风险
-  const savedToken = sessionStorage.getItem(ADMIN_GH_TOKEN_KEY) || "";
+  const rememberCheckbox = document.getElementById("gh-remember-token") as HTMLInputElement | null;
+
+  // "记住 Token" 偏好持久化，复选框状态跨刷新保留
+  const remember = localStorage.getItem(ADMIN_GH_TOKEN_REMEMBER_KEY) === "1";
+  if (rememberCheckbox) rememberCheckbox.checked = remember;
+
+  // 勾选记住 → 从 localStorage 读；否则从 sessionStorage 读（关闭标签即清）
+  const savedToken = remember
+    ? (localStorage.getItem(ADMIN_GH_TOKEN_KEY) || "")
+    : (sessionStorage.getItem(ADMIN_GH_TOKEN_KEY) || "");
   const savedBranch = localStorage.getItem(ADMIN_GH_BRANCH_KEY) || "main";
   const savedApi = localStorage.getItem(ADMIN_GH_API_URL_KEY) || GITHUB_API_DEFAULT;
   if (tokenInput && savedToken) tokenInput.value = savedToken;
@@ -133,7 +142,21 @@ export function loadGitHubDraft() {
 export function saveGitHubDraft() {
   const token = getToken();
   const branch = getBranch();
-  sessionStorage.setItem(ADMIN_GH_TOKEN_KEY, token);
+  const rememberCheckbox = document.getElementById("gh-remember-token") as HTMLInputElement | null;
+  const remember = !!rememberCheckbox?.checked;
+
+  // 持久化"记住"偏好
+  localStorage.setItem(ADMIN_GH_TOKEN_REMEMBER_KEY, remember ? "1" : "0");
+
+  if (remember) {
+    // 勾选：存 localStorage（长期保留），清掉 sessionStorage 避免残留
+    localStorage.setItem(ADMIN_GH_TOKEN_KEY, token);
+    sessionStorage.removeItem(ADMIN_GH_TOKEN_KEY);
+  } else {
+    // 不勾选：存 sessionStorage（关闭标签即清），清掉 localStorage 避免残留
+    sessionStorage.setItem(ADMIN_GH_TOKEN_KEY, token);
+    localStorage.removeItem(ADMIN_GH_TOKEN_KEY);
+  }
   localStorage.setItem(ADMIN_GH_BRANCH_KEY, branch || "main");
   syncApiBase();
 }

@@ -2,6 +2,7 @@ import { externalUrlsConfig } from '@/config'
 
 export const SESSION_KEY = "cmchen_admin_ok";
 export const ADMIN_GH_TOKEN_KEY = "cmchen_admin_gh_token";
+export const ADMIN_GH_TOKEN_REMEMBER_KEY = "cmchen_admin_gh_token_remember";
 export const ADMIN_GH_BRANCH_KEY = "cmchen_admin_gh_branch";
 export const ADMIN_GH_API_URL_KEY = "cmchen_admin_api_url";
 export const ADMIN_PREVIEW_DRAFT_KEY = "cmchen_admin_preview_draft";
