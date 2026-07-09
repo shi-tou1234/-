@@ -225,6 +225,12 @@ const aboutPersonal: AboutPersonal = {
         "修复content.config.ts 缩进，保留双字段兼容新旧文章可观测性",
         "多处静默 catch 补 console.warn，鉴权错误（401/403）提示重新登录"
       ]
+    },
+    {
+      "date": "2026.7.10",
+      "content": [
+        "合并重复函数，避免行为分叉，修正误导日志"
+      ]
     }
   ],
   "musicTracks": [
