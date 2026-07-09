@@ -467,7 +467,7 @@ export class AdminService {
         throw new Error("invalid config");
       this.security = json;
     } catch (err) {
-      console.warn("[admin] 安全配置加载失败，已回退到默认配置（可能使用公开默认密码）：", err);
+      console.warn("[admin] 安全配置加载失败，登录已禁用（不会回退到任何默认密码）：", err);
       this.security = this.fallbackSecurity;
     }
   }

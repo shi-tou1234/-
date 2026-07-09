@@ -23,7 +23,7 @@ import {
   buildPostMarkdown,
   getPrimaryCategoryFromItems,
   getSubcategoriesFromItems,
-  normalizeCategoryItems,
+  extractCategoriesFromMarkdown,
 } from "./core";
 import {
   CATEGORY_OPTIONS_LIMIT,
@@ -65,41 +65,6 @@ function parsePostMarkdown(markdown: string) {
     frontmatter[key] = value;
   });
   return { frontmatter, content: bodyContent };
-}
-
-function extractCategoriesFromMarkdown(markdown: string) {
-  const matched = String(markdown || "").match(/^---\n([\s\S]*?)\n---/);
-  if (!matched?.[1]) return [];
-
-  const frontmatter = matched[1];
-  const values: string[] = [];
-
-  const singleCategory = frontmatter.match(/^category:\s*(.+)$/m)?.[1];
-  if (singleCategory) {
-    values.push(singleCategory.trim().replace(/^['"]|['"]$/g, ""));
-  }
-
-  const inlineCategories = frontmatter.match(/^categories:\s*\[(.+)\]\s*$/m)?.[1];
-  if (inlineCategories) {
-    inlineCategories
-      .split(",")
-      .map((item) => item.trim().replace(/^['"]|['"]$/g, ""))
-      .filter(Boolean)
-      .forEach((item) => values.push(item));
-  }
-
-  const blockCategories = frontmatter.match(/^categories:\s*\n((?:\s*-\s*.+\n?)*)/m)?.[1] || "";
-  if (blockCategories) {
-    blockCategories
-      .split("\n")
-      .map((line) => line.trim())
-      .filter((line) => /^-\s+/.test(line))
-      .map((line) => line.replace(/^-\s+/, "").trim().replace(/^['"]|['"]$/g, ""))
-      .filter(Boolean)
-      .forEach((item) => values.push(item));
-  }
-
-  return normalizeCategoryItems(values);
 }
 
 function normalizeCategoryOptionList(categories: string[]) {

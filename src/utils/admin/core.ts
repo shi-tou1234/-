@@ -349,3 +349,42 @@ export {
   getSubcategoriesFromItems,
   normalizeCategoryItems,
 } from "@utils/blog-taxonomy";
+
+/**
+ * 从文章 Markdown frontmatter 中提取分类（合并 category + categories）
+ * 统一实现，供 posts.ts 和 export.ts 共用，避免两处行为不一致
+ */
+export function extractCategoriesFromMarkdown(markdown: string): string[] {
+  const matched = String(markdown || "").match(/^---\n([\s\S]*?)\n---/);
+  if (!matched?.[1]) return [];
+
+  const frontmatter = matched[1];
+  const values: string[] = [];
+
+  const singleCategory = frontmatter.match(/^category:\s*(.+)$/m)?.[1];
+  if (singleCategory) {
+    values.push(singleCategory.trim().replace(/^['"]|['"]$/g, ""));
+  }
+
+  const inlineCategories = frontmatter.match(/^categories:\s*\[(.+)\]\s*$/m)?.[1];
+  if (inlineCategories) {
+    inlineCategories
+      .split(",")
+      .map((item) => item.trim().replace(/^['"]|['"]$/g, ""))
+      .filter(Boolean)
+      .forEach((item) => values.push(item));
+  }
+
+  const blockCategories = frontmatter.match(/^categories:\s*\n((?:\s*-\s*.+\n?)*)/m)?.[1] || "";
+  if (blockCategories) {
+    blockCategories
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => /^-\s+/.test(line))
+      .map((line) => line.replace(/^-\s+/, "").trim().replace(/^['"]|['"]$/g, ""))
+      .filter(Boolean)
+      .forEach((item) => values.push(item));
+  }
+
+  return normalizeCategoryItems(values);
+}
