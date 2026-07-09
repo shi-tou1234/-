@@ -43,9 +43,63 @@ $$ f(t) = a_0 + \sum_{k=1}^{\infty} (a_k \cos k\omega_1 t + b_k \sin k\omega_1 t
 
 $$ a_0 = \frac{1}{T} \int_0^T f(t) \, dt $$
 
+:::derivation
+**推导**：将傅里叶级数 $f(t) = a_0 + \sum_{k=1}^{\infty}(a_k\cos k\omega_1 t + b_k\sin k\omega_1 t)$ 两端在 $[0, T]$ 上积分：
+
+$$ \int_0^T f(t)\,dt = \int_0^T a_0\,dt + \sum_{k=1}^{\infty}\left[a_k\int_0^T\cos k\omega_1 t\,dt + b_k\int_0^T\sin k\omega_1 t\,dt\right] $$
+
+由于 $\omega_1 = 2\pi/T$，对任意正整数 $k$：
+
+$$ \int_0^T\cos k\omega_1 t\,dt = \frac{\sin k\omega_1 T}{k\omega_1}\bigg|_0^T = \frac{\sin 2k\pi}{k\omega_1} = 0 $$
+
+$$ \int_0^T\sin k\omega_1 t\,dt = -\frac{\cos k\omega_1 T}{k\omega_1}\bigg|_0^T = -\frac{\cos 2k\pi - 1}{k\omega_1} = 0 $$
+
+故所有正弦、余弦项积分均为零，只剩 $a_0 \cdot T$：
+
+$$ \int_0^T f(t)\,dt = a_0 T \;\Rightarrow\; a_0 = \frac{1}{T}\int_0^T f(t)\,dt $$
+
+可见 $a_0$ 即 $f(t)$ 在一个周期内的平均值，亦即直流分量。
+:::
+
 $$ a_k = \frac{2}{T} \int_0^T f(t) \cos k\omega_1 t \, dt $$
 
+:::derivation
+**推导**：将傅里叶级数两边同乘 $\cos n\omega_1 t$（$n$ 为正整数）后积分：
+
+$$ \int_0^T f(t)\cos n\omega_1 t\,dt = a_0\int_0^T\cos n\omega_1 t\,dt + \sum_{k=1}^{\infty}\left[a_k\int_0^T\cos k\omega_1 t\cos n\omega_1 t\,dt + b_k\int_0^T\sin k\omega_1 t\cos n\omega_1 t\,dt\right] $$
+
+利用三角函数的正交性：
+
+- $\int_0^T\cos n\omega_1 t\,dt = 0$
+- $\int_0^T\sin k\omega_1 t\cos n\omega_1 t\,dt = 0$（任意 $k, n$）
+- $\int_0^T\cos k\omega_1 t\cos n\omega_1 t\,dt = \begin{cases}0, & k\ne n \\ T/2, & k=n\end{cases}$
+
+故求和式中仅 $k=n$ 的 $a_k$ 项不为零：
+
+$$ \int_0^T f(t)\cos n\omega_1 t\,dt = a_n \cdot \frac{T}{2} $$
+
+将 $n$ 换回 $k$ 即得：
+
+$$ a_k = \frac{2}{T}\int_0^T f(t)\cos k\omega_1 t\,dt $$
+:::
+
 $$ b_k = \frac{2}{T} \int_0^T f(t) \sin k\omega_1 t \, dt $$
+
+:::derivation
+**推导**：将傅里叶级数两边同乘 $\sin n\omega_1 t$ 后在 $[0,T]$ 上积分：
+
+$$ \int_0^T f(t)\sin n\omega_1 t\,dt = a_0\int_0^T\sin n\omega_1 t\,dt + \sum_{k=1}^{\infty}\left[a_k\int_0^T\cos k\omega_1 t\sin n\omega_1 t\,dt + b_k\int_0^T\sin k\omega_1 t\sin n\omega_1 t\,dt\right] $$
+
+利用正交性：
+
+- $\int_0^T\sin n\omega_1 t\,dt = 0$
+- $\int_0^T\cos k\omega_1 t\sin n\omega_1 t\,dt = 0$（任意 $k, n$）
+- $\int_0^T\sin k\omega_1 t\sin n\omega_1 t\,dt = \begin{cases}0, & k\ne n \\ T/2, & k=n\end{cases}$
+
+求和式中仅 $k=n$ 的 $b_k$ 项保留：
+
+$$ \int_0^T f(t)\sin n\omega_1 t\,dt = b_n \cdot \frac{T}{2} \;\Rightarrow\; b_k = \frac{2}{T}\int_0^T f(t)\sin k\omega_1 t\,dt $$
+:::
 
 ### 1.3 正弦-余弦合并形式（电子电气技术中的常用形式）
 
@@ -53,13 +107,71 @@ $$ b_k = \frac{2}{T} \int_0^T f(t) \sin k\omega_1 t \, dt $$
 
 $$ f(t) = A_0 + \sum_{k=1}^{\infty} A_{km} \sin(k\omega_1 t + \psi_k) $$
 
+:::derivation
+**推导**：从三角形式 $a_k\cos k\omega_1 t + b_k\sin k\omega_1 t$ 出发，希望将其合并为单一正弦量 $A_{km}\sin(k\omega_1 t + \psi_k)$。
+
+利用和角公式展开右边：
+
+$$ A_{km}\sin(k\omega_1 t + \psi_k) = A_{km}\cos\psi_k\sin k\omega_1 t + A_{km}\sin\psi_k\cos k\omega_1 t $$
+
+与左边比较 $\sin k\omega_1 t$、$\cos k\omega_1 t$ 的系数：
+
+$$ b_k = A_{km}\cos\psi_k, \quad a_k = A_{km}\sin\psi_k $$
+
+由此解出 $A_{km} = \sqrt{a_k^2 + b_k^2}$，$\psi_k = \arctan(a_k/b_k)$，从而：
+
+$$ a_k\cos k\omega_1 t + b_k\sin k\omega_1 t = \sqrt{a_k^2+b_k^2}\,\sin\left(k\omega_1 t + \arctan\frac{a_k}{b_k}\right) $$
+
+将每项都用此变换，并注意 $A_0 = a_0$（直流分量不变），即得合并形式：
+
+$$ f(t) = A_0 + \sum_{k=1}^{\infty} A_{km}\sin(k\omega_1 t + \psi_k) $$
+
+此形式在电工技术中常用，因为每项对应一个有明确幅值和初相的正弦量，便于用相量法分析。
+:::
+
 两种形式系数之间的关系为：
 
 $$ A_0 = a_0 $$
 
 $$ A_{km} = \sqrt{a_k^2 + b_k^2} $$
 
+:::derivation
+**推导**：将两种形式的第 $k$ 次谐波项比较：
+
+$$ a_k\cos k\omega_1 t + b_k\sin k\omega_1 t = A_{km}\sin(k\omega_1 t + \psi_k) $$
+
+将右边按和角公式展开：
+
+$$ A_{km}\sin(k\omega_1 t + \psi_k) = A_{km}\cos\psi_k\sin k\omega_1 t + A_{km}\sin\psi_k\cos k\omega_1 t $$
+
+比较 $\sin k\omega_1 t$ 和 $\cos k\omega_1 t$ 的系数：
+
+$$ b_k = A_{km}\cos\psi_k, \quad a_k = A_{km}\sin\psi_k $$
+
+两式平方相加：
+
+$$ a_k^2 + b_k^2 = A_{km}^2(\sin^2\psi_k + \cos^2\psi_k) = A_{km}^2 $$
+
+故：
+
+$$ A_{km} = \sqrt{a_k^2 + b_k^2} $$
+
+其几何意义：$a_k$、$b_k$ 为直角三角形两直角边，$A_{km}$ 为斜边。
+:::
+
 $$ \psi_k = \arctan\frac{a_k}{b_k} $$
+
+:::derivation
+**推导**：由上述 $a_k = A_{km}\sin\psi_k$、$b_k = A_{km}\cos\psi_k$ 两式相除：
+
+$$ \tan\psi_k = \frac{\sin\psi_k}{\cos\psi_k} = \frac{a_k/A_{km}}{b_k/A_{km}} = \frac{a_k}{b_k} $$
+
+故：
+
+$$ \psi_k = \arctan\frac{a_k}{b_k} $$
+
+注意：用反正切确定 $\psi_k$ 时应根据 $a_k$、$b_k$ 的正负号判断象限，以确保 $\psi_k$ 的正确性。
+:::
 
 ### 1.4 谐波分析
 
@@ -93,6 +205,32 @@ $$ I = \sqrt{I_0^2 + \sum_{k=1}^{\infty} I_k^2} = \sqrt{I_0^2 + I_1^2 + I_2^2 + 
 
 其中 $I_0$ 为直流分量，$I_k = \dfrac{I_{km}}{\sqrt{2}}$ 为 $k$ 次谐波对应正弦量的有效值。
 
+:::derivation
+**推导**：周期电流 $i(t)$ 的有效值定义：
+
+$$ I = \sqrt{\frac{1}{T}\int_0^T i^2(t)\,dt} $$
+
+将 $i(t) = I_0 + \sum_{k=1}^{\infty} I_{km}\sin(k\omega_1 t + \psi_{ik})$ 代入并展开平方：
+
+$$ i^2(t) = I_0^2 + 2I_0\sum_{k=1}^{\infty}I_{km}\sin(k\omega_1 t + \psi_{ik}) + \left[\sum_{k=1}^{\infty}I_{km}\sin(k\omega_1 t + \psi_{ik})\right]^2 $$
+
+在一个周期内取平均：
+
+1. $\dfrac{1}{T}\int_0^T I_0^2\,dt = I_0^2$
+2. $\dfrac{1}{T}\int_0^T 2I_0 I_{km}\sin(k\omega_1 t+\psi_{ik})\,dt = 0$（正弦函数整周期积分为零）
+3. 平方项展开后含同频率与不同频率两种交叉项。不同频率的乘积 $\sin(k\omega_1 t + \psi_{ik})\sin(n\omega_1 t + \psi_{in})$（$k\ne n$）整周期积分为零；同频率项 $\sin^2(k\omega_1 t + \psi_{ik})$ 整周期平均为 $\dfrac{1}{2}$。
+
+故：
+
+$$ \frac{1}{T}\int_0^T i^2(t)\,dt = I_0^2 + \sum_{k=1}^{\infty}\frac{I_{km}^2}{2} = I_0^2 + \sum_{k=1}^{\infty} I_k^2 $$
+
+其中 $I_k = I_{km}/\sqrt{2}$。开方即得：
+
+$$ I = \sqrt{I_0^2 + \sum_{k=1}^{\infty} I_k^2} $$
+
+**关键点**：不同频率分量之间的交叉项积分为零（正交性），所以有效值平方等于各分量有效值平方之和，而不是各分量有效值之和。
+:::
+
 同理，设非正弦周期电压的傅里叶级数展开式为：
 
 $$ u(t) = U_0 + \sum_{k=1}^{\infty} U_{km} \sin(k\omega_1 t + \psi_{uk}) $$
@@ -102,6 +240,25 @@ $$ u(t) = U_0 + \sum_{k=1}^{\infty} U_{km} \sin(k\omega_1 t + \psi_{uk}) $$
 $$ U = \sqrt{U_0^2 + \sum_{k=1}^{\infty} U_k^2} = \sqrt{U_0^2 + U_1^2 + U_2^2 + \cdots} $$
 
 其中 $U_k = \dfrac{U_{km}}{\sqrt{2}}$。
+
+:::derivation
+**推导**：与电流有效值推导方法完全类似。电压有效值定义为：
+
+$$ U = \sqrt{\frac{1}{T}\int_0^T u^2(t)\,dt} $$
+
+代入 $u(t) = U_0 + \sum_{k=1}^{\infty} U_{km}\sin(k\omega_1 t + \psi_{uk})$，展开平方后取周期平均：
+
+- 直流分量平方项贡献 $U_0^2$
+- 直流与谐波交叉项 $2U_0 U_{km}\sin(\cdot)$ 整周期积分为零
+- 不同频率谐波之间的交叉项积分为零（三角函数正交性）
+- 同频率谐波平方项 $\sin^2(k\omega_1 t + \psi_{uk})$ 整周期平均为 $1/2$，贡献 $U_{km}^2/2 = U_k^2$
+
+故：
+
+$$ U = \sqrt{U_0^2 + \sum_{k=1}^{\infty} \frac{U_{km}^2}{2}} = \sqrt{U_0^2 + \sum_{k=1}^{\infty} U_k^2} $$
+
+注意 $U_k = U_{km}/\sqrt{2}$ 是把谐波分量当作正弦量按通常的有效值定义计算得到的。
+:::
 
 > **重要结论**：非正弦周期量的有效值等于**直流分量的平方**与**各次谐波有效值的平方之和**的平方根。各次谐波的有效值按正弦交流电的有效值公式 $U_k = U_{km}/\sqrt{2}$ 计算。
 
@@ -147,6 +304,41 @@ $$ P = U_0 I_0 + \sum_{k=1}^{\infty} U_k I_k \cos\varphi_k $$
 * $U_k$、$I_k$ 为 $k$ 次谐波电压、电流的有效值
 * $\varphi_k = \psi_{uk} - \psi_{ik}$ 为 $k$ 次谐波电压与电流的相位差
 
+:::derivation
+**推导**：平均功率定义 $P = \dfrac{1}{T}\int_0^T u(t)i(t)\,dt$。代入傅里叶展开：
+
+$$ u(t) = U_0 + \sum_{k=1}^{\infty} U_{km}\sin(k\omega_1 t + \psi_{uk}), \quad i(t) = I_0 + \sum_{k=1}^{\infty} I_{km}\sin(k\omega_1 t + \psi_{ik}) $$
+
+乘积展开后有以下几类项：
+
+**1. 直流 × 直流**：
+
+$$ \frac{1}{T}\int_0^T U_0 I_0\,dt = U_0 I_0 $$
+
+**2. 直流 × 谐波**：$2U_0 \cdot I_{km}\sin(k\omega_1 t + \psi_{ik})$ 与 $2I_0 \cdot U_{km}\sin(k\omega_1 t + \psi_{uk})$ 整周期积分为零。
+
+**3. 谐波 × 谐波**：考虑 $U_{km}\sin(k\omega_1 t + \psi_{uk}) \cdot I_{nm}\sin(n\omega_1 t + \psi_{in})$。
+
+- 当 $k \ne n$（不同频率）时，由积化和差化为余弦差，整周期积分为零；
+- 当 $k = n$（同频率）时：
+
+$$ \frac{1}{T}\int_0^T U_{km}\sin(k\omega_1 t + \psi_{uk}) \cdot I_{km}\sin(k\omega_1 t + \psi_{ik})\,dt $$
+
+利用 $\sin\alpha\sin\beta = \tfrac{1}{2}[\cos(\alpha-\beta) - \cos(\alpha+\beta)]$：
+
+$$ = \frac{U_{km}I_{km}}{2}\cos(\psi_{uk} - \psi_{ik}) - \underbrace{\frac{U_{km}I_{km}}{2}\cdot\frac{1}{T}\int_0^T\cos(2k\omega_1 t + \psi_{uk}+\psi_{ik})\,dt}_{=0} $$
+
+$$ = \frac{U_{km}I_{km}}{2}\cos\varphi_k = U_k I_k\cos\varphi_k $$
+
+其中 $U_k = U_{km}/\sqrt{2}$，$I_k = I_{km}/\sqrt{2}$，$\varphi_k = \psi_{uk}-\psi_{ik}$。
+
+汇总所有非零项：
+
+$$ P = U_0 I_0 + \sum_{k=1}^{\infty} U_k I_k\cos\varphi_k $$
+
+**核心结论**：只有直流-直流和同频率电压电流分量才贡献平均功率，不同频率分量之间不产生平均功率（即所谓"不同频率不产生功率"）。
+:::
+
 > **定理（平均功率的叠加性）**非正弦周期电流电路的平均功率等于**直流分量的功率**与**同频率的各次谐波的平均功率之和**。
 > 
 > $$ P = U_0 I_0 + \sum_{k=1}^{\infty} U_k I_k \cos\varphi_k $$
@@ -156,6 +348,40 @@ $$ P = U_0 I_0 + \sum_{k=1}^{\infty} U_k I_k \cos\varphi_k $$
 ### 3.2 平均功率的叠加性质
 
 非正弦周期电路中的平均功率满足**叠加性**，这是非常重要的性质。
+
+:::derivation
+**推导（不同频率功率叠加性的来源与同频率不可叠加的原因）**：
+
+设电压 $u = u_1 + u_2$，电流 $i = i_1 + i_2$，其中 $u_1, i_1$ 频率为 $\omega_1$，$u_2, i_2$ 频率为 $\omega_2$。瞬时功率：
+
+$$ p = ui = (u_1+u_2)(i_1+i_2) = u_1 i_1 + u_2 i_2 + u_1 i_2 + u_2 i_1 $$
+
+平均功率：
+
+$$ P = \frac{1}{T}\int_0^T p\,dt = \underbrace{\frac{1}{T}\int_0^T u_1 i_1\,dt}_{P_1} + \underbrace{\frac{1}{T}\int_0^T u_2 i_2\,dt}_{P_2} + \underbrace{\frac{1}{T}\int_0^T u_1 i_2\,dt}_{\text{交叉项}} + \underbrace{\frac{1}{T}\int_0^T u_2 i_1\,dt}_{\text{交叉项}} $$
+
+**情形一：$\omega_1 \ne \omega_2$（不同频率）**
+
+设 $u_1 = U_{1m}\sin(\omega_1 t + \alpha)$，$i_2 = I_{2m}\sin(\omega_2 t + \beta)$，则：
+
+$$ u_1 i_2 = \frac{U_{1m}I_{2m}}{2}\left[\cos((\omega_1-\omega_2)t + \alpha-\beta) - \cos((\omega_1+\omega_2)t + \alpha+\beta)\right] $$
+
+当 $\omega_1 \ne \omega_2$ 时，$(\omega_1 \pm \omega_2) \ne 0$，两个余弦项在一个公共周期内积分均为零。故交叉项为零：
+
+$$ P = P_1 + P_2 $$
+
+即**不同频率下平均功率满足叠加性**。
+
+**情形二：$\omega_1 = \omega_2 = \omega$（相同频率）**
+
+$$ u_1 i_2 = \frac{U_{1m}I_{2m}}{2}\left[\cos(\alpha-\beta) - \cos(2\omega t + \alpha+\beta)\right] $$
+
+第一项 $\cos(\alpha-\beta)$ 是常数，积分不为零；只有第二项（二倍频）积分为零。故：
+
+$$ \frac{1}{T}\int_0^T u_1 i_2\,dt = \frac{U_{1m}I_{2m}}{2}\cos(\alpha-\beta) \ne 0 $$
+
+此时交叉项不为零，$P \ne P_1 + P_2$，**同频率平均功率不满足叠加性**。必须先用相量法将同频率电压（电流）合并为一个等效相量，再计算功率。
+:::
 
 > **理解要点**：
 > 
@@ -291,9 +517,28 @@ $\omega = 2$ 分量：$$ U_2 = \frac{1}{\sqrt{2}} \text{ V}, \quad I_2 = \frac{2
 求谐波分量作用下的响应时，如同计算正弦交流电路，可用**相量法**。但需特别注意：
 
 * **电感对 $k$ 次谐波的感抗**：$$ X_{Lk} = k\omega_1 L = k X_{L1} $$
-  
+
+  :::derivation
+  **推导**：基波角频率为 $\omega_1$，$k$ 次谐波角频率为 $\omega_k = k\omega_1$。电感的感抗定义 $X_L = \omega L$，故：
+
+  $$ X_{Lk} = \omega_k L = k\omega_1 L = k \cdot (\omega_1 L) = k X_{L1} $$
+
+  其中 $X_{L1} = \omega_1 L$ 为基波感抗。可见感抗与谐波次数 $k$ 成**正比**，谐波次数越高，感抗越大，电感对高次谐波呈现"阻高频"特性。
+  :::
+
 * **电容对 $k$ 次谐波的容抗**：$$ X_{Ck} = \frac{1}{k\omega_1 C} = \frac{1}{k} X_{C1} $$
-  
+
+  :::derivation
+  **推导**：电容的容抗定义 $X_C = 1/(\omega C)$。$k$ 次谐波角频率 $\omega_k = k\omega_1$，故：
+
+  $$ X_{Ck} = \frac{1}{\omega_k C} = \frac{1}{k\omega_1 C} = \frac{1}{k}\cdot\frac{1}{\omega_1 C} = \frac{1}{k} X_{C1} $$
+
+  其中 $X_{C1} = 1/(\omega_1 C)$ 为基波容抗。可见容抗与谐波次数 $k$ 成**反比**，谐波次数越高，容抗越小，电容对高次谐波呈现"通高频"特性。
+
+  这一特性正是 LC 滤波器的工作基础：电感阻高频、电容通高频，二者组合可实现低通、高通、带通等滤波功能。
+  :::
+
+
 
 感抗、容抗和阻抗等参数必须指明是在哪种频率下得到的。**不同频率下电感和电容呈现不同的阻抗值**，这是非正弦周期电路计算中的关键点。
 
@@ -309,6 +554,24 @@ $$ Y = G + j\left(\omega C - \frac{1}{\omega L}\right) $$
 
 当 $\omega C = \dfrac{1}{\omega L}$ 时，虚部为 0，导纳角为 0，端口电压与端口电流同相位，电路呈阻性，发生**并联谐振**。
 
+:::derivation
+**推导**：GLC 并联电路的导纳由各元件导纳相加：
+
+- 电阻导纳 $Y_R = 1/R = G$
+- 电感导纳 $Y_L = 1/(j\omega L) = -j/(\omega L)$
+- 电容导纳 $Y_C = j\omega C$
+
+总导纳：
+
+$$ Y = G + j\omega C - j\frac{1}{\omega L} = G + j\left(\omega C - \frac{1}{\omega L}\right) $$
+
+谐振要求端口电压与电流同相，即导纳角 $\arg Y = 0$，亦即虚部（电纳）$B = 0$：
+
+$$ \omega C - \frac{1}{\omega L} = 0 \;\Rightarrow\; \omega C = \frac{1}{\omega L} $$
+
+此时 $Y = G$ 为纯电导。并联 LC 部分的导纳 $Y_{LC} = j(\omega C - 1/(\omega L)) = 0$，对应阻抗 $Z_{LC} = 1/Y_{LC} \to \infty$，即 LC 并联部分相当于开路，总电流全部流过电导 $G$ 支路。
+:::
+
 > 并联谐振时，LC 并联部分的等效阻抗趋近于无穷大，相当于**开路**。
 
 **串联谐振**
@@ -318,6 +581,24 @@ RLC 串联电路的等效阻抗为：
 $$ Z = R + j\left(\omega L - \frac{1}{\omega C}\right) $$
 
 当 $\omega L = \dfrac{1}{\omega C}$ 时，虚部为 0，阻抗角为 0，电压与电流同相位，电路呈阻性，发生**串联谐振**。
+
+:::derivation
+**推导**：RLC 串联电路的阻抗由各元件阻抗相加：
+
+- 电阻阻抗 $Z_R = R$
+- 电感阻抗 $Z_L = j\omega L$
+- 电容阻抗 $Z_C = 1/(j\omega C) = -j/(\omega C)$
+
+总阻抗：
+
+$$ Z = R + j\omega L - j\frac{1}{\omega C} = R + j\left(\omega L - \frac{1}{\omega C}\right) $$
+
+谐振要求电压与电流同相，即阻抗角 $\arg Z = 0$，亦即虚部（电抗）$X = 0$：
+
+$$ \omega L - \frac{1}{\omega C} = 0 \;\Rightarrow\; \omega L = \frac{1}{\omega C} $$
+
+此时 $Z = R$ 为纯电阻。串联 LC 部分的阻抗 $Z_{LC} = j(\omega L - 1/(\omega C)) = 0$，即 LC 串联部分相当于短路，电源电压全部加在电阻 $R$ 上。
+:::
 
 > 串联谐振时，LC 串联部分的等效阻抗为 0，相当于**短路**。
 

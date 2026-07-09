@@ -54,10 +54,46 @@ slugId: 刚体（一）
 设质点到转轴的距离为 $r$：
 - **线速度**：
   $$ \vec{v} = \vec{\omega} \times \vec{r} \quad \Rightarrow \quad v = r\omega $$
+
+  :::derivation
+  刚体定轴转动时，质点作半径为 $r$ 的圆周运动。在时间 $dt$ 内，角位移为 $d\theta$，质点经过的弧长为 $ds = r\,d\theta$。线速度大小为：
+
+  $$
+  v = \frac{ds}{dt} = \frac{r\,d\theta}{dt} = r\frac{d\theta}{dt} = r\omega
+  $$
+
+  方向沿圆周切线方向。矢量形式为 $\vec{v} = \vec{\omega} \times \vec{r}$，由叉乘定义可知方向符合右手定则。
+  :::
 - **切向加速度**：
   $$ a_t = r\alpha $$
+  
+  :::derivation
+  切向加速度反映线速度大小随时间的变化率。由 $v = r\omega$，对时间求导（$r$ 为定轴转动中常量）：
+
+  $$
+  a_t = \frac{dv}{dt} = \frac{d(r\omega)}{dt} = r\frac{d\omega}{dt} = r\alpha
+  $$
+
+  切向加速度方向沿圆周切线方向，与角加速度成正比。
+  :::
 - **法向加速度**：
   $$ a_n = r\omega^2 $$
+
+  :::derivation
+  法向加速度（向心加速度）反映速度方向的变化，指向圆心。对匀速圆周运动，法向加速度为：
+
+  $$
+  a_n = \frac{v^2}{r}
+  $$
+
+  代入 $v = r\omega$：
+
+  $$
+  a_n = \frac{(r\omega)^2}{r} = \frac{r^2\omega^2}{r} = r\omega^2
+  $$
+
+  即使角速度变化，某一瞬时的法向加速度仍由该瞬时的角速度决定。
+  :::
 - **总加速度**：
   $$ \vec{a} = \vec{a}_t + \vec{a}_n $$
 
@@ -95,6 +131,36 @@ slugId: 刚体（一）
 6. 得到转动定律：
    $$ M = J\alpha $$
 
+   :::derivation
+   取刚体中第 $i$ 个质量元 $\Delta m_i$，其到转轴的距离为 $r_i$，受外力 $\vec{F}_i$（切向分量 $F_{it}$）和内力 $\vec{F}'_i$（切向分量 $F'_{it}$）。
+
+   由牛顿第二定律，切向运动方程：
+
+   $$
+   F_{it} + F'_{it} = \Delta m_i\, a_{it} = \Delta m_i\, r_i\, \alpha
+   $$
+
+   两边同乘 $r_i$（将力转化为力矩）：
+
+   $$
+   r_i F_{it} + r_i F'_{it} = \Delta m_i\, r_i^2\, \alpha
+   $$
+
+   对所有质元求和。由牛顿第三定律，内力成对出现且力臂相同，内力矩之和为零 $\sum r_i F'_{it} = 0$：
+
+   $$
+   \sum r_i F_{it} = \left(\sum \Delta m_i\, r_i^2\right) \alpha
+   $$
+
+   定义合外力矩 $M = \sum r_i F_{it}$，转动惯量 $J = \sum \Delta m_i\, r_i^2$，得转动定律：
+
+   $$
+   M = J\alpha
+   $$
+
+   该定律在转动中的地位与牛顿第二定律 $F = ma$ 在平动中的地位相当。
+   :::
+
 #### 说明
 - $M, \alpha$ 方向相同。
 - 为瞬时关系。
@@ -109,8 +175,33 @@ slugId: 刚体（一）
 
 - **质量离散分布**：
   $$ J = \sum \Delta m_i r_i^2 = m_1 r_1^2 + m_2 r_2^2 + \dots $$
+
+  :::derivation
+  刚体绕定轴转动时，第 $i$ 个质量元 $\Delta m_i$ 到转轴距离为 $r_i$，线速度 $v_i = r_i\omega$，动能为 $\dfrac{1}{2}\Delta m_i v_i^2 = \dfrac{1}{2}\Delta m_i r_i^2 \omega^2$。刚体总动能：
+
+  $$
+  E_k = \sum \frac{1}{2}\Delta m_i r_i^2 \omega^2 = \frac{1}{2}\left(\sum \Delta m_i r_i^2\right)\omega^2
+  $$
+
+  类比平动动能 $E_k = \dfrac{1}{2}mv^2$，定义转动惯量 $J = \sum \Delta m_i r_i^2$，则 $E_k = \dfrac{1}{2}J\omega^2$。转动惯量是转动惯性大小的量度，其值取决于质量分布和转轴位置。
+  :::
 - **质量连续分布**：
   $$ J = \int r^2 dm = \int_V \rho r^2 dV $$
+
+  :::derivation
+  当质量连续分布时，将离散求和取极限变为积分。将刚体分割为无穷小质量元 $dm$，每个质量元到转轴距离为 $r$，则：
+
+  $$
+  J = \lim_{\Delta m_i \to 0} \sum \Delta m_i\, r_i^2 = \int r^2\,dm
+  $$
+
+  根据质量分布类型，$dm$ 可表示为：
+  - 体分布：$dm = \rho\,dV$，故 $J = \int_V \rho\, r^2\,dV$
+  - 面分布：$dm = \sigma\,dS$，故 $J = \int_S \sigma\, r^2\,dS$
+  - 线分布：$dm = \lambda\,dl$，故 $J = \int_l \lambda\, r^2\,dl$
+
+  其中 $\rho$、$\sigma$、$\lambda$ 分别为体密度、面密度、线密度。
+  :::
   其中 $dm$ 为质量元，$dV$ 为体积元，$\rho$ 为体密度。
 
 ### 2. 影响因素
@@ -121,6 +212,35 @@ slugId: 刚体（一）
 ### 3. 平行轴定理
 质量为 $m$ 的刚体，如果对其质心轴的转动惯量为 $J_C$，则对任一与该轴平行、相距为 $d$ 的转轴的转动惯量 $J$ 为：
 $$ J = J_C + md^2 $$
+
+:::derivation
+设刚体质量为 $m$，对质心轴的转动惯量为 $J_C$，另一平行轴与质心轴相距 $d$。以质心为坐标原点，质心轴为 $z$ 轴，平行轴过 $(0, d)$ 且与 $z$ 轴平行。
+
+质量元 $\Delta m_i$ 的坐标为 $(x_i, y_i)$，到质心轴距离平方 $r_i^2 = x_i^2 + y_i^2$，到平行轴距离平方 $r_i'^2 = x_i^2 + (y_i - d)^2$。对平行轴的转动惯量：
+
+$$
+J = \sum \Delta m_i\, r_i'^2 = \sum \Delta m_i [x_i^2 + (y_i - d)^2]
+$$
+
+展开 $(y_i - d)^2 = y_i^2 - 2dy_i + d^2$：
+
+$$
+J = \sum \Delta m_i (x_i^2 + y_i^2) - 2d\sum \Delta m_i\, y_i + d^2 \sum \Delta m_i
+$$
+
+其中：
+- $\sum \Delta m_i (x_i^2 + y_i^2) = J_C$（对质心轴的转动惯量）
+- $\sum \Delta m_i\, y_i = m \cdot y_C = 0$（质心在原点，$y_C = 0$）
+- $\sum \Delta m_i = m$
+
+故：
+
+$$
+J = J_C + 0 + md^2 = J_C + md^2
+$$
+
+该定理表明：对质心轴的转动惯量最小，对其他平行轴的转动惯量随距离 $d$ 增大而增大。
+:::
 
 #### 典型刚体的转动惯量
 - **均匀细长棒** (质量 $m$, 长 $l$)：
@@ -175,6 +295,38 @@ $$ J = J_C + md^2 $$
 3. 由 $M = J\alpha$ 求 $\alpha = \frac{3g}{2l}\sin\theta$。
 4. 由 $\alpha = \omega \frac{d\omega}{d\theta}$ 积分求 $\omega$：
    $$ \omega = \sqrt{\frac{3g}{l}(1 - \cos\theta)} $$
+
+   :::derivation
+   匀质细杆长 $l$、质量 $m$，下端铰链固定，从竖直位置倒下到与竖直线成 $\theta$ 角。
+
+   (1) 重力对铰链的力矩（质心在 $l/2$ 处）：
+
+   $$
+   M = mg \cdot \frac{l}{2}\sin\theta
+   $$
+
+   (2) 绕端点转动惯量 $J = \dfrac{1}{3}ml^2$（由平行轴定理：$J = \dfrac{1}{12}ml^2 + m\left(\dfrac{l}{2}\right)^2 = \dfrac{1}{3}ml^2$）。
+
+   (3) 由转动定律 $M = J\alpha$：
+
+   $$
+   \alpha = \frac{M}{J} = \frac{mg\frac{l}{2}\sin\theta}{\frac{1}{3}ml^2} = \frac{3g}{2l}\sin\theta
+   $$
+
+   (4) 利用链式法则 $\alpha = \dfrac{d\omega}{dt} = \dfrac{d\omega}{d\theta}\cdot\dfrac{d\theta}{dt} = \omega\dfrac{d\omega}{d\theta}$，分离变量积分：
+
+   $$
+   \int_0^\omega \omega\,d\omega = \int_0^\theta \frac{3g}{2l}\sin\theta\,d\theta
+   $$
+
+   $$
+   \frac{\omega^2}{2} = \frac{3g}{2l}[-\cos\theta]_0^\theta = \frac{3g}{2l}(1 - \cos\theta)
+   $$
+
+   $$
+   \omega = \sqrt{\frac{3g}{l}(1 - \cos\theta)}
+   $$
+   :::
 
 ---
 

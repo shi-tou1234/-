@@ -91,6 +91,26 @@ $$
 $$
 \frac{\partial z}{\partial x}\bigg|_{(x_0, y_0)} = \lim_{\Delta x \to 0} \frac{f(x_0 + \Delta x, y_0) - f(x_0, y_0)}{\Delta x}
 $$
+
+:::derivation
+**推导过程：**
+
+偏导数是一元函数导数在多元函数中的推广。对于二元函数 $z = f(x, y)$，固定 $y = y_0$，则 $f$ 成为仅关于 $x$ 的一元函数 $\varphi(x) = f(x, y_0)$。
+
+给 $x_0$ 以增量 $\Delta x$（保持 $y_0$ 不变），函数增量为一元增量：
+
+$$
+\Delta_x z = f(x_0 + \Delta x, y_0) - f(x_0, y_0)
+$$
+
+由一元函数导数定义，$\varphi(x)$ 在 $x_0$ 处的导数即为 $f$ 在 $(x_0, y_0)$ 处对 $x$ 的偏导数：
+
+$$
+\frac{\partial z}{\partial x}\bigg|_{(x_0, y_0)} = \lim_{\Delta x \to 0} \frac{f(x_0 + \Delta x, y_0) - f(x_0, y_0)}{\Delta x}
+$$
+
+同理固定 $x = x_0$ 可定义对 $y$ 的偏导数。其几何意义为：曲面 $z=f(x,y)$ 被平面 $y=y_0$ 所截得的曲线在点 $(x_0, y_0, z_0)$ 处切线对 $x$ 轴的斜率。
+:::
 - **计算方法**：求 $\frac{\partial z}{\partial x}$ 时，将 $y$ 视为常数，对 $x$ 求一元导数；反之亦然。
 - **几何意义**：曲面 $z=f(x,y)$ 被平面 $y=y_0$ 截得的曲线在点 $(x_0, y_0, z_0)$ 处切线对 $x$ 轴的斜率。
 
@@ -103,6 +123,26 @@ $$
   $$
   \Delta z = A \Delta x + B \Delta y + o(\rho), \quad \rho = \sqrt{(\Delta x)^2 + (\Delta y)^2}
   $$
+
+  :::derivation
+  **推导过程：**
+
+  设 $z = f(x, y)$，当自变量 $x, y$ 分别有增量 $\Delta x, \Delta y$ 时，全增量为：
+
+  $$
+  \Delta z = f(x + \Delta x, y + \Delta y) - f(x, y)
+  $$
+
+  若 $f$ 在 $(x, y)$ 处可微，则 $\Delta z$ 可用 $\Delta x, \Delta y$ 的**线性主部**近似，即存在与 $\Delta x, \Delta y$ 无关的常数 $A, B$，使得：
+
+  $$
+  \Delta z = A \Delta x + B \Delta y + o(\rho), \quad \rho = \sqrt{(\Delta x)^2 + (\Delta y)^2}
+  $$
+
+  其中 $o(\rho)$ 是比 $\rho$ 高阶的无穷小。线性主部 $A \Delta x + B \Delta y$ 称为全微分 $dz$。
+
+  **确定 $A, B$**：令 $\Delta y = 0$，则 $\Delta z = A \Delta x + o(|\Delta x|)$，两边除以 $\Delta x$ 取极限得 $A = \frac{\partial z}{\partial x}$；同理令 $\Delta x = 0$ 得 $B = \frac{\partial z}{\partial y}$。故 $dz = \frac{\partial z}{\partial x}dx + \frac{\partial z}{\partial y}dy$。
+  :::
   则称 $A \Delta x + B \Delta y$ 为全微分，记作 $dz = A dx + B dy$。
 - **可微的必要条件**：若可微，则偏导数存在，且 $A = \frac{\partial z}{\partial x}, B = \frac{\partial z}{\partial y}$。
 - **可微的充分条件**：若偏导数 $\frac{\partial z}{\partial x}, \frac{\partial z}{\partial y}$ 在点 $(x, y)$ 处**连续**，则函数在该点可微。
@@ -112,6 +152,21 @@ $$
 $$
 \text{偏导连续} \implies \text{可微} \implies \begin{cases} \text{连续} \\ \text{偏导存在} \end{cases}
 $$
+
+:::derivation
+**逻辑推导（各环节成立的原因）：**
+
+**① 偏导连续 $\implies$ 可微**：偏导数连续可保证全增量 $\Delta z$ 与线性主部之差为 $o(\rho)$（由拉格朗日中值定理并取极限可得），这是可微的充分条件。
+
+**② 可微 $\implies$ 连续**：可微时 $\Delta z = A\Delta x + B\Delta y + o(\rho)$，当 $(\Delta x, \Delta y) \to (0,0)$ 时 $\Delta z \to 0$，即 $\lim f(x_0+\Delta x, y_0+\Delta y) = f(x_0, y_0)$，故连续。
+
+**③ 可微 $\implies$ 偏导存在**：可微定义中令 $\Delta y = 0$，得 $\Delta z = A\Delta x + o(|\Delta x|)$，取极限即得 $\frac{\partial z}{\partial x} = A$ 存在；同理 $\frac{\partial z}{\partial y} = B$ 存在。
+
+**反向不成立的反例**：
+- 偏导存在 $\nRightarrow$ 连续：$f(x,y)=\frac{xy}{x^2+y^2}$（在原点补充定义 $0$）在原点偏导存在但不连续。
+- 连续 $\nRightarrow$ 偏导存在：$f(x,y)=\sqrt{x^2+y^2}$ 在原点连续但偏导不存在（圆锥顶点）。
+- 偏导存在 $\nRightarrow$ 可微：偏导存在仅保证沿坐标轴方向可导，不能保证全增量的线性近似。
+:::
 - **反向均不成立**：
   - 偏导存在 $\nRightarrow$ 连续（例如分段函数在原点）
   - 连续 $\nRightarrow$ 偏导存在（例如圆锥顶点）
@@ -139,6 +194,36 @@ $$
 \frac{\partial z}{\partial x} = \frac{\partial z}{\partial u} \cdot \frac{\partial u}{\partial x} + \frac{\partial z}{\partial v} \cdot \frac{\partial v}{\partial x}
 $$
 
+:::derivation
+**推导过程：**
+
+设 $z = f(u, v)$，其中 $u = \varphi(x, y)$，$v = \psi(x, y)$，且 $f$ 可微，$\varphi, \psi$ 的偏导数存在。
+
+给 $x$ 以增量 $\Delta x$（$y$ 保持不变），则 $u, v$ 产生相应增量：
+
+$$
+\Delta u = \varphi(x + \Delta x, y) - \varphi(x, y), \quad \Delta v = \psi(x + \Delta x, y) - \psi(x, y)
+$$
+
+因 $f$ 可微，由全微分定义：
+
+$$
+\Delta z = \frac{\partial z}{\partial u}\Delta u + \frac{\partial z}{\partial v}\Delta v + o(\rho), \quad \rho = \sqrt{(\Delta u)^2 + (\Delta v)^2}
+$$
+
+两边除以 $\Delta x$：
+
+$$
+\frac{\Delta z}{\Delta x} = \frac{\partial z}{\partial u}\cdot\frac{\Delta u}{\Delta x} + \frac{\partial z}{\partial v}\cdot\frac{\Delta v}{\Delta x} + \frac{o(\rho)}{\Delta x}
+$$
+
+令 $\Delta x \to 0$，由 $\varphi, \psi$ 对 $x$ 可导知 $\Delta u \to 0, \Delta v \to 0$，从而 $\rho \to 0$；且 $\frac{o(\rho)}{\Delta x} = \frac{o(\rho)}{\rho}\cdot\frac{\rho}{\Delta x} \to 0$（因 $\frac{\rho}{|\Delta x|}$ 有界），故：
+
+$$
+\frac{\partial z}{\partial x} = \frac{\partial z}{\partial u} \cdot \frac{\partial u}{\partial x} + \frac{\partial z}{\partial v} \cdot \frac{\partial v}{\partial x}
+$$
+:::
+
 ### 4.2 三种核心复合情形
 
 #### 情形 1：全导数（单自变量复合）
@@ -147,6 +232,28 @@ $$
   $$
   \frac{dz}{dt} = \frac{\partial z}{\partial u} \cdot \frac{du}{dt} + \frac{\partial z}{\partial v} \cdot \frac{dv}{dt}
   $$
+
+  :::derivation
+  **推导过程：**
+
+  设 $z = f(u, v)$，$u = \varphi(t)$，$v = \psi(t)$，即所有中间变量都是同一个自变量 $t$ 的一元函数。
+
+  给 $t$ 以增量 $\Delta t$，则 $u, v$ 的增量为 $\Delta u = \varphi(t+\Delta t) - \varphi(t)$，$\Delta v = \psi(t+\Delta t) - \psi(t)$。
+
+  由 $f$ 可微，全增量：
+
+  $$
+  \Delta z = \frac{\partial z}{\partial u}\Delta u + \frac{\partial z}{\partial v}\Delta v + o(\rho)
+  $$
+
+  两边除以 $\Delta t$ 并令 $\Delta t \to 0$。由于 $u, v$ 是 $t$ 的一元函数，$\frac{\Delta u}{\Delta t} \to \frac{du}{dt}$，$\frac{\Delta v}{\Delta t} \to \frac{dv}{dt}$（全导数符号 $d$），且 $\frac{o(\rho)}{\Delta t} \to 0$，故：
+
+  $$
+  \frac{dz}{dt} = \frac{\partial z}{\partial u} \cdot \frac{du}{dt} + \frac{\partial z}{\partial v} \cdot \frac{dv}{dt}
+  $$
+
+  注意：此处中间变量到自变量是一元关系，故用全导符号 $d$；而 $z$ 到中间变量是二元关系，故用偏导符号 $\partial$。
+  :::
 - **注意**：若 $z$ 显含 $t$（即 $z=f(u,v,t)$），公式需增加一项 $\frac{\partial z}{\partial t}$。
 
 #### 情形 2：标准多元复合（多自变量 + 多中间变量）
@@ -156,12 +263,51 @@ $$
   \frac{\partial z}{\partial x} = \frac{\partial z}{\partial u} \cdot \frac{\partial u}{\partial x} + \frac{\partial z}{\partial v} \cdot \frac{\partial v}{\partial x}
   $$
 
+  :::derivation
+  **推导过程（树状图视角）：**
+
+  设 $z = f(u, v)$，$u = \varphi(x, y)$，$v = \psi(x, y)$。
+
+  绘制变量依赖树：$z \to u \to x$、$z \to v \to x$ 两条路径影响 $x$。按「分段相乘，分叉相加」原则：
+
+  - 路径 $z \to u \to x$ 贡献 $\frac{\partial z}{\partial u} \cdot \frac{\partial u}{\partial x}$
+  - 路径 $z \to v \to x$ 贡献 $\frac{\partial z}{\partial v} \cdot \frac{\partial v}{\partial x}$
+
+  两路相加即得：
+
+  $$
+  \frac{\partial z}{\partial x} = \frac{\partial z}{\partial u} \cdot \frac{\partial u}{\partial x} + \frac{\partial z}{\partial v} \cdot \frac{\partial v}{\partial x}
+  $$
+
+  同理对 $y$ 求偏导：$\frac{\partial z}{\partial y} = \frac{\partial z}{\partial u} \cdot \frac{\partial u}{\partial y} + \frac{\partial z}{\partial v} \cdot \frac{\partial v}{\partial y}$。严格证明见情形 1 中全微分展开取极限的方法。
+  :::
+
 #### 情形 3：混合复合（自变量兼作中间变量）
 - **场景**：自变量既直接出现在外层，又通过中间变量间接复合。**高频易错点**。
 - **公式**：设 $z=f(u,x,y), u=\varphi(x,y)$，则：
   $$
   \frac{\partial z}{\partial x} = \frac{\partial f}{\partial u} \cdot \frac{\partial u}{\partial x} + \frac{\partial f}{\partial x}
   $$
+
+  :::derivation
+  **推导过程：**
+
+  设 $z = f(u, x, y)$，$u = \varphi(x, y)$。此时 $x$ 既是外层函数 $f$ 的显式自变量，又通过中间变量 $u$ 间接影响 $z$。
+
+  给 $x$ 以增量 $\Delta x$（$y$ 固定），$u$ 产生增量 $\Delta u = \varphi(x+\Delta x, y) - \varphi(x, y)$。由 $f$ 可微（视 $f$ 为三元函数）：
+
+  $$
+  \Delta z = \frac{\partial f}{\partial u}\Delta u + \frac{\partial f}{\partial x}\Delta x + \frac{\partial f}{\partial y}\cdot 0 + o(\rho)
+  $$
+
+  两边除以 $\Delta x$ 并令 $\Delta x \to 0$：
+
+  $$
+  \frac{\partial z}{\partial x} = \frac{\partial f}{\partial u} \cdot \frac{\partial u}{\partial x} + \frac{\partial f}{\partial x}
+  $$
+
+  **关键区分**：$\frac{\partial f}{\partial x}$ 仅对 $f$ 表达式中**显式**出现的 $x$ 求导（视 $u, y$ 为常数）；而 $\frac{\partial z}{\partial x}$ 是对最终自变量 $x$ 的**全偏导**，包含经 $u$ 的间接影响。二者绝不能划等号。
+  :::
 - **符号区分（必考）**：
   - $\boldsymbol{\frac{\partial f}{\partial x}}$：仅对函数表达式中**显式**的 $x$ 求导（视 $u,y$ 为常数）。这是对“位置变量”的偏导。
   - $\boldsymbol{\frac{\partial z}{\partial x}}$：对最终自变量 $x$ 的**全偏导**（包含间接影响）。这是对“最终自变量”的偏导。
@@ -191,6 +337,30 @@ $$
   $$
   dz = \frac{\partial z}{\partial u} du + \frac{\partial z}{\partial v} dv
   $$
+
+  :::derivation
+  **推导过程：**
+
+  设 $z = f(u, v)$，$u, v$ 为自变量时，由全微分定义：
+
+  $$
+  dz = \frac{\partial z}{\partial u}du + \frac{\partial z}{\partial v}dv
+  $$
+
+  若 $u = \varphi(x, y)$，$v = \psi(x, y)$ 为中间变量，由链式法则：
+
+  $$
+  \frac{\partial z}{\partial x} = \frac{\partial z}{\partial u}\frac{\partial u}{\partial x} + \frac{\partial z}{\partial v}\frac{\partial v}{\partial x}, \quad \frac{\partial z}{\partial y} = \frac{\partial z}{\partial u}\frac{\partial u}{\partial y} + \frac{\partial z}{\partial v}\frac{\partial v}{\partial y}
+  $$
+
+  则 $dz = \frac{\partial z}{\partial x}dx + \frac{\partial z}{\partial y}dy$，代入并重新按 $du, dv$ 合并（注意 $du = \frac{\partial u}{\partial x}dx + \frac{\partial u}{\partial y}dy$，$dv = \frac{\partial v}{\partial x}dx + \frac{\partial v}{\partial y}dy$）：
+
+  $$
+  dz = \frac{\partial z}{\partial u}\left(\frac{\partial u}{\partial x}dx + \frac{\partial u}{\partial y}dy\right) + \frac{\partial z}{\partial v}\left(\frac{\partial v}{\partial x}dx + \frac{\partial v}{\partial y}dy\right) = \frac{\partial z}{\partial u}du + \frac{\partial z}{\partial v}dv
+  $$
+
+  形式与 $u, v$ 为自变量时完全一致，这就是全微分形式不变性。利用此性质可避免区分变量类型，直接展开微分并合并 $dx, dy$ 系数即得偏导数。
+  :::
 - **优势**：无需区分变量类型，直接展开微分，合并 $dx, dy$ 系数即可得到偏导数，可有效避免链式法则漏项。
 
 ### 4.4 隐函数求导法则
@@ -199,6 +369,36 @@ $$
   $$
   \frac{\partial z}{\partial x} = -\frac{F_x}{F_z}, \quad \frac{\partial z}{\partial y} = -\frac{F_y}{F_z}
   $$
+
+  :::derivation
+  **推导过程：**
+
+  设方程 $F(x, y, z) = 0$ 确定 $z = z(x, y)$。将 $z(x, y)$ 代回方程得恒等式：
+
+  $$
+  F(x, y, z(x, y)) = 0
+  $$
+
+  对上述恒等式两边取全微分（利用全微分形式不变性）：
+
+  $$
+  dF = F_x dx + F_y dy + F_z dz = 0
+  $$
+
+  解出 $dz$：
+
+  $$
+  dz = -\frac{F_x}{F_z}dx - \frac{F_y}{F_z}dy \quad (F_z \neq 0)
+  $$
+
+  另一方面，由 $z = z(x, y)$ 的全微分 $dz = \frac{\partial z}{\partial x}dx + \frac{\partial z}{\partial y}dy$，比较 $dx, dy$ 的系数即得：
+
+  $$
+  \frac{\partial z}{\partial x} = -\frac{F_x}{F_z}, \quad \frac{\partial z}{\partial y} = -\frac{F_y}{F_z}
+  $$
+
+  也可对恒等式直接两边对 $x$ 求偏导（视 $z$ 为 $x, y$ 的函数，$y$ 为常数），由链式法则 $F_x + F_z \frac{\partial z}{\partial x} = 0$，解出同样结果。
+  :::
 - **推导逻辑**：对方程两边同时求微分 $d(F)=0$，解出 $dz$ 即可。
 
 ---
@@ -236,6 +436,30 @@ $$
   $$
   \frac{\partial f}{\partial l} = \frac{\partial f}{\partial x} \cos \alpha + \frac{\partial f}{\partial y} \cos \beta
   $$
+
+  :::derivation
+  **推导过程：**
+
+  设 $f(x, y)$ 在点 $P(x, y)$ 可微，方向 $l$ 的单位向量为 $\boldsymbol{e}_l = (\cos\alpha, \cos\beta)$，其中 $\cos\alpha, \cos\beta$ 为方向 $l$ 的方向余弦（满足 $\cos^2\alpha + \cos^2\beta = 1$）。
+
+  从点 $P$ 沿方向 $l$ 移动距离 $t$ 到达 $P'(x + t\cos\alpha, y + t\cos\beta)$，函数增量：
+
+  $$
+  f(P') - f(P) = f(x + t\cos\alpha, y + t\cos\beta) - f(x, y)
+  $$
+
+  由 $f$ 可微，令 $\Delta x = t\cos\alpha$，$\Delta y = t\cos\beta$：
+
+  $$
+  f(P') - f(P) = \frac{\partial f}{\partial x}t\cos\alpha + \frac{\partial f}{\partial y}t\cos\beta + o(t)
+  $$
+
+  方向导数定义为 $\frac{\partial f}{\partial l} = \lim_{t \to 0^+}\frac{f(P') - f(P)}{t}$，代入并取极限（$o(t)/t \to 0$）：
+
+  $$
+  \frac{\partial f}{\partial l} = \frac{\partial f}{\partial x}\cos\alpha + \frac{\partial f}{\partial y}\cos\beta
+  $$
+  :::
 - **注意**：方向余弦必须归一化，即 $\cos^2 \alpha + \cos^2 \beta = 1$。若给定向量 $\vec{v}=(a,b)$，需先单位化。
 
 ### 6.2 梯度（Gradient）
@@ -243,6 +467,26 @@ $$
   $$
   \text{grad } f = \left( \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right)
   $$
+
+  :::derivation
+  **推导过程：**
+
+  将方向导数公式改写为向量内积形式。设方向 $l$ 的单位向量 $\boldsymbol{e}_l = (\cos\alpha, \cos\beta)$，定义向量：
+
+  $$
+  \text{grad } f = \nabla f = \left(\frac{\partial f}{\partial x}, \frac{\partial f}{\partial y}\right)
+  $$
+
+  则方向导数可表示为：
+
+  $$
+  \frac{\partial f}{\partial l} = \text{grad } f \cdot \boldsymbol{e}_l = |\text{grad } f|\cos\theta
+  $$
+
+  其中 $\theta$ 为梯度方向与方向 $l$ 的夹角。
+
+  **为何梯度方向增长最快**：由上式，方向导数 $\frac{\partial f}{\partial l} = |\text{grad } f|\cos\theta$，当 $\theta = 0$（即 $l$ 与梯度同向）时取最大值 $|\text{grad } f|$；当 $\theta = \pi$（反向）时取最小值 $-|\text{grad } f|$（下降最快）。故梯度方向是函数增长最快的方向，其模为最大方向导数。此外，沿等值线（面）方向 $\theta = \frac{\pi}{2}$，方向导数为零，说明梯度与等值线法线同向。
+  :::
 - **核心性质**：
   1. 梯度方向是函数**增长最快**的方向。
   2. 梯度的模 $|\text{grad } f|$ 是该方向上的最大方向导数。
@@ -267,6 +511,28 @@ $$
   $$
   L(x, y, \lambda) = f(x, y) + \lambda \varphi(x, y)
   $$
+
+  :::derivation
+  **推导过程：**
+
+  问题：求 $z = f(x, y)$ 在约束 $\varphi(x, y) = 0$ 下的极值。
+
+  **几何思想**：设极值点为 $(x_0, y_0)$。在约束曲线 $\varphi(x, y) = 0$ 上，该点处曲线的切线方向 $\boldsymbol{\tau}$ 必与 $f$ 的梯度方向垂直——否则沿切线方向 $f$ 仍会变化，$(x_0, y_0)$ 就不是极值点。即 $\text{grad } f \perp \boldsymbol{\tau}$。
+
+  而约束曲线 $\varphi = 0$ 在 $(x_0, y_0)$ 处的法向量恰为 $\text{grad } \varphi = (\varphi_x, \varphi_y)$，它与切线 $\boldsymbol{\tau}$ 垂直。故 $\text{grad } f$ 与 $\text{grad } \varphi$ 都垂直于同一切线方向，二者共线：
+
+  $$
+  \text{grad } f = -\lambda\, \text{grad } \varphi \quad \text{即} \quad f_x + \lambda\varphi_x = 0,\ f_y + \lambda\varphi_y = 0
+  $$
+
+  引入辅助函数（拉格朗日函数）$L(x, y, \lambda) = f(x, y) + \lambda\varphi(x, y)$，则上述条件等价于：
+
+  $$
+  L_x = f_x + \lambda\varphi_x = 0, \quad L_y = f_y + \lambda\varphi_y = 0, \quad L_\lambda = \varphi(x, y) = 0
+  $$
+
+  解此方程组即得驻点 $(x_0, y_0, \lambda_0)$。$\lambda$ 称为拉格朗日乘数，其几何意义为梯度比例系数。
+  :::
 - **求解步骤**：
   1. 解方程组 $\begin{cases} L_x' = 0 \\ L_y' = 0 \\ L_\lambda' = 0 \end{cases}$ 得到驻点 $(x_0, y_0, \lambda_0)$。
   2. 根据实际问题意义判断是否为极值点（通常应用题中唯一驻点即为最值点）。

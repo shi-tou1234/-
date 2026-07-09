@@ -26,11 +26,61 @@ $$ u_R(t) + u_L(t) + u_C(t) = u_S(t) $$
 根据元件VCR：
 $$ i(t) = C \frac{\mathrm{d}u_C(t)}{\mathrm{d}t} $$
 $$ u_L(t) = L \frac{\mathrm{d}i(t)}{\mathrm{d}t} = L \frac{\mathrm{d}}{\mathrm{d}t} \left( C \frac{\mathrm{d}u_C(t)}{\mathrm{d}t} \right) = LC \frac{\mathrm{d}^2 u_C(t)}{\mathrm{d}t^2} $$
+
+:::derivation
+**推导**：以电容电压 $u_C(t)$ 为变量，需要将 $u_L$ 用 $u_C$ 表示。
+
+第一步，由电容的 VCR $i = C\dfrac{du_C}{dt}$ 得到电流 $i(t)$ 与 $u_C$ 的关系。
+
+第二步，由电感的 VCR $u_L = L\dfrac{di}{dt}$，将 $i(t)$ 代入：
+
+$$ u_L = L\frac{d}{dt}\left(C\frac{du_C}{dt}\right) = L\cdot C\cdot\frac{d^2 u_C}{dt^2} = LC\frac{d^2 u_C}{dt^2} $$
+
+这里用到了链式法则 $\dfrac{d}{dt}\left(\dfrac{du_C}{dt}\right) = \dfrac{d^2 u_C}{dt^2}$。
+
+物理意义：电感电压正比于电容电压的二阶导数。这是因为电感电压取决于电流变化率，而电流本身又正比于电容电压的变化率，故电感电压与电容电压的二阶变化率相关。
+:::
+
 $$ u_R(t) = R i(t) = RC \frac{\mathrm{d}u_C(t)}{\mathrm{d}t} $$
 将上述表达式代入KVL方程，整理得关于 $u_C(t)$ 的二阶微分方程：
 $$ LC \frac{\mathrm{d}^2 u_C(t)}{\mathrm{d}t^2} + RC \frac{\mathrm{d}u_C(t)}{\mathrm{d}t} + u_C(t) = u_S(t) $$
+
+:::derivation
+**推导**：将各元件 VCR 代入 KVL 方程 $u_R + u_L + u_C = u_S$：
+
+- $u_R = RC\dfrac{du_C}{dt}$
+- $u_L = LC\dfrac{d^2 u_C}{dt^2}$
+- $u_C = u_C$
+
+代入得：
+
+$$ LC\frac{d^2 u_C}{dt^2} + RC\frac{du_C}{dt} + u_C = u_S(t) $$
+
+这是关于 $u_C(t)$ 的二阶线性常系数非齐次微分方程。方程左端三项分别对应电感、电阻、电容上的电压，右端为激励源电压。
+
+**化为标准形式**：两边同除以 $LC$：
+
+$$ \frac{d^2 u_C}{dt^2} + \frac{R}{L}\frac{du_C}{dt} + \frac{1}{LC}u_C = \frac{1}{LC}u_S(t) $$
+
+标准形式中二阶导数系数为 1，便于后续求解特征方程和分析电路性质。
+:::
+
 化为标准形式：
 $$ \frac{\mathrm{d}^2 u_C(t)}{\mathrm{d}t^2} + \frac{R}{L} \frac{\mathrm{d}u_C(t)}{\mathrm{d}t} + \frac{1}{LC} u_C(t) = \frac{1}{LC} u_S(t) $$
+
+:::derivation
+**推导（特征方程与电路性质）**：对标准形式齐次方程 $\ddot{u}_C + \dfrac{R}{L}\dot{u}_C + \dfrac{1}{LC}u_C = 0$，设特解 $u_C = e^{st}$，代入得特征方程：
+
+$$ s^2 + \frac{R}{L}s + \frac{1}{LC} = 0 $$
+
+判别式 $\Delta = \left(\dfrac{R}{L}\right)^2 - \dfrac{4}{LC} = \dfrac{R^2 C - 4L}{L^2 C}$。
+
+- 当 $R > 2\sqrt{L/C}$（过阻尼）：$\Delta > 0$，有两个不等实根，响应为两个衰减指数之和；
+- 当 $R = 2\sqrt{L/C}$（临界阻尼）：$\Delta = 0$，有重根，响应为 $(A+Bt)e^{st}$ 形式；
+- 当 $R < 2\sqrt{L/C}$（欠阻尼）：$\Delta < 0$，有共轭复根，响应为衰减振荡。
+
+这说明 RLC 串联电路的暂态过程丰富多样，参数 $R$、$L$、$C$ 决定响应性质。
+:::
 
 **例2：RLC并联电路（以 $i_L(t)$ 和 $u(t)$ 为输出）**
 电路由电流源 $i_S(t)$ 与 $R, L, C$ 并联。由KCL得：$i_S = i_C + i_R + i_L$。
@@ -38,12 +88,49 @@ $$ \frac{\mathrm{d}^2 u_C(t)}{\mathrm{d}t^2} + \frac{R}{L} \frac{\mathrm{d}u_C(t
   并联电压 $u = L \frac{\mathrm{d}i_L}{\mathrm{d}t}$，则 $i_C = C \frac{\mathrm{d}u}{\mathrm{d}t} = LC \frac{\mathrm{d}^2 i_L}{\mathrm{d}t^2}$，$i_R = \frac{u}{R} = \frac{L}{R} \frac{\mathrm{d}i_L}{\mathrm{d}t}$。
   代入KCL方程得：
   $$ LC \frac{\mathrm{d}^2 i_L}{\mathrm{d}t^2} + \frac{L}{R} \frac{\mathrm{d}i_L}{\mathrm{d}t} + i_L = i_S(t) $$
+
+  :::derivation
+  **推导**：以 $i_L$ 为变量，需将 $i_C$、$i_R$ 用 $i_L$ 表示。
+
+  并联电压 $u = L\dfrac{di_L}{dt}$（电感 VCR），则：
+
+  - 电容电流 $i_C = C\dfrac{du}{dt} = C\dfrac{d}{dt}\left(L\dfrac{di_L}{dt}\right) = LC\dfrac{d^2 i_L}{dt^2}$
+  - 电阻电流 $i_R = \dfrac{u}{R} = \dfrac{L}{R}\dfrac{di_L}{dt}$
+
+  代入 KCL 方程 $i_S = i_C + i_R + i_L$：
+
+  $$ LC\frac{d^2 i_L}{dt^2} + \frac{L}{R}\frac{di_L}{dt} + i_L = i_S(t) $$
+
+  与串联电路的二阶方程 $LC\ddot{u}_C + RC\dot{u}_C + u_C = u_S$ 对比，可见并联电路中 $L/R$ 对应串联中的 $RC$，体现了 RLC 串并联的对偶性。
+  :::
 - **以 $u$ 为输出**：
   $i_L = \frac{1}{L} \int_{-\infty}^{t} u(\tau) \mathrm{d}\tau$，$i_C = C \frac{\mathrm{d}u}{\mathrm{d}t}$，$i_R = \frac{u}{R}$。
   代入KCL得积分微分方程：
   $$ C \frac{\mathrm{d}u}{\mathrm{d}t} + \frac{u}{R} + \frac{1}{L} \int_{-\infty}^{t} u(\tau) \mathrm{d}\tau = i_S(t) $$
   两边对 $t$ 求导，消去积分项，得二阶微分方程：
   $$ C \frac{\mathrm{d}^2 u}{\mathrm{d}t^2} + \frac{1}{R} \frac{\mathrm{d}u}{\mathrm{d}t} + \frac{1}{L} u = \frac{\mathrm{d}i_S(t)}{\mathrm{d}t} $$
+
+  :::derivation
+  **推导**：从积分微分方程出发：
+
+  $$ C\frac{du}{dt} + \frac{u}{R} + \frac{1}{L}\int_{-\infty}^{t}u(\tau)\,d\tau = i_S(t) $$
+
+  为消去积分项，两边对 $t$ 求导：
+
+  $$ \frac{d}{dt}\left[C\frac{du}{dt}\right] + \frac{d}{dt}\left[\frac{u}{R}\right] + \frac{d}{dt}\left[\frac{1}{L}\int_{-\infty}^{t}u(\tau)\,d\tau\right] = \frac{di_S}{dt} $$
+
+  逐项计算：
+
+  - 第一项：$C\dfrac{d^2 u}{dt^2}$
+  - 第二项：$\dfrac{1}{R}\dfrac{du}{dt}$
+  - 第三项：由 Leibniz 法则 $\dfrac{d}{dt}\int_{-\infty}^{t}u(\tau)\,d\tau = u(t)$，故为 $\dfrac{1}{L}u$
+
+  合并：
+
+  $$ C\frac{d^2 u}{dt^2} + \frac{1}{R}\frac{du}{dt} + \frac{1}{L}u = \frac{di_S(t)}{dt} $$
+
+  注意：求导后右端变为 $i_S(t)$ 的导数，这是从积分微分方程转化为微分方程的代价。此方程与串联电路标准形式对偶：$C \leftrightarrow L$，$1/R \leftrightarrow R$，$1/L \leftrightarrow 1/C$。
+  :::
 
 ### 3. 电路阶数
 输入输出方程为 $n$ 阶微分方程的电路称为 **$n$ 阶电路**。通常，电路中独立储能元件的个数决定了方程的阶数。在列写方程时，以电容电压 $u_C$ 或电感电流 $i_L$ 为变量最为简便。
@@ -66,13 +153,76 @@ $$ \frac{\mathrm{d}^2 u_C(t)}{\mathrm{d}t^2} + \frac{R}{L} \frac{\mathrm{d}u_C(t
 $$ q_C(0^+) = q_C(0^-) + \int_{0^-}^{0^+} i_C(\tau) \mathrm{d}\tau $$
 当 $i_C(t)$ 有界时，积分区间趋于零，积分值为0，故 $q_C(0^+) = q_C(0^-)$。结合 $q_C = C u_C$，得：
 $$ u_C(0^+) = u_C(0^-) $$
+
+:::derivation
+**推导**：电容的电压-电流关系为 $i_C = C\dfrac{du_C}{dt}$，积分形式为：
+
+$$ u_C(t) = u_C(t_0) + \frac{1}{C}\int_{t_0}^{t} i_C(\tau)\,d\tau $$
+
+令 $t_0 = 0^-$、$t = 0^+$（换路前后的瞬时）：
+
+$$ u_C(0^+) = u_C(0^-) + \frac{1}{C}\int_{0^-}^{0^+} i_C(\tau)\,d\tau $$
+
+**关键条件**：若换路瞬间电容电流 $i_C$ 为有限值（无冲激电流），则积分区间 $[0^-, 0^+]$ 长度趋于零，被积函数有界，故积分值为零：
+
+$$ \int_{0^-}^{0^+} i_C(\tau)\,d\tau = 0 $$
+
+因此：
+
+$$ u_C(0^+) = u_C(0^-) $$
+
+**物理意义**：电容电压反映了电容储存的电场能量 $W_C = \tfrac{1}{2}Cu_C^2$。能量不能突变（否则需要无穷大功率），故电容电压不能突变。
+
+**等价表述**：由 $q_C = Cu_C$，电容电荷也不能突变：$q_C(0^+) = q_C(0^-)$。
+:::
+
 同理，由电感的积分关系 $\Psi_L(t) = \Psi_L(t_m) + \int_{t_m}^{t} u_L(\tau) \mathrm{d}\tau$，令 $t_m=0^-$，$t=0^+$：
 $$ \Psi_L(0^+) = \Psi_L(0^-) + \int_{0^-}^{0^+} u_L(\tau) \mathrm{d}\tau = \Psi_L(0^-) $$
 结合 $\Psi_L = L i_L$，得：
 $$ i_L(0^+) = i_L(0^-) $$
 
+:::derivation
+**推导**：电感的电压-电流关系为 $u_L = L\dfrac{di_L}{dt}$，积分形式为：
+
+$$ i_L(t) = i_L(t_0) + \frac{1}{L}\int_{t_0}^{t} u_L(\tau)\,d\tau $$
+
+令 $t_0 = 0^-$、$t = 0^+$：
+
+$$ i_L(0^+) = i_L(0^-) + \frac{1}{L}\int_{0^-}^{0^+} u_L(\tau)\,d\tau $$
+
+**关键条件**：若换路瞬间电感电压 $u_L$ 为有限值（无冲激电压），则积分区间趋于零时积分为零：
+
+$$ \int_{0^-}^{0^+} u_L(\tau)\,d\tau = 0 $$
+
+故：
+
+$$ i_L(0^+) = i_L(0^-) $$
+
+**物理意义**：电感电流反映了电感储存的磁场能量 $W_L = \tfrac{1}{2}Li_L^2$。能量不能突变，故电感电流不能突变。
+
+**等价表述**：由 $\Psi_L = Li_L$（磁链），电感磁链也不能突变：$\Psi_L(0^+) = \Psi_L(0^-)$。
+:::
+
 **结论**：
 $$ u_C(0^+) = u_C(0^-), \quad i_L(0^+) = i_L(0^-) $$
+
+:::derivation
+**推导（换路定则的统一表述）**：
+
+电容和电感都是储能元件，其状态变量（$u_C$ 和 $i_L$）直接决定了储能大小：
+
+$$ W_C = \frac{1}{2}Cu_C^2, \quad W_L = \frac{1}{2}Li_L^2 $$
+
+若 $u_C$ 或 $i_L$ 在 $t=0$ 处发生跃变，则储能 $W$ 在 $t=0$ 处也发生跃变，意味着功率 $p = dW/dt \to \infty$，这要求有无穷大的能量源，物理上不可能（除非有冲激源）。
+
+数学上，由积分关系：
+
+$$ u_C(0^+) - u_C(0^-) = \frac{1}{C}\int_{0^-}^{0^+} i_C\,d\tau, \quad i_L(0^+) - i_L(0^-) = \frac{1}{L}\int_{0^-}^{0^+} u_L\,d\tau $$
+
+只要 $i_C$、$u_L$ 有界，右边积分为零，故状态变量连续。
+
+**注意**：换路定则只适用于状态变量 $u_C$、$i_L$。其他变量（如 $i_C$、$u_L$、$u_R$、$i_R$）不受此约束，可能发生跃变。
+:::
 > 注：电阻电压/电流、电容电流、电感电压等其他变量在换路瞬间**可能发生跃变**。
 
 ### 3. 初始值的系统化计算步骤
@@ -97,6 +247,37 @@ $$ u_C(0^+) = u_C(0^-), \quad i_L(0^+) = i_L(0^-) $$
 ### 2. 一阶电路与两要素法
 仅含一个独立储能元件（或可等效为单个）的电路为一阶电路。其零输入响应具有统一的指数衰减形式：
 $$ r(t) = r(0^+) e^{-\frac{t}{\tau}}, \quad t \ge 0 $$
+
+:::derivation
+**推导（一阶电路零输入响应的统一形式）**：
+
+一阶电路的输入输出方程一般形式为：
+
+$$ \tau\frac{dr}{dt} + r = 0 \quad (\text{零输入，无激励}) $$
+
+这是一个一阶线性常系数齐次微分方程。设特解 $r(t) = e^{st}$，代入得特征方程：
+
+$$ \tau s + 1 = 0 \;\Rightarrow\; s = -\frac{1}{\tau} $$
+
+通解为：
+
+$$ r(t) = A e^{-t/\tau} $$
+
+由初始条件 $r(0^+) = r(0^+)$（换路定则确定的状态变量初始值），令 $t = 0^+$：
+
+$$ r(0^+) = A e^{0} = A $$
+
+故 $A = r(0^+)$，最终解为：
+
+$$ r(t) = r(0^+) e^{-t/\tau}, \quad t \ge 0 $$
+
+**关键点**：
+- 响应随时间按指数规律衰减，衰减快慢由时间常数 $\tau$ 决定。
+- $t = \tau$ 时，$r(\tau) = r(0^+)e^{-1} \approx 0.368\,r(0^+)$，即衰减到初值的 36.8%。
+- $t = 5\tau$ 时，$r(5\tau) \approx 0.0067\,r(0^+)$，工程上认为暂态过程结束。
+- 此公式适用于任意一阶电路中的任意变量（不限于状态变量），只要能求出该变量的初始值 $r(0^+)$ 和时间常数 $\tau$。
+:::
+
 其中：
 - $r(0^+)$：目标变量在 $t=0^+$ 的初始值。
 - $\tau$：电路的时间常数。
@@ -108,6 +289,53 @@ $$ r(t) = r(0^+) e^{-\frac{t}{\tau}}, \quad t \ge 0 $$
 KVL: $u_R + u_C = 0 \Rightarrow R i + u_C = 0$。
 代入 $i = C \frac{\mathrm{d}u_C}{\mathrm{d}t}$，得一阶齐次微分方程：
 $$ RC \frac{\mathrm{d}u_C}{\mathrm{d}t} + u_C = 0 $$
+
+:::derivation
+**推导**：RC 串联零输入电路（电容已充电至 $U_0$，$t=0$ 时闭合开关通过 $R$ 放电）。
+
+**第一步：建立方程**
+
+由 KVL：$u_R + u_C = 0$（无激励源）
+
+代入电阻 VCR $u_R = Ri$ 和电容 VCR $i = C\dfrac{du_C}{dt}$：
+
+$$ RC\frac{du_C}{dt} + u_C = 0 $$
+
+**第二步：求特征方程**
+
+设 $u_C = e^{st}$，代入齐次方程：
+
+$$ RCs\,e^{st} + e^{st} = 0 \;\Rightarrow\; (RCs + 1)e^{st} = 0 $$
+
+因 $e^{st} \ne 0$，故特征方程：
+
+$$ RCs + 1 = 0 \;\Rightarrow\; s = -\frac{1}{RC} $$
+
+**第三步：写出通解并定常数**
+
+通解 $u_C(t) = A e^{-t/(RC)}$。由换路定则 $u_C(0^+) = u_C(0^-) = U_0$，代入 $t=0^+$：
+
+$$ U_0 = A \;\Rightarrow\; A = U_0 $$
+
+故：
+
+$$ u_C(t) = U_0 e^{-t/(RC)}, \quad t \ge 0 $$
+
+时间常数 $\tau = RC$，反映了放电快慢。
+
+**第四步：求电流**
+
+$$ i(t) = C\frac{du_C}{dt} = C\cdot\left(-\frac{U_0}{RC}\right)e^{-t/(RC)} = -\frac{U_0}{R}e^{-t/(RC)} $$
+
+负号表示放电电流方向与充电时相反。
+
+**能量验证**：初始储能 $W_C(0) = \tfrac{1}{2}CU_0^2$，电阻消耗总能量：
+
+$$ W_R = \int_0^{\infty} i^2 R\,dt = \frac{U_0^2}{R}\int_0^{\infty} e^{-2t/(RC)}\,dt = \frac{U_0^2}{R}\cdot\frac{RC}{2} = \frac{1}{2}CU_0^2 $$
+
+正好等于电容初始储能，验证了能量守恒。
+:::
+
 特征方程为 $RC \lambda + 1 = 0 \Rightarrow \lambda = -\frac{1}{RC}$。
 通解为 $u_C(t) = A e^{-\frac{t}{RC}}$。由初始条件 $u_C(0^+) = U_0$ 定积分常数 $A = U_0$。
 故 $u_C(t) = U_0 e^{-\frac{t}{RC}}$，时间常数 $\tau = RC$。电流及其他支路电压同理可得。
@@ -124,6 +352,43 @@ $$ RC \frac{\mathrm{d}u_C}{\mathrm{d}t} + u_C = 0 $$
 - **RC放电**：$u_C(t) = u_C(0^+) e^{-t/(R_{eq}C)}$，电压按指数规律衰减至0。
 - **RL放电**：$i_L(t) = i_L(0^+) e^{-t/(L/R_{eq})}$，电流按指数规律衰减至0。
 - 含受控源或复杂电阻网络时，$R_{eq}$ 的计算是核心，务必保留受控源关系进行代数求解。
+
+:::derivation
+**推导（RL 电路零输入响应与时间常数 $\tau = L/R_{eq}$）**：
+
+RL 串联零输入电路（电感已有初始电流 $I_0$，$t=0$ 时通过 $R$ 释放磁场能量）。
+
+由 KVL：$u_R + u_L = 0$（无激励源）。
+
+代入 $u_R = Ri$ 和 $u_L = L\dfrac{di_L}{dt}$：
+
+$$ L\frac{di_L}{dt} + Ri_L = 0 \;\Rightarrow\; \frac{L}{R}\frac{di_L}{dt} + i_L = 0 $$
+
+化为标准形式 $\tau\dfrac{di_L}{dt} + i_L = 0$，其中 $\tau = L/R$。
+
+设特解 $i_L = e^{st}$，特征方程 $\dfrac{L}{R}s + 1 = 0$，特征根 $s = -R/L = -1/\tau$。
+
+通解 $i_L(t) = A e^{-t/\tau}$，由换路定则 $i_L(0^+) = i_L(0^-) = I_0$，定 $A = I_0$：
+
+$$ i_L(t) = I_0 e^{-t/(L/R)} = I_0 e^{-Rt/L} $$
+
+**对比 RC 与 RL 电路的对偶性**：
+
+| 项目 | RC 电路 | RL 电路 |
+| --- | --- | --- |
+| 状态变量 | $u_C$ | $i_L$ |
+| 储能 | $\tfrac{1}{2}Cu_C^2$ | $\tfrac{1}{2}Li_L^2$ |
+| 时间常数 | $\tau = RC$ | $\tau = L/R$ |
+| 特征根 | $s = -1/(RC)$ | $s = -R/L$ |
+
+可见 $L \leftrightarrow C$，$R \leftrightarrow 1/R$（导纳），体现对偶关系。
+
+**推广到含复杂电阻网络**：将储能元件以外视为无源一端口，用戴维南等效得 $R_{eq}$，则：
+
+$$ \tau_{RC} = R_{eq}C, \quad \tau_{RL} = \frac{L}{R_{eq}} $$
+
+注意 $R_{eq}$ 是从储能元件两端看进去的等效电阻，需将独立源置零（电压源短路、电流源开路），受控源保留。
+:::
 
 ---
 

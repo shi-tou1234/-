@@ -34,6 +34,22 @@ $$
 dW = \vec{F} \cdot d\vec{s} = F_t ds = F_t r d\theta = M d\theta
 $$
 
+:::derivation
+力 $\vec{F}$ 作用在刚体上某点，该点绕定轴转过微小角位移 $d\theta$ 时，位移大小 $ds = r\,d\theta$（$r$ 为该点到转轴的距离）。力做的元功：
+
+$$
+dW = \vec{F} \cdot d\vec{s} = F\cos\varphi\,ds = F_t\,ds
+$$
+
+其中 $F_t = F\cos\varphi$ 为力的切向分量（$\varphi$ 为力与位移方向的夹角）。代入 $ds = r\,d\theta$：
+
+$$
+dW = F_t \cdot r\,d\theta = (F_t \cdot r)\,d\theta = M\,d\theta
+$$
+
+其中 $M = F_t \cdot r$ 为力矩。可见力矩的功是力的功在转动中的等效表达。
+:::
+
 其中：
 - $F_t$ 为切向力
 - $r$ 为力臂
@@ -56,6 +72,16 @@ $$
 P = \frac{dW}{dt} = M \frac{d\theta}{dt} = M \omega
 $$
 
+:::derivation
+功率是功对时间的变化率。由力矩的元功 $dW = M\,d\theta$，对时间求导：
+
+$$
+P = \frac{dW}{dt} = \frac{M\,d\theta}{dt} = M \frac{d\theta}{dt} = M\omega
+$$
+
+该式与平动中的功率 $P = \vec{F} \cdot \vec{v}$ 完全对应（$M \leftrightarrow F$，$\omega \leftrightarrow v$）。
+:::
+
 > **比较**：平动中力的功率 $P = \vec{F} \cdot \vec{v}$
 
 ### 3. 刚体的转动动能 (Rotational Kinetic Energy)
@@ -72,6 +98,22 @@ $$
 E_k = \frac{1}{2} J \omega^2
 $$
 
+:::derivation
+刚体绕定轴转动时，第 $i$ 个质量元 $\Delta m_i$ 到转轴距离为 $r_i$，线速度 $v_i = r_i\omega$，动能为 $\dfrac{1}{2}\Delta m_i v_i^2$。刚体总动能为各质元动能之和：
+
+$$
+E_k = \sum \frac{1}{2}\Delta m_i v_i^2 = \sum \frac{1}{2}\Delta m_i (r_i\omega)^2 = \frac{1}{2}\left(\sum \Delta m_i r_i^2\right)\omega^2
+$$
+
+由于所有质元具有相同的角速度 $\omega$，可提取公因子。代入转动惯量定义 $J = \sum \Delta m_i r_i^2$：
+
+$$
+E_k = \frac{1}{2}J\omega^2
+$$
+
+该式与平动动能 $E_k = \dfrac{1}{2}mv^2$ 形式完全对应（$J \leftrightarrow m$，$\omega \leftrightarrow v$）。
+:::
+
 > **比较**：平动动能 $E_k = \frac{1}{2} m v^2$
 
 ### 4. 刚体绕定轴转动的动能定理
@@ -85,6 +127,28 @@ $$
 $$
 W = \frac{1}{2} J \omega_2^2 - \frac{1}{2} J \omega_1^2
 $$
+
+:::derivation
+由转动定律 $M = J\alpha$ 及 $\alpha = \dfrac{d\omega}{dt}$，力矩的功为：
+
+$$
+W = \int_{\theta_1}^{\theta_2} M\,d\theta = \int_{\theta_1}^{\theta_2} J\alpha\,d\theta
+$$
+
+将 $\alpha = \dfrac{d\omega}{dt}$ 代入，并利用 $d\theta = \omega\,dt$ 换元：
+
+$$
+W = \int_{\theta_1}^{\theta_2} J\frac{d\omega}{dt}\,d\theta = \int_{\omega_1}^{\omega_2} J\frac{d\omega}{dt}\cdot\omega\,dt = \int_{\omega_1}^{\omega_2} J\omega\,d\omega
+$$
+
+对刚体（$J$ 为常量）积分：
+
+$$
+W = J\left[\frac{\omega^2}{2}\right]_{\omega_1}^{\omega_2} = \frac{1}{2}J\omega_2^2 - \frac{1}{2}J\omega_1^2 = \Delta E_k
+$$
+
+即合外力矩对刚体所做的功等于刚体转动动能的增量，这就是刚体绕定轴转动的动能定理。
+:::
 
 **定理表述**：
 $$
@@ -129,6 +193,16 @@ $$
 \vec{L} = \vec{r} \times \vec{p} = \vec{r} \times m\vec{v}
 $$
 
+:::derivation
+角动量是描述物体转动状态的物理量，定义为位矢 $\vec{r}$ 与动量 $\vec{p} = m\vec{v}$ 的叉积：
+
+$$
+\vec{L} = \vec{r} \times \vec{p} = \vec{r} \times m\vec{v}
+$$
+
+其大小 $L = rmv\sin\theta$（$\theta$ 为 $\vec{r}$ 与 $\vec{v}$ 的夹角），方向由右手螺旋法则确定。角动量与参考点 $O$ 的选取有关，不同参考点对应的 $\vec{r}$ 不同，角动量也不同。单位为 $\text{kg}\cdot\text{m}^2\cdot\text{s}^{-1}$。
+:::
+
 **大小**：
 $$
 L = r m v \sin\theta
@@ -141,6 +215,22 @@ $$
 $$
 L = m r^2 \omega = J \omega
 $$
+
+:::derivation
+质点作半径为 $r$ 的圆周运动时，速度 $\vec{v}$ 沿切向，与位矢 $\vec{r}$ 垂直（$\theta = 90°$，$\sin\theta = 1$），且线速度 $v = r\omega$。由角动量大小公式：
+
+$$
+L = rmv\sin\theta = rmv \cdot 1 = rmv
+$$
+
+代入 $v = r\omega$：
+
+$$
+L = rm \cdot r\omega = mr^2\omega
+$$
+
+又质点对转轴的转动惯量 $J = mr^2$，故 $L = J\omega$。此式与刚体角动量公式形式一致。
+:::
 
 ### 2. 质点的角动量定理
 
@@ -156,14 +246,44 @@ $$
 
 **定理表述**：
 作用于质点的合外力对参考点 $O$ 的力矩，等于质点对该点 $O$ 的角动量随时间的变化率。
-$$
+$$$$
 \vec{M} = \frac{d\vec{L}}{dt}
 $$
+
+:::derivation
+由角动量定义 $\vec{L} = \vec{r} \times \vec{p} = \vec{r} \times m\vec{v}$，对时间求导（利用叉积求导法则）：
+
+$$
+\frac{d\vec{L}}{dt} = \frac{d}{dt}(\vec{r} \times \vec{p}) = \frac{d\vec{r}}{dt} \times \vec{p} + \vec{r} \times \frac{d\vec{p}}{dt}
+$$
+
+分析两项：
+- 第一项：$\dfrac{d\vec{r}}{dt} = \vec{v}$，而 $\vec{p} = m\vec{v}$，故 $\vec{v} \times m\vec{v} = 0$（平行矢量叉积为零）；
+- 第二项：由牛顿第二定律 $\dfrac{d\vec{p}}{dt} = \vec{F}$，故 $\vec{r} \times \dfrac{d\vec{p}}{dt} = \vec{r} \times \vec{F} = \vec{M}$。
+
+因此：
+
+$$
+\frac{d\vec{L}}{dt} = 0 + \vec{M} = \vec{M}
+$$
+
+即作用于质点的合外力矩等于质点角动量随时间的变化率。这是转动中与牛顿第二定律 $\vec{F} = \dfrac{d\vec{p}}{dt}$ 地位相当的定理。
+:::
 
 **积分形式（冲量矩）**：
 $$
 \int_{t_1}^{t_2} \vec{M} dt = \vec{L}_2 - \vec{L}_1
 $$
+
+:::derivation
+由角动量定理的微分形式 $\vec{M} = \dfrac{d\vec{L}}{dt}$，两边对时间从 $t_1$ 到 $t_2$ 积分：
+
+$$
+\int_{t_1}^{t_2} \vec{M}\,dt = \int_{t_1}^{t_2} \frac{d\vec{L}}{dt}\,dt = \vec{L}(t_2) - \vec{L}(t_1) = \vec{L}_2 - \vec{L}_1
+$$
+
+左边 $\int \vec{M}\,dt$ 称为**冲量矩**（角冲量），是力矩对时间的累积效应，与平动中冲量 $\int \vec{F}\,dt$ 对应。该式表明：合外力矩对质点的冲量矩等于质点角动量的增量。
+:::
 
 ### 3. 质点的角动量守恒定律
 
@@ -183,6 +303,28 @@ $$
 $$
 \vec{L} = \sum (\vec{r}_i \times m_i \vec{v}_i) = \sum m_i r_i^2 \vec{\omega} = J \vec{\omega}
 $$
+
+:::derivation
+刚体绕定轴转动时，第 $i$ 个质量元 $m_i$ 到转轴距离为 $r_i$，线速度 $v_i = r_i\omega$，且 $\vec{r}_i \perp \vec{v}_i$（圆周运动），故其角动量大小为：
+
+$$
+L_i = r_i m_i v_i \sin 90° = m_i r_i^2 \omega
+$$
+
+方向沿转轴（与 $\vec{\omega}$ 同向）。刚体总角动量为各质元角动量之和：
+
+$$
+\vec{L} = \sum \vec{L}_i = \sum m_i r_i^2 \vec{\omega}
+$$
+
+由于所有质元具有相同的角速度 $\vec{\omega}$，提取公因子：
+
+$$
+\vec{L} = \left(\sum m_i r_i^2\right)\vec{\omega} = J\vec{\omega}
+$$
+
+其中 $J = \sum m_i r_i^2$ 为刚体的转动惯量。该式与质点圆周运动的 $L = J\omega$ 形式一致。
+:::
 
 ### 5. 刚体定轴转动的角动量定理
 
@@ -205,6 +347,22 @@ $$
 $$
 \vec{L} = J \vec{\omega} = \text{常量}
 $$
+
+:::derivation
+由刚体角动量定理 $\vec{M} = \dfrac{d\vec{L}}{dt}$，当合外力矩为零（$\vec{M} = 0$）时：
+
+$$
+\frac{d\vec{L}}{dt} = 0 \quad \Rightarrow \quad \vec{L} = \text{常矢量}
+$$
+
+即 $\vec{L} = J\vec{\omega} = \text{常量}$。讨论：
+
+1. **$J$ 不变**（刚体）：$\omega$ 保持不变，刚体作匀角速转动；
+2. **$J$ 变化**（非刚体或系统内物体相对位置变化）：$\omega$ 随 $J$ 变化，但乘积 $J\omega$ 保持不变。例如花样滑冰运动员收臂时 $J$ 减小，$\omega$ 增大，转速加快；
+3. **内力矩不改变系统总角动量**：只有外力矩才能改变系统的角动量，内力矩只能改变系统内各部分的角动量分配。
+
+角动量守恒是自然界的基本守恒定律之一，与动量守恒、能量守恒并列。
+:::
 
 **讨论**：
 - 若 $J$ 不变，则 $\omega$ 不变。

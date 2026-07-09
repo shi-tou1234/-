@@ -31,9 +31,40 @@ slugId: 电磁感应与电磁场
 
 $$ \mathcal{E}_i = -\frac{d\Phi}{dt} $$
 
+:::derivation
+**推导过程：**
+
+法拉第通过大量实验总结出：回路中感应电动势的大小与穿过回路的磁通量变化率成正比。
+
+设 $t$ 时刻穿过回路的磁通量为 $\Phi(t)$，$t + dt$ 时刻为 $\Phi(t + dt)$，则 $dt$ 时间内磁通量变化：
+$$ d\Phi = \Phi(t + dt) - \Phi(t) $$
+
+实验表明感应电动势正比于 $\frac{d\Phi}{dt}$。由楞次定律，感应电流的方向总是反抗磁通量的变化，故取负号：
+$$ \mathcal{E}_i = -\frac{d\Phi}{dt} $$
+
+负号的物理意义：当磁通量增加（$d\Phi > 0$）时，$\mathcal{E}_i < 0$，感应电流的磁场反抗增加；当磁通量减少（$d\Phi < 0$）时，$\mathcal{E}_i > 0$，感应电流的磁场补偿减少。
+:::
+
 若闭合回路由 $N$ 匝密绕线圈组成，总磁通链数为 $N\Phi$，则：
 
 $$ \mathcal{E}_i = -\frac{d(N\Phi)}{dt} = -N\frac{d\Phi}{dt} $$
+
+:::derivation
+**推导过程：**
+
+对于 $N$ 匝密绕线圈，每匝线圈穿过的磁通量均为 $\Phi$（密绕条件下各匝磁通相同）。
+
+总磁通链数（全磁通）为各匝磁通量之和：
+$$ \Psi = N\Phi $$
+
+将法拉第电磁感应定律推广到多匝线圈，感应电动势等于磁通链数的变化率：
+$$ \mathcal{E}_i = -\frac{d\Psi}{dt} = -\frac{d(N\Phi)}{dt} $$
+
+当 $N$ 为常数时：
+$$ \mathcal{E}_i = -N\frac{d\Phi}{dt} $$
+
+即 $N$ 匝线圈的感应电动势是单匝的 $N$ 倍。
+:::
 
 若闭合回路的电阻为 $R$，则感应电流为：
 
@@ -77,9 +108,36 @@ $$ I_i = \frac{\mathcal{E}_i}{R} = -\frac{1}{R}\frac{d\Phi}{dt} $$
 
 $$ \mathcal{E}_{ab} = \int_a^b (\boldsymbol{v} \times \boldsymbol{B}) \cdot d\boldsymbol{l} $$
 
+:::derivation
+**推导过程：**
+
+导体在磁场中以速度 $\boldsymbol{v}$ 运动时，导体内的自由电荷 $q$ 随导体一起运动，受洛伦兹力：
+$$ \boldsymbol{F}_m = q(\boldsymbol{v} \times \boldsymbol{B}) $$
+
+该洛伦兹力即为非静电力，对应的非静电场强为：
+$$ \boldsymbol{E}_k = \frac{\boldsymbol{F}_m}{q} = \boldsymbol{v} \times \boldsymbol{B} $$
+
+由电动势的定义 $\mathcal{E} = \int \boldsymbol{E}_k \cdot d\boldsymbol{l}$，对导体从端点 $a$ 到端点 $b$ 积分：
+$$ \mathcal{E}_{ab} = \int_a^b (\boldsymbol{v} \times \boldsymbol{B}) \cdot d\boldsymbol{l} $$
+
+动生电动势的本质是洛伦兹力对电荷做功，将机械能转化为电能。
+:::
+
 对于长度为 $l$ 的直导线在均匀磁场中以速度 $v$ 垂直于磁场和导线方向运动时：
 
 $$ \mathcal{E} = Blv $$
+
+:::derivation
+**推导过程：**
+
+长度为 $l$ 的直导线在均匀磁场 $\boldsymbol{B}$ 中以速度 $\boldsymbol{v}$ 运动，且 $\boldsymbol{v} \perp \boldsymbol{B}$，$\boldsymbol{v} \perp \boldsymbol{l}$，$\boldsymbol{B} \perp \boldsymbol{l}$。
+
+由动生电动势公式：
+$$ \mathcal{E} = \int_0^l (\boldsymbol{v} \times \boldsymbol{B}) \cdot d\boldsymbol{l} $$
+
+由于 $\boldsymbol{v} \times \boldsymbol{B}$ 的方向沿导线方向（即 $d\boldsymbol{l}$ 方向），大小为 $vB$，且各量均为常量：
+$$ \mathcal{E} = vB \int_0^l dl = vBl = Blv $$
+:::
 
 > **注意**：动生电动势对应的是"切割磁感线"的过程，其方向可用**右手定则**判断——伸开右手，拇指与四指垂直，让磁感线穿入手心，拇指指向导体运动方向，四指指向感应电动势方向（从低电势指向高电势）。
 
@@ -112,11 +170,50 @@ $$ \mathcal{E} = Blv $$
 
 $$ \mathcal{E}_i = \oint_L \boldsymbol{E}_{\text{感}} \cdot d\boldsymbol{l} = -\frac{d\Phi}{dt} = -\int_S \frac{\partial \boldsymbol{B}}{\partial t} \cdot d\boldsymbol{S} $$
 
+:::derivation
+**推导过程：**
+
+麦克斯韦提出：变化的磁场在空间激发一种电场，称为感生电场（有旋电场）$\boldsymbol{E}_{\text{感}}$。
+
+**步骤 1**：感生电场对闭合回路中的电荷做功，产生感生电动势：
+$$ \mathcal{E}_i = \oint_L \boldsymbol{E}_{\text{感}} \cdot d\boldsymbol{l} $$
+
+**步骤 2**：由法拉第电磁感应定律，感应电动势等于磁通量变化率的负值：
+$$ \mathcal{E}_i = -\frac{d\Phi}{dt} $$
+
+**步骤 3**：将磁通量 $\Phi = \int_S \boldsymbol{B} \cdot d\boldsymbol{S}$ 代入（$S$ 是以 $L$ 为边界的曲面）：
+$$ \mathcal{E}_i = -\frac{d}{dt}\int_S \boldsymbol{B} \cdot d\boldsymbol{S} $$
+
+当回路 $L$ 不动时，面积 $S$ 不随时间变化，求导与积分可交换：
+$$ \mathcal{E}_i = -\int_S \frac{\partial \boldsymbol{B}}{\partial t} \cdot d\boldsymbol{S} $$
+
+因此：
+$$ \oint_L \boldsymbol{E}_{\text{感}} \cdot d\boldsymbol{l} = -\int_S \frac{\partial \boldsymbol{B}}{\partial t} \cdot d\boldsymbol{S} $$
+
+这表明变化的磁场是感生电场的涡旋源，感生电场是无源有旋场。
+:::
+
 ### 2.3 电子感应加速器
 
 电子感应加速器是利用感生电场加速电子的装置。电子在半径为 $R$ 的圆形轨道上运动，由洛伦兹力和牛顿第二定律：
 
 $$ evB_R = m\frac{v^2}{R} \quad \Rightarrow \quad mv = eRB_R $$
+
+:::derivation
+**推导过程：**
+
+电子在半径为 $R$ 的圆形轨道上运动，轨道处的磁感应强度为 $B_R$。
+
+电子受洛伦兹力提供圆周运动的向心力。由牛顿第二定律：
+$$ evB_R = m\frac{v^2}{R} $$
+
+两边消去 $v$：
+$$ mv = eRB_R $$
+
+此即电子在磁场中做圆周运动的轨道条件，表明电子动量与轨道处磁感应强度成正比。
+
+**轨道条件**：为保证电子在加速过程中轨道半径不变，需满足 $B_R = \bar{B}/2$（$\bar{B}$ 为轨道内平均磁感应强度），由此可控制磁场分布实现稳定加速。
+:::
 
 其中 $B_R$ 为电子轨道所在处的磁感应强度。加速过程中需满足轨道条件，即轨道处的磁场 $B_R$ 与轨道内平均磁场 $\overline{B}$ 之间满足 $B_R = \overline{B}/2$ 的关系。
 
@@ -134,6 +231,21 @@ $$ evB_R = m\frac{v^2}{R} \quad \Rightarrow \quad mv = eRB_R $$
 
 $$ L = \frac{\Psi}{I} = \frac{N\Phi}{I} $$
 
+:::derivation
+**推导过程：**
+
+当线圈通有电流 $I$ 时，电流产生的磁场穿过线圈自身的磁通量为 $\Phi$，$N$ 匝线圈的总磁通链数为：
+$$ \Psi = N\Phi $$
+
+对于线性磁介质，磁通链数 $\Psi$ 与电流 $I$ 成正比：
+$$ \Psi \propto I $$
+
+定义比例系数 $L$ 为自感系数（简称自感）：
+$$ L = \frac{\Psi}{I} = \frac{N\Phi}{I} $$
+
+$L$ 仅取决于线圈的几何形状、大小、匝数及周围介质的磁导率，与电流 $I$ 无关（铁磁质除外）。
+:::
+
 自感 $L$ 的单位为亨利（H），$1\,\text{H} = 1\,\text{Wb/A}$。
 
 **2. 自感电动势**
@@ -141,6 +253,21 @@ $$ L = \frac{\Psi}{I} = \frac{N\Phi}{I} $$
 由法拉第定律得自感电动势为：
 
 $$ \mathcal{E}_L = -\frac{d\Psi}{dt} = -L\frac{dI}{dt} $$
+
+:::derivation
+**推导过程：**
+
+由法拉第电磁感应定律，线圈中磁通链数变化产生的感应电动势为：
+$$ \mathcal{E}_L = -\frac{d\Psi}{dt} $$
+
+由自感定义 $\Psi = LI$，对线性介质 $L$ 为常数，故：
+$$ \frac{d\Psi}{dt} = \frac{d(LI)}{dt} = L\frac{dI}{dt} $$
+
+代入得自感电动势：
+$$ \mathcal{E}_L = -L\frac{dI}{dt} $$
+
+负号表示：电流增大时（$dI/dt > 0$），$\mathcal{E}_L$ 与 $I$ 反向，阻碍增大；电流减小时（$dI/dt < 0$），$\mathcal{E}_L$ 与 $I$ 同向，阻碍减小。此即"自感现象反抗电流变化"的数学表达。
+:::
 
 式中负号表示自感电动势总是**反抗**回路中电流的变化——电流增大时 $\mathcal{E}_L$ 与 $I$ 反向，电流减小时 $\mathcal{E}_L$ 与 $I$ 同向。
 
@@ -164,6 +291,26 @@ $$ \Psi = N\Phi = nl \cdot \mu nIS = \mu n^2 lS I $$
 
 $$ L = \frac{\Psi}{I} = \mu n^2 lS = \mu n^2 V $$
 
+:::derivation
+**推导过程：**
+
+设长直螺线管长度 $l$，截面积 $S$，单位长度匝数 $n$，总匝数 $N = nl$，管内充满磁导率 $\mu$ 的介质。
+
+**步骤 1**：由安培环路定理，螺线管内部磁场均匀：
+$$ B = \mu n I $$
+
+**步骤 2**：穿过每匝线圈的磁通量：
+$$ \Phi = BS = \mu n I S $$
+
+**步骤 3**：总磁通链数：
+$$ \Psi = N\Phi = nl \cdot \mu n I S = \mu n^2 l S I $$
+
+**步骤 4**：由自感定义：
+$$ L = \frac{\Psi}{I} = \mu n^2 lS = \mu n^2 V $$
+
+其中 $V = lS$ 为螺线管体积。可见 $L$ 仅由 $n$、$V$、$\mu$ 决定，与电流无关。
+:::
+
 其中 $V = lS$ 为螺线管的体积。可见 $L$ 仅由几何尺寸和介质磁导率决定。
 
 ### 3.2 互感现象
@@ -176,11 +323,41 @@ $$ L = \frac{\Psi}{I} = \mu n^2 lS = \mu n^2 V $$
 
 $$ M = \frac{\Psi_{21}}{I_1} = \frac{\Psi_{12}}{I_2} $$
 
+:::derivation
+**推导过程：**
+
+设线圈 1 通有电流 $I_1$，其磁场穿过线圈 2 的磁通链为 $\Psi_{21}$。对于线性介质，$\Psi_{21} \propto I_1$，定义互感系数：
+$$ M_{21} = \frac{\Psi_{21}}{I_1} $$
+
+同理，线圈 2 通有电流 $I_2$ 时，穿过线圈 1 的磁通链为 $\Psi_{12}$，定义：
+$$ M_{12} = \frac{\Psi_{12}}{I_2} $$
+
+由能量守恒可以证明 $M_{12} = M_{21}$（互易关系），因此统一记为 $M$：
+$$ M = \frac{\Psi_{21}}{I_1} = \frac{\Psi_{12}}{I_2} $$
+
+$M$ 仅取决于两线圈的形状、大小、相对位置及介质磁导率。
+:::
+
 可以证明 $M_{12} = M_{21} = M$，$M$ 称为**互感系数**（简称互感），单位也是亨利（H）。
 
 **2. 互感电动势**
 
 $$ \mathcal{E}_{21} = -\frac{d\Psi_{21}}{dt} = -M\frac{dI_1}{dt} $$
+
+:::derivation
+**推导过程：**
+
+由法拉第电磁感应定律，线圈 1 中电流 $I_1$ 变化时，在线圈 2 中产生的感应电动势为：
+$$ \mathcal{E}_{21} = -\frac{d\Psi_{21}}{dt} $$
+
+由互感定义 $\Psi_{21} = MI_1$，对线性介质 $M$ 为常数，故：
+$$ \frac{d\Psi_{21}}{dt} = M\frac{dI_1}{dt} $$
+
+代入得互感电动势：
+$$ \mathcal{E}_{21} = -M\frac{dI_1}{dt} $$
+
+负号表示互感电动势的方向反抗线圈 1 中电流的变化。
+:::
 
 同理，线圈 2 中的电流 $I_2$ 变化在线圈 1 中产生的互感电动势为：
 
@@ -210,6 +387,29 @@ $$ L\frac{dI}{dt} + IR = \mathcal{E} $$
 
 $$ I(t) = \frac{\mathcal{E}}{R}\left(1 - e^{-\frac{R}{L}t}\right) = I_0\left(1 - e^{-\frac{t}{\tau}}\right) $$
 
+:::derivation
+**推导过程：**
+
+RL 电路接通电源后，由回路电压定律（KVL）：
+$$ \mathcal{E} - L\frac{dI}{dt} = IR $$
+
+整理为一阶线性常微分方程：
+$$ L\frac{dI}{dt} + IR = \mathcal{E} $$
+
+分离变量：
+$$ \frac{dI}{\frac{\mathcal{E}}{R} - I} = \frac{R}{L}dt $$
+
+两边积分（初始条件 $t=0$ 时 $I=0$）：
+$$ \int_0^I \frac{dI}{\frac{\mathcal{E}}{R} - I} = \int_0^t \frac{R}{L}dt $$
+
+$$ -\ln\left(\frac{\frac{\mathcal{E}}{R} - I}{\frac{\mathcal{E}}{R}}\right) = \frac{R}{L}t $$
+
+解出 $I$：
+$$ I = \frac{\mathcal{E}}{R}\left(1 - e^{-\frac{R}{L}t}\right) = I_0\left(1 - e^{-\frac{t}{\tau}}\right) $$
+
+其中 $I_0 = \mathcal{E}/R$ 为稳态电流，$\tau = L/R$ 为时间常数。
+:::
+
 其中 $I_0 = \mathcal{E}/R$ 为稳态电流，$\tau = L/R$ 称为**时间常数**（弛豫时间），单位为秒（s）。
 
 ### 4.2 电流衰减过程（放电）
@@ -221,6 +421,29 @@ $$ -L\frac{dI}{dt} = IR $$
 初始条件 $t=0$ 时 $I = I_0$，求解得：
 
 $$ I(t) = I_0 e^{-\frac{R}{L}t} = I_0 e^{-\frac{t}{\tau}} $$
+
+:::derivation
+**推导过程：**
+
+RL 电路短路后（移除电源），仅由自感电动势维持电流。由回路电压定律：
+$$ -L\frac{dI}{dt} = IR $$
+
+整理为：
+$$ L\frac{dI}{dt} + IR = 0 $$
+
+分离变量：
+$$ \frac{dI}{I} = -\frac{R}{L}dt $$
+
+两边积分（初始条件 $t=0$ 时 $I=I_0$）：
+$$ \int_{I_0}^I \frac{dI}{I} = -\frac{R}{L}\int_0^t dt $$
+
+$$ \ln\frac{I}{I_0} = -\frac{R}{L}t $$
+
+解得：
+$$ I(t) = I_0 e^{-\frac{R}{L}t} = I_0 e^{-\frac{t}{\tau}} $$
+
+电流按指数规律衰减，时间常数 $\tau = L/R$ 越大，衰减越慢。
+:::
 
 > **要点**：
 > 
@@ -240,6 +463,23 @@ $$ I(t) = I_0 e^{-\frac{R}{L}t} = I_0 e^{-\frac{t}{\tau}} $$
 
 $$ W_m = \int_0^I L I\,dI = \frac{1}{2}LI^2 $$
 
+:::derivation
+**推导过程：**
+
+在 RL 电路电流增长过程中，电源克服自感电动势做功。瞬时功率为：
+$$ P = |\mathcal{E}_L| \cdot I = L\frac{dI}{dt} \cdot I = LI\frac{dI}{dt} $$
+
+在 $dt$ 时间内做的功：
+$$ dW = P \, dt = LI \, dI $$
+
+将电流从 $0$ 增长到 $I$，对 $dI$ 积分：
+$$ W_m = \int_0^I LI \, dI = L \left[\frac{1}{2}I^2\right]_0^I = \frac{1}{2}LI^2 $$
+
+这部分功全部转化为储存在线圈磁场中的能量。
+
+**对称性**：此式与电容储能 $W_e = \frac{1}{2}CU^2$ 形式对称，体现了电与磁的对称性。
+:::
+
 > **注意**：此式与电容储能 $W_e = \dfrac{1}{2}CU^2$ 形式上完美对称，体现了电与磁的对称性。
 
 ### 5.2 磁场能量密度
@@ -251,6 +491,25 @@ $$ W_m = \frac{1}{2}LI^2 = \frac{1}{2}(\mu n^2 V)\left(\frac{B}{\mu n}\right)^2 
 由此得到**磁场能量密度**（单位体积内的磁场能量）为：
 
 $$ w_m = \frac{dW_m}{dV} = \frac{B^2}{2\mu} = \frac{1}{2}\mu H^2 = \frac{1}{2}BH $$
+
+:::derivation
+**推导过程：**
+
+以长直螺线管为例推导磁场能量密度。
+
+**步骤 1**：螺线管自感 $L = \mu n^2 V$，内部磁场 $B = \mu n I$，故 $I = \frac{B}{\mu n}$。
+
+**步骤 2**：代入磁能公式：
+$$ W_m = \frac{1}{2}LI^2 = \frac{1}{2}(\mu n^2 V)\left(\frac{B}{\mu n}\right)^2 = \frac{1}{2}\mu n^2 V \cdot \frac{B^2}{\mu^2 n^2} = \frac{B^2}{2\mu}V $$
+
+**步骤 3**：磁场能量密度为单位体积内的磁场能量：
+$$ w_m = \frac{W_m}{V} = \frac{B^2}{2\mu} $$
+
+**步骤 4**：利用本构关系 $B = \mu H$，可化为：
+$$ w_m = \frac{B^2}{2\mu} = \frac{(\mu H)^2}{2\mu} = \frac{1}{2}\mu H^2 = \frac{1}{2}BH $$
+
+此结果虽由螺线管特例导出，但适用于任意磁场。
+:::
 
 对于一般非均匀磁场，通过对全空间积分可得总磁场能量：
 
@@ -295,6 +554,23 @@ $$ \oint_L \boldsymbol{H} \cdot d\boldsymbol{l} = I_{\text{传}} = \int_S \bolds
 麦克斯韦提出了"位移电流"假设：电场中某一点**位移电流密度** $\boldsymbol{J}_d$ 等于该点电位移矢量对时间的变化率：
 
 $$ \boldsymbol{J}_d = \frac{\partial \boldsymbol{D}}{\partial t} $$
+
+:::derivation
+**推导过程：**
+
+麦克斯韦注意到，在电容器充放电过程中，传导电流 $I_{\text{传}}$ 在电容器极板间中断，导致安培环路定理 $\oint \boldsymbol{H} \cdot d\boldsymbol{l} = I_{\text{传}}$ 对不同曲面给出矛盾结果。
+
+**关键洞察**：电容器极板间虽无传导电流，但极板上电荷 $q$ 随时间变化，导致极板间电位移 $\boldsymbol{D}$ 随时间变化。由高斯定理 $\oint \boldsymbol{D} \cdot d\boldsymbol{S} = q$，对时间求导：
+$$ \frac{d}{dt}\oint \boldsymbol{D} \cdot d\boldsymbol{S} = \frac{dq}{dt} = I_{\text{传}} $$
+
+即：
+$$ \oint \frac{\partial \boldsymbol{D}}{\partial t} \cdot d\boldsymbol{S} = I_{\text{传}} $$
+
+这表明 $\frac{\partial \boldsymbol{D}}{\partial t}$ 与传导电流 $I_{\text{传}}$ 在产生磁场方面等效。麦克斯韦定义**位移电流密度**：
+$$ \boldsymbol{J}_d = \frac{\partial \boldsymbol{D}}{\partial t} $$
+
+位移电流的本质是**变化的电场**，并非电荷的定向移动。
+:::
 
 通过电场中某一截面的**位移电流** $I_d$ 等于通过该截面电位移通量对时间的变化率：
 

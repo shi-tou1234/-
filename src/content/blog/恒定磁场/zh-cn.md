@@ -26,6 +26,21 @@ $$ I = \frac{dq}{dt} $$
 对于金属导体，自由电子定向漂移形成电流。设电子数密度为 $n$，电子电荷量为 $e$，漂移速度为 $v_d$，横截面积为 $S$，则：
 $$ I = n e v_d S $$
 
+:::derivation
+**推导过程：**
+
+设导线横截面积为 $S$，自由电子数密度为 $n$，电子电荷量为 $e$，漂移速度为 $v_d$。
+
+在时间 $dt$ 内，电子沿导体定向移动的距离为 $v_d \, dt$，因此通过横截面 $S$ 的电子总数为：
+$$ dN = n \cdot S \cdot v_d \, dt $$
+
+对应的电荷量为：
+$$ dq = e \cdot dN = n e v_d S \, dt $$
+
+由电流的定义 $I = \frac{dq}{dt}$，得：
+$$ I = n e v_d S $$
+:::
+
 **2. 电流密度矢量**
 为描述导体内各点电流分布的细致情况，引入电流密度 $\vec{j}$：
 
@@ -55,9 +70,32 @@ $$ I = \int_S \vec{j} \cdot d\vec{S} $$
 单位时间内通过闭合曲面向外流出的电荷，等于该闭合曲面内电荷的减少量：
 $$ \oint_S \vec{j} \cdot d\vec{S} = -\frac{dQ_{\text{内}}}{dt} $$
 
+:::derivation
+**推导过程：**
+
+由电荷守恒定律，闭合曲面 $S$ 内电荷 $Q_{\text{内}}$ 的减少速率，等于单位时间内通过该闭合曲面向外流出的电荷量。
+
+电流密度 $\vec{j}$ 通过闭合曲面 $S$ 的通量 $\oint_S \vec{j} \cdot d\vec{S}$ 表示单位时间内净流出闭合曲面的电荷量。因此：
+$$ \oint_S \vec{j} \cdot d\vec{S} = -\frac{dQ_{\text{内}}}{dt} $$
+
+负号表示：当净流出为正（电荷减少）时，$Q_{\text{内}}$ 随时间减小。
+:::
+
 **恒定电流条件**：
 若闭合曲面内电荷分布不随时间变化（$\frac{dQ_{\text{内}}}{dt} = 0$），则：
 $$ \oint_S \vec{j} \cdot d\vec{S} = 0 $$
+
+:::derivation
+**推导过程：**
+
+恒定电流要求空间各处的电荷分布不随时间变化，即：
+$$ \frac{dQ_{\text{内}}}{dt} = 0 $$
+
+代入电流连续性方程 $\oint_S \vec{j} \cdot d\vec{S} = -\frac{dQ_{\text{内}}}{dt}$，得：
+$$ \oint_S \vec{j} \cdot d\vec{S} = 0 $$
+
+此式表明恒定电流场是无源场，电流线既无源头也无尾闾，必须形成闭合回路。
+:::
 
 > **物理意义**：恒定电流场是无源场，电流线是连续闭合的。
 
@@ -74,6 +112,27 @@ $$ E \cdot dl = (j \cdot dS) \cdot \left(\rho \frac{dl}{dS}\right) \Rightarrow E
 
 即欧姆定律的微分形式：
 $$ \vec{j} = \gamma \vec{E} = \frac{1}{\rho} \vec{E} $$
+
+:::derivation
+**推导过程：**
+
+取导体微元 $dl$，横截面积 $dS$，由电阻定律：
+$$ dR = \rho \frac{dl}{dS} $$
+
+微元两端电压与场强关系：
+$$ dU = E \cdot dl $$
+
+微元电流与电流密度关系：
+$$ dI = j \cdot dS $$
+
+由欧姆定律 $dU = dI \cdot dR$ 代入：
+$$ E \cdot dl = (j \cdot dS) \cdot \left(\rho \frac{dl}{dS}\right) = \rho j \cdot dl $$
+
+两边消去 $dl$ 得：
+$$ E = \rho j \quad \Rightarrow \quad j = \frac{1}{\rho} E = \gamma E $$
+
+矢量形式为 $\vec{j} = \gamma \vec{E}$，表明电流密度与电场强度方向相同、大小成正比。
+:::
 
 > **说明**：任一点的电流密度与该点电场强度方向相同，大小成正比。
 
@@ -118,10 +177,38 @@ $$ \vec{E}_k = \frac{\vec{F}_k}{q} $$
 **电动势**：单位正电荷绕闭合回路运动一周，非静电力所做的功：
 $$ \mathcal{E} = \frac{W_k}{q} = \oint_L \vec{E}_k \cdot d\vec{l} $$
 
+:::derivation
+**推导过程：**
+
+非静电力 $\vec{F}_k$ 将电荷 $q$ 绕闭合回路 $L$ 移动一周所做的功为：
+$$ W_k = \oint_L \vec{F}_k \cdot d\vec{l} $$
+
+由非静电场强定义 $\vec{E}_k = \frac{\vec{F}_k}{q}$，即 $\vec{F}_k = q \vec{E}_k$，代入上式：
+$$ W_k = \oint_L q \vec{E}_k \cdot d\vec{l} = q \oint_L \vec{E}_k \cdot d\vec{l} $$
+
+电动势定义为单位正电荷所做的功：
+$$ \mathcal{E} = \frac{W_k}{q} = \oint_L \vec{E}_k \cdot d\vec{l} $$
+:::
+
 **重要结论**：
 电源外部 $\vec{E}_k = 0$，故：
 
 $$ \mathcal{E} = \int_{-}^{+} \vec{E}_k \cdot d\vec{l} $$
+
+:::derivation
+**推导过程：**
+
+电动势的定义为 $\mathcal{E} = \oint_L \vec{E}_k \cdot d\vec{l}$，积分沿整个闭合回路 $L$。
+
+在电源外部，非静电场 $\vec{E}_k = 0$，故闭合回路积分中仅电源内部部分有贡献：
+$$ \oint_L \vec{E}_k \cdot d\vec{l} = \int_{\text{电源内}} \vec{E}_k \cdot d\vec{l} + \int_{\text{电源外}} \vec{E}_k \cdot d\vec{l} = \int_{-}^{+} \vec{E}_k \cdot d\vec{l} + 0 $$
+
+因此：
+$$ \mathcal{E} = \int_{-}^{+} \vec{E}_k \cdot d\vec{l} $$
+
+即电动势等于将单位正电荷从负极经电源内部移至正极时非静电力所做的功。
+:::
+
 - 电动势大小等于将单位正电荷从负极经电源内部移至正极时非静电力所做的功。
 
 #### 例题 3：两导体间电流与几何参数无关的证明
@@ -160,7 +247,22 @@ $$ B = \frac{F_{\text{max}}}{qv} $$
 **方向**：正电荷垂直于特定直线运动时，$\vec{F}_{\text{max}}$ 与 $\vec{v}$ 的叉积方向，即：
 $$ \vec{F} = q \vec{v} \times \vec{B} $$
 
-**单位**：特斯拉（T），$1 \, \text{T} = 1 \, \text{N} \cdot \text{A}^{-1} \cdot \text{m}^{-1}$
+:::derivation
+**推导过程：**
+
+实验表明，运动电荷在磁场中受力的大小 $F$ 与电荷量 $q$、速率 $v$ 及速度与磁场夹角 $\theta$ 的正弦成正比：
+$$ F \propto qv \sin\theta $$
+
+引入比例系数并写成矢量形式，力的方向垂直于 $\vec{v}$ 和 $\vec{B}$ 所构成的平面，由右手螺旋定则确定：
+$$ \vec{F} = q (\vec{v} \times \vec{B}) $$
+
+- 当 $\vec{v} \parallel \vec{B}$ 时，$\sin\theta = 0$，$F = 0$（粒子不受力）
+- 当 $\vec{v} \perp \vec{B}$ 时，$\sin\theta = 1$，$F = F_{\text{max}} = qvB$
+
+此即洛伦兹力公式，是电磁学的基本实验定律之一。
+:::
+
+**单位**：特斯拉（T），$1 \, \text{T} = 1 \, \text{N} \cdot \text{A}^{-1} \cdot \text{m}^{-1}$"
 
 ---
 
@@ -170,6 +272,24 @@ $$ \vec{F} = q \vec{v} \times \vec{B} $$
 
 **电流元的磁场**：
 $$ d\vec{B} = \frac{\mu_0}{4\pi} \frac{I d\vec{l} \times \vec{r}}{r^3} = \frac{\mu_0}{4\pi} \frac{I d\vec{l} \times \hat{r}}{r^2} $$
+
+:::derivation
+**推导过程：**
+
+毕奥-萨伐尔定律源于 1820 年毕奥和萨伐尔的实验测量，后经拉普拉斯数学化总结而成。
+
+从运动电荷的磁场公式出发：单个电荷 $q$ 以速度 $\vec{v}$ 运动时产生的磁场为 $\vec{B} = \frac{\mu_0}{4\pi} \frac{q \vec{v} \times \vec{r}}{r^3}$。
+
+考虑载流导线中的电流元 $I d\vec{l}$：设导线截面积为 $S$，载流子数密度 $n$，电荷 $q$，漂移速度 $\vec{v}_d$。电流元 $I d\vec{l} = n q v_d S \, d\vec{l}$ 中的载流子总数 $dN = n S \, dl$。
+
+这些载流子产生的合磁场：
+$$ d\vec{B} = dN \cdot \frac{\mu_0}{4\pi} \frac{q \vec{v}_d \times \vec{r}}{r^3} = \frac{\mu_0}{4\pi} \frac{(n S dl) q (\vec{v}_d \times \vec{r})}{r^3} $$
+
+由于 $I d\vec{l} = n q v_d S \, d\vec{l}$（方向沿电流方向，即 $\vec{v}_d$ 方向），代入得：
+$$ d\vec{B} = \frac{\mu_0}{4\pi} \frac{I d\vec{l} \times \vec{r}}{r^3} = \frac{\mu_0}{4\pi} \frac{I d\vec{l} \times \hat{r}}{r^2} $$
+
+其中 $\hat{r} = \vec{r}/r$ 为单位矢量，方向由电流元指向场点。
+:::
 
 - $\mu_0 = 4\pi \times 10^{-7} \, \text{T} \cdot \text{m} \cdot \text{A}^{-1}$：真空磁导率
 - $d\vec{l}$：电流元矢量，方向沿电流方向
@@ -215,8 +335,25 @@ $$ \vec{B} = \int d\vec{B} = \frac{\mu_0}{4\pi} \int \frac{I d\vec{l} \times \ve
 4. 积分（$\oint dl = 2\pi R$）：
    $$ B = \int dB_x = \frac{\mu_0 I R}{4\pi r^3} \cdot 2\pi R = \frac{\mu_0 I R^2}{2(R^2 + x^2)^{3/2}} $$
 
+:::derivation
+**推导过程：**
+
+半径为 $R$、电流 $I$ 的圆线圈，求轴线上距圆心 $x$ 处的磁感强度。
+
+**步骤 1**：由对称性分析，圆电流上各电流元在场点产生的磁场垂直于轴线的分量相互抵消，仅轴向分量 $B_x$ 叠加。
+
+**步骤 2**：取电流元 $I dl$，到场点距离 $r = \sqrt{R^2 + x^2}$，$d\vec{l} \perp \vec{r}$，由毕奥-萨伐尔定律：
+$$ dB = \frac{\mu_0}{4\pi} \frac{I dl}{r^2} $$
+
+**步骤 3**：轴向分量为 $dB_x = dB \cos\alpha$，其中 $\cos\alpha = \frac{R}{r}$：
+$$ dB_x = \frac{\mu_0 I R}{4\pi r^3} dl $$
+
+**步骤 4**：对整个圆周积分（$\oint dl = 2\pi R$）：
+$$ B = \int_0^{2\pi R} \frac{\mu_0 I R}{4\pi r^3} dl = \frac{\mu_0 I R}{4\pi r^3} \cdot 2\pi R = \frac{\mu_0 I R^2}{2(R^2 + x^2)^{3/2}} $$
+:::
+
 **讨论**：
-- 圆心处（$x=0$）：$B = \frac{\mu_0 I}{2R}$
+- 圆心处（$x=0$）：$B = \frac{\mu_0 I}{2R}$"
 - 远场（$x \gg R$）：$B \approx \frac{\mu_0 I R^2}{2x^3} = \frac{\mu_0}{2\pi} \frac{IS}{x^3}$，其中 $S = \pi R^2$ 为线圈面积
 
 #### 例题 6：载流直螺线管轴线上的磁场
@@ -234,6 +371,26 @@ $$ \vec{B} = \int d\vec{B} = \frac{\mu_0}{4\pi} \int \frac{I d\vec{l} \times \ve
    $$ B = \int_{\beta_1}^{\beta_2} \frac{\mu_0 n I R^2}{2(R^2 \csc^2\beta)^{3/2}} \cdot (-R \csc^2\beta) d\beta = \frac{\mu_0 n I}{2} \int_{\beta_1}^{\beta_2} \sin\beta \, d\beta $$
    $$ B = \frac{\mu_0 n I}{2} (\cos\beta_1 - \cos\beta_2) $$
 
+:::derivation
+**推导过程：**
+
+将长 $l$、半径 $R$、单位长度匝数 $n$ 的螺线管视为无数圆电流的叠加。
+
+**步骤 1**：取距场点 $P$ 为 $x$ 处、厚度 $dx$ 的薄层，含 $n \, dx$ 匝，等效电流 $dI = In \, dx$。由圆电流轴线公式：
+$$ dB = \frac{\mu_0 R^2}{2(R^2 + x^2)^{3/2}} \cdot In \, dx $$
+
+**步骤 2**：引入角度变量 $\beta$（场点到螺线管边缘的视角），令 $\cot\beta = x/R$，则：
+$$ x = R \cot\beta, \quad dx = -R \csc^2\beta \, d\beta, \quad R^2 + x^2 = R^2 \csc^2\beta $$
+
+**步骤 3**：代入积分：
+$$ B = \int_{\beta_1}^{\beta_2} \frac{\mu_0 n I R^2}{2(R^2 \csc^2\beta)^{3/2}} \cdot (-R \csc^2\beta) \, d\beta = \frac{\mu_0 n I}{2} \int_{\beta_1}^{\beta_2} \sin\beta \, d\beta $$
+
+**步骤 4**：完成积分：
+$$ B = \frac{\mu_0 n I}{2} [-\cos\beta]_{\beta_1}^{\beta_2} = \frac{\mu_0 n I}{2} (\cos\beta_1 - \cos\beta_2) $$
+
+其中 $\beta_1$、$\beta_2$ 分别为螺线管两端到场点的连线与轴线的夹角。
+:::
+
 **讨论**：
 - 无限长螺线管（$\beta_1 = 0, \beta_2 = \pi$）：$B = \mu_0 n I$（内部均匀磁场）
 - 半无限长螺线管端点（$\beta_1 = 0, \beta_2 = \pi/2$）：$B = \frac{1}{2} \mu_0 n I$
@@ -248,6 +405,22 @@ $$ \vec{m} = I S \hat{e}_n $$
 **远场磁场**（$x \gg R$）：
 $$ \vec{B} = \frac{\mu_0}{2\pi} \frac{\vec{m}}{x^3} $$
 
+:::derivation
+**推导过程：**
+
+由圆形载流线圈轴线上的磁场公式：
+$$ B = \frac{\mu_0 I R^2}{2(R^2 + x^2)^{3/2}} $$
+
+当 $x \gg R$ 时，$R^2 + x^2 \approx x^2$，故：
+$$ B \approx \frac{\mu_0 I R^2}{2 x^3} $$
+
+注意到线圈面积 $S = \pi R^2$，磁偶极矩大小 $m = IS = I \pi R^2$，代入：
+$$ B \approx \frac{\mu_0 I \pi R^2}{2\pi x^3} = \frac{\mu_0}{2\pi} \frac{m}{x^3} $$
+
+写成矢量形式（$\vec{B}$ 沿轴线方向，与 $\vec{m}$ 同向）：
+$$ \vec{B} = \frac{\mu_0}{2\pi} \frac{\vec{m}}{x^3} $$
+:::
+
 > **意义**：磁偶极子是描述小电流环磁场的基本模型，与电偶极子具有数学形式的相似性。
 
 ### 4.4 运动电荷的磁场
@@ -255,6 +428,25 @@ $$ \vec{B} = \frac{\mu_0}{2\pi} \frac{\vec{m}}{x^3} $$
 由毕奥-萨伐尔定律 $d\vec{B} = \frac{\mu_0}{4\pi} \frac{I d\vec{l} \times \vec{r}}{r^3}$，结合 $I = n q v S$，$dN = n S dl$，得单个运动电荷的磁场：
 
 $$ \vec{B} = \frac{\mu_0}{4\pi} \frac{q \vec{v} \times \vec{r}}{r^3} $$
+
+:::derivation
+**推导过程：**
+
+由毕奥-萨伐尔定律，电流元 $I d\vec{l}$ 产生的磁场：
+$$ d\vec{B} = \frac{\mu_0}{4\pi} \frac{I d\vec{l} \times \vec{r}}{r^3} $$
+
+设导线截面积 $S$，载流子数密度 $n$，单个载流子电荷 $q$，漂移速度 $\vec{v}$。则电流：
+$$ I = n q v S $$
+
+电流元 $I d\vec{l}$ 中包含的载流子总数：
+$$ dN = n S \, dl $$
+
+因此 $I d\vec{l} = n q v S \, d\vec{l} = q \vec{v} \cdot (n S \, dl) = q \vec{v} \cdot dN$，代入毕奥-萨伐尔定律：
+$$ d\vec{B} = \frac{\mu_0}{4\pi} \frac{dN \cdot q \vec{v} \times \vec{r}}{r^3} $$
+
+单个运动电荷（$dN = 1$）产生的磁场：
+$$ \vec{B} = \frac{\mu_0}{4\pi} \frac{q \vec{v} \times \vec{r}}{r^3} $$
+:::
 
 **适用条件**：$v \ll c$（非相对论情形）
 
@@ -272,6 +464,24 @@ $$ \vec{B} = \frac{\mu_0}{4\pi} \frac{q \vec{v} \times \vec{r}}{r^3} $$
 
 4. 积分：
    $$ B = \int_0^R \frac{\mu_0 \sigma \omega}{2} dr = \frac{\mu_0 \sigma \omega R}{2} $$
+
+:::derivation
+**推导过程：**
+
+半径为 $R$、电荷面密度 $\sigma$ 的均匀带电圆盘以角速度 $\omega$ 旋转。
+
+**步骤 1**：取半径 $r$、宽度 $dr$ 的细圆环，其电荷量为：
+$$ dq = \sigma \cdot 2\pi r \, dr $$
+
+**步骤 2**：圆盘旋转时，该圆环等效为一个圆电流。旋转周期 $T = \frac{2\pi}{\omega}$，故等效电流：
+$$ dI = \frac{dq}{T} = \frac{\sigma \cdot 2\pi r \, dr}{2\pi/\omega} = \sigma \omega r \, dr $$
+
+**步骤 3**：圆电流在圆心处产生的磁场（由 $B = \frac{\mu_0 I}{2R}$）：
+$$ dB = \frac{\mu_0 dI}{2r} = \frac{\mu_0 \sigma \omega r \, dr}{2r} = \frac{\mu_0 \sigma \omega}{2} dr $$
+
+**步骤 4**：对整个圆盘积分（$r$ 从 $0$ 到 $R$）：
+$$ B = \int_0^R \frac{\mu_0 \sigma \omega}{2} dr = \frac{\mu_0 \sigma \omega R}{2} $$
+:::
 
 **解法二（运动电荷公式）**：
 1. 取面积元 $dS = 2\pi r dr$，电荷 $dq = \sigma dS$，速度 $v = \omega r$
@@ -302,6 +512,20 @@ $$ \Phi_B = \int_S \vec{B} \cdot d\vec{S} = \int_S B \cos\theta \, dS $$
 **定理内容**：
 $$ \oint_S \vec{B} \cdot d\vec{S} = 0 $$
 
+:::derivation
+**推导过程：**
+
+**方法一（磁感线性质）**：磁感线是无头无尾的闭合曲线（与电场线不同，不存在磁单极子）。对于任意闭合曲面，每一条穿入的磁感线必然从另一侧穿出，因此净磁通量为零：
+$$ \oint_S \vec{B} \cdot d\vec{S} = 0 $$
+
+**方法二（由毕奥-萨伐尔定律）**：电流元 $I d\vec{l}$ 产生的磁场可写为：
+$$ d\vec{B} = \frac{\mu_0 I}{4\pi} \frac{d\vec{l} \times \vec{r}}{r^3} = -\frac{\mu_0 I}{4\pi} d\vec{l} \times \nabla\left(\frac{1}{r}\right) $$
+
+利用矢量恒等式 $\nabla \cdot (\vec{A} \times \vec{C}) = \vec{C} \cdot (\nabla \times \vec{A}) - \vec{A} \cdot (\nabla \times \vec{C})$，可以证明 $\nabla \cdot d\vec{B} = 0$。
+
+由高斯散度定理 $\oint_S \vec{B} \cdot d\vec{S} = \int_V \nabla \cdot \vec{B} \, dV = 0$，得磁场高斯定理。
+:::
+
 **物理意义**：
 - 磁场是无源场，不存在磁单极子
 - 穿入闭合曲面的磁通量等于穿出的磁通量
@@ -318,6 +542,19 @@ $$ \oint_S \vec{B} \cdot d\vec{S} = 0 $$
 
 3. 积分：
    $$ \Phi_B = \int_{d_1}^{d_2} \frac{\mu_0 I l}{2\pi x} dx = \frac{\mu_0 I l}{2\pi} \ln\frac{d_2}{d_1} $$
+
+:::derivation
+**推导过程：**
+
+无限长直导线通电流 $I$，在距离 $x$ 处产生的磁感应强度：
+$$ B = \frac{\mu_0 I}{2\pi x} $$
+
+方向垂直于纸面向里。在矩形面积上取宽 $dx$、长 $l$ 的窄条微元，面积 $dS = l \, dx$，磁通量微元：
+$$ d\Phi_B = B \cdot dS = \frac{\mu_0 I}{2\pi x} \cdot l \, dx = \frac{\mu_0 I l}{2\pi x} dx $$
+
+对 $x$ 从 $d_1$ 到 $d_2$ 积分：
+$$ \Phi_B = \int_{d_1}^{d_2} \frac{\mu_0 I l}{2\pi x} dx = \frac{\mu_0 I l}{2\pi} \int_{d_1}^{d_2} \frac{dx}{x} = \frac{\mu_0 I l}{2\pi} \ln\frac{d_2}{d_1} $$
+:::
 
 ---
 

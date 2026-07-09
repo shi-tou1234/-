@@ -86,6 +86,18 @@ $$
 $$
 （直角坐标转换：$r=\sqrt{x^2+y^2}$，$\cos\theta=\frac{x}{r}$）
 
+:::derivation
+**推导摘要：**
+
+由 $x = r\cos\theta$、$y = r\sin\theta$ 两边对 $x$ 求偏导（$y$ 视为常数），利用乘积法则与链式法则得方程组：
+
+$$\begin{cases} 1 = \cos\theta\,\frac{\partial r}{\partial x} - r\sin\theta\,\frac{\partial \theta}{\partial x} \\ 0 = \sin\theta\,\frac{\partial r}{\partial x} + r\cos\theta\,\frac{\partial \theta}{\partial x} \end{cases}$$
+
+消去 $\frac{\partial \theta}{\partial x}$：(1)×$\cos\theta$ + (2)×$\sin\theta$，利用 $\cos^2\theta+\sin^2\theta=1$：
+
+$$\frac{\partial r}{\partial x} = \cos\theta = \frac{x}{r} = \frac{x}{\sqrt{x^2+y^2}}$$
+:::
+
 ##### 步骤3：加减消元求 $\frac{\partial \theta}{\partial x}$
 这次消去 $\frac{\partial r}{\partial x}$，只保留 $\frac{\partial \theta}{\partial x}$：
 - 把方程(1)两边同时乘以 $\sin\theta$：
@@ -109,6 +121,18 @@ $$
 $$
 \boldsymbol{\frac{\partial \theta}{\partial x} = -\frac{\sin\theta}{r} = -\frac{y}{x^2+y^2}}
 $$
+
+:::derivation
+**推导摘要：**
+
+利用同一方程组，这次消去 $\frac{\partial r}{\partial x}$：(2)×$\cos\theta$ − (1)×$\sin\theta$：
+
+$$0 - \sin\theta = r(\cos^2\theta+\sin^2\theta)\,\frac{\partial \theta}{\partial x}$$
+
+$$\frac{\partial \theta}{\partial x} = -\frac{\sin\theta}{r} = -\frac{y/r}{r} = -\frac{y}{x^2+y^2}$$
+
+**负号的几何意义**：$x$ 增大时 $\theta$ 减小（点向右移动，极角变小），故偏导为负。
+:::
 
 ---
 
@@ -143,6 +167,18 @@ $$
 \frac{\partial r}{\partial y} = \sin\theta = \frac{y}{\sqrt{x^2+y^2}}
 $$
 
+:::derivation
+**推导摘要：**
+
+对 $y$ 求偏导（$x$ 视为常数），得方程组：
+
+$$\begin{cases} 0 = \cos\theta\,\frac{\partial r}{\partial y} - r\sin\theta\,\frac{\partial \theta}{\partial y} \\ 1 = \sin\theta\,\frac{\partial r}{\partial y} + r\cos\theta\,\frac{\partial \theta}{\partial y} \end{cases}$$
+
+消去 $\frac{\partial \theta}{\partial y}$：(3)×$\cos\theta$ + (4)×$\sin\theta$：
+
+$$\frac{\partial r}{\partial y} = \sin\theta = \frac{y}{r} = \frac{y}{\sqrt{x^2+y^2}}$$
+:::
+
 ---
 
 ### 步骤3：消元求 $\frac{\partial \theta}{\partial y}$
@@ -162,6 +198,19 @@ $$
 $$
 \frac{\partial \theta}{\partial y} = \frac{\cos\theta}{r} = \frac{x}{x^2+y^2}
 $$
+
+:::derivation
+**推导摘要：**
+
+利用同一方程组，消去 $\frac{\partial r}{\partial y}$：(4)×$\cos\theta$ − (3)×$\sin\theta$：
+
+$$\cos\theta - 0 = r(\cos^2\theta+\sin^2\theta)\,\frac{\partial \theta}{\partial y}$$
+
+$$\frac{\partial \theta}{\partial y} = \frac{\cos\theta}{r} = \frac{x/r}{r} = \frac{x}{x^2+y^2}$$
+
+**四式汇总**：$\frac{\partial r}{\partial x}=\cos\theta$，$\frac{\partial \theta}{\partial x}=-\frac{\sin\theta}{r}$，$\frac{\partial r}{\partial y}=\sin\theta$，$\frac{\partial \theta}{\partial y}=\frac{\cos\theta}{r}$——这组关系在柱坐标下拉普拉斯算子、梯度散度旋度运算中均有重要应用。
+:::
+
 ---
 
 ### 常见卡点答疑
@@ -265,6 +314,24 @@ $$
 \boldsymbol{E = \frac{q}{4\pi\varepsilon_0 d(L+d)}}
 $$
 
+:::derivation
+**推导摘要：**
+
+均匀带电细杆长 $L$、总电量 $q$，求延长线上距杆端 $d$ 处的场强。
+
+1. 电荷线密度 $\lambda = \dfrac{q}{L}$，杆上 $x$ 处微元 $dq = \lambda\,dx$，到场点距离 $r = (L+d)-x$。
+2. 微元场强 $dE = \dfrac{1}{4\pi\varepsilon_0}\dfrac{\lambda\,dx}{[(L+d)-x]^2}$，所有微元方向相同，标量积分。
+3. 换元 $u = (L+d)-x$，$du = -dx$，积分限 $u: L+d \to d$：
+
+$$E = \frac{\lambda}{4\pi\varepsilon_0}\int_d^{L+d}\frac{du}{u^2} = \frac{\lambda}{4\pi\varepsilon_0}\left[\frac{1}{d}-\frac{1}{L+d}\right] = \frac{\lambda}{4\pi\varepsilon_0}\cdot\frac{L}{d(L+d)}$$
+
+4. 代入 $\lambda = \dfrac{q}{L}$，$L$ 约掉：
+
+$$E = \frac{q}{4\pi\varepsilon_0\,d(L+d)}$$
+
+**极限验证**：$L\to 0$ 时 $E \to \dfrac{q}{4\pi\varepsilon_0 d^2}$，退化为点电荷场强。
+:::
+
 ---
 
 ### 常见卡点答疑
@@ -364,6 +431,28 @@ $$
 \boldsymbol{E = -\frac{Q}{2\pi^2 \varepsilon_0 R^2}}
 $$
 
+:::derivation
+**推导摘要：**
+
+半圆环半径 $R$、总电量 $Q$，求圆心处场强。
+
+1. 线密度 $\lambda = \dfrac{Q}{\pi R}$，弧长微元 $dl = R\,d\theta$，$dq = \lambda R\,d\theta$。
+2. 微元场强 $dE = \dfrac{\lambda\,d\theta}{4\pi\varepsilon_0 R}$，方向沿半径指向圆心。
+3. **对称性**：半圆关于 $y$ 轴对称，$x$ 分量成对抵消（$E_x = 0$），仅 $y$ 分量有效：
+
+$$dE_y = -dE\sin\theta$$
+
+4. 积分 $\theta: 0 \to \pi$：
+
+$$E = -\frac{\lambda}{4\pi\varepsilon_0 R}\int_0^\pi \sin\theta\,d\theta = -\frac{\lambda}{4\pi\varepsilon_0 R}\cdot 2 = -\frac{\lambda}{2\pi\varepsilon_0 R}$$
+
+5. 代入 $\lambda = \dfrac{Q}{\pi R}$：
+
+$$E = -\frac{Q}{2\pi^2\varepsilon_0 R^2}$$
+
+负号表示方向沿 $y$ 轴负方向（指向半圆环凹侧）。
+:::
+
 ---
 
 ### 最终结果说明
@@ -422,6 +511,25 @@ $$
 $$
 \boldsymbol{E = \frac{\lambda}{2\pi\varepsilon_0 r}}
 $$
+
+:::derivation
+**推导摘要：**
+
+无限长直导线线密度 $\lambda$，求距导线垂直距离 $r$ 处的场强（纯积分法，不用高斯定理）。
+
+1. 导线沿 $y$ 轴，场点 $P$ 在 $x$ 轴上距导线 $x$。微元 $dq = \lambda\,dy$，距 $P$ 点 $r = \sqrt{x^2+y^2}$。
+2. 微元场强 $dE = \dfrac{\lambda\,dy}{4\pi\varepsilon_0(x^2+y^2)}$。
+3. **对称性**：$y$ 和 $-y$ 处微元的 $y$ 分量抵消，仅 $x$ 分量有效，$\cos\theta = \dfrac{x}{\sqrt{x^2+y^2}}$：
+
+$$dE_x = \frac{\lambda x\,dy}{4\pi\varepsilon_0(x^2+y^2)^{3/2}}$$
+
+4. 积分 $y: -\infty \to +\infty$，三角换元 $y = x\tan\theta$：
+
+$$\int_{-\infty}^{+\infty}\frac{dy}{(x^2+y^2)^{3/2}} = \frac{1}{x^2}\int_{-\pi/2}^{\pi/2}\cos\theta\,d\theta = \frac{2}{x^2}$$
+
+5. 代回得 $E = \dfrac{\lambda x}{4\pi\varepsilon_0}\cdot\dfrac{2}{x^2} = \dfrac{\lambda}{2\pi\varepsilon_0 x}$，记 $r=x$ 即得。
+:::
+
 其中 $r$ 是到场点的垂直距离，方向：正电荷电场垂直导线向外，负电荷向内。
 
 ---
@@ -443,6 +551,19 @@ $E_1$ 和 $E_2$ 同方向，直接相加化简：
 $$
 E = E_1 + E_2 = \frac{\lambda}{2\pi\varepsilon_0} \left( \frac{1}{x} + \frac{1}{r_0 - x} \right) = \boldsymbol{\frac{\lambda r_0}{2\pi\varepsilon_0 x (r_0 - x)}}
 $$
+
+:::derivation
+**推导摘要：**
+
+两导线之间（$0 < x < r_0$），利用单根导线场强公式 $E = \dfrac{\lambda}{2\pi\varepsilon_0 r}$ 叠加：
+
+1. 导线1（$+\lambda$）在 $P$ 点场强：$E_1 = \dfrac{\lambda}{2\pi\varepsilon_0 x}$，方向沿 $+x$（正电荷向外，$P$ 在右侧）。
+2. 导线2（$-\lambda$）在 $P$ 点场强：$E_2 = \dfrac{\lambda}{2\pi\varepsilon_0(r_0-x)}$，方向沿 $+x$（负电荷向内，$P$ 在左侧）。
+3. 两者同向，直接相加：
+
+$$E = \frac{\lambda}{2\pi\varepsilon_0}\left(\frac{1}{x}+\frac{1}{r_0-x}\right) = \frac{\lambda}{2\pi\varepsilon_0}\cdot\frac{r_0}{x(r_0-x)}$$
+:::
+
 方向：沿 $x$ 轴正方向，由 $+\lambda$ 导线指向 $-\lambda$ 导线。
 
 ##### 区域2：导线1左侧（$\boldsymbol{x < 0}$）
@@ -453,6 +574,20 @@ $E_1$ 和 $E_2$ 反方向，叠加后：
 $$
 E = E_2 - E_1 = \boldsymbol{-\frac{\lambda r_0}{2\pi\varepsilon_0 |x| (r_0 + |x|)}}
 $$
+
+:::derivation
+**推导摘要：**
+
+导线1左侧（$x < 0$，即 $|x| = -x$），两场强方向相反：
+
+- $E_1 = \dfrac{\lambda}{2\pi\varepsilon_0|x|}$，方向沿 $-x$（正电荷向外，$P$ 在左侧）。
+- $E_2 = \dfrac{\lambda}{2\pi\varepsilon_0(r_0+|x|)}$，方向沿 $+x$（负电荷向内）。
+
+取 $+x$ 为正，$E = E_2 - E_1$。由于 $|x| < r_0+|x|$，故 $E_1 > E_2$，结果为负（沿 $-x$ 方向）：
+
+$$E = \frac{\lambda}{2\pi\varepsilon_0}\left(\frac{1}{r_0+|x|} - \frac{1}{|x|}\right) = -\frac{\lambda r_0}{2\pi\varepsilon_0|x|(r_0+|x|)}$$
+:::
+
 负号表示方向沿 $x$ 轴负方向。
 
 ##### 区域3：导线2右侧（$\boldsymbol{x > r_0}$）
@@ -463,6 +598,20 @@ $E_1$ 和 $E_2$ 反方向，叠加后：
 $$
 E = E_1 - E_2 = \boldsymbol{-\frac{\lambda r_0}{2\pi\varepsilon_0 x (x - r_0)}}
 $$
+
+:::derivation
+**推导摘要：**
+
+导线2右侧（$x > r_0$），两场强方向相反：
+
+- $E_1 = \dfrac{\lambda}{2\pi\varepsilon_0 x}$，方向沿 $+x$（正电荷向外，$P$ 在右侧）。
+- $E_2 = \dfrac{\lambda}{2\pi\varepsilon_0(x-r_0)}$，方向沿 $-x$（负电荷向内，$P$ 在右侧）。
+
+取 $+x$ 为正，$E = E_1 - E_2$。由于 $x > x-r_0$，故 $E_2 > E_1$，结果为负（沿 $-x$ 方向）：
+
+$$E = \frac{\lambda}{2\pi\varepsilon_0}\left(\frac{1}{x} - \frac{1}{x-r_0}\right) = -\frac{\lambda r_0}{2\pi\varepsilon_0 x(x-r_0)}$$
+:::
+
 负号表示方向沿 $x$ 轴负方向。
 
 ---
@@ -480,6 +629,23 @@ $$
   $$
   F_1 = \lambda \cdot E_2 = \boldsymbol{\frac{\lambda^2}{2\pi\varepsilon_0 r_0}}
   $$
+
+  :::derivation
+  **推导摘要：**
+
+  导线受力规则：导线自身电场不对自己施力，力来自另一根导线的外电场。
+
+  1. 导线2（$-\lambda$）在导线1位置（$x=0$，距导线2为 $r_0$）产生的外电场：
+
+  $$E_2 = \frac{\lambda}{2\pi\varepsilon_0 r_0} \quad (\text{方向沿}+x\text{，指向导线2})$$
+
+  2. 导线1单位长度带电量 $+\lambda$，由 $F = qE$：
+
+  $$F_1 = \lambda \cdot E_2 = \frac{\lambda^2}{2\pi\varepsilon_0 r_0}$$
+
+  方向沿 $+x$，指向导线2——异号电荷相互吸引。
+  :::
+
   方向：沿 $x$ 轴正方向，指向导线2（异号电荷相互吸引）。
 
 ##### 导线2（$-\lambda$）受到的力
@@ -489,6 +655,21 @@ $$
   $$
   F_2 = -\lambda \cdot E_1 = \boldsymbol{-\frac{\lambda^2}{2\pi\varepsilon_0 r_0}}
   $$
+
+  :::derivation
+  **推导摘要：**
+
+  1. 导线1（$+\lambda$）在导线2位置（$x=r_0$，距导线1为 $r_0$）产生的外电场：
+
+  $$E_1 = \frac{\lambda}{2\pi\varepsilon_0 r_0} \quad (\text{方向沿}+x)$$
+
+  2. 导线2单位长度带电量为 $-\lambda$，由 $F = qE$：
+
+  $$F_2 = (-\lambda)\cdot E_1 = -\frac{\lambda^2}{2\pi\varepsilon_0 r_0}$$
+
+  负号表示方向沿 $-x$，指向导线1——与 $F_1$ 大小相等、方向相反，构成一对吸引力，符合牛顿第三定律。
+  :::
+
   负号表示方向沿 $x$ 轴负方向，指向导线1（异号电荷相互吸引）。
 
 ---
@@ -535,11 +716,44 @@ $$
    E_{圆盘} = \frac{\sigma a}{4\varepsilon_0} \int_{a^2}^{R^2+a^2} u^{-\frac{3}{2}} du = \frac{\sigma}{2\varepsilon_0} \left( 1 - \frac{a}{\sqrt{R^2+a^2}} \right)
    $$
 
+   :::derivation
+   **推导摘要：**
+
+   圆盘面密度 $\sigma$、半径 $R$，求轴线上距盘心 $a$ 处的场强。
+
+   1. 将圆盘分割为半径 $r$、宽 $dr$ 的细圆环，$dq = \sigma\cdot 2\pi r\,dr$。
+   2. 利用圆环轴线场强公式，细圆环场强 $dE = \dfrac{1}{4\pi\varepsilon_0}\dfrac{a\,dq}{(r^2+a^2)^{3/2}}$。
+   3. 积分 $r: 0 \to R$，换元 $u = r^2+a^2$，$du = 2r\,dr$：
+
+   $$E = \frac{\sigma a}{4\varepsilon_0}\int_{a^2}^{R^2+a^2}u^{-3/2}\,du = \frac{\sigma a}{4\varepsilon_0}\left[-2u^{-1/2}\right]_{a^2}^{R^2+a^2}$$
+
+   4. 代入上下限：
+
+   $$E = \frac{\sigma a}{4\varepsilon_0}\left(\frac{2}{a} - \frac{2}{\sqrt{R^2+a^2}}\right) = \frac{\sigma}{2\varepsilon_0}\left(1 - \frac{a}{\sqrt{R^2+a^2}}\right)$$
+   :::
+
 ##### 步骤2：无限大平面的场强
 当圆盘半径 $R\to\infty$ 时，$\frac{a}{\sqrt{R^2+a^2}} \to 0$，因此无限大平面的场强为：
 $$
 \boldsymbol{E_{平面} = \frac{\sigma}{2\varepsilon_0}}
 $$
+
+:::derivation
+**推导摘要：**
+
+无限大平面是圆盘半径 $R\to\infty$ 的极限情形。
+
+由圆盘场强公式 $E = \dfrac{\sigma}{2\varepsilon_0}\left(1 - \dfrac{a}{\sqrt{R^2+a^2}}\right)$，当 $R\to\infty$ 时：
+
+$$\frac{a}{\sqrt{R^2+a^2}} \to \frac{a}{R} \to 0$$
+
+故：
+
+$$E_{\text{平面}} = \frac{\sigma}{2\varepsilon_0}(1-0) = \frac{\sigma}{2\varepsilon_0}$$
+
+**关键特征**：$E$ 与距离 $a$ 无关，是匀强电场。此结论与高斯定理结果一致。
+:::
+
 方向：垂直平面向外（$\sigma>0$ 时）。
 
 ---
@@ -577,6 +791,27 @@ $$
 $$
 \boldsymbol{E_{总} = \frac{\sigma a}{2\varepsilon_0 \sqrt{R^2 + a^2}}}
 $$
+
+:::derivation
+**推导摘要（补偿法）：**
+
+挖去圆孔的无限大平面 = 完整无限大平面（$+\sigma$） + 带负电圆盘（$-\sigma$，半径 $R$）。
+
+1. 完整平面场强：$E_{\text{平面}} = \dfrac{\sigma}{2\varepsilon_0}$（沿轴线向外）。
+2. 负圆盘场强（面密度 $-\sigma$）：
+
+$$E_{\text{负圆盘}} = \frac{-\sigma}{2\varepsilon_0}\left(1 - \frac{a}{\sqrt{R^2+a^2}}\right)$$
+
+3. 两者同方向（均沿轴线），代数相加：
+
+$$E_{\text{总}} = \frac{\sigma}{2\varepsilon_0} + \left[-\frac{\sigma}{2\varepsilon_0}\left(1 - \frac{a}{\sqrt{R^2+a^2}}\right)\right]$$
+
+4. 展开后前两项抵消：
+
+$$E_{\text{总}} = \frac{\sigma}{2\varepsilon_0} - \frac{\sigma}{2\varepsilon_0} + \frac{\sigma a}{2\varepsilon_0\sqrt{R^2+a^2}} = \frac{\sigma a}{2\varepsilon_0\sqrt{R^2+a^2}}$$
+
+**物理意义**：结果等价于半径 $R$ 的圆孔"挖掉"的电荷所产生的场强，即一个带电量 $q=\sigma\pi R^2$ 的圆盘在轴线上产生的场强。
+:::
 
 ---
 

@@ -29,6 +29,21 @@ $$
 \oint_L \vec{B} \cdot d\vec{l} = \mu_0 \sum I_i
 $$
 
+:::derivation
+**推导过程：**
+
+**步骤 1（无限长直导线特例）**：由毕奥-萨伐尔定律，无限长直导线在距离 $R$ 处的磁场 $B = \frac{\mu_0 I}{2\pi R}$，方向沿切向。取以导线为轴、半径 $R$ 的圆形回路：
+$$ \oint_L \vec{B} \cdot d\vec{l} = B \cdot 2\pi R = \frac{\mu_0 I}{2\pi R} \cdot 2\pi R = \mu_0 I $$
+
+**步骤 2（推广至任意回路）**：对任意形状回路，利用几何关系 $dl \cos\phi = r \, d\theta$（$\phi$ 为 $\vec{B}$ 与 $d\vec{l}$ 夹角）：
+$$ \vec{B} \cdot d\vec{l} = \frac{\mu_0 I}{2\pi r} \cos\phi \, dl = \frac{\mu_0 I}{2\pi} d\theta $$
+
+积分一周 $\oint d\theta = 2\pi$，故 $\oint_L \vec{B} \cdot d\vec{l} = \mu_0 I$。
+
+**步骤 3（多电流叠加）**：由磁场叠加原理 $\vec{B} = \sum \vec{B}_i$，积分线性可加：
+$$ \oint_L \vec{B} \cdot d\vec{l} = \sum_i \oint_L \vec{B}_i \cdot d\vec{l} = \mu_0 \sum I_i $$
+:::
+
 **电流正负规定（右手螺旋定则）：**
 - 电流方向与闭合回路绕行方向满足右手螺旋关系时，$I_i > 0$；
 - 反之，$I_i < 0$。
@@ -96,6 +111,23 @@ $$
 \oint \vec{B} \cdot d\vec{l} = B \cdot 2\pi R = \mu_0 N I \implies B = \frac{\mu_0 N I}{2\pi R} = \mu_0 n I
 $$
 
+:::derivation
+**推导过程：**
+
+对总匝数 $N$、平均半径 $R$ 的螺绕环，由对称性分析：环内磁场沿切向，且在同心圆上大小恒定。
+
+取环内半径为 $R$ 的圆形安培环路，应用安培环路定理：
+$$ \oint_L \vec{B} \cdot d\vec{l} = B \cdot 2\pi R = \mu_0 \sum I_{\text{内}} $$
+
+环路穿过螺绕环的 $N$ 匝线圈，每匝载有电流 $I$，故 $\sum I_{\text{内}} = NI$：
+$$ B \cdot 2\pi R = \mu_0 N I $$
+
+解得：
+$$ B = \frac{\mu_0 N I}{2\pi R} = \mu_0 n I $$
+
+其中 $n = \frac{N}{2\pi R}$ 为单位长度匝数。环外磁场近似为零（每匝电流正反方向抵消）。
+:::
+
 其中 $n = N/(2\pi R)$ 为单位长度匝数。当环半径远大于截面尺寸时，环内可视为均匀磁场。
 
 #### (3) 无限大均匀载流平面（面电流密度 $i$）
@@ -104,6 +136,27 @@ $$
 $$
 2 B l = \mu_0 i l \implies B = \frac{\mu_0 i}{2}
 $$
+
+:::derivation
+**推导过程：**
+
+无限大均匀载流平面，面电流密度为 $i$（单位宽度上的电流）。
+
+**步骤 1（对称性分析）**：由平面对称性，磁场 $\vec{B}$ 平行于平面、垂直于电流方向，且两侧磁场大小相等、方向相反。
+
+**步骤 2（选取安培环路）**：取矩形回路 $L$，其中两条边长为 $l$，平行于 $\vec{B}$ 方向，分别位于平面两侧；另两条边垂直于平面。
+
+**步骤 3（应用安培环路定理）**：
+- 平行边的贡献：$B \cdot l + B \cdot l = 2Bl$
+- 垂直边的贡献：$\vec{B} \perp d\vec{l}$，贡献为零
+- 回路包围的电流：$i \cdot l$
+
+由安培环路定理：
+$$ 2Bl = \mu_0 \cdot il $$
+
+解得：
+$$ B = \frac{\mu_0 i}{2} $$
+:::
 
 磁场大小恒定，方向平行于平面且与电流垂直，两侧磁场方向相反。
 
@@ -118,6 +171,23 @@ $$
 \vec{F} = q\vec{E} + q(\vec{v} \times \vec{B})
 $$
 
+:::derivation
+**推导过程：**
+
+作用于运动电荷的力由两部分组成：
+
+**1. 电场力**：与电荷运动状态无关，仅取决于电荷所在位置的电场：
+$$ \vec{F}_e = q\vec{E} $$
+
+**2. 磁场力（洛伦兹力）**：与电荷速度有关，方向垂直于 $\vec{v}$ 和 $\vec{B}$ 构成的平面：
+$$ \vec{F}_m = q(\vec{v} \times \vec{B}) $$
+
+由叠加原理，总电磁力为两者之和：
+$$ \vec{F} = \vec{F}_e + \vec{F}_m = q\vec{E} + q(\vec{v} \times \vec{B}) $$
+
+**重要性质**：由于 $\vec{F}_m \perp \vec{v}$，磁场力对粒子不做功（$\vec{F}_m \cdot \vec{v} = 0$），仅改变速度方向，不改变速率。
+:::
+
 其中磁场力（洛伦兹力）$\vec{F}_m = q(\vec{v} \times \vec{B})$ 始终垂直于速度方向，**对粒子不做功**，仅改变速度方向，不改变速率。
 
 ### 2. 均匀磁场中的运动轨迹
@@ -129,9 +199,38 @@ $$
 qvB = m\frac{v^2}{R} \implies R = \frac{mv}{qB}
 $$
 
+:::derivation
+**推导过程：**
+
+当带电粒子速度 $\vec{v} \perp \vec{B}$ 时，洛伦兹力大小为 $F = qvB$，方向始终垂直于速度方向。
+
+洛伦兹力提供粒子做圆周运动所需的向心力，由牛顿第二定律：
+$$ qvB = m \frac{v^2}{R} $$
+
+两边消去 $v$，解得回旋半径：
+$$ R = \frac{mv}{qB} $$
+
+可见半径与粒子动量 $mv$ 成正比，与磁感应强度 $B$ 成反比。
+:::
+
 $$
 T = \frac{2\pi R}{v} = \frac{2\pi m}{qB}, \quad f = \frac{1}{T} = \frac{qB}{2\pi m}
 $$
+
+:::derivation
+**推导过程：**
+
+粒子做圆周运动一周所需的时间（周期）为圆周长除以速率：
+$$ T = \frac{2\pi R}{v} $$
+
+将回旋半径 $R = \frac{mv}{qB}$ 代入：
+$$ T = \frac{2\pi \cdot \frac{mv}{qB}}{v} = \frac{2\pi m}{qB} $$
+
+频率为周期的倒数：
+$$ f = \frac{1}{T} = \frac{qB}{2\pi m} $$
+
+**关键**：$T$ 和 $f$ 中 $v$ 和 $R$ 已约去，故与粒子速率及半径无关，仅取决于荷质比 $q/m$ 和磁感应强度 $B$。
+:::
 
 **关键结论**：周期 $T$ 和频率 $f$ 与粒子速率 $v$ 及半径 $R$ 无关，仅取决于荷质比 $q/m$ 和磁感应强度 $B$。
 
@@ -145,6 +244,23 @@ $$
 h = v_{\parallel} T = \frac{2\pi m v \cos\theta}{qB}
 $$
 
+:::derivation
+**推导过程：**
+
+当粒子速度 $\vec{v}$ 与磁场 $\vec{B}$ 成夹角 $\theta$ 时，将速度分解为：
+
+- 平行分量：$v_{\parallel} = v \cos\theta$（沿磁场方向，不受力，做匀速直线运动）
+- 垂直分量：$v_{\perp} = v \sin\theta$（受洛伦兹力，做圆周运动）
+
+垂直分量导致的圆周运动周期为：
+$$ T = \frac{2\pi m}{qB} $$
+
+在一个周期内，粒子沿磁场方向前进的距离（螺距）为：
+$$ h = v_{\parallel} \cdot T = v \cos\theta \cdot \frac{2\pi m}{qB} = \frac{2\pi m v \cos\theta}{qB} $$
+
+合成轨迹为等距螺旋线。
+:::
+
 **磁聚焦现象**：若一束带电粒子初速度大小相近，且与 $\vec{B}$ 夹角 $\theta$ 较小，则 $\cos\theta \approx 1$，螺距 $h$ 近似相等。经过一个周期后，粒子将重新会聚于同一点。该原理广泛应用于电子显微镜和示波器。
 
 ### 3. 典型应用装置
@@ -155,6 +271,23 @@ $$
 $$
 R = \frac{mv}{qB_2} \implies m = \frac{q B_2 R}{v} = \frac{q B_1 B_2 R}{E}
 $$
+
+:::derivation
+**推导过程：**
+
+**步骤 1（速度选择器）**：粒子先通过正交电磁场区域，当电场力与磁场力平衡时：
+$$ qE = qvB_1 \implies v = \frac{E}{B_1} $$
+
+仅特定速率 $v = E/B_1$ 的粒子能直线通过。
+
+**步骤 2（偏转磁场）**：粒子进入磁场 $B_2$ 后做圆周运动，由 $R = \frac{mv}{qB_2}$ 解得：
+$$ m = \frac{qB_2 R}{v} $$
+
+**步骤 3（代入速度）**：将 $v = E/B_1$ 代入：
+$$ m = \frac{qB_2 R}{E/B_1} = \frac{qB_1 B_2 R}{E} $$
+
+通过测量偏转半径 $R$ 即可精确测定粒子质量。
+:::
 
 通过测量半径 $R$ 即可精确测定粒子质量或同位素丰度。
 
@@ -171,6 +304,20 @@ $$
 E_k = \frac{1}{2}mv^2 = \frac{q^2 B^2 R_0^2}{2m}
 $$
 
+:::derivation
+**推导过程：**
+
+粒子在回旋加速器中受磁场约束做圆周运动，最大回旋半径受 D 形盒半径 $R_0$ 限制。
+
+由回旋半径公式 $R = \frac{mv}{qB}$，当 $R = R_0$ 时对应最大速度：
+$$ R_0 = \frac{mv_{\max}}{qB} \implies v_{\max} = \frac{qBR_0}{m} $$
+
+粒子最大动能为：
+$$ E_k = \frac{1}{2}mv_{\max}^2 = \frac{1}{2}m\left(\frac{qBR_0}{m}\right)^2 = \frac{q^2 B^2 R_0^2}{2m} $$
+
+可见最大动能与 $R_0^2$ 成正比、与 $B^2$ 成正比、与 $m$ 成反比，且与加速电压无关。
+:::
+
 （注：相对论效应显著时，质量随速度增加，回旋频率下降，需改用同步加速器或调频回旋加速器。）
 
 #### (3) 霍尔效应 (Hall Effect)
@@ -185,6 +332,27 @@ $$
 $$
 U_H = E_H b = v_d B b = \frac{I B}{n q d} = R_H \frac{I B}{d}
 $$
+
+:::derivation
+**推导过程：**
+
+载流导体置于垂直磁场 $\vec{B}$ 中，载流子受洛伦兹力偏转向导体一侧积累，形成横向霍尔电场 $E_H$。
+
+**步骤 1（平衡条件）**：当电场力与洛伦兹力平衡时：
+$$ qE_H = qv_d B \implies E_H = v_d B $$
+
+**步骤 2（霍尔电压）**：导体宽度为 $b$，霍尔电压为：
+$$ U_H = E_H \cdot b = v_d B b $$
+
+**步骤 3（用电流表示）**：设导体厚度 $d$，载流子数密度 $n$，电流 $I = nqv_d \cdot bd$（截面积 $= bd$），故：
+$$ v_d = \frac{I}{nqbd} $$
+
+代入得：
+$$ U_H = \frac{I}{nqbd} \cdot Bb = \frac{IB}{nqd} $$
+
+定义霍尔系数 $R_H = \frac{1}{nq}$，则：
+$$ U_H = R_H \frac{IB}{d} $$
+:::
 
 其中 $R_H = \frac{1}{nq}$ 为霍尔系数。
 
@@ -213,6 +381,21 @@ $$
 d\vec{F} = I d\vec{l} \times \vec{B}
 $$
 
+:::derivation
+**推导过程：**
+
+设导线截面积 $S$，载流子数密度 $n$，电荷量 $q$，漂移速度 $\vec{v}_d$。电流：
+$$ I = n q v_d S $$
+
+微元 $dl$ 内载流子总数 $dN = n S \, dl$，每个载流子受洛伦兹力 $q(\vec{v}_d \times \vec{B})$，总力：
+$$ d\vec{F} = dN \cdot q(\vec{v}_d \times \vec{B}) = (nS \, dl) \cdot q(\vec{v}_d \times \vec{B}) $$
+
+由于 $\vec{v}_d$ 方向与 $d\vec{l}$ 方向一致，提取 $n q v_d S = I$：
+$$ d\vec{F} = (n q v_d S) (d\vec{l} \times \vec{B}) = I (d\vec{l} \times \vec{B}) $$
+
+此即安培力微分形式，本质是导线内所有载流子洛伦兹力的宏观表现。
+:::
+
 **有限长导线受力：**
 
 $$
@@ -234,6 +417,21 @@ $$
 \vec{F} = I \left( \int_A^B d\vec{l} \right) \times \vec{B} = I \vec{L}_{AB} \times \vec{B}
 $$
 
+:::derivation
+**推导过程：**
+
+在均匀磁场 $\vec{B}$ 中，任意形状平面载流导线从端点 $A$ 到端点 $B$，所受安培力为：
+$$ \vec{F} = \int_A^B I \, d\vec{l} \times \vec{B} $$
+
+由于 $\vec{B}$ 为常矢量，$I$ 为常数，可提出积分号外：
+$$ \vec{F} = I \left( \int_A^B d\vec{l} \right) \times \vec{B} $$
+
+而 $\int_A^B d\vec{l}$ 是从 $A$ 到 $B$ 的位移矢量 $\vec{L}_{AB}$，故：
+$$ \vec{F} = I \vec{L}_{AB} \times \vec{B} $$
+
+**结论**：任意形状平面载流导线在均匀磁场中所受的力，等效于从起点到终点的直导线通以相同电流时所受的力。
+:::
+
 ### 3. 磁场对载流线圈的磁力矩
 设矩形线圈置于均匀磁场 $\vec{B}$ 中，法向单位矢量 $\vec{n}$ 与 $\vec{B}$ 夹角为 $\theta$。线圈边长 $l_1, l_2$，电流 $I$。
 
@@ -249,6 +447,26 @@ $$
 $$
 \vec{M} = \vec{m} \times \vec{B}
 $$
+
+:::derivation
+**推导过程：**
+
+设矩形线圈（边长 $l_1, l_2$，电流 $I$）置于均匀磁场 $\vec{B}$ 中，线圈法向 $\vec{n}$ 与 $\vec{B}$ 夹角为 $\theta$。
+
+**步骤 1（受力分析）**：
+- 边长 $l_1$ 的对边：受力大小 $F_1 = Il_1 B \sin(90°) = Il_1 B$，方向相反，合力为零
+- 边长 $l_2$ 的对边：受力大小 $F_2 = Il_2 B$，方向相反，合力为零
+
+**步骤 2（力矩计算）**：$F_2$ 这对力形成力偶，力臂为 $l_1 \sin\theta$：
+$$ M = F_2 \cdot l_1 \sin\theta = Il_2 B \cdot l_1 \sin\theta = I(l_1 l_2) B \sin\theta = ISB \sin\theta $$
+
+其中 $S = l_1 l_2$ 为线圈面积。
+
+**步骤 3（矢量形式）**：定义磁矩 $\vec{m} = NIS\vec{n}$，力矩方向垂直于 $\vec{m}$ 和 $\vec{B}$ 构成的平面：
+$$ \vec{M} = \vec{m} \times \vec{B} $$
+
+推广至 $N$ 匝任意形状平面线圈。
+:::
 
 其中 $\vec{m} = N I S \vec{n}$ 为线圈的**磁矩**，方向由右手螺旋定则确定（四指沿电流方向，拇指指向 $\vec{n}$）。
 
@@ -314,6 +532,32 @@ $$
 \oint_L \vec{H} \cdot d\vec{l} = \sum I_c
 $$
 
+:::derivation
+**推导过程：**
+
+**步骤 1（真空安培环路定理）**：在真空中，磁感应强度的环流由所有电流决定：
+$$ \oint_L \vec{B} \cdot d\vec{l} = \mu_0 (I_c + I_s) $$
+
+其中 $I_c$ 为传导电流，$I_s$ 为磁化电流（束缚电流）。
+
+**步骤 2（磁化电流与磁化强度关系）**：磁化电流沿闭合路径 $L$ 的总值为：
+$$ I_s = \oint_L \vec{M} \cdot d\vec{l} $$
+
+**步骤 3（代入整理）**：
+$$ \oint_L \vec{B} \cdot d\vec{l} = \mu_0 I_c + \mu_0 \oint_L \vec{M} \cdot d\vec{l} $$
+
+移项：
+$$ \oint_L \frac{\vec{B}}{\mu_0} \cdot d\vec{l} - \oint_L \vec{M} \cdot d\vec{l} = I_c $$
+
+即：
+$$ \oint_L \left( \frac{\vec{B}}{\mu_0} - \vec{M} \right) \cdot d\vec{l} = I_c $$
+
+**步骤 4（引入磁场强度）**：定义 $\vec{H} = \frac{\vec{B}}{\mu_0} - \vec{M}$，得：
+$$ \oint_L \vec{H} \cdot d\vec{l} = \sum I_c $$
+
+$\vec{H}$ 的环流仅与自由传导电流有关，与磁化电流无关。
+:::
+
 该定理表明：$\vec{H}$ 的环流仅与自由传导电流有关，与磁化电流无关，极大简化了含介质磁场的计算。
 
 ### 3. 本构关系与磁导率
@@ -330,6 +574,28 @@ $$
 $$
 \vec{B} = \mu_0 (\vec{H} + \vec{M}) = \mu_0 (1 + \chi_m) \vec{H} = \mu_r \mu_0 \vec{H} = \mu \vec{H}
 $$
+
+:::derivation
+**推导过程：**
+
+**步骤 1**：由磁场强度定义 $\vec{H} = \frac{\vec{B}}{\mu_0} - \vec{M}$，解出 $\vec{B}$：
+$$ \vec{B} = \mu_0 (\vec{H} + \vec{M}) $$
+
+**步骤 2**：对于各向同性线性磁介质，磁化强度与磁场强度成正比：
+$$ \vec{M} = \chi_m \vec{H} $$
+
+其中 $\chi_m$ 为磁化率（无量纲）。
+
+**步骤 3**：代入 $\vec{M}$：
+$$ \vec{B} = \mu_0 (\vec{H} + \chi_m \vec{H}) = \mu_0 (1 + \chi_m) \vec{H} $$
+
+**步骤 4**：定义相对磁导率 $\mu_r = 1 + \chi_m$，磁导率 $\mu = \mu_r \mu_0$，则：
+$$ \vec{B} = \mu_r \mu_0 \vec{H} = \mu \vec{H} $$
+
+- 顺磁质：$\chi_m > 0$，$\mu_r > 1$
+- 抗磁质：$\chi_m < 0$，$\mu_r < 1$
+- 铁磁质：$\chi_m \gg 1$，$\mu_r \gg 1$（非线性）
+:::
 
 其中 $\mu_r = 1 + \chi_m$ 为相对磁导率，$\mu = \mu_r \mu_0$ 为磁导率。
 

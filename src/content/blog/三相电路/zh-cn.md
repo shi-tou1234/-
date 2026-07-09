@@ -102,9 +102,49 @@ $$ \dot{U}_C = U \angle 120^\circ $$
 
 $$ \dot{U}_{AB} = \dot{U}_A - \dot{U}_B $$
 
+:::derivation
+**推导过程：**
+
+在星形连接中，线电压 $\dot{U}_{AB}$ 是端点 $A$ 与端点 $B$ 之间的电压。从 $A$ 经中性点 $N$ 到 $B$ 的路径上，根据 KVL：
+
+$$\dot{U}_{AB} = \dot{U}_{AN} + \dot{U}_{NB} = \dot{U}_A - \dot{U}_B$$
+
+其中 $\dot{U}_A = \dot{U}_{AN}$（$A$ 相相电压，$A$ 指向 $N$），$\dot{U}_B = \dot{U}_{BN}$（$B$ 相相电压，$B$ 指向 $N$），因此 $\dot{U}_{NB} = -\dot{U}_B$。
+
+**图解说明**：线电压等于两个相电压之差，而非之和。这是因为相电压的参考方向是从端点指向中性点，而线电压是从一个端点指向另一个端点。
+:::
+
 代入相量表达式可得：
 
 $$ \dot{U}_{AB} = U \angle 0^\circ - U e^{-j120^\circ} = \sqrt{3}U \angle 30^\circ = \sqrt{3} \dot{U}_A \angle 30^\circ $$
+
+:::derivation
+**推导过程：**
+
+设 $\dot{U}_A = U\angle 0^\circ$，$\dot{U}_B = U e^{-j120^\circ} = U\angle(-120^\circ)$。
+
+代入 $\dot{U}_{AB} = \dot{U}_A - \dot{U}_B$：
+
+$$\dot{U}_{AB} = U\angle 0^\circ - U\angle(-120^\circ)$$
+
+化为代数形式计算：
+
+$$\dot{U}_A = U + j0, \quad \dot{U}_B = U\cos(-120^\circ) + jU\sin(-120^\circ) = -\frac{U}{2} - j\frac{\sqrt{3}U}{2}$$
+
+$$\dot{U}_{AB} = U - \left(-\frac{U}{2} - j\frac{\sqrt{3}U}{2}\right) = \frac{3U}{2} + j\frac{\sqrt{3}U}{2}$$
+
+求模和辐角：
+
+$$|\dot{U}_{AB}| = \sqrt{\left(\frac{3U}{2}\right)^2 + \left(\frac{\sqrt{3}U}{2}\right)^2} = \sqrt{\frac{9U^2}{4} + \frac{3U^2}{4}} = \sqrt{3U^2} = \sqrt{3}U$$
+
+$$\varphi = \arctan\left(\frac{\sqrt{3}U/2}{3U/2}\right) = \arctan\left(\frac{1}{\sqrt{3}}\right) = 30^\circ$$
+
+因此：
+
+$$\dot{U}_{AB} = \sqrt{3}U\angle 30^\circ = \sqrt{3}\dot{U}_A\angle 30^\circ$$
+
+**几何图解**：在相量图中，$\dot{U}_A$ 和 $-\dot{U}_B$ 构成等腰三角形的两边（夹角 $60^\circ$），其矢量和 $\dot{U}_{AB}$ 为底边。由几何关系可直观得出模为 $\sqrt{3}$ 倍、角度超前 $30^\circ$。
+:::
 
 同理可得：
 
@@ -125,6 +165,30 @@ $$ \dot{U}_{CA} = \sqrt{3} \dot{U}_C \angle 30^\circ $$
 上述结论同样适用于星形连接的对称三相负载端。若端线上没有阻抗（无论中性线上是否有阻抗），则电源端线电压等于负载端线电压。
 
 $$ \dot{U}_{A'B'} = \sqrt{3} \dot{U}_{A'N'} \angle 30^\circ $$
+
+:::derivation
+**推导过程：**
+
+对称星形连接的负载端，相电压 $\dot{U}_{A'N'}$、$\dot{U}_{B'N'}$、$\dot{U}_{C'N'}$ 同样对称（依次滞后 $120^\circ$）。
+
+对负载端回路 $A'N'B'A'$ 应用 KVL：
+
+$$\dot{U}_{A'B'} = \dot{U}_{A'N'} - \dot{U}_{B'N'}$$
+
+由于 $\dot{U}_{B'N'} = \dot{U}_{A'N'}\,e^{-j120^\circ}$，与电源端线电压的推导完全类似：
+
+$$\dot{U}_{A'B'} = \dot{U}_{A'N'} - \dot{U}_{A'N'}\,e^{-j120^\circ} = \dot{U}_{A'N'}(1 - e^{-j120^\circ})$$
+
+计算 $1 - e^{-j120^\circ}$：
+
+$$1 - e^{-j120^\circ} = 1 - \left(-\frac{1}{2} - j\frac{\sqrt{3}}{2}\right) = \frac{3}{2} + j\frac{\sqrt{3}}{2} = \sqrt{3}\,e^{j30^\circ}$$
+
+因此：
+
+$$\dot{U}_{A'B'} = \sqrt{3}\,\dot{U}_{A'N'}\,e^{j30^\circ} = \sqrt{3}\,\dot{U}_{A'N'}\angle 30^\circ$$
+
+**结论**：负载端线电压与相电压的关系与电源端完全一致，前提是端线上无阻抗（否则负载端线电压不等于电源端线电压）。
+:::
 
 * * *
 
@@ -156,6 +220,36 @@ $$ \dot{I}_{C'A'} = I \angle 120^\circ $$
 
 $$ \dot{I}_{A'} = \dot{I}_{A'B'} - \dot{I}_{C'A'} = I \angle 0^\circ - I \angle 120^\circ = \sqrt{3} I e^{-j30^\circ} $$
 
+:::derivation
+**推导过程：**
+
+在三角形连接的负载中，对节点 $A'$ 应用 KCL。流入节点 $A'$ 的线电流 $\dot{I}_{A'}$ 等于流出节点 $A'$ 的相电流 $\dot{I}_{A'B'}$ 减去流入节点 $A'$ 的相电流 $\dot{I}_{C'A'}$：
+
+$$\dot{I}_{A'} = \dot{I}_{A'B'} - \dot{I}_{C'A'}$$
+
+代入对称相电流：$\dot{I}_{A'B'} = I\angle 0^\circ$，$\dot{I}_{C'A'} = I\angle 120^\circ$。
+
+化为代数形式：
+
+$$\dot{I}_{A'B'} = I + j0$$
+
+$$\dot{I}_{C'A'} = I\cos 120^\circ + jI\sin 120^\circ = -\frac{I}{2} + j\frac{\sqrt{3}I}{2}$$
+
+$$\dot{I}_{A'} = I - \left(-\frac{I}{2} + j\frac{\sqrt{3}I}{2}\right) = \frac{3I}{2} - j\frac{\sqrt{3}I}{2}$$
+
+求模和辐角：
+
+$$|\dot{I}_{A'}| = \sqrt{\frac{9I^2}{4} + \frac{3I^2}{4}} = \sqrt{3}I$$
+
+$$\varphi = \arctan\left(\frac{-\sqrt{3}I/2}{3I/2}\right) = \arctan\left(-\frac{1}{\sqrt{3}}\right) = -30^\circ$$
+
+因此：
+
+$$\dot{I}_{A'} = \sqrt{3}I\,e^{-j30^\circ}$$
+
+**结论**：线电流有效值是相电流的 $\sqrt{3}$ 倍，且线电流滞后对应相电流 $30^\circ$。这与 Y 接中线电压超前相电压 $30^\circ$ 形成对偶关系。
+:::
+
 **结论**：在对称△-△连接电路中：
 
 1. 线电流有效值是相电流有效值的 $\sqrt{3}$ 倍：$I_L = \sqrt{3} I_P$
@@ -181,6 +275,22 @@ $$ \dot{I}_{A'} = \dot{I}_{A'B'} - \dot{I}_{C'A'} = I \angle 0^\circ - I \angle 
 
 $$ \dot{I}_A = \frac{\dot{U}_A}{Z_A + Z_{lA}} $$
 
+:::derivation
+**推导过程：**
+
+在对称 Y-Y 三相四线制电路中，每相构成一个独立的回路：电源相电压 $\dot{U}_A$ → 端线阻抗 $Z_{lA}$ → 负载阻抗 $Z_A$ → 中性线 → 回到电源中性点。
+
+对 $A$ 相回路应用 KVL：
+
+$$\dot{U}_A = Z_{lA}\dot{I}_A + Z_A\dot{I}_A = (Z_A + Z_{lA})\dot{I}_A$$
+
+因此：
+
+$$\dot{I}_A = \frac{\dot{U}_A}{Z_A + Z_{lA}}$$
+
+**核心依据**：对称三相电路中，三个相电流大小相等、相位依次相差 $120^\circ$，中性线电流 $\dot{I}_N = \dot{I}_A + \dot{I}_B + \dot{I}_C = 0$。因此中性线可视为短路，各相独立计算，只需算 $A$ 相即可由对称性推出 $B$、$C$ 相。
+:::
+
 然后利用对称性，$B$ 相电流滞后 $A$ 相 $120^\circ$：
 
 $$ \dot{I}_B = \dot{I}_A e^{-j120^\circ} $$
@@ -195,6 +305,32 @@ $$ \dot{I}_C = \dot{I}_A \angle 120^\circ $$
 
 $$ \dot{I}_N = \dot{I}_A + \dot{I}_B + \dot{I}_C = 0 $$
 
+:::derivation
+**推导过程：**
+
+在对称三相电路中，三个相电流大小相等、相位依次相差 $120^\circ$。设 $\dot{I}_A = I\angle 0^\circ$，则：
+
+$$\dot{I}_B = I\,e^{-j120^\circ}, \quad \dot{I}_C = I\,e^{j120^\circ}$$
+
+中性线电流为三个线电流之和：
+
+$$\dot{I}_N = \dot{I}_A + \dot{I}_B + \dot{I}_C = I\angle 0^\circ + I\,e^{-j120^\circ} + I\,e^{j120^\circ}$$
+
+利用欧拉公式展开：
+
+$$e^{-j120^\circ} = \cos(-120^\circ) + j\sin(-120^\circ) = -\frac{1}{2} - j\frac{\sqrt{3}}{2}$$
+
+$$e^{j120^\circ} = \cos 120^\circ + j\sin 120^\circ = -\frac{1}{2} + j\frac{\sqrt{3}}{2}$$
+
+代入求和：
+
+$$\dot{I}_N = I\left[1 + \left(-\frac{1}{2} - j\frac{\sqrt{3}}{2}\right) + \left(-\frac{1}{2} + j\frac{\sqrt{3}}{2}\right)\right] = I\left[1 - \frac{1}{2} - \frac{1}{2} + j\left(-\frac{\sqrt{3}}{2} + \frac{\sqrt{3}}{2}\right)\right] = 0$$
+
+**几何图解**：三个对称相电流相量在复平面上构成等边三角形，首尾相接恰好闭合，矢量和为零。
+
+**重要推论**：对称三相四线制电路中中性线电流恒为零，因此中性线可以断开（变为三相三线制）而不影响电路工作状态。这就是对称三相电路可用单相法计算的理论基础。
+:::
+
 **关键结论**：对称三相四线制电路中的中性线电流始终为 $0$，因此可将其断开而不影响电路工作状态。这也是单相计算法的核心依据——中性线有无都不影响，带上中性线阻抗也可等效为短路。
 
 ### 4.2 △-△型的等效变换法
@@ -207,6 +343,30 @@ $$ \dot{I}_N = \dot{I}_A + \dot{I}_B + \dot{I}_C = 0 $$
 
 $$ \dot{U}_{A(Y)} = \frac{\dot{U}_{AB(\triangle)}}{\sqrt{3}} e^{-j30^\circ} $$
 
+:::derivation
+**推导过程：**
+
+△接电源的线电压等于相电压：$\dot{U}_{AB(\triangle)} = \dot{U}_A$（△接相电压）。
+
+要将△接电源等效变换为 Y 接电源，需保证变换前后的**线电压不变**（因为线电压是外部可观测量）。
+
+在 Y 接中，线电压与相电压的关系为：
+
+$$\dot{U}_{AB(Y)} = \sqrt{3}\,\dot{U}_{A(Y)}\,e^{j30^\circ}$$
+
+令变换前后线电压相等：
+
+$$\dot{U}_{AB(Y)} = \dot{U}_{AB(\triangle)}$$
+
+$$\sqrt{3}\,\dot{U}_{A(Y)}\,e^{j30^\circ} = \dot{U}_{AB(\triangle)}$$
+
+解得：
+
+$$\dot{U}_{A(Y)} = \frac{\dot{U}_{AB(\triangle)}}{\sqrt{3}}\,e^{-j30^\circ}$$
+
+**结论**：Y 接等效相电压的有效值为△接线电压的 $1/\sqrt{3}$，相位滞后 $30^\circ$。
+:::
+
 即星形连接时 $A$ 相电源的相电压有效值为三角形连接时线电压有效值的 $1/\sqrt{3}$，相位滞后 $30^\circ$。
 
 #### 负载△→Y变换
@@ -214,6 +374,30 @@ $$ \dot{U}_{A(Y)} = \frac{\dot{U}_{AB(\triangle)}}{\sqrt{3}} e^{-j30^\circ} $$
 对称三角形负载 $Z$ 与等效星形负载 $Z'$ 的关系：
 
 $$ Z' = \frac{1}{3} Z $$
+
+:::derivation
+**推导过程：**
+
+对称△接负载每相阻抗为 $Z$，要等效变换为 Y 接负载每相阻抗 $Z'$，需保证变换前后从端口看入的**等效阻抗相同**。
+
+对于△接负载，从任意两端（如 $A'$、$B'$）看入，等效阻抗为两相串联后再与第三相并联：
+
+$$Z_{AB(\triangle)} = Z \parallel (Z + Z) = \frac{Z \cdot 2Z}{Z + 2Z} = \frac{2Z^2}{3Z} = \frac{2}{3}Z$$
+
+对于 Y 接负载，从 $A'$、$B'$ 端看入，等效阻抗为两相串联：
+
+$$Z_{AB(Y)} = Z' + Z' = 2Z'$$
+
+令两者相等：
+
+$$2Z' = \frac{2}{3}Z$$
+
+解得：
+
+$$Z' = \frac{1}{3}Z$$
+
+**结论**：对称三相负载△→Y变换时，Y 接每相阻抗等于△接每相阻抗的 $1/3$。此关系仅适用于对称情况。
+:::
 
 > **注意**：这个关系仅适用于对称三相负载的△→Y等效变换。
 
@@ -244,11 +428,53 @@ $$ P = P_A + P_B + P_C = U_{PA}I_{PA}\cos\varphi_A + U_{PB}I_{PB}\cos\varphi_B +
 
 $$ P = 3U_P I_P \cos\varphi $$
 
+:::derivation
+**推导过程：**
+
+三相负载的总有功功率等于各相有功功率之和：
+
+$$P = P_A + P_B + P_C = U_{PA}I_{PA}\cos\varphi_A + U_{PB}I_{PB}\cos\varphi_B + U_{PC}I_{PC}\cos\varphi_C$$
+
+在对称三相电路中，各相电压有效值相等 $U_{PA} = U_{PB} = U_{PC} = U_P$，各相电流有效值相等 $I_{PA} = I_{PB} = I_{PC} = I_P$，各相阻抗角相等 $\varphi_A = \varphi_B = \varphi_C = \varphi$。
+
+代入得：
+
+$$P = 3 \times U_P I_P \cos\varphi = 3U_P I_P \cos\varphi$$
+
+**物理意义**：$\varphi$ 是每相负载的阻抗角（相电压与相电流的相位差），$\cos\varphi$ 是每相的功率因数。
+:::
+
 #### 用线电压线电流表示
 
 无论星形还是三角形连接，总有功功率均可表示为：
 
 $$ P = \sqrt{3} U_L I_L \cos\varphi $$
+
+:::derivation
+**推导过程：**
+
+从相电压相电流形式 $P = 3U_P I_P \cos\varphi$ 出发，分别就 Y 接和 △ 接进行推导。
+
+**情况一：Y 接负载**
+
+Y 接时：$U_L = \sqrt{3}U_P$（线电压是相电压的 $\sqrt{3}$ 倍），$I_L = I_P$（线电流等于相电流）。
+
+代入：
+
+$$P = 3 \times \frac{U_L}{\sqrt{3}} \times I_L \times \cos\varphi = \frac{3}{\sqrt{3}} U_L I_L \cos\varphi = \sqrt{3} U_L I_L \cos\varphi$$
+
+**情况二：△ 接负载**
+
+△ 接时：$U_L = U_P$（线电压等于相电压），$I_L = \sqrt{3}I_P$（线电流是相电流的 $\sqrt{3}$ 倍）。
+
+代入：
+
+$$P = 3 \times U_L \times \frac{I_L}{\sqrt{3}} \times \cos\varphi = \frac{3}{\sqrt{3}} U_L I_L \cos\varphi = \sqrt{3} U_L I_L \cos\varphi$$
+
+**结论**：无论 Y 接还是 △ 接，对称三相电路的有功功率均可用线电压线电流表示为 $P = \sqrt{3}U_LI_L\cos\varphi$。这是因为 $U_P I_P$ 与 $U_L I_L$ 之间恒有 $U_P I_P = \dfrac{U_L I_L}{\sqrt{3}}$ 的关系（Y 接和 △ 接互补）。
+
+**注意**：$\varphi$ 仍然是每相负载的阻抗角（相电压与相电流的相位差），**不是**线电压与线电流的相位差。
+:::
 
 > **注意**：这里的 $\varphi$ 是**每相负载的阻抗角**（即相电压与相电流的相位差），而不是线电压与线电流的相位差。
 
@@ -258,9 +484,47 @@ $$ P = \sqrt{3} U_L I_L \cos\varphi $$
 
 $$ Q = 3U_P I_P \sin\varphi = \sqrt{3} U_L I_L \sin\varphi $$
 
+:::derivation
+**推导过程：**
+
+每相负载的无功功率为 $Q_{\text{相}} = U_P I_P \sin\varphi$（$\varphi$ 为相电压与相电流的相位差，即阻抗角）。
+
+对称三相电路总无功功率为三相之和：
+
+$$Q = 3Q_{\text{相}} = 3U_P I_P \sin\varphi$$
+
+与有功功率的推导类似，利用 $U_P I_P = \dfrac{U_L I_L}{\sqrt{3}}$（无论 Y 接还是 △ 接均成立）：
+
+$$Q = 3 \times \frac{U_L I_L}{\sqrt{3}} \times \sin\varphi = \sqrt{3} U_L I_L \sin\varphi$$
+
+**物理意义**：无功功率反映三相负载与电源之间交换电能的规模。$\sin\varphi$ 的正负由 $\varphi$ 决定：感性负载 $\varphi > 0$，$Q > 0$（吸收无功）；容性负载 $\varphi < 0$，$Q < 0$（发出无功）。
+:::
+
 ### 5.3 视在功率
 
 $$ S = \sqrt{P^2 + Q^2} = 3U_P I_P = \sqrt{3} U_L I_L $$
+
+:::derivation
+**推导过程：**
+
+视在功率定义为 $S = \sqrt{P^2 + Q^2}$，反映设备的容量（额定电压与额定电流的乘积）。
+
+代入 $P = 3U_P I_P \cos\varphi$ 和 $Q = 3U_P I_P \sin\varphi$：
+
+$$S = \sqrt{(3U_P I_P \cos\varphi)^2 + (3U_P I_P \sin\varphi)^2}$$
+
+$$= \sqrt{9U_P^2 I_P^2 (\cos^2\varphi + \sin^2\varphi)}$$
+
+利用 $\cos^2\varphi + \sin^2\varphi = 1$：
+
+$$S = \sqrt{9U_P^2 I_P^2} = 3U_P I_P$$
+
+再利用 $U_P I_P = \dfrac{U_L I_L}{\sqrt{3}}$：
+
+$$S = 3 \times \frac{U_L I_L}{\sqrt{3}} = \sqrt{3} U_L I_L$$
+
+**几何关系**：$P$、$Q$、$S$ 构成功率三角形，$S$ 为斜边，$P$ 和 $Q$ 为两直角边，$\varphi$ 为 $P$ 与 $S$ 之间的夹角。
+:::
 
 ### 5.4 功率因数
 

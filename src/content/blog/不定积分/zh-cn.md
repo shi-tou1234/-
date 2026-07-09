@@ -29,6 +29,7 @@ slugId: 不定积分
 
 ## (14) $\int \tan x \, dx = -\ln |\cos x| + C = \ln |\sec x| + C$
 
+:::derivation
 **推导：**
 
 $$
@@ -44,10 +45,13 @@ $$
 
 由对数性质，$-\ln |\cos x| = \ln |\cos x|^{-1} = \ln |\sec x|$，所以也可写为 $\ln |\sec x| + C$。
 
+:::
+
 ---
 
 ## (15) $\int \cot x \, dx = \ln |\sin x| + C = -\ln |\csc x| + C$
 
+:::derivation
 **推导：**
 
 $$
@@ -62,10 +66,13 @@ $$
 
 又 $\ln |\sin x| = -\ln |\csc x|$，故也可写为 $-\ln |\csc x| + C$。
 
+:::
+
 ---
 
 ## (16) $\int \sec x \, dx = \ln |\sec x + \tan x| + C$
 
+:::derivation
 **推导：**  
 分子分母同乘 $\sec x + \tan x$：
 
@@ -86,10 +93,13 @@ $$
 \int \sec x \, dx = \int \frac{du}{u} = \ln |u| + C = \ln |\sec x + \tan x| + C
 $$
 
+:::
+
 ---
 
 ## (17) $\int \csc x \, dx = \ln |\csc x - \cot x| + C$
 
+:::derivation
 **推导：**  
 分子分母同乘 $\csc x - \cot x$：
 
@@ -110,10 +120,13 @@ $$
 \int \csc x \, dx = \int \frac{du}{u} = \ln |u| + C = \ln |\csc x - \cot x| + C
 $$
 
+:::
+
 ---
 
 ## (18) $\int \frac{1}{a^2 + x^2} \, dx = \frac{1}{a} \arctan \frac{x}{a} + C$
 
+:::derivation
 **推导：**  
 令 $x = a \tan \theta$，其中 $\theta \in (-\frac{\pi}{2}, \frac{\pi}{2})$，则 $dx = a \sec^2 \theta \, d\theta$，且
 
@@ -133,10 +146,13 @@ $$
 = \frac{1}{a} \arctan \frac{x}{a} + C
 $$
 
+:::
+
 ---
 
 ## (19) $\int \frac{1}{x^2 - a^2} \, dx = \frac{1}{2a} \ln \left| \frac{x - a}{x + a} \right| + C$
 
+:::derivation
 **推导：**  
 将分式分解为部分分式：
 
@@ -172,10 +188,13 @@ $$
 = \frac{1}{2a} \left( \ln |x - a| - \ln |x + a| \right) + C = \frac{1}{2a} \ln \left| \frac{x - a}{x + a} \right| + C
 $$
 
+:::
+
 ---
 
 ## (20) $\int \frac{1}{\sqrt{a^2 - x^2}} \, dx = \arcsin \frac{x}{a} + C$
 
+:::derivation
 **推导：**  
 令 $x = a \sin \theta$，其中 $\theta \in [-\frac{\pi}{2}, \frac{\pi}{2}]$，则 $dx = a \cos \theta \, d\theta$，且
 
@@ -196,10 +215,13 @@ $$
 = \arcsin \frac{x}{a} + C
 $$
 
+:::
+
 ---
 
 ## (21) $\int \frac{1}{\sqrt{x^2 + a^2}} \, dx = \ln \left( x + \sqrt{x^2 + a^2} \right) + C$（三角换元 $x = a \tan \theta$）
 
+:::derivation
 **推导：**  
 令 $x = a \tan \theta$，$\theta \in (-\frac{\pi}{2}, \frac{\pi}{2})$，则 $dx = a \sec^2 \theta \, d\theta$，且
 
@@ -233,10 +255,13 @@ $$
 \ln \left( x + \sqrt{x^2 + a^2} \right) + C
 $$
 
+:::
+
 ---
 
 ## (22) $\int \frac{1}{\sqrt{x^2 - a^2}} \, dx = \ln \left| x + \sqrt{x^2 - a^2} \right| + C$（三角换元 $x = a \sec \theta$）
 
+:::derivation
 **推导：**  
 先考虑 $x > a$ 的情形。令 $x = a \sec \theta$，$\theta \in (0, \frac{\pi}{2})$，则 $dx = a \sec \theta \tan \theta \, d\theta$，且
 
@@ -272,10 +297,13 @@ $$
 
 对于 $x < -a$ 的情形，可类似处理，结果形式相同，故一般写为绝对值形式。
 
+:::
+
 ---
 
 ## (25) $\int \sqrt{x^2 + a^2} \, dx = \frac{a^2}{2} \ln \left( x + \sqrt{x^2 + a^2} \right) + \frac{x}{2} \sqrt{x^2 + a^2} + C$（三角换元 $x = a \tan \theta$）
 
+:::derivation
 **推导：**  
 令 $x = a \tan \theta$，$\theta \in (-\frac{\pi}{2}, \frac{\pi}{2})$，则 $dx = a \sec^2 \theta \, d\theta$，$\sqrt{x^2 + a^2} = a \sec \theta$。  
 代入：
@@ -352,10 +380,13 @@ $$
 \int \sqrt{x^2 + a^2} \, dx = \frac{x}{2} \sqrt{x^2 + a^2} + \frac{a^2}{2} \ln \left( x + \sqrt{x^2 + a^2} \right) + C
 $$
 
+:::
+
 ---
 
 ## (26) $\int \sqrt{x^2 - a^2} \, dx = \frac{a^2}{2} \ln \left| x - \sqrt{x^2 - a^2} \right| + \frac{x}{2} \sqrt{x^2 - a^2} + C$（三角换元 $x = a \sec \theta$）
 
+:::derivation
 **推导：**  
 考虑 $x > a$，令 $x = a \sec \theta$，$\theta \in (0, \frac{\pi}{2})$，则 $dx = a \sec \theta \tan \theta \, d\theta$，$\sqrt{x^2 - a^2} = a \tan \theta$。  
 代入：
@@ -430,10 +461,13 @@ $$
 
 这正是原公式。
 
+:::
+
 ---
 
 ## (27) $\int \sqrt{a^2 - x^2} \, dx = \frac{a^2}{2} \arcsin \frac{x}{a} + \frac{x}{2} \sqrt{a^2 - x^2} + C$
 
+:::derivation
 **推导：**  
 令 $x = a \sin \theta$，$\theta \in [-\frac{\pi}{2}, \frac{\pi}{2}]$，则 $dx = a \cos \theta \, d\theta$，且 $\sqrt{a^2 - x^2} = a \cos \theta$（非负）。  
 代入：
@@ -459,3 +493,5 @@ $$
 $$
 \int \sqrt{a^2 - x^2} \, dx = \frac{a^2}{2} \arcsin \frac{x}{a} + \frac{x}{2} \sqrt{a^2 - x^2} + C
 $$
+
+:::

@@ -35,6 +35,16 @@ $$
 V_A = V_B \quad (\forall A, B \in \text{导体})
 $$
 
+:::derivation
+由电场强度与电势的微分关系 $\vec{E} = -\nabla V$，静电平衡时导体内部场强处处为零，即 $\vec{E}_{\text{内}} = 0$。对导体内部任意两点 $A$、$B$，其电势差为：
+
+$$
+V_A - V_B = \int_A^B \vec{E} \cdot d\vec{l} = \int_A^B 0 \cdot d\vec{l} = 0
+$$
+
+故 $V_A = V_B$。又导体表面场强仅有法向分量（$\vec{E}_{\text{表面}} \perp$ 表面），沿表面任意路径的切向分量为零，故表面各点电势也相等且等于导体内部电势。因此导体为等势体，导体表面为等势面。
+:::
+
 即导体内部及表面各点电势相等，导体为等势体，表面为等势面。
 
 ---
@@ -91,6 +101,22 @@ $$
 \boxed{E = \frac{\sigma}{\varepsilon_0}}
 $$
 
+:::derivation
+在导体表面处作一扁圆柱形高斯面，两底面面积均为 $\Delta S$，分别位于导体内部和外部，侧面与导体表面垂直。由高斯定理 $\oint_S \vec{E} \cdot d\vec{S} = \dfrac{q_{\text{内}}}{\varepsilon_0}$ 逐面分析：
+
+1. 导体内部底面：静电平衡时 $\vec{E}_{\text{内}} = 0$，电通量为零；
+2. 侧面：导体内 $\vec{E} = 0$，导体外场强垂直于导体表面（即平行于侧面），电通量为零；
+3. 外部底面：场强 $E$ 与底面法线同向，电通量为 $E \Delta S$。
+
+高斯面内包围的电荷为 $q_{\text{内}} = \sigma \Delta S$（$\sigma$ 为该处导体表面电荷面密度），故：
+
+$$
+E \Delta S = \frac{\sigma \Delta S}{\varepsilon_0} \quad \Rightarrow \quad E = \frac{\sigma}{\varepsilon_0}
+$$
+
+该结果表明导体表面附近场强仅取决于该处的电荷面密度。
+:::
+
 #### 5. 导体表面电荷分布规律
 - 曲率半径小处（尖端）：$\sigma$ 大，$E$ 大
 - 曲率半径大处（平坦）：$\sigma$ 小，$E$ 小
@@ -117,6 +143,22 @@ $$
 $$
 E = \frac{E_0}{\varepsilon_r}
 $$
+
+:::derivation
+设平行板电容器极板上自由电荷面密度为 $\sigma_0$，真空中场强 $E_0 = \dfrac{\sigma_0}{\varepsilon_0}$。插入电介质后，电介质极化在表面产生极化电荷（面密度 $\sigma'$），形成反向附加电场 $E' = \dfrac{\sigma'}{\varepsilon_0}$。由电场叠加原理，电介质内总场强：
+
+$$
+E = E_0 - E' = \frac{\sigma_0 - \sigma'}{\varepsilon_0}
+$$
+
+对各向同性线性电介质，极化电荷 $\sigma'$ 正比于总场强 $E$，可证明 $\sigma' = \dfrac{\varepsilon_r - 1}{\varepsilon_r}\sigma_0$（见后文推导），代入得：
+
+$$
+E = \frac{\sigma_0 - \frac{\varepsilon_r - 1}{\varepsilon_r}\sigma_0}{\varepsilon_0} = \frac{\sigma_0}{\varepsilon_0 \varepsilon_r} = \frac{E_0}{\varepsilon_r}
+$$
+
+其中 $\varepsilon_r > 1$，故电介质中电场总是被削弱，削弱程度由相对电容率决定。
+:::
 
 其中：
 - $E_0 = \dfrac{\sigma}{\varepsilon_0}$：真空中的电场强度
@@ -161,6 +203,24 @@ $$
 \boxed{\sigma' = P}
 $$
 
+:::derivation
+在均匀极化的电介质表面取面积为 $\Delta S$、厚度为 $l$ 的体积元 $\Delta V = \Delta S \cdot l$。该体积内分子电偶极矩沿电场方向（法向）的投影之和为 $\sum p$，每个分子电偶极矩 $p = ql$（$q$ 为分子内正电荷，$l$ 为正负电荷中心位移）。
+
+极化时，体积元内所有分子正电荷中心沿电场方向位移 $l$，穿过面 $\Delta S$ 的极化电荷总量为：
+
+$$
+q' = \frac{\sum p}{l}
+$$
+
+极化电荷面密度 $\sigma' = \dfrac{q'}{\Delta S} = \dfrac{\sum p}{l \cdot \Delta S} = \dfrac{\sum p}{\Delta V}$。而电极化强度定义 $P = \dfrac{\sum \vec{p}}{\Delta V}$，在均匀极化时取法向分量，故：
+
+$$
+\sigma' = P
+$$
+
+即极化电荷面密度等于电极化强度在表面外法线方向的分量。
+:::
+
 ---
 
 ### 四、极化电荷与自由电荷的关系
@@ -187,6 +247,22 @@ $$
 \boxed{\sigma' = \frac{\varepsilon_r - 1}{\varepsilon_r} \sigma_0}, \quad \boxed{Q' = \frac{\varepsilon_r - 1}{\varepsilon_r} Q_0}
 $$
 
+:::derivation
+电介质内总场强为自由电荷场强与极化电荷反向场强之差：$E = E_0 - E'$，其中 $E_0 = \dfrac{\sigma_0}{\varepsilon_0}$，$E' = \dfrac{\sigma'}{\varepsilon_0}$。又已知 $E = \dfrac{E_0}{\varepsilon_r}$，故：
+
+$$
+E' = E_0 - E = E_0 - \frac{E_0}{\varepsilon_r} = E_0 \left(1 - \frac{1}{\varepsilon_r}\right) = \frac{\varepsilon_r - 1}{\varepsilon_r} E_0
+$$
+
+将 $E' = \dfrac{\sigma'}{\varepsilon_0}$、$E_0 = \dfrac{\sigma_0}{\varepsilon_0}$ 代入：
+
+$$
+\frac{\sigma'}{\varepsilon_0} = \frac{\varepsilon_r - 1}{\varepsilon_r} \cdot \frac{\sigma_0}{\varepsilon_0} \quad \Rightarrow \quad \sigma' = \frac{\varepsilon_r - 1}{\varepsilon_r} \sigma_0
+$$
+
+对整个极板面积积分，得总极化电荷 $Q' = \dfrac{\varepsilon_r - 1}{\varepsilon_r} Q_0$。可见极化电荷总是少于自由电荷，且 $\varepsilon_r$ 越大极化电荷越多。
+:::
+
 ---
 
 ### 五、电极化强度与电场的关系
@@ -194,6 +270,16 @@ $$
 $$
 \vec{P} = \varepsilon_0 (\varepsilon_r - 1) \vec{E} = \varepsilon_0 \chi_e \vec{E}
 $$
+
+:::derivation
+由极化电荷面密度公式 $\sigma' = \dfrac{\varepsilon_r - 1}{\varepsilon_r} \sigma_0$ 及 $\sigma' = P$，并利用自由电荷面密度 $\sigma_0 = \varepsilon_0 E_0 = \varepsilon_0 \varepsilon_r E$（因 $E_0 = \varepsilon_r E$），代入：
+
+$$
+P = \sigma' = \frac{\varepsilon_r - 1}{\varepsilon_r} \sigma_0 = \frac{\varepsilon_r - 1}{\varepsilon_r} \cdot \varepsilon_0 \varepsilon_r E = \varepsilon_0 (\varepsilon_r - 1) E
+$$
+
+令 $\chi_e = \varepsilon_r - 1$（电极化率），则 $\vec{P} = \varepsilon_0 \chi_e \vec{E}$。该式表明对各向同性线性电介质，电极化强度与电场强度成正比，方向相同。
+:::
 
 其中 $\chi_e = \varepsilon_r - 1$ 为**电极化率**。
 
@@ -229,11 +315,49 @@ $$
 \boxed{\vec{D} = \varepsilon \vec{E} = \varepsilon_0 \varepsilon_r \vec{E}}
 $$
 
+:::derivation
+为简化有介质时的电场计算，引入辅助矢量——电位移 $\vec{D}$。由有介质高斯定理 $\oint \vec{E} \cdot d\vec{S} = \dfrac{Q_0 - Q'}{\varepsilon_0}$，两边乘 $\varepsilon_0$ 并移项：
+
+$$
+\oint_S (\varepsilon_0 \vec{E} + \vec{P}) \cdot d\vec{S} = Q_0
+$$
+
+定义电位移矢量 $\vec{D} = \varepsilon_0 \vec{E} + \vec{P}$，使其通量仅与自由电荷有关。对各向同性线性电介质，代入 $\vec{P} = \varepsilon_0(\varepsilon_r - 1)\vec{E}$：
+
+$$
+\vec{D} = \varepsilon_0 \vec{E} + \varepsilon_0(\varepsilon_r - 1)\vec{E} = \varepsilon_0 [1 + (\varepsilon_r - 1)] \vec{E} = \varepsilon_0 \varepsilon_r \vec{E} = \varepsilon \vec{E}
+$$
+
+其中 $\varepsilon = \varepsilon_0 \varepsilon_r$ 为电介质的电容率。
+:::
+
 #### 2. 有介质时的高斯定理
 
 $$
 \boxed{\oint_S \vec{D} \cdot d\vec{S} = \sum_{i=1}^n Q_{0i}}
 $$
+
+:::derivation
+自由电荷 $Q_0$ 与极化电荷 $Q'$ 共同产生电场，由高斯定理：
+
+$$
+\oint_S \vec{E} \cdot d\vec{S} = \frac{Q_0 - Q'}{\varepsilon_0}
+$$
+
+将极化电荷关系 $Q' = \dfrac{\varepsilon_r - 1}{\varepsilon_r} Q_0$ 代入：
+
+$$
+\oint_S \vec{E} \cdot d\vec{S} = \frac{Q_0 - \frac{\varepsilon_r - 1}{\varepsilon_r} Q_0}{\varepsilon_0} = \frac{Q_0 \cdot \frac{1}{\varepsilon_r}}{\varepsilon_0} = \frac{Q_0}{\varepsilon_0 \varepsilon_r}
+$$
+
+两边乘 $\varepsilon = \varepsilon_0 \varepsilon_r$，并代入 $\vec{D} = \varepsilon \vec{E}$：
+
+$$
+\oint_S \varepsilon \vec{E} \cdot d\vec{S} = Q_0 \quad \Rightarrow \quad \oint_S \vec{D} \cdot d\vec{S} = \sum_{i=1}^n Q_{0i}
+$$
+
+该结果表明：电位移通量仅与自由电荷有关，与极化电荷无关，从而避免了极化电荷的复杂计算。
+:::
 
 **物理意义**：电位移通量仅与自由电荷有关，与极化电荷无关。
 
@@ -396,6 +520,30 @@ $$
   \boxed{C = \frac{Q}{U} = \frac{\varepsilon_0 \varepsilon_r S}{d}}
   $$
 
+  :::derivation
+  设平行板电容器极板面积为 $S$，间距为 $d$，极板间充满相对电容率为 $\varepsilon_r$ 的电介质，极板带电荷 $\pm Q$。
+
+  (1) 自由电荷面密度 $\sigma = \dfrac{Q}{S}$，由高斯定理得极板间均匀场强：
+
+  $$
+  E = \frac{\sigma}{\varepsilon_0 \varepsilon_r} = \frac{Q}{\varepsilon_0 \varepsilon_r S}
+  $$
+
+  (2) 极板间为均匀电场，电势差：
+
+  $$
+  U = E \cdot d = \frac{Qd}{\varepsilon_0 \varepsilon_r S}
+  $$
+
+  (3) 由电容定义 $C = \dfrac{Q}{U}$：
+
+  $$
+  C = \frac{Q}{\frac{Qd}{\varepsilon_0 \varepsilon_r S}} = \frac{\varepsilon_0 \varepsilon_r S}{d}
+  $$
+
+  可见电容仅与极板面积 $S$、间距 $d$ 和介质 $\varepsilon_r$ 有关，与 $Q$、$U$ 无关。
+  :::
+
 #### 2. 圆柱形电容器
 
 设内半径 $R_A$，外半径 $R_B$，长度 $l \gg R_B$，介质 $\varepsilon_r$
@@ -415,6 +563,28 @@ $$
   $$
   \boxed{C = \frac{Q}{U} = \frac{2\pi \varepsilon_0 \varepsilon_r l}{\ln(R_B/R_A)}}
   $$
+
+  :::derivation
+  设圆柱形电容器内半径 $R_A$，外半径 $R_B$，长度 $l \gg R_B$，单位长度电荷 $\lambda = \dfrac{Q}{l}$。
+
+  (1) 由高斯定理，极板间（$R_A < r < R_B$）场强：
+
+  $$
+  E = \frac{\lambda}{2\pi \varepsilon_0 \varepsilon_r r}
+  $$
+
+  (2) 沿径向积分求电势差：
+
+  $$
+  U = \int_{R_A}^{R_B} E\,dr = \frac{\lambda}{2\pi \varepsilon_0 \varepsilon_r} \int_{R_A}^{R_B} \frac{dr}{r} = \frac{\lambda}{2\pi \varepsilon_0 \varepsilon_r} \ln\frac{R_B}{R_A}
+  $$
+
+  (3) 由 $Q = \lambda l$ 及电容定义：
+
+  $$
+  C = \frac{Q}{U} = \frac{\lambda l}{\frac{\lambda}{2\pi \varepsilon_0 \varepsilon_r} \ln\frac{R_B}{R_A}} = \frac{2\pi \varepsilon_0 \varepsilon_r l}{\ln(R_B/R_A)}
+  $$
+  :::
 
 **近似**：当 $R_B - R_A = d \ll R_A$ 时，$\ln(R_B/R_A) \approx d/R_A$，则：
 
@@ -443,6 +613,30 @@ $$
   $$
   \boxed{C = \frac{Q}{U} = \frac{4\pi \varepsilon_0 R_1 R_2}{R_2 - R_1}}
   $$
+
+  :::derivation
+  设球形电容器内半径 $R_1$，外半径 $R_2$，内球带电 $+Q$，外球带电 $-Q$，介质为真空。
+
+  (1) 由高斯定理，极板间（$R_1 < r < R_2$）场强：
+
+  $$
+  E = \frac{Q}{4\pi \varepsilon_0 r^2}
+  $$
+
+  (2) 沿径向积分求电势差：
+
+  $$
+  U = \int_{R_1}^{R_2} E\,dr = \frac{Q}{4\pi \varepsilon_0} \int_{R_1}^{R_2} \frac{dr}{r^2} = \frac{Q}{4\pi \varepsilon_0} \left(\frac{1}{R_1} - \frac{1}{R_2}\right) = \frac{Q(R_2 - R_1)}{4\pi \varepsilon_0 R_1 R_2}
+  $$
+
+  (3) 由电容定义：
+
+  $$
+  C = \frac{Q}{U} = \frac{Q}{\frac{Q(R_2 - R_1)}{4\pi \varepsilon_0 R_1 R_2}} = \frac{4\pi \varepsilon_0 R_1 R_2}{R_2 - R_1}
+  $$
+
+  当 $R_2 \to \infty$ 时，$C \to 4\pi \varepsilon_0 R_1$，即退化为孤立导体球电容。
+  :::
 
 **讨论**：当 $R_2 \to \infty$ 时，退化为孤立导体球电容：
 
@@ -505,6 +699,28 @@ $$
 \boxed{W_e = \frac{1}{2}CU^2 = \frac{1}{2}QU = \frac{Q^2}{2C}}
 $$
 
+:::derivation
+电容器充电过程中，外力克服电场力将电荷从一极板搬运到另一极板。设在某时刻极板已带电荷 $q$，此时极板间电压为 $u = \dfrac{q}{C}$。将微小电荷 $dq$ 从负极板搬到正极板，外力克服电场力做元功：
+
+$$
+dW = u\,dq = \frac{q}{C}\,dq
+$$
+
+对整个充电过程从 $0$ 到 $Q$ 积分：
+
+$$
+W_e = \int_0^Q \frac{q}{C}\,dq = \frac{1}{C} \cdot \left[\frac{q^2}{2}\right]_0^Q = \frac{Q^2}{2C}
+$$
+
+代入 $Q = CU$，可得三种等价表达式：
+
+$$
+W_e = \frac{Q^2}{2C} = \frac{(CU)^2}{2C} = \frac{1}{2}CU^2 = \frac{1}{2}QU
+$$
+
+该能量以电场能量的形式储存在电容器中。
+:::
+
 ---
 
 ### 二、静电场的能量密度
@@ -523,6 +739,26 @@ $$
   $$
   \boxed{w_e = \frac{W_e}{V} = \frac{1}{2} \varepsilon_0 \varepsilon_r E^2 = \frac{1}{2} \varepsilon E^2 = \frac{1}{2} ED}
   $$
+
+  :::derivation
+  以平行板电容器为例推导。设极板面积 $S$，间距 $d$，介质电容率 $\varepsilon = \varepsilon_0 \varepsilon_r$。
+
+  已知：电容 $C = \dfrac{\varepsilon S}{d}$，极板间均匀电场 $E = \dfrac{U}{d}$（即 $U = Ed$）。
+
+  电容器储存的总能量：
+
+  $$
+  W_e = \frac{1}{2}CU^2 = \frac{1}{2} \cdot \frac{\varepsilon S}{d} \cdot (Ed)^2 = \frac{1}{2} \varepsilon E^2 \cdot Sd
+  $$
+
+  其中 $V = Sd$ 为电场存在的空间体积。定义单位体积内的电场能量为能量密度：
+
+  $$
+  w_e = \frac{W_e}{V} = \frac{1}{2} \varepsilon E^2 = \frac{1}{2} \varepsilon_0 \varepsilon_r E^2
+  $$
+
+  由 $\vec{D} = \varepsilon \vec{E}$，还可表示为 $w_e = \dfrac{1}{2} ED$。此结论虽由平行板特例推出，但可推广至任意电场：电场能量定域于电场存在的空间中。
+  :::
 
 #### 2. 一般电场中的能量
 电场空间存储的总能量：

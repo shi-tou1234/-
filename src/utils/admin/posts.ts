@@ -623,6 +623,7 @@ function insertMarkdownSnippet(type: string) {
     tip: () => insertAtCursor(textarea, ":::tip\n这里填写提示内容\n:::\n"),
     "formula-inline": () => insertAtCursor(textarea, "$", "$", "a^2+b^2=c^2"),
     "formula-block": () => insertAtCursor(textarea, "$$\n", "\n$$\n", "\\int_a^b f(x)\\,dx"),
+    derivation: () => insertAtCursor(textarea, "\n\n:::derivation\n**推导过程：**\n\n在此填写推导内容...\n:::\n\n"),
     "code-inline": () => insertAtCursor(textarea, "`", "`", "code"),
     "code-block": () => insertAtCursor(textarea, "```ts\n", "\n```\n", "console.log('hello')"),
     bold: () => insertAtCursor(textarea, "**", "**", "加粗文本"),

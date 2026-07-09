@@ -126,6 +126,34 @@ $$ Q^{n+1} = \overline{S_D} + S_D Q^n $$
 
 $$ Q^{n+1} = S + \overline{R} Q^n $$
 
+:::derivation
+**RS 触发器特征方程 $Q^{n+1} = S + \overline{R} Q^n$ 的推导**：
+
+从状态转换真值表（高电平有效 R、S）出发，将 $Q^{n+1}=1$ 的最小项及禁止态作为无关项填入卡诺图：
+
+| $S$ | $R$ | $Q^n$ | $Q^{n+1}$ |
+|-----|-----|-------|-----------|
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 1 | 1 |
+| 0 | 1 | 0 | 0 |
+| 0 | 1 | 1 | 0 |
+| 1 | 0 | 0 | 1 |
+| 1 | 0 | 1 | 1 |
+| 1 | 1 | 0 | ×（禁止） |
+| 1 | 1 | 1 | ×（禁止） |
+
+卡诺图分组（利用禁止态作为无关项 $d$ 扩大合并圈）：
+
+- $m_4, m_5, m_6, m_7$（$S=1$）合并为 $S$；
+- $m_1, m_5$（$R=0, Q^n=1$）合并为 $\overline{R}\,Q^n$。
+
+故：
+
+$$Q^{n+1} = S + \overline{R}\,Q^n$$
+
+约束条件 $R \cdot S = 0$ 保证 R、S 不同时为 1，排除禁止态。
+:::
+
 **约束条件**：$$ R \cdot S = 0 \quad \text{（R 和 S 不能同时为 1）} $$
 
 #### 3. 状态转换图和激励表
@@ -209,6 +237,16 @@ $$ Q^{n+1} = S + \overline{R} Q^n $$
 
 $$ Q^{n+1} = D $$
 
+:::derivation
+**D 触发器特征方程 $Q^{n+1} = D$ 的推导**：
+
+钟控 D 触发器在 RS 触发器基础上引入互补输入：令 $S = D$，$R = \overline{D}$（通过 D 端加反相器实现），代入 RS 触发器特征方程 $Q^{n+1} = S + \overline{R}\,Q^n$：
+
+$$Q^{n+1} = D + \overline{\overline{D}}\,Q^n = D + D \cdot Q^n = D(1 + Q^n) = D \cdot 1 = D$$
+
+由于 $S$ 与 $R$ 始终互补（$R \cdot S = D \cdot \overline{D} = 0$），约束条件自动满足，不会出现不定状态。
+:::
+
 由于 $\overline{R_D}$ 和 $\overline{S_D}$ 恰好互补，D 触发器不会出现不确定状态，**约束条件始终满足**。
 
 #### 状态转换真值表
@@ -257,6 +295,34 @@ $$ Q^{n+1} = D $$
 
 $$ Q^{n+1} = J \overline{Q^n} + \overline{K} Q^n $$
 
+:::derivation
+**JK 触发器特征方程 $Q^{n+1} = J\overline{Q^n} + \overline{K}Q^n$ 的推导**：
+
+从 JK 触发器的状态转换真值表出发，列出 $Q^{n+1}=1$ 的最小项：
+
+| $J$ | $K$ | $Q^n$ | $Q^{n+1}$ | 最小项 |
+|-----|-----|-------|-----------|--------|
+| 0 | 0 | 0 | 0 | $m_0$ |
+| 0 | 0 | 1 | 1 | $m_1$ |
+| 0 | 1 | 0 | 0 | $m_2$ |
+| 0 | 1 | 1 | 0 | $m_3$ |
+| 1 | 0 | 0 | 1 | $m_4$ |
+| 1 | 0 | 1 | 1 | $m_5$ |
+| 1 | 1 | 0 | 1 | $m_6$ |
+| 1 | 1 | 1 | 0 | $m_7$ |
+
+$Q^{n+1} = \sum m(1, 4, 5, 6)$，卡诺图分组：
+
+- $m_4, m_6$（$J=1, Q^n=0$）合并为 $J\overline{Q^n}$；
+- $m_1, m_5$（$K=0, Q^n=1$）合并为 $\overline{K}\,Q^n$。
+
+故：
+
+$$Q^{n+1} = J\overline{Q^n} + \overline{K}\,Q^n$$
+
+**电路层面理解**：JK 触发器将 $Q^n$ 和 $\overline{Q^n}$ 反馈到输入控制门，使有效置位信号为 $S' = J\overline{Q^n}$，有效复位信号为 $R' = KQ^n$。代入 RS 方程 $Q^{n+1} = S' + \overline{R'}\,Q^n$ 并利用 $\overline{KQ^n} = \overline{K} + \overline{Q^n}$ 化简，同样得到上式。由于 $S' \cdot R' = J\overline{Q^n} \cdot KQ^n = JK \cdot 0 = 0$，约束条件始终满足，故 JK 无约束。
+:::
+
 **约束条件**：无（J 和 K 可以同时为 1，不会出现不定状态）
 
 #### 功能总结
@@ -283,6 +349,21 @@ T 触发器（Toggle Flip-Flop）是 JK 触发器在 J = K = T 时的特例。
 #### 特征方程
 
 $$ Q^{n+1} = T \overline{Q^n} + \overline{T} Q^n = T \oplus Q^n $$
+
+:::derivation
+**T 触发器特征方程的推导**：
+
+T 触发器是 JK 触发器在 $J = K = T$ 时的特例。将 $J = K = T$ 代入 JK 触发器特征方程 $Q^{n+1} = J\overline{Q^n} + \overline{K}\,Q^n$：
+
+$$Q^{n+1} = T\overline{Q^n} + \overline{T}\,Q^n$$
+
+注意到该形式恰为异或运算的定义 $A\overline{B} + \overline{A}B = A \oplus B$（令 $A = T$，$B = Q^n$），故：
+
+$$Q^{n+1} = T \oplus Q^n$$
+
+- 当 $T = 0$ 时：$Q^{n+1} = 0 \oplus Q^n = Q^n$（**保持**）；
+- 当 $T = 1$ 时：$Q^{n+1} = 1 \oplus Q^n = \overline{Q^n}$（**翻转**）。
+:::
 
 #### 状态转换真值表
 
@@ -508,6 +589,20 @@ JK 触发器特征方程：$$ Q^{n+1} = J \overline{Q^n} + \overline{K} Q^n $$
 
 令 D 触发器的特征方程等于 JK 触发器的特征方程：$$ D = J \overline{Q^n} + \overline{K} Q^n $$
 
+:::derivation
+**D → JK 转换的推导**：
+
+D 触发器特征方程：$Q^{n+1} = D$
+
+JK 触发器特征方程：$Q^{n+1} = J\overline{Q^n} + \overline{K}\,Q^n$
+
+令二者相等（同一电路的 $Q^{n+1}$ 必须相同）：
+
+$$D = J\overline{Q^n} + \overline{K}\,Q^n$$
+
+此即转换电路的逻辑表达式。用与门实现 $J\overline{Q^n}$ 和 $\overline{K}\,Q^n$，再用或门合并后接入 D 端即可。需要从 $\overline{Q}$ 端获取 $\overline{Q^n}$，并加反相器获得 $\overline{K}$。
+:::
+
 **转换电路**：将 D 触发器的输入端通过组合逻辑电路（由 J、K 和 $Q^n$ 构成的与或门网络）实现上述表达式。
 
     转换电路逻辑表达式：
@@ -529,6 +624,20 @@ T 触发器特征方程：$$ Q^{n+1} = T \overline{Q^n} + \overline{T} Q^n = T \
 
 令二者相等：$$ D = T \oplus Q^n $$
 
+:::derivation
+**D → T 转换的推导**：
+
+D 触发器特征方程：$Q^{n+1} = D$
+
+T 触发器特征方程：$Q^{n+1} = T \oplus Q^n$
+
+令二者相等：
+
+$$D = T \oplus Q^n = T\overline{Q^n} + \overline{T}\,Q^n$$
+
+转换电路用异或门实现：将 T 信号和 $Q^n$（从 $Q$ 端取出）接入异或门，输出接 D 端。也可展开为与或式，用基本门实现。
+:::
+
 **转换电路逻辑表达式**：$$ D = T \oplus Q^n $$
 
 #### 4. D → T'
@@ -536,6 +645,20 @@ T 触发器特征方程：$$ Q^{n+1} = T \overline{Q^n} + \overline{T} Q^n = T \
 T' 触发器特征方程：$$ Q^{n+1} = \overline{Q^n} $$
 
 令二者相等：$$ D = \overline{Q^n} $$
+
+:::derivation
+**D → T' 转换的推导**：
+
+T' 触发器（翻转触发器）的特征方程：$Q^{n+1} = \overline{Q^n}$（每来一个 CP 脉冲翻转一次）
+
+D 触发器特征方程：$Q^{n+1} = D$
+
+令二者相等：
+
+$$D = \overline{Q^n}$$
+
+即将 D 触发器的 D 输入端连接到自身的 $\overline{Q}$ 输出端。每个 CP 上升沿到来时，D 端读入的是当前 $\overline{Q}$ 的值，使触发器翻转为相反状态，实现 T' 功能。
+:::
 
 即：**只需将 D 触发器的 D 端与 $\overline{Q}$ 端相连**，即可实现 T' 触发器的逻辑功能（每来一个 CP 脉冲翻转一次）。
 
@@ -558,6 +681,28 @@ T' 触发器特征方程：$$ Q^{n+1} = \overline{Q^n} $$
 
 推导得：$$ J = S, \quad K = R $$
 
+:::derivation
+**JK → RS 转换的推导（激励表法）**：
+
+RS 触发器特征方程：$Q^{n+1} = S + \overline{R}\,Q^n$
+
+JK 触发器特征方程：$Q^{n+1} = J\overline{Q^n} + \overline{K}\,Q^n$
+
+将 RS 方程变形以与 JK 方程比较：
+
+$$Q^{n+1} = S + \overline{R}\,Q^n = S(\overline{Q^n} + Q^n) + \overline{R}\,Q^n = S\overline{Q^n} + (S + \overline{R})\,Q^n = S\overline{Q^n} + \overline{R \cdot \overline{S}}\,Q^n$$
+
+利用约束条件 $RS = 0$（即 $R\overline{S} = R$），上式化简为：
+
+$$Q^{n+1} = S\overline{Q^n} + \overline{R}\,Q^n$$
+
+与 JK 方程 $Q^{n+1} = J\overline{Q^n} + \overline{K}\,Q^n$ 逐项比较，得：
+
+$$J = S, \quad K = R$$
+
+即直接将 S 接 J 端、R 接 K 端即可。注意：转换后 JK 无约束，故 $R = S = 1$ 时触发器翻转而非不定。
+:::
+
 > **注意**：用 JK 触发器转换为 RS 触发器后，R = S = 1 时**不再是禁止状态**，而是翻转状态（$Q^{n+1} = \overline{Q^n}$）。
 
 #### 2. JK → D
@@ -574,6 +719,26 @@ D 触发器特征方程：$$ Q^{n+1} = D $$
 
 要实现 D 功能，令：$$ J = D, \quad K = \overline{D} $$
 
+:::derivation
+**JK → D 转换的推导（比较法）**：
+
+D 触发器特征方程：$Q^{n+1} = D$
+
+将 D 展开为含 $Q^n$ 和 $\overline{Q^n}$ 的形式：
+
+$$Q^{n+1} = D = D \cdot 1 = D(\overline{Q^n} + Q^n) = D\overline{Q^n} + D\,Q^n$$
+
+JK 触发器特征方程：$Q^{n+1} = J\overline{Q^n} + \overline{K}\,Q^n$
+
+逐项比较：
+
+$$J\overline{Q^n} = D\overline{Q^n} \Rightarrow J = D$$
+
+$$\overline{K}\,Q^n = D\,Q^n \Rightarrow \overline{K} = D \Rightarrow K = \overline{D}$$
+
+故令 $J = D$，$K = \overline{D}$（即 J、K 互补），在 D 端加反相器接 K 端即可。
+:::
+
 即：**当 D = 0 时，J = 0，K = 1（置 0）；当 D = 1 时，J = 1，K = 0（置 1）**。
 
 #### 3. JK → T
@@ -584,6 +749,22 @@ JK 触发器特征方程：$$ Q^{n+1} = J \overline{Q^n} + \overline{K} Q^n $$
 
 比较两个方程，令对应项相等：$$ J = K = T $$
 
+:::derivation
+**JK → T 转换的推导**：
+
+T 触发器特征方程：$Q^{n+1} = T\overline{Q^n} + \overline{T}\,Q^n$
+
+JK 触发器特征方程：$Q^{n+1} = J\overline{Q^n} + \overline{K}\,Q^n$
+
+逐项比较：
+
+$$J\overline{Q^n} = T\overline{Q^n} \Rightarrow J = T$$
+
+$$\overline{K}\,Q^n = \overline{T}\,Q^n \Rightarrow \overline{K} = \overline{T} \Rightarrow K = T$$
+
+故令 $J = K = T$，将 J、K 端短接连 T 信号即可。
+:::
+
 #### 4. JK → T'
 
 T' 触发器特征方程：$$ Q^{n+1} = \overline{Q^n} $$
@@ -591,6 +772,24 @@ T' 触发器特征方程：$$ Q^{n+1} = \overline{Q^n} $$
 在 JK 触发器中，要实现翻转功能需要 J = K = 1。此时：$$ Q^{n+1} = J \overline{Q^n} + \overline{K} Q^n = 1 \cdot \overline{Q^n} + 0 \cdot Q^n = \overline{Q^n} $$
 
 所以：$$ J = K = 1 $$
+
+:::derivation
+**JK → T' 转换的推导**：
+
+T' 触发器特征方程：$Q^{n+1} = \overline{Q^n}$（每来一个 CP 脉冲翻转一次）
+
+JK 触发器特征方程：$Q^{n+1} = J\overline{Q^n} + \overline{K}\,Q^n$
+
+要使 $Q^{n+1} = \overline{Q^n}$，需令 $\overline{Q^n}$ 的系数为 1、$Q^n$ 的系数为 0：
+
+$$J = 1, \quad \overline{K} = 0 \Rightarrow K = 1$$
+
+代入验证：
+
+$$Q^{n+1} = 1 \cdot \overline{Q^n} + \overline{1} \cdot Q^n = \overline{Q^n} + 0 = \overline{Q^n} \quad \checkmark$$
+
+故将 J、K 端同时接高电平（$J = K = 1$），JK 触发器即实现 T' 翻转功能。
+:::
 
 即：**将 JK 触发器的 J 端和 K 端同时接高电平**，即可实现 T' 触发器功能。
 

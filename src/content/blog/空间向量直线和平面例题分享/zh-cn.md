@@ -41,6 +41,27 @@ slugId: 空间向量直线和平面例题分享
    $$\overrightarrow{AC}=(1-1,-1-1,2-(-1))=(0,-2,3)$$
 3. 步骤 2：叉乘求法向量$\boldsymbol{n}=\overrightarrow{AB}\times\overrightarrow{AC}$
    $$\boldsymbol{n}=\begin{vmatrix} \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\ -3 & -3 & 3 \\ 0 & -2 & 3 \end{vmatrix} =\boldsymbol{i}(-9+6)-\boldsymbol{j}(-9-0)+\boldsymbol{k}(6-0)=(-3,9,6)$$
+
+   :::derivation
+   **三点式求法向量公式推导**（$\boldsymbol{n}=\overrightarrow{AB}\times\overrightarrow{AC}$）：
+
+   设平面过三点 $A$、$B$、$C$（不共线），求平面法向量 $\boldsymbol{n}$。
+
+   1. 三点确定两条平面内向量：$\overrightarrow{AB}=B-A$，$\overrightarrow{AC}=C-A$，二者不共线（因为三点不共线）。
+
+   2. 法向量 $\boldsymbol{n}$ 垂直于平面内所有向量，故需同时满足：
+      - $\boldsymbol{n}\cdot\overrightarrow{AB}=0$
+      - $\boldsymbol{n}\cdot\overrightarrow{AC}=0$
+
+   3. 由叉乘的几何性质，$\overrightarrow{AB}\times\overrightarrow{AC}$ 的结果同时垂直于 $\overrightarrow{AB}$ 和 $\overrightarrow{AC}$，恰好满足法向量的要求。
+
+   故：
+
+   $$\boldsymbol{n}=\overrightarrow{AB}\times\overrightarrow{AC}$$
+
+   法向量乘以任意非零常数方向不变（仅改变长度），故 $\boldsymbol{n}$ 与 $k\boldsymbol{n}$（$k\neq 0$）表示同一法向量方向。
+   :::
+
    法向量可简化为$\boldsymbol{n}=(-1,3,2)$（乘以非零常数不改变法向量方向）。
 4. 步骤 3：代入点法式（选点$A(1,1,-1)$）
    $$-1(x-1)+3(y-1)+2(z+1)=0$$
@@ -97,6 +118,23 @@ slugId: 空间向量直线和平面例题分享
    点积$\boldsymbol{n_1}\cdot\boldsymbol{n_2}=1\times2+(-1)\times1+2\times1=3\neq0$，故不垂直。
 4. 步骤 3：计算夹角
    $$\cos\theta=\frac{|\boldsymbol{n_1}\cdot\boldsymbol{n_2}|}{|\boldsymbol{n_1}||\boldsymbol{n_2}|}=\frac{|3|}{\sqrt{1+1+4}\times\sqrt{4+1+1}}=\frac{3}{6}=\frac{1}{2}$$
+
+   :::derivation
+   **两平面夹角公式推导**：
+
+   设两平面 $\pi_1$、$\pi_2$ 的法向量分别为 $\boldsymbol{n_1}$、$\boldsymbol{n_2}$，两平面的夹角 $\theta$ 定义为其法向量夹角的锐角或直角（范围 $[0,\frac{\pi}{2}]$）。
+
+   由向量点积公式知：$\boldsymbol{n_1}\cdot\boldsymbol{n_2}=|\boldsymbol{n_1}||\boldsymbol{n_2}|\cos\varphi$，其中 $\varphi$ 为两法向量的夹角。
+
+   解得：$\cos\varphi=\dfrac{\boldsymbol{n_1}\cdot\boldsymbol{n_2}}{|\boldsymbol{n_1}||\boldsymbol{n_2}|}$。
+
+   由于两平面夹角取锐角（$[0,\frac{\pi}{2}]$），而法向量夹角可能为钝角（法向量方向可反向），故对分子取绝对值：
+
+   $$\cos\theta=\frac{|\boldsymbol{n_1}\cdot\boldsymbol{n_2}|}{|\boldsymbol{n_1}||\boldsymbol{n_2}|}$$
+
+   这就是两平面夹角公式。当 $\cos\theta=0$ 时两平面垂直，当 $\cos\theta=1$ 时两平面平行。
+   :::
+
    因此$\boldsymbol{\theta=\frac{\pi}{3}}$（60°）。
 5. 易错提示：夹角公式必须加绝对值，确保结果为锐角/直角。
 
@@ -115,6 +153,22 @@ slugId: 空间向量直线和平面例题分享
    $$\boldsymbol{\frac{x-1}{2}=\frac{y-2}{-1}=\frac{z-3}{1}}$$
 3. 参数方程：令对称式的比值为参数$t$（$t\in\mathbb{R}$），拆分得：
    $$\boldsymbol{\begin{cases} x=1+2t \\ y=2-t \\ z=3+t \end{cases}} \quad t\in\mathbb{R}$$
+
+   :::derivation
+   **直线对称式与参数式的互化推导**：
+
+   直线过点 $M_0(x_0,y_0,z_0)$，方向向量 $\boldsymbol{s}=(m,n,p)$。
+
+   **对称式方程**：直线上任一点 $M(x,y,z)$，向量 $\overrightarrow{M_0M}=(x-x_0,\,y-y_0,\,z-z_0)$ 与 $\boldsymbol{s}$ 平行，即坐标成比例：
+
+   $$\frac{x-x_0}{m}=\frac{y-y_0}{n}=\frac{z-z_0}{p}$$
+
+   **参数方程**：令上述比值为参数 $t\in\mathbb{R}$，即 $\dfrac{x-x_0}{m}=t$，解出各坐标：
+
+   $$\begin{cases} x=x_0+mt \\ y=y_0+nt \\ z=z_0+pt \end{cases} \quad t\in\mathbb{R}$$
+
+   参数 $t$ 的几何意义：$t=0$ 对应定点 $M_0$，$t$ 的绝对值正比于点到 $M_0$ 的距离（$|MM_0|=|t|\cdot|\boldsymbol{s}|$）。
+   :::
 
 ---
 
@@ -150,6 +204,23 @@ slugId: 空间向量直线和平面例题分享
    直线是两个平面的交线，因此直线的方向向量同时垂直于两个平面的法向量，即$\boldsymbol{s}=\boldsymbol{n_1}\times\boldsymbol{n_2}$。
    两个平面的法向量：$\boldsymbol{n_1}=(2,-3,1)$，$\boldsymbol{n_2}=(3,1,-2)$。
    $$\boldsymbol{s}=\boldsymbol{n_1}\times\boldsymbol{n_2}=\begin{vmatrix} \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\ 2 & -3 & 1 \\ 3 & 1 & -2 \end{vmatrix} =\boldsymbol{i}(6-1)-\boldsymbol{j}(-4-3)+\boldsymbol{k}(2+9)=(5,7,11)$$
+
+   :::derivation
+   **交面式直线方向向量公式推导**（$\boldsymbol{s}=\boldsymbol{n_1}\times\boldsymbol{n_2}$）：
+
+   直线 $L$ 是两个平面 $\pi_1$ 和 $\pi_2$ 的交线，直线既在 $\pi_1$ 内又在 $\pi_2$ 内。
+
+   设 $\pi_1$ 的法向量为 $\boldsymbol{n_1}$，$\pi_2$ 的法向量为 $\boldsymbol{n_2}$。由于直线 $L$ 在 $\pi_1$ 内，故 $L$ 的方向向量 $\boldsymbol{s}$ 垂直于 $\boldsymbol{n_1}$；同理，$L$ 在 $\pi_2$ 内，故 $\boldsymbol{s}$ 也垂直于 $\boldsymbol{n_2}$。
+
+   因此 $\boldsymbol{s}$ 同时垂直于 $\boldsymbol{n_1}$ 和 $\boldsymbol{n_2}$。由向量叉乘的几何性质，$\boldsymbol{n_1}\times\boldsymbol{n_2}$ 的结果向量同时垂直于 $\boldsymbol{n_1}$ 和 $\boldsymbol{n_2}$（右手定则确定方向），恰好满足 $\boldsymbol{s}$ 的要求。
+
+   故直线的方向向量为：
+
+   $$\boldsymbol{s}=\boldsymbol{n_1}\times\boldsymbol{n_2}$$
+
+   这就是交面式（一般式）直线求方向向量的核心公式。
+   :::
+
 4. 步骤 3：写对称式方程
    代入定点和方向向量，得：
    $$\boldsymbol{\frac{x-\frac{17}{11}}{5}=\frac{y+\frac{7}{11}}{7}=\frac{z}{11}}$$
@@ -183,6 +254,23 @@ slugId: 空间向量直线和平面例题分享
      混合积不为 0，故两直线**异面**。
 4. 步骤 3：计算夹角
    $$\cos\theta=\frac{|\boldsymbol{s_1}\cdot\boldsymbol{s_2}|}{|\boldsymbol{s_1}||\boldsymbol{s_2}|}=\frac{|2\times1+1\times(-1)+(-1)\times2|}{\sqrt{6}\times\sqrt{6}}=\frac{|-1|}{6}=\frac{1}{6}$$
+
+   :::derivation
+   **两直线夹角公式推导**：
+
+   设两直线 $L_1$、$L_2$ 的方向向量分别为 $\boldsymbol{s_1}$、$\boldsymbol{s_2}$，两直线的夹角 $\theta$ 定义为方向向量夹角的锐角或直角（范围 $[0,\frac{\pi}{2}]$）。
+
+   由向量点积公式：$\boldsymbol{s_1}\cdot\boldsymbol{s_2}=|\boldsymbol{s_1}||\boldsymbol{s_2}|\cos\varphi$，其中 $\varphi$ 为两方向向量的夹角。
+
+   解得：$\cos\varphi=\dfrac{\boldsymbol{s_1}\cdot\boldsymbol{s_2}}{|\boldsymbol{s_1}||\boldsymbol{s_2}|}$。
+
+   由于方向向量可取正反两个方向（如 $\boldsymbol{s}$ 和 $-\boldsymbol{s}$ 表示同一直线），夹角 $\varphi$ 可能为钝角。为保证夹角取锐角，对分子取绝对值：
+
+   $$\cos\theta=\frac{|\boldsymbol{s_1}\cdot\boldsymbol{s_2}|}{|\boldsymbol{s_1}||\boldsymbol{s_2}|}$$
+
+   当 $\cos\theta=0$ 时两直线垂直，当 $\cos\theta=1$ 时两直线平行或重合。
+   :::
+
    因此夹角$\boldsymbol{\theta=\arccos\frac{1}{6}}$。
 
 ---
@@ -212,6 +300,26 @@ slugId: 空间向量直线和平面例题分享
    代入参数方程，得交点坐标：$\boldsymbol{(9,-6,7)}$。
 5. 步骤 4：求直线与平面的夹角
    $$\sin\theta=\frac{|\boldsymbol{s}\cdot\boldsymbol{n}|}{|\boldsymbol{s}||\boldsymbol{n}|}=\frac{|1|}{\sqrt{4+1+1}\times\sqrt{1+4+1}}=\frac{1}{6}$$
+
+   :::derivation
+   **直线与平面夹角公式推导**（为何用 $\sin$ 而非 $\cos$）：
+
+   直线 $L$ 与平面 $\pi$ 的夹角 $\theta$ 定义为直线与其在平面内投影直线的夹角（范围 $[0,\frac{\pi}{2}]$）。
+
+   设直线方向向量为 $\boldsymbol{s}$，平面法向量为 $\boldsymbol{n}$，记 $\boldsymbol{s}$ 与 $\boldsymbol{n}$ 的夹角为 $\varphi$。
+
+   **关键几何关系**：直线在平面内的投影方向与法向量垂直，故夹角 $\theta$ 与 $\varphi$ 互余，即：
+
+   $$\theta + \varphi = \frac{\pi}{2}$$
+
+   因此 $\sin\theta = \cos\varphi$。由点积公式 $\cos\varphi = \dfrac{|\boldsymbol{s}\cdot\boldsymbol{n}|}{|\boldsymbol{s}||\boldsymbol{n}|}$（取绝对值保证锐角），得：
+
+   $$\sin\theta = \frac{|\boldsymbol{s}\cdot\boldsymbol{n}|}{|\boldsymbol{s}||\boldsymbol{n}|}$$
+
+   - 当 $\sin\theta=0$（即 $\boldsymbol{s}\cdot\boldsymbol{n}=0$）：$\boldsymbol{s}\perp\boldsymbol{n}$，直线在平面内或平行于平面；
+   - 当 $\sin\theta=1$（即 $\boldsymbol{s}\parallel\boldsymbol{n}$）：直线垂直于平面。
+   :::
+
    因此夹角$\boldsymbol{\theta=\arcsin\frac{1}{6}}$。
 6. 易错提示：直线与平面夹角公式是$\sin\theta$，不是$\cos\theta$，极易混淆！
 
@@ -268,6 +376,25 @@ slugId: 空间向量直线和平面例题分享
 2. 步骤 1：写过直线$L$的平面束方程
    直线$L$是两个平面的交线，过$L$的所有平面（除第二个平面）可表示为：
    $$(x+y-z-1)+\lambda(x-y+z+1)=0 \quad \lambda\in\mathbb{R}$$
+
+   :::derivation
+   **平面束方程推导**：
+
+   设直线 $L$ 为两平面 $\pi_1: F_1(x,y,z)=0$ 与 $\pi_2: F_2(x,y,z)=0$ 的交线，即 $L$ 上的点同时满足 $F_1=0$ 和 $F_2=0$。
+
+   构造方程：$\lambda_1 F_1(x,y,z) + \lambda_2 F_2(x,y,z) = 0$，其中 $\lambda_1$、$\lambda_2$ 不全为零。
+
+   **验证过交线**：对 $L$ 上任一点，$F_1=0$ 且 $F_2=0$，故 $\lambda_1\cdot0+\lambda_2\cdot0=0$ 恒成立，该方程确实过交线 $L$。
+
+   **验证是平面**：$F_1$、$F_2$ 均为一次式，其线性组合仍为一次式，故表示平面。
+
+   当 $\lambda_1\neq 0$ 时，两边除以 $\lambda_1$，令 $\lambda=\lambda_2/\lambda_1$，得单参数平面束方程：
+
+   $$F_1(x,y,z) + \lambda F_2(x,y,z) = 0$$
+
+   **注意**：该方程包含了过 $L$ 的所有平面，**唯独不含** $\pi_2$ 本身（对应 $\lambda_1=0$ 的情形），故使用时需单独验证 $\pi_2$ 是否满足条件。
+   :::
+
    整理得：$(1+\lambda)x+(1-\lambda)y+(\lambda-1)z+(\lambda-1)=0$，法向量$\boldsymbol{n_1}=(1+\lambda,1-\lambda,\lambda-1)$。
 3. 步骤 2：求垂直平面的$\lambda$值
    平面束中的平面需与$\pi$垂直，故法向量点积为 0。$\pi$的法向量$\boldsymbol{n}=(1,1,1)$，因此：
@@ -316,6 +443,28 @@ slugId: 空间向量直线和平面例题分享
    因此距离：
    $$d=\frac{6\sqrt{6}}{\sqrt{14}}=\boldsymbol{\frac{6\sqrt{21}}{7}}$$
 
+   :::derivation
+   **点到直线距离的叉乘公式推导**（$d=\dfrac{|\overrightarrow{M_0M}\times\boldsymbol{s}|}{|\boldsymbol{s}|}$）：
+
+   设直线 $L$ 过点 $M_0$，方向向量为 $\boldsymbol{s}$，求点 $M$ 到 $L$ 的距离 $d$。
+
+   **几何思路**：过 $M_0$ 和 $M$ 构造向量 $\overrightarrow{M_0M}$，它与方向向量 $\boldsymbol{s}$ 张成一个平行四边形，点 $M$ 到直线 $L$ 的距离 $d$ 恰好是该平行四边形的高（以 $\boldsymbol{s}$ 为底边）。
+
+   **推导步骤**：
+
+   1. 平行四边形面积 $S$：以 $\overrightarrow{M_0M}$ 和 $\boldsymbol{s}$ 为邻边的平行四边形面积为 $|\overrightarrow{M_0M}\times\boldsymbol{s}|$（叉乘模长的几何意义）。
+
+   2. 面积的另一种表达：$S = \text{底} \times \text{高} = |\boldsymbol{s}|\cdot d$。
+
+   3. 两式联立：$|\overrightarrow{M_0M}\times\boldsymbol{s}| = |\boldsymbol{s}|\cdot d$。
+
+   解得：
+
+   $$d=\frac{|\overrightarrow{M_0M}\times\boldsymbol{s}|}{|\boldsymbol{s}|}$$
+
+   该公式的优势在于无需计算投影点，直接用叉乘一步到位。
+   :::
+
 ---
 
 **例题 15** 求两异面直线$L_1:\frac{x-1}{1}=\frac{y-2}{0}=\frac{z-3}{-1}$，$L_2:\frac{x}{2}=\frac{y+1}{1}=\frac{z}{1}$的距离。
@@ -334,6 +483,28 @@ slugId: 空间向量直线和平面例题分享
    混合积$\overrightarrow{M_1M_2}\cdot(\boldsymbol{s_1}\times\boldsymbol{s_2})=(-1)\times1+(-3)\times(-3)+(-3)\times1=5$；
    因此距离：
    $$d=\frac{|5|}{\sqrt{11}}=\boldsymbol{\frac{5\sqrt{11}}{11}}$$
+
+   :::derivation
+   **两异面直线距离公式推导**（$d=\dfrac{|\overrightarrow{M_1M_2}\cdot(\boldsymbol{s_1}\times\boldsymbol{s_2})|}{|\boldsymbol{s_1}\times\boldsymbol{s_2}|}$）：
+
+   设两异面直线 $L_1$（过 $M_1$，方向向量 $\boldsymbol{s_1}$）和 $L_2$（过 $M_2$，方向向量 $\boldsymbol{s_2}$），求公垂线段的长度 $d$。
+
+   **推导步骤**：
+
+   1. **公垂线方向**：公垂线同时垂直于 $L_1$ 和 $L_2$，故其方向向量为 $\boldsymbol{s_1}\times\boldsymbol{s_2}$（同时垂直于两个方向向量）。
+
+   2. **投影法求距离**：在两直线上各取一点 $M_1$、$M_2$，构造向量 $\overrightarrow{M_1M_2}$。两异面直线的距离等于 $\overrightarrow{M_1M_2}$ 在公垂线方向上的**投影长度**（垂直分量）。
+
+   3. **投影公式**：向量 $\overrightarrow{M_1M_2}$ 在单位向量 $\dfrac{\boldsymbol{s_1}\times\boldsymbol{s_2}}{|\boldsymbol{s_1}\times\boldsymbol{s_2}|}$ 方向上的投影为：
+
+   $$\text{投影} = \overrightarrow{M_1M_2}\cdot\frac{\boldsymbol{s_1}\times\boldsymbol{s_2}}{|\boldsymbol{s_1}\times\boldsymbol{s_2}|}$$
+
+   4. 取绝对值（距离非负），得：
+
+   $$d=\frac{|\overrightarrow{M_1M_2}\cdot(\boldsymbol{s_1}\times\boldsymbol{s_2})|}{|\boldsymbol{s_1}\times\boldsymbol{s_2}|}$$
+
+   其中分子 $\overrightarrow{M_1M_2}\cdot(\boldsymbol{s_1}\times\boldsymbol{s_2})$ 为**混合积**，几何意义是以三个向量为邻边的平行六面体的体积；分母为底面平行四边形面积，二者之商即为高（距离）。
+   :::
 
 ---
 
@@ -373,6 +544,25 @@ slugId: 空间向量直线和平面例题分享
 2. 步骤 1：求公垂线的方向向量$\boldsymbol{s}$
    $L_1$方向向量$\boldsymbol{s_1}=(1,2,3)$，$L_2$方向向量$\boldsymbol{s_2}=(1,1,2)$，故：
    $$\boldsymbol{s}=\boldsymbol{s_1}\times\boldsymbol{s_2}=\begin{vmatrix} \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\ 1 & 2 & 3 \\ 1 & 1 & 2 \end{vmatrix}=(1,1,-1)$$
+
+   :::derivation
+   **公垂线方向向量公式推导**（$\boldsymbol{s}=\boldsymbol{s_1}\times\boldsymbol{s_2}$）：
+
+   两异面直线 $L_1$、$L_2$ 的公垂线是同时与两直线垂直相交的直线。
+
+   设 $L_1$ 的方向向量为 $\boldsymbol{s_1}$，$L_2$ 的方向向量为 $\boldsymbol{s_2}$。公垂线需同时垂直于 $L_1$ 和 $L_2$，即其方向向量 $\boldsymbol{s}$ 需同时满足：
+
+   - $\boldsymbol{s}\cdot\boldsymbol{s_1}=0$（垂直于 $L_1$）
+   - $\boldsymbol{s}\cdot\boldsymbol{s_2}=0$（垂直于 $L_2$）
+
+   由叉乘的定义，$\boldsymbol{s_1}\times\boldsymbol{s_2}$ 的结果同时垂直于 $\boldsymbol{s_1}$ 和 $\boldsymbol{s_2}$，恰好满足要求。
+
+   故公垂线的方向向量为：
+
+   $$\boldsymbol{s}=\boldsymbol{s_1}\times\boldsymbol{s_2}$$
+
+   有了公垂线方向后，公垂线可看作"过 $L_1$ 且平行于 $\boldsymbol{s}$ 的平面"与"过 $L_2$ 且平行于 $\boldsymbol{s}$ 的平面"的交线。
+   :::
 3. 步骤 2：求过$L_1$且平行于$\boldsymbol{s}$的平面$\pi_1$
    $\pi_1$的法向量$\boldsymbol{n_1}=\boldsymbol{s_1}\times\boldsymbol{s}=\begin{vmatrix}\boldsymbol{i}&\boldsymbol{j}&\boldsymbol{k}\\1&2&3\\1&1&-1\end{vmatrix}=(-5,4,-1)$；
    $\pi_1$过$L_1$上定点$M_1(1,1,1)$，代入点法式得：

@@ -50,6 +50,16 @@ slugId: 质点运动学
   \vec{v} = \lim_{\Delta t\to 0}\frac{\Delta\vec{r}}{\Delta t} = \frac{d\vec{r}}{dt} = \frac{dx}{dt}\vec{i} + \frac{dy}{dt}\vec{j} + \frac{dz}{dt}\vec{k}
   $$
 
+:::derivation
+由平均速度的定义 $\overline{\vec{v}} = \dfrac{\Delta\vec{r}}{\Delta t}$ 出发，令时间间隔 $\Delta t \to 0$，取极限即得瞬时速度。
+
+将位移 $\Delta\vec{r} = \Delta x\,\vec{i} + \Delta y\,\vec{j} + \Delta z\,\vec{k}$ 代入，利用极限的线性性质：
+$$
+\vec{v} = \lim_{\Delta t\to 0}\left(\frac{\Delta x}{\Delta t}\vec{i} + \frac{\Delta y}{\Delta t}\vec{j} + \frac{\Delta z}{\Delta t}\vec{k}\right) = \frac{dx}{dt}\vec{i} + \frac{dy}{dt}\vec{j} + \frac{dz}{dt}\vec{k}
+$$
+即速度为位置矢量对时间的一阶导数，方向沿轨迹切线方向。
+:::
+
 - **速率**：速度的大小 $v = \left|\frac{d\vec{r}}{dt}\right| = \frac{ds}{dt}$  
   当 $\Delta t\to 0$ 时，$|d\vec{r}| = ds$，故 $\vec{v} = \frac{ds}{dt}\vec{e}_t$，方向沿轨迹切线。
 
@@ -65,6 +75,21 @@ slugId: 质点运动学
   $$
   \vec{a} = \lim_{\Delta t\to 0}\frac{\Delta\vec{v}}{\Delta t} = \frac{d\vec{v}}{dt} = \frac{d^2\vec{r}}{dt^2}
   $$
+
+:::derivation
+由平均加速度 $\overline{\vec{a}} = \dfrac{\Delta\vec{v}}{\Delta t}$ 出发，令 $\Delta t \to 0$ 取极限：
+
+$$
+\vec{a} = \lim_{\Delta t\to 0}\frac{\Delta\vec{v}}{\Delta t} = \frac{d\vec{v}}{dt}
+$$
+
+再将 $\vec{v} = \dfrac{d\vec{r}}{dt}$ 代入，得：
+$$
+\vec{a} = \frac{d}{dt}\left(\frac{d\vec{r}}{dt}\right) = \frac{d^2\vec{r}}{dt^2}
+$$
+分量形式为 $a_x = \dfrac{dv_x}{dt} = \dfrac{d^2x}{dt^2}$ 等，即加速度为位置矢量对时间的二阶导数。
+:::
+
   分量：$a_x = \frac{dv_x}{dt},\ a_y = \frac{dv_y}{dt},\ a_z = \frac{dv_z}{dt}$  
   大小：$a = \sqrt{a_x^2 + a_y^2 + a_z^2}$  
   方向：直线运动时 $\vec{a}\parallel\vec{v}$，曲线运动时指向轨迹凹侧。
@@ -143,6 +168,21 @@ $$
   $$
   v = \frac{ds}{dt} = \frac{d}{dt}(r\theta) = r\frac{d\theta}{dt} = r\omega
   $$
+
+:::derivation
+质点沿半径为 $r$ 的圆周运动时，弧长与角坐标的关系为 $s = r\theta$（$\theta$ 以弧度为单位）。
+
+对时间求导，注意到圆周运动中半径 $r$ 为常量：
+$$
+v = \frac{ds}{dt} = \frac{d}{dt}(r\theta) = r\frac{d\theta}{dt}
+$$
+代入角速度定义 $\omega = \dfrac{d\theta}{dt}$，即得：
+$$
+v = r\omega
+$$
+此式建立了线量（线速度）与角量（角速度）之间的联系。
+:::
+
   方向沿圆周的切线方向，记切向单位矢量为 $\vec{e}_t$，则速度矢量可写为：
   $$
   \vec{v} = v\,\vec{e}_t = r\omega\,\vec{e}_t
@@ -166,6 +206,24 @@ $$
 \vec{a}_t = r\alpha\,\vec{e}_t
 $$
 
+:::derivation
+切向加速度定义为 $\vec{a}_t = \dfrac{dv}{dt}\vec{e}_t$，反映速度大小的变化率。
+
+由线速度与角速度关系 $v = r\omega$，对时间求导（圆周运动 $r$ 为常量）：
+$$
+\frac{dv}{dt} = \frac{d}{dt}(r\omega) = r\frac{d\omega}{dt}
+$$
+代入角加速度定义 $\alpha = \dfrac{d\omega}{dt}$，得：
+$$
+\frac{dv}{dt} = r\alpha
+$$
+故切向加速度为：
+$$
+\vec{a}_t = r\alpha\,\vec{e}_t
+$$
+当 $\alpha > 0$ 时切向加速度与速度同向（加速），$\alpha < 0$ 时反向（减速）。
+:::
+
 #### 2. 法向加速度
 
 第二项 $v\,\dfrac{d\vec{e}_t}{dt}$ 是由于速度方向变化引起的加速度。需要求出 $\dfrac{d\vec{e}_t}{dt}$。
@@ -176,6 +234,24 @@ $$
 = \lim_{\Delta t\to0}\frac{\Delta\theta}{\Delta t}\,\vec{e}_n = \frac{d\theta}{dt}\,\vec{e}_n = \omega\,\vec{e}_n
 $$
 
+:::derivation
+在 $\Delta t$ 时间内，质点沿圆周转过角度 $\Delta\theta$，切向单位矢量 $\vec{e}_t$ 也随之转过相同角度 $\Delta\theta$。
+
+由于 $|\vec{e}_t| = 1$，矢量增量 $\Delta\vec{e}_t$ 的大小为：
+$$
+|\Delta\vec{e}_t| \approx |\vec{e}_t|\cdot\Delta\theta = \Delta\theta
+$$
+方向垂直于 $\vec{e}_t$，指向圆心，即法向单位矢量 $\vec{e}_n$ 的方向。
+
+取极限 $\Delta t \to 0$：
+$$
+\frac{d\vec{e}_t}{dt} = \lim_{\Delta t\to 0}\frac{\Delta\vec{e}_t}{\Delta t} = \lim_{\Delta t\to 0}\frac{\Delta\theta}{\Delta t}\,\vec{e}_n = \frac{d\theta}{dt}\,\vec{e}_n
+$$
+代入角速度 $\omega = \dfrac{d\theta}{dt}$，得 $\dfrac{d\vec{e}_t}{dt} = \omega\,\vec{e}_n$。
+
+此结果表明：切向单位矢量的时间变化率指向法向，是曲线运动产生法向加速度的根源。
+:::
+
 于是
 $$
 v\frac{d\vec{e}_t}{dt} = v\omega\,\vec{e}_n = r\omega^2\,\vec{e}_n = \frac{v^2}{r}\,\vec{e}_n
@@ -185,12 +261,45 @@ $$
 \vec{a}_n = \frac{v^2}{r}\,\vec{e}_n = r\omega^2\,\vec{e}_n
 $$
 
+:::derivation
+由 $\dfrac{d\vec{e}_t}{dt} = \omega\,\vec{e}_n$，加速度中因速度方向变化的部分为：
+$$
+v\frac{d\vec{e}_t}{dt} = v\omega\,\vec{e}_n
+$$
+利用线速度与角速度关系 $v = r\omega$（即 $\omega = v/r$），代入上式：
+$$
+v\omega\,\vec{e}_n = v\cdot\frac{v}{r}\,\vec{e}_n = \frac{v^2}{r}\,\vec{e}_n
+$$
+或用 $\omega$ 表示：
+$$
+v\omega\,\vec{e}_n = r\omega\cdot\omega\,\vec{e}_n = r\omega^2\,\vec{e}_n
+$$
+因此法向加速度为 $\vec{a}_n = \dfrac{v^2}{r}\vec{e}_n = r\omega^2\vec{e}_n$，方向恒指向圆心。
+:::
+
 #### 3. 总加速度
 
 总加速度为切向加速度与法向加速度的矢量和：
 $$
 \vec{a} = \vec{a}_t + \vec{a}_n = \frac{dv}{dt}\vec{e}_t + \frac{v^2}{r}\vec{e}_n
 $$
+
+:::derivation
+由加速度定义 $\vec{a} = \dfrac{d\vec{v}}{dt}$，圆周运动中速度 $\vec{v} = v\,\vec{e}_t$，应用乘积求导法则：
+$$
+\vec{a} = \frac{d}{dt}(v\,\vec{e}_t) = \frac{dv}{dt}\,\vec{e}_t + v\,\frac{d\vec{e}_t}{dt}
+$$
+第一项 $\dfrac{dv}{dt}\vec{e}_t$ 为切向加速度 $\vec{a}_t$，反映速度大小的变化；
+
+第二项 $v\,\dfrac{d\vec{e}_t}{dt} = v\omega\,\vec{e}_n = \dfrac{v^2}{r}\vec{e}_n$ 为法向加速度 $\vec{a}_n$，反映速度方向的变化。
+
+由于 $\vec{e}_t \perp \vec{e}_n$，两部分相互正交，故总加速度为两者的矢量和：
+$$
+\vec{a} = \vec{a}_t + \vec{a}_n = \frac{dv}{dt}\vec{e}_t + \frac{v^2}{r}\vec{e}_n
+$$
+其大小 $a = \sqrt{a_t^2 + a_n^2}$。
+:::
+
 大小：
 $$
 a = \sqrt{a_t^2 + a_n^2} = \sqrt{\left(\frac{dv}{dt}\right)^2 + \left(\frac{v^2}{r}\right)^2}
@@ -217,14 +326,73 @@ $$
 $$
 \int_{\omega_0}^{\omega} d\omega = \int_0^t \alpha\,dt \quad\Rightarrow\quad \omega = \omega_0 + \alpha t
 $$
+
+:::derivation
+匀角加速圆周运动中，角加速度 $\alpha$ 为常量。由角加速度定义 $\alpha = \dfrac{d\omega}{dt}$，分离变量：
+$$
+d\omega = \alpha\,dt
+$$
+两边积分，时间从 $0$ 到 $t$，角速度从 $\omega_0$ 到 $\omega$：
+$$
+\int_{\omega_0}^{\omega} d\omega = \int_0^t \alpha\,dt = \alpha\int_0^t dt = \alpha t
+$$
+左端积分为 $\omega - \omega_0$，故：
+$$
+\omega - \omega_0 = \alpha t \quad\Rightarrow\quad \omega = \omega_0 + \alpha t
+$$
+:::
+
 由 $\omega = \dfrac{d\theta}{dt}$ 积分得：
 $$
 \int_{\theta_0}^{\theta} d\theta = \int_0^t (\omega_0 + \alpha t)\,dt \quad\Rightarrow\quad \theta = \theta_0 + \omega_0 t + \frac{1}{2}\alpha t^2
 $$
+
+:::derivation
+由角速度定义 $\omega = \dfrac{d\theta}{dt}$，分离变量 $d\theta = \omega\,dt$。
+
+将已得结果 $\omega = \omega_0 + \alpha t$ 代入，两边积分（角坐标从 $\theta_0$ 到 $\theta$，时间从 $0$ 到 $t$）：
+$$
+\int_{\theta_0}^{\theta} d\theta = \int_0^t (\omega_0 + \alpha t)\,dt
+$$
+右端逐项积分：
+$$
+\int_0^t (\omega_0 + \alpha t)\,dt = \omega_0 \int_0^t dt + \alpha\int_0^t t\,dt = \omega_0 t + \frac{1}{2}\alpha t^2
+$$
+故：
+$$
+\theta - \theta_0 = \omega_0 t + \frac{1}{2}\alpha t^2 \quad\Rightarrow\quad \theta = \theta_0 + \omega_0 t + \frac{1}{2}\alpha t^2
+$$
+:::
+
 消去 $t$ 得角速度与角位移的关系：
 $$
 \omega^2 = \omega_0^2 + 2\alpha(\theta - \theta_0)
 $$
+
+:::derivation
+由前两式：
+$$
+\omega = \omega_0 + \alpha t \quad\Rightarrow\quad t = \frac{\omega - \omega_0}{\alpha}
+$$
+$$
+\theta - \theta_0 = \omega_0 t + \frac{1}{2}\alpha t^2
+$$
+将 $t = \dfrac{\omega - \omega_0}{\alpha}$ 代入第二式：
+$$
+\theta - \theta_0 = \omega_0\cdot\frac{\omega - \omega_0}{\alpha} + \frac{1}{2}\alpha\cdot\left(\frac{\omega - \omega_0}{\alpha}\right)^2
+$$
+$$
+= \frac{\omega_0(\omega - \omega_0)}{\alpha} + \frac{(\omega - \omega_0)^2}{2\alpha}
+= \frac{2\omega_0(\omega - \omega_0) + (\omega - \omega_0)^2}{2\alpha}
+$$
+$$
+= \frac{(\omega - \omega_0)(2\omega_0 + \omega - \omega_0)}{2\alpha} = \frac{(\omega - \omega_0)(\omega + \omega_0)}{2\alpha} = \frac{\omega^2 - \omega_0^2}{2\alpha}
+$$
+故：
+$$
+\omega^2 - \omega_0^2 = 2\alpha(\theta - \theta_0) \quad\Rightarrow\quad \omega^2 = \omega_0^2 + 2\alpha(\theta - \theta_0)
+$$
+:::
 
 线量形式（$s = r\theta,\ v = r\omega,\ a_t = r\alpha$）完全对应：
 $$
@@ -283,6 +451,23 @@ $$
   $$
   \vec{v} = \vec{v}' + \vec{u}
   $$
+
+:::derivation
+设 S' 系相对 S 系以速度 $\vec{u}$ 运动，质点在 S 系中的位矢为 $\vec{r}$，在 S' 系中的位矢为 $\vec{r}'$。
+
+由位移关系 $\vec{r} = \vec{r}' + \vec{u}\,t$（设 $t=0$ 时两系原点重合），两边对时间求导：
+$$
+\frac{d\vec{r}}{dt} = \frac{d\vec{r}'}{dt} + \frac{d(\vec{u}\,t)}{dt}
+$$
+在经典力学中时间绝对（$t = t'$），且 $\vec{u}$ 为常量时 $\dfrac{d\vec{u}}{dt} = 0$，故：
+$$
+\vec{v} = \vec{v}' + \vec{u}
+$$
+其中 $\vec{v} = \dfrac{d\vec{r}}{dt}$ 为绝对速度（S 系观察），$\vec{v}' = \dfrac{d\vec{r}'}{dt}$ 为相对速度（S' 系观察），$\vec{u}$ 为牵连速度。
+
+若 $\vec{u}$ 也随时间变化，再对时间求导可得加速度变换：$\vec{a} = \vec{a}' + \dfrac{d\vec{u}}{dt}$。
+:::
+
   其中 $\vec{v}$ 为绝对速度（S系中观察），$\vec{v}'$ 为相对速度（S'系中观察），$\vec{u}$ 为牵连速度。
 - **加速度关系**：若 $\vec{u}$ 为常量，则 $\vec{a} = \vec{a}'$；若 $\vec{u}$ 变化，则 $\vec{a} = \vec{a}' + \frac{d\vec{u}}{dt}$。
 

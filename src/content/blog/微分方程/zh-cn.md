@@ -88,6 +88,26 @@ $$ \frac{dy}{g(y)} = f(x)\,dx $$
 
 $$ \int \frac{dy}{g(y)} = \int f(x)\,dx + C $$
 
+:::derivation
+**推导过程：**
+
+对方程 $\dfrac{dy}{dx} = f(x)g(y)$，当 $g(y) \neq 0$ 时，两边同除以 $g(y)$：
+
+$$ \frac{1}{g(y)} \cdot \frac{dy}{dx} = f(x) $$
+
+两边同乘 $dx$（形式上分离变量）：
+
+$$ \frac{dy}{g(y)} = f(x)\,dx $$
+
+左右两边分别只含 $y$ 和 $x$，可独立积分：
+
+$$ \int \frac{1}{g(y)}\,dy = \int f(x)\,dx + C $$
+
+设 $G'(y) = \dfrac{1}{g(y)}$，$F'(x) = f(x)$，则得 $G(y) = F(x) + C$，即为隐式通解。
+
+> **注意**：若 $g(y_0) = 0$，则 $y = y_0$ 也是方程的解（常数解），分离变量时会丢失，需单独检查。
+:::
+
 设 $G'(y) = \frac{1}{g(y)}$，$F'(x) = f(x)$，则有 $G(y) = F(x) + C$，称为方程的**隐式通解（通积分）**。
 
 > **注意**：求解过程中每一步不一定是同解变形，可能增、减解。分离变量时需注意分母为零的情况（如 $g(y) = 0$ 可能丢失解）。
@@ -143,6 +163,32 @@ $$ \frac{dy}{y} = -P(x)\,dx $$
 
 $$ y = C e^{-\int P(x)\,dx} $$
 
+:::derivation
+**推导过程：**
+
+一阶线性齐次方程 $y' + P(x)y = 0$ 属于可分离变量型。当 $y \neq 0$ 时，两边除以 $y$：
+
+$$ \frac{y'}{y} = -P(x) $$
+
+即 $\dfrac{1}{y}\dfrac{dy}{dx} = -P(x)$，分离变量得：
+
+$$ \frac{dy}{y} = -P(x)\,dx $$
+
+两边积分：
+
+$$ \ln|y| = -\int P(x)\,dx + C_1 $$
+
+取指数：
+
+$$ |y| = e^{C_1} \cdot e^{-\int P(x)\,dx} $$
+
+去掉绝对值（允许 $C$ 取正负）：
+
+$$ y = C \cdot e^{-\int P(x)\,dx}, \quad C = \pm e^{C_1} $$
+
+此外 $y = 0$ 也是解（对应 $C = 0$），故通解为 $y = Ce^{-\int P(x)\,dx}$（$C$ 为任意常数）。
+:::
+
 **3. 非齐次方程的解法——常数变易法**
 
 设非齐次方程的解具有与齐次方程通解相同的形式，但将常数 $C$ 换为待定函数 $u(x)$：
@@ -160,6 +206,34 @@ $$ u(x) = \int Q(x) e^{\int P(x)\,dx}\,dx + C $$
 因此非齐次方程的通解为：
 
 $$ y = e^{-\int P(x)\,dx} \left[ \int Q(x) e^{\int P(x)\,dx}\,dx + C \right] $$
+
+:::derivation
+**推导过程（常数变易法）：**
+
+已知齐次方程 $y' + P(x)y = 0$ 的通解为 $y = Ce^{-\int P(x)\,dx}$。常数变易法的思想是：将常数 $C$ 替换为待定函数 $u(x)$，设非齐次方程的解为：
+
+$$ y = u(x) \cdot e^{-\int P(x)\,dx} $$
+
+对 $x$ 求导：
+
+$$ y' = u'(x) e^{-\int P(x)\,dx} + u(x) \cdot \left(-P(x)\right) e^{-\int P(x)\,dx} $$
+
+代入非齐次方程 $y' + P(x)y = Q(x)$：
+
+$$ u'(x) e^{-\int P\,dx} - u(x) P(x) e^{-\int P\,dx} + P(x) \cdot u(x) e^{-\int P\,dx} = Q(x) $$
+
+含 $u(x)$ 的两项恰好相消（因为 $u(x)e^{-\int P\,dx}$ 满足齐次方程），得：
+
+$$ u'(x) \cdot e^{-\int P(x)\,dx} = Q(x) $$
+
+故 $u'(x) = Q(x) e^{\int P(x)\,dx}$，积分得：
+
+$$ u(x) = \int Q(x) e^{\int P(x)\,dx}\,dx + C $$
+
+代回 $y = u(x)e^{-\int P\,dx}$ 即得通解公式。
+
+> **本质**：齐次解满足齐次方程，故代入后 $u(x)$ 相关项自动消去，仅剩 $u'(x)$，从而将问题降为一阶可积。
+:::
 
 即**非齐次方程的通解 = 对应齐次方程的通解 + 非齐次方程的一个特解**。
 
@@ -201,6 +275,32 @@ $$ y' + P(x)y = Q(x) y^n \quad (n \neq 0, 1) $$
 令 $z = y^{1-n}$，则方程化为关于 $z$ 的一阶线性方程：
 
 $$ z' + (1-n)P(x)z = (1-n)Q(x) $$
+
+:::derivation
+**推导过程：**
+
+伯努利方程 $y' + P(x)y = Q(x)y^n$（$n \neq 0, 1$）虽非线性，但可通过变量代换化为线性。
+
+两边同除以 $y^n$（设 $y \neq 0$）：
+
+$$ y^{-n} y' + P(x) y^{1-n} = Q(x) $$
+
+令 $z = y^{1-n}$，则对 $x$ 求导：
+
+$$ z' = (1-n) y^{-n} y' $$
+
+即 $y^{-n} y' = \dfrac{z'}{1-n}$，代入上式：
+
+$$ \frac{z'}{1-n} + P(x) z = Q(x) $$
+
+两边同乘 $(1-n)$：
+
+$$ z' + (1-n) P(x) z = (1-n) Q(x) $$
+
+这是关于 $z$ 的一阶线性方程，可用通解公式求解，最后换回 $z = y^{1-n}$ 即得原方程通解。
+
+> **关键**：代换 $z = y^{1-n}$ 恰好将非线性项 $y^n$ 消去，化为线性结构。
+:::
 
 求出此线性方程的通解后，换回原变量即得伯努利方程的通解。
 
@@ -248,6 +348,30 @@ $$ u + x\frac{du}{dx} = \varphi(u) $$
 
 $$ \frac{du}{\varphi(u) - u} = \frac{dx}{x} $$
 
+:::derivation
+**推导过程：**
+
+齐次方程 $\dfrac{dy}{dx} = \varphi\left(\dfrac{y}{x}\right)$ 的右端是 $\dfrac{y}{x}$ 的函数。令 $u = \dfrac{y}{x}$，即 $y = ux$，对 $x$ 求导（注意 $u$ 是 $x$ 的函数）：
+
+$$ \frac{dy}{dx} = u + x \frac{du}{dx} \quad \text{（乘积法则）} $$
+
+代入原方程：
+
+$$ u + x \frac{du}{dx} = \varphi(u) $$
+
+移项得：
+
+$$ x \frac{du}{dx} = \varphi(u) - u $$
+
+分离变量（设 $\varphi(u) - u \neq 0$）：
+
+$$ \frac{du}{\varphi(u) - u} = \frac{dx}{x} $$
+
+两边积分后得到 $u$ 与 $x$ 的关系，再用 $u = \dfrac{y}{x}$ 代回，即得原方程的通解。
+
+> **本质**：通过换元 $u = y/x$，将齐次方程化为可分离变量型。
+:::
+
 两边积分，再用 $\dfrac{y}{x}$ 代回 $u$，即得原方程的通解。
 
 #### 例题 5：解微分方程 $y' = \dfrac{y}{x} + \tan\dfrac{y}{x}$
@@ -292,6 +416,28 @@ $$ y'' = \frac{1}{2}e^{2x} + C_1, \quad y' = \frac{1}{4}e^{2x} + C_1 x + C_2, \q
 
 $$ y = \int \varphi(x, C_1)\,dx + C_2 $$
 
+:::derivation
+**推导过程：**
+
+对方程 $y'' = f(x, y')$（不显含 $y$），令 $p = y'$，则：
+
+$$ y'' = \frac{d}{dx}(y') = \frac{dp}{dx} = p' $$
+
+代入原方程，$y$ 不出现，方程降为关于 $p(x)$ 的一阶方程：
+
+$$ p' = f(x, p) $$
+
+设此一阶方程的通解为 $p = \varphi(x, C_1)$，即 $y' = \varphi(x, C_1)$。
+
+再积分一次：
+
+$$ y = \int \varphi(x, C_1)\,dx + C_2 $$
+
+即得含两个任意常数 $C_1, C_2$ 的通解，与二阶方程通解的常数个数一致。
+
+> **关键**：方程不显含 $y$，故令 $p = y'$ 可直接降一阶（$y''$ 变为 $p'$），不涉及 $p$ 对 $y$ 的链式求导。
+:::
+
 #### 例题 7：求解 $y'' = \dfrac{y'}{x} + x$
 
 **解：**令 $p = y'$，则：
@@ -311,6 +457,26 @@ $$ y = \frac{x^3}{3} + \frac{C_1}{2} x^2 + C_2 $$
 令 $p = y'$，则 $y'' = p\dfrac{dp}{dy}$，原方程化为：
 
 $$ p\frac{dp}{dy} = f(y, p) $$
+
+:::derivation
+**推导过程：**
+
+对方程 $y'' = f(y, y')$（不显含 $x$），令 $p = y'$，则 $y'' = \dfrac{dp}{dx}$。但方程右端不含 $x$，直接对 $x$ 积分不方便。利用链式法则将 $\dfrac{dp}{dx}$ 改写为对 $y$ 求导：
+
+$$ y'' = \frac{dp}{dx} = \frac{dp}{dy} \cdot \frac{dy}{dx} = \frac{dp}{dy} \cdot p $$
+
+即：
+
+$$ y'' = p \frac{dp}{dy} $$
+
+代入原方程 $y'' = f(y, y')$ 得：
+
+$$ p \frac{dp}{dy} = f(y, p) $$
+
+这是以 $y$ 为自变量、$p$ 为未知函数的一阶方程，降阶成功。
+
+> **关键**：利用复合函数链式法则 $\dfrac{dp}{dx} = \dfrac{dp}{dy} \cdot \dfrac{dy}{dx} = p \cdot \dfrac{dp}{dy}$，将关于 $x$ 的二阶方程转化为关于 $y$ 的一阶方程。
+:::
 
 设其通解为 $p = \psi(y, C_1)$，即 $\dfrac{dy}{dx} = \psi(y, C_1)$，分离变量后积分得原方程的通解。
 
@@ -349,9 +515,54 @@ $$ y'' + P(x)y' + Q(x)y = f(x) $$
 
 > **定理 2（齐次方程通解结构）**若 $y_1(x)$、$y_2(x)$ 是二阶线性齐次方程的两个线性无关特解，则 $y = C_1 y_1 + C_2 y_2$（$C_1$、$C_2$ 为任意常数）是该方程的通解。
 
+:::derivation
+**推导过程：**
+
+设 $L[y] = y'' + P(x)y' + Q(x)y$。已知 $L[y_1] = 0$，$L[y_2] = 0$。
+
+由算子线性性，对任意常数 $C_1, C_2$：
+
+$$ L[C_1 y_1 + C_2 y_2] = C_1 L[y_1] + C_2 L[y_2] = 0 + 0 = 0 $$
+
+故 $C_1 y_1 + C_2 y_2$ 是齐次方程的解。
+
+**为何是通解**：二阶方程的通解应含两个独立任意常数。由于 $y_1, y_2$ 线性无关（即 $y_1/y_2$ 不是常数），$C_1, C_2$ 不能合并为一个常数，故确实含两个独立常数，从而是通解。
+
+> **关键**：线性无关保证两个常数不能合并。若 $y_1, y_2$ 线性相关（如 $y_2 = ky_1$），则 $C_1 y_1 + C_2 y_2 = (C_1 + kC_2) y_1$ 实际只含一个常数。
+:::
+
 > **定理 3（非齐次方程通解结构）**若 $y^*(x)$ 是二阶非齐次方程 $y'' + P(x)y' + Q(x)y = f(x)$ 的一个特解，$Y(x)$ 是相应齐次方程的通解，则 $y = Y(x) + y^*(x)$ 是非齐次方程的通解。
 
+:::derivation
+**证明：**
+
+设 $L[y] = y'' + P(x)y' + Q(x)y$（线性微分算子），则：
+
+- 齐次方程：$L[Y] = 0$
+- 非齐次方程：$L[y^*] = f(x)$
+
+令 $y = Y + y^*$，由算子线性性：
+
+$$ L[Y + y^*] = L[Y] + L[y^*] = 0 + f(x) = f(x) $$
+
+故 $y = Y + y^*$ 是非齐次方程的解。又 $Y$ 含两个独立任意常数，$y^*$ 不含常数，故 $y = Y + y^*$ 含两个独立常数，即通解。
+:::
+
 > **定理 4（解的叠加原理）**若 $y_1^*$、$y_2^*$ 分别是方程 $y'' + Py' + Qy = f_1(x)$ 和 $y'' + Py' + Qy = f_2(x)$ 的特解，则 $y_1^* + y_2^*$ 是方程 $y'' + Py' + Qy = f_1(x) + f_2(x)$ 的特解。
+
+:::derivation
+**证明：**
+
+设 $L[y] = y'' + Py' + Qy$，由条件 $L[y_1^*] = f_1(x)$，$L[y_2^*] = f_2(x)$。
+
+令 $y = y_1^* + y_2^*$，由算子线性性：
+
+$$ L[y_1^* + y_2^*] = L[y_1^*] + L[y_2^*] = f_1(x) + f_2(x) $$
+
+故 $y_1^* + y_2^*$ 是方程 $L[y] = f_1(x) + f_2(x)$ 的特解。
+
+> **意义**：当非齐次项 $f(x) = f_1(x) + f_2(x)$ 时，可分别求对应 $f_1$、$f_2$ 的特解再相加，简化求解。
+:::
 
 * * *
 
@@ -366,6 +577,32 @@ $$ y'' + py' + qy = 0 $$
 令 $y = e^{rx}$，代入得特征方程：
 
 $$ r^2 + pr + q = 0 $$
+
+:::derivation
+**推导过程：**
+
+对方程 $y'' + py' + qy = 0$，注意到 $e^{rx}$ 的各阶导数仍为 $e^{rx}$ 的常数倍，故尝试 $y = e^{rx}$ 为解。求导：
+
+$$ y' = re^{rx}, \quad y'' = r^2 e^{rx} $$
+
+代入方程：
+
+$$ r^2 e^{rx} + p \cdot r e^{rx} + q \cdot e^{rx} = 0 $$
+
+提取 $e^{rx}$（$e^{rx} \neq 0$）：
+
+$$ (r^2 + pr + q) e^{rx} = 0 $$
+
+故 $y = e^{rx}$ 是方程的解当且仅当：
+
+$$ r^2 + pr + q = 0 $$
+
+此即**特征方程**。由二次方程求根公式 $r = \dfrac{-p \pm \sqrt{p^2 - 4q}}{2}$，根据判别式 $\Delta = p^2 - 4q$ 的符号分三种情况：
+
+- $\Delta > 0$：两个相异实根 $r_1 \neq r_2$，$e^{r_1 x}$ 与 $e^{r_2 x}$ 线性无关，通解 $y = C_1 e^{r_1 x} + C_2 e^{r_2 x}$。
+- $\Delta = 0$：重根 $r_1 = r_2 = r$，此时 $e^{rx}$ 仅提供一个解，另一个线性无关解为 $xe^{rx}$（可由降阶法验证），通解 $y = (C_1 + C_2 x)e^{rx}$。
+- $\Delta < 0$：共轭复根 $r = \alpha \pm i\beta$，利用欧拉公式 $e^{(\alpha+i\beta)x} = e^{\alpha x}(\cos\beta x + i\sin\beta x)$，取实部、虚部得两个实值解，通解 $y = e^{\alpha x}(C_1\cos\beta x + C_2\sin\beta x)$。
+:::
 
 **2. 三种情况**
 
@@ -413,6 +650,30 @@ $$ y'' + py' + qy = f(x) $$
 
 $Q_m(x)$ 为 $m$ 次待定多项式。
 
+:::derivation
+**推导过程（为何设此形式及 $k$ 的取值）：**
+
+对方程 $y'' + py' + qy = P_m(x)e^{\lambda x}$，由于右端是多项式乘 $e^{\lambda x}$，而 $e^{\lambda x}$ 的各阶导数仍为 $e^{\lambda x}$ 乘多项式，故特解应设为 $y^* = Q(x)e^{\lambda x}$（$Q(x)$ 为多项式）。
+
+计算 $y^* = Q(x)e^{\lambda x}$ 的导数：
+
+$$ y^{*\prime} = (Q' + \lambda Q)e^{\lambda x}, \quad y^{*\prime\prime} = (Q'' + 2\lambda Q' + \lambda^2 Q)e^{\lambda x} $$
+
+代入方程并消去 $e^{\lambda x}$：
+
+$$ Q'' + (2\lambda + p)Q' + (\lambda^2 + p\lambda + q)Q = P_m(x) $$
+
+记 $\varphi(\lambda) = \lambda^2 + p\lambda + q$（即特征多项式），$\varphi'(\lambda) = 2\lambda + p$，则：
+
+$$ Q'' + \varphi'(\lambda) Q' + \varphi(\lambda) Q = P_m(x) $$
+
+- 若 $\varphi(\lambda) \neq 0$（$\lambda$ 不是特征根）：左端最高次项由 $\varphi(\lambda) Q$ 贡献，取 $Q$ 为 $m$ 次多项式 $Q_m(x)$ 即可，即 $k = 0$。
+- 若 $\varphi(\lambda) = 0$，$\varphi'(\lambda) \neq 0$（$\lambda$ 是单根）：$\varphi(\lambda)Q$ 项消失，需 $Q'$ 为 $m$ 次，即 $Q$ 为 $m+1$ 次。但常数项不可观测，故设 $Q = x \cdot Q_m(x)$，即 $k = 1$。
+- 若 $\varphi(\lambda) = \varphi'(\lambda) = 0$（$\lambda$ 是重根）：$Q$ 和 $Q'$ 项均消失，需 $Q''$ 为 $m$ 次，设 $Q = x^2 \cdot Q_m(x)$，即 $k = 2$。
+
+> **本质**：$x^k$ 因子是为了补偿 $\lambda$ 作为特征根时方程左端自动消失的项，确保两边多项式次数匹配。
+:::
+
 #### 例题 11：求 $y'' - 3y' + 2y = 2x e^{x}$ 的通解
 
 **解：**特征方程 $r^2 - 3r + 2 = 0$，特征根 $r_1 = 1$，$r_2 = 2$。
@@ -437,6 +698,29 @@ $$ y^* = x^k e^{\alpha x}[R_m(x)\cos\beta x + S_m(x)\sin\beta x] $$
 
 * 若 $\alpha \pm i\beta$ **不是**特征根，$k = 0$；
 * 若 $\alpha \pm i\beta$ 是特征根，$k = 1$。
+
+:::derivation
+**推导过程（为何 $k$ 最大为 $1$）：**
+
+对于 $f(x) = e^{\alpha x}[P_l(x)\cos\beta x + Q_n(x)\sin\beta x]$，利用欧拉公式 $e^{i\beta x} = \cos\beta x + i\sin\beta x$，可将 $f(x)$ 表为：
+
+$$ f(x) = e^{\alpha x} \cdot \text{Re}\left[\tilde{P}(x) e^{i\beta x}\right] = \text{Re}\left[\tilde{P}(x) e^{(\alpha + i\beta)x}\right] $$
+
+其中 $\tilde{P}(x)$ 为复系数多项式（次数 $m = \max\{l, n\}$）。
+
+问题转化为求 $y'' + py' + qy = \tilde{P}(x) e^{(\alpha + i\beta)x}$ 的特解，这与形式 1 类似。设特解：
+
+$$ \tilde{y}^* = x^k \tilde{R}_m(x) e^{(\alpha + i\beta)x} $$
+
+其中 $\tilde{R}_m(x)$ 为 $m$ 次复系数多项式。此时"特征方程"为 $r^2 + pr + q = 0$，检验 $\lambda = \alpha + i\beta$：
+
+- 若 $\alpha + i\beta$ 不是特征根（即 $\varphi(\alpha + i\beta) \neq 0$），取 $k = 0$。
+- 若 $\alpha + i\beta$ 是特征根，由于实系数方程的复根成共轭对出现，$\alpha + i\beta$ 只能是**单根**（共轭复根 $\alpha \pm i\beta$ 各算一个），故 $k$ 最大为 $1$。
+
+取实部（或虚部）即得实形式特解 $y^* = x^k e^{\alpha x}[R_m(x)\cos\beta x + S_m(x)\sin\beta x]$。
+
+> **与形式 1 的区别**：实系数方程的复特征根成对出现，$\alpha \pm i\beta$ 不可能为重根，故 $k \le 1$。
+:::
 
 #### 例题 12：求 $y'' + y = x\cos 2x$ 的一个特解
 
