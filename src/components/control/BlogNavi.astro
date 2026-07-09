@@ -1,11 +1,12 @@
 ---
 import { Icon } from "astro-icon/components"
 import i18nit from '@i18n/translation'
+import type { CollectionEntry } from 'astro:content'
 import { getRelativeLocaleUrl } from '@utils/url-utils';
 
 interface Props {
-    prev: any;
-    next: any;
+    prev: CollectionEntry<'blog'> | null;
+    next: CollectionEntry<'blog'> | null;
 }
 
 const { prev, next } = Astro.props;

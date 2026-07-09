@@ -188,13 +188,15 @@ async function loadCategoryOptions(preloadedEntries: { path: string; slug: strin
     const categorySet = new Set<string>();
     const subcategoriesByRoot: Record<string, Set<string>> = {};
 
-    for (const entry of entries) {
+    const CONCURRENCY = 6;
+    const entryQueue = [...entries];
+    const processEntry = async (entry: { path: string; slug: string; lang: string }) => {
       try {
         const meta = await getFileMeta(entry.path, token, branch, true);
         const markdown = decodeFileContent(meta?.content || "");
         const cats = extractCategoriesFromMarkdown(markdown);
         const rootCategory = getPrimaryCategoryFromItems(cats);
-        if (!rootCategory) continue;
+        if (!rootCategory) return;
         categorySet.add(rootCategory);
         const subcategories = getSubcategoriesFromItems(cats);
         if (subcategories.length > 0) {
@@ -202,7 +204,19 @@ async function loadCategoryOptions(preloadedEntries: { path: string; slug: strin
           for (const sub of subcategories) subcategoriesByRoot[rootCategory].add(sub);
         }
       } catch (err) { console.warn("[admin] 单篇文章分类提取失败:", entry?.path, err); }
+    };
+    const entryWorkers: Promise<void>[] = [];
+    const runEntryWorker = async () => {
+      while (entryQueue.length > 0) {
+        const entry = entryQueue.shift();
+        if (!entry) break;
+        await processEntry(entry);
+      }
+    };
+    for (let i = 0; i < Math.min(CONCURRENCY, entries.length); i++) {
+      entryWorkers.push(runEntryWorker());
     }
+    await Promise.all(entryWorkers);
 
     const categoryMeta = {
       topLevelCategories: Array.from(categorySet),

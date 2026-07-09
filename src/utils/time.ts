@@ -22,18 +22,6 @@ function addPanguSpace(text: string): string {
 }
 
 /**
- * 函数 1：返回 “月 日”
- */
-export function formatMonthDay(dateInput: string | Date, lang: string = 'zh-CN'): string {
-  const date = ensureDate(dateInput);
-  const formatted = new Intl.DateTimeFormat(lang, {
-    month: 'short',
-    day: 'numeric',
-  }).format(date);
-
-  return lang.toLowerCase().startsWith('zh') ? addPanguSpace(formatted) : formatted;
-}
-/**
  * 函数 2：返回 “年 月 日”
  */
 export function formatFullDate(dateInput: string | Date, lang: string = 'zh-CN'): string {

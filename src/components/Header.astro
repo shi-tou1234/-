@@ -80,7 +80,7 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
     <!-- tools -->
     <div class="shrink-0 ml-auto flex flex-nowrap gap-2 pl-1 md:pl-2 md:translate-x-48 py-2 justify-end z-30">
         <!-- Search -->
-        <button id="search-button" class="hidden min-[380px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+        <button id="search-button" aria-label="搜索" class="hidden min-[380px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
             <Icon name="fa6-solid:magnifying-glass" class="w-4 h-4" />
         </button>
         <!-- Dark Mode -->
@@ -90,7 +90,7 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
           <FontSizeControl class="hide-on-tiny flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] rounded-lg hover:text-current active:scale-90 border border-[var(--button-border-color)] transition-all duration-300" />
         </div>
         <!-- Email Copy -->
-        <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" class="hide-on-tiny copy-email-action hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+        <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" aria-label="复制邮箱" class="hide-on-tiny copy-email-action hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
           <Icon name="fa6-solid:envelope" class="w-4 h-4" />
         </button>
         <!-- Blog Guide -->
@@ -300,22 +300,6 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
 @media (max-width: 379px) {
   #main-header .hide-on-tiny {
     display: none !important;
-  }
-
-  #mobile-menu.is-tiny-screen {
-    top: 0;
-    right: 0;
-    width: min(84vw, 300px);
-    height: 100vh;
-    border-radius: 0;
-    border-top: 0;
-    border-right: 0;
-    padding-top: 3.8rem;
-    overflow-y: auto;
-  }
-
-  #mobile-menu.is-tiny-screen .tiny-only {
-    display: block;
   }
 }
 

@@ -28,7 +28,10 @@ const pageLang = lang || "zh-cn";
         } else {
           theme = savedTheme || 'light';
         }
-        localStorage.setItem('theme', savedTheme || theme);
+        // 仅在用户未明确选择时写入；保留 'system' 值不被覆盖
+        if (savedTheme !== 'system') {
+          localStorage.setItem('theme', theme);
+        }
         document.documentElement.setAttribute('data-theme', theme);
 
         if (theme === 'dark') {
@@ -39,7 +42,7 @@ const pageLang = lang || "zh-cn";
         })();
     </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, max-image-preview:none">
     <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, max-image-preview:none">
     <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">

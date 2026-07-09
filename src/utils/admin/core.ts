@@ -100,7 +100,8 @@ export function syncApiBase() {
 export function loadGitHubDraft() {
   const tokenInput = document.getElementById("gh-token");
   const branchInput = document.getElementById("gh-branch");
-  const savedToken = localStorage.getItem(ADMIN_GH_TOKEN_KEY) || "";
+  // Token 改用 sessionStorage，关闭标签即清除，降低 XSS 窃取仓库写权限的风险
+  const savedToken = sessionStorage.getItem(ADMIN_GH_TOKEN_KEY) || "";
   const savedBranch = localStorage.getItem(ADMIN_GH_BRANCH_KEY) || "main";
   const savedApi = localStorage.getItem(ADMIN_GH_API_URL_KEY) || GITHUB_API_DEFAULT;
   if (tokenInput && savedToken) tokenInput.value = savedToken;
@@ -132,7 +133,7 @@ export function loadGitHubDraft() {
 export function saveGitHubDraft() {
   const token = getToken();
   const branch = getBranch();
-  localStorage.setItem(ADMIN_GH_TOKEN_KEY, token);
+  sessionStorage.setItem(ADMIN_GH_TOKEN_KEY, token);
   localStorage.setItem(ADMIN_GH_BRANCH_KEY, branch || "main");
   syncApiBase();
 }

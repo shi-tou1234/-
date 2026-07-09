@@ -124,20 +124,3 @@ export function buildSubcategoriesByRoot(posts: BlogEntryWithLocaleStatus[], lan
     return acc;
   }, {} as Record<string, Set<string>>);
 }
-
-export function buildCategoryRootMap(posts: BlogEntryWithLocaleStatus[], lang: string) {
-  return posts.reduce((acc, post) => {
-    const categories = getPostCategories(post, lang);
-    const rootCategory = categories[0];
-    if (!rootCategory) return acc;
-
-    acc[rootCategory] = rootCategory;
-    categories.slice(1).forEach((category) => {
-      if (category) {
-        acc[category] = rootCategory;
-      }
-    });
-
-    return acc;
-  }, {} as Record<string, string>);
-}

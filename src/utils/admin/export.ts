@@ -111,8 +111,11 @@ async function exportPosts(format: "csv" | "markdown") {
   if (progressText) progressText.textContent = `0 / ${entries.length}`;
 
   const posts: { path: string; slug: string; lang: string; markdown: string }[] = [];
-  for (let i = 0; i < entries.length; i++) {
-    const entry = entries[i];
+  const total = entries.length;
+  let completed = 0;
+  const CONCURRENCY = 6;
+  const entryQueue = [...entries];
+  const processEntry = async (entry: { path: string; slug: string; lang: string }) => {
     try {
       const meta = await getFileMeta(entry.path, token, branch);
       if (meta?.content) {
@@ -122,11 +125,23 @@ async function exportPosts(format: "csv" | "markdown") {
     } catch {
       posts.push({ ...entry, markdown: "# 加载失败\n\n无法获取此文章内容。" });
     }
-    const pct = Math.round(((i + 1) / entries.length) * 100);
+    completed++;
+    const pct = Math.round((completed / total) * 100);
     if (progressBar) progressBar.style.width = `${pct}%`;
-    if (progressText) progressText.textContent = `${i + 1} / ${entries.length}`;
-    await new Promise((r) => setTimeout(r, 10));
+    if (progressText) progressText.textContent = `${completed} / ${total}`;
+  };
+  const entryWorkers: Promise<void>[] = [];
+  const runEntryWorker = async () => {
+    while (entryQueue.length > 0) {
+      const entry = entryQueue.shift();
+      if (!entry) break;
+      await processEntry(entry);
+    }
+  };
+  for (let i = 0; i < Math.min(CONCURRENCY, entries.length); i++) {
+    entryWorkers.push(runEntryWorker());
   }
+  await Promise.all(entryWorkers);
 
   setMsg(msgEl, "正在生成压缩包...");
   const zip = new JSZip();

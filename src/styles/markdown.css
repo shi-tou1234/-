@@ -246,12 +246,6 @@
   }
 }
 
-[data-theme="dark"] .markdown-content pre code {
-  padding: 0;
-  background: none;
-  font-size: 0.9rem;
-}
-
 .markdown-content pre.astro-code {
   border: 1px solid var(--button-border-color);
   box-shadow: 0 4px 12px var(--shadow-color);
@@ -280,12 +274,6 @@
 .markdown-content iframe {
   aspect-ratio: 16 / 9;
   min-height: 320px;
-}
-
-.markdown-content hr {
-  margin: 2rem 0;
-  border: none;
-  border-top: 1px solid var(--border-color);
 }
 
 .markdown-content table {
@@ -538,7 +526,8 @@
 
 .fetch-error {
   background-color: #ffe6e6;
-  border: 1px solid #ffcccc;
+  border: 1px solid #ff6b6b;
+  opacity: 0.5;
 }
 
 [data-theme="dark"] .fetch-error {
@@ -690,11 +679,6 @@
 .no-styling {
     text-decoration: none;
     color: inherit;
-}
-
-.fetch-error {
-    opacity: 0.5;
-    border: 1px solid #ff6b6b;
 }
 
 .quote {

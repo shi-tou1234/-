@@ -74,11 +74,12 @@ export class GitHubApiError extends Error {
 // PBKDF2 迭代次数：OWASP 2023 建议 PBKDF2-SHA256 至少 600,000 次
 const PBKDF2_ITERATIONS = 600000;
 
-const DEFAULT_SECURITY: SecurityConfig = {
+// 加载失败时不回退到任何默认密码——直接禁用登录，防止默认密码被利用
+const NULL_SECURITY: SecurityConfig = {
   algorithm: "PBKDF2-SHA256",
-  iterations: 150000,
-  salt: "sZPlZ007W2b7Jl5bq4HwKA==",
-  hash: "Y8U44x/bJKZkj056F/Ot0JVT0fs0rZS+xIsVE7dY/6Q=",
+  iterations: PBKDF2_ITERATIONS,
+  salt: "",
+  hash: "",
 };
 
 // ====== Base64 & Crypto Helpers ======
@@ -113,7 +114,7 @@ async function hashPassword(
     {
       name: "PBKDF2",
       hash: "SHA-256",
-      salt: fromBase64(saltBase64) as unknown as BufferSource,
+      salt: fromBase64(saltBase64),
       iterations,
     },
     keyMaterial,
@@ -349,7 +350,7 @@ export class AdminService {
       "",
     );
     this.fallbackSecurity =
-      opts.fallbackSecurityConfig || DEFAULT_SECURITY;
+      opts.fallbackSecurityConfig || NULL_SECURITY;
     this.security = this.fallbackSecurity;
   }
 
@@ -406,6 +407,7 @@ export class AdminService {
     token: string,
     options: RequestInit = {},
   ): Promise<any> {
+    // GitHub API 返回结构多样（meta/tree/user/content 等），用 any 避免每个调用点都加断言
     const normalizedPath = path.startsWith("/") ? path : `/${path}`;
     const url = `${this.apiBase}${normalizedPath}`;
 
@@ -471,6 +473,11 @@ export class AdminService {
   }
 
   async verifyPassword(password: string): Promise<boolean> {
+    // 安全配置未加载（salt/hash 为空）时直接拒绝登录，不回退到默认密码
+    if (!this.security.salt || !this.security.hash) {
+      console.warn("[admin] 安全配置未加载，登录已禁用");
+      return false;
+    }
     const hashed = await hashPassword(
       password,
       this.security.salt,

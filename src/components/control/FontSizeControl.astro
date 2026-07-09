@@ -3,7 +3,7 @@ const className = Astro.props.class;
 import { Icon } from "astro-icon/components";
 ---
 
-<button id="fontSizeToggle" title="调节字体大小" class={className}>
+<button id="fontSizeToggle" title="调节字体大小" aria-label="调节字体大小" class={className}>
     <Icon name="fa6-solid:text-height" class="w-4 h-4" />
 </button>
 
