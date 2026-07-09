@@ -1,227 +1,93 @@
 ---
-import TravelMap from '@/components/misc/TravelMap.astro';
+import AboutMarkdown from '@/components/admin/settings/AboutMarkdown.astro';
+import AboutTimeline from '@/components/admin/settings/AboutTimeline.astro';
+import AboutPersonal from '@/components/admin/settings/AboutPersonal.astro';
+import AboutProfile from '@/components/admin/settings/AboutProfile.astro';
+import ToolsLinks from '@/components/admin/settings/ToolsLinks.astro';
+import SiteSlogan from '@/components/admin/settings/SiteSlogan.astro';
+import HeaderContact from '@/components/admin/settings/HeaderContact.astro';
+import BlogGuide from '@/components/admin/settings/BlogGuide.astro';
+
+const subTabs = [
+  { key: 'about-markdown', label: '关于页文本' },
+  { key: 'about-timeline', label: '时间线' },
+  { key: 'about-personal', label: '个人介绍' },
+  { key: 'about-profile', label: '特质' },
+  { key: 'tools-links', label: '工具链接' },
+  { key: 'site-slogan', label: '标语' },
+  { key: 'header-contact', label: '联系方式' },
+  { key: 'blog-guide', label: '博客介绍' },
+];
 ---
-<div class="space-y-6">
-  <!-- About Markdown -->
-  <div class="rounded-lg border border-[var(--button-border-color)] p-5">
-    <h2 class="text-xl font-semibold mb-4">关于页 Markdown 文本</h2>
-    <div class="flex gap-3 mb-3">
-      <select id="about-lang" class="rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2">
-        <option value="zh-cn">中文</option>
-      </select>
-      <button id="load-about-markdown-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">加载</button>
-      <button id="save-about-markdown-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">保存</button>
-    </div>
-    <textarea id="about-markdown-content" class="w-full min-h-[200px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2"></textarea>
-    <p id="about-markdown-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
+<div class="admin-site-settings space-y-4">
+  <div class="admin-subtabs flex gap-1 overflow-x-auto border-b border-[var(--button-border-color)]">
+    {subTabs.map((tab, idx) => (
+      <button
+        type="button"
+        class="admin-subtab whitespace-nowrap px-4 py-2 text-sm font-medium border-b-2 border-transparent transition-colors duration-[0.32s] [transition-timing-function:cubic-bezier(0.23,1,0.320,1)]"
+        data-subtab={tab.key}
+        aria-selected={idx === 0 ? 'true' : 'false'}
+      >{tab.label}</button>
+    ))}
   </div>
 
-  <!-- About Timeline -->
-  <div class="rounded-lg border border-[var(--button-border-color)] p-5">
-    <h2 class="text-xl font-semibold mb-4">网站记录（时间线）</h2>
-    <div class="flex gap-3 mb-3">
-      <button id="load-about-timeline-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">加载</button>
-      <button id="save-about-timeline-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">保存</button>
-    </div>
-    <p class="text-sm mb-2 text-[var(--text-color)]/70">每行一条，格式：<code>日期|内容</code>。同一日期可写多行，自动合并显示。</p>
-    <textarea id="about-timeline-content" class="w-full min-h-[160px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder="2024-01|网站上线&#10;2024-06|新增功能"></textarea>
-    <p id="about-timeline-msg" class="text-sm mt-2 text-[var(--text-color)]/70"></p>
-  </div>
-
-  <!-- About Personal -->
-  <div class="rounded-lg border border-[var(--button-border-color)] p-5">
-    <h2 class="text-xl font-semibold mb-4">关于我的一些事情</h2>
-    <div class="flex gap-3 mb-3">
-      <button id="load-about-personal-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">加载</button>
-      <button id="save-about-personal-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">保存</button>
-    </div>
-
-    <div class="space-y-3">
-      <div>
-        <label class="block text-sm mb-1">自我介绍</label>
-        <textarea id="about-personal-intro" class="w-full min-h-[80px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2"></textarea>
-      </div>
-      <div>
-        <label class="block text-sm mb-1">音乐列表（每行一条，格式：标题|艺术家|URL）</label>
-        <textarea id="about-personal-music" class="w-full min-h-[100px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2"></textarea>
-      </div>
-      <div class="flex flex-wrap items-center gap-2">
-        <input id="about-music-files" type="file" multiple accept="audio/mpeg,.mp3" class="hidden" />
-        <label for="about-music-files" class="cursor-pointer rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">选择 MP3</label>
-        <span id="about-music-files-count" class="text-sm text-[var(--text-color)]/70">未选择文件</span>
-        <button id="upload-about-music-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">上传 MP3</button>
-      </div>
-      <div>
-        <label class="block text-sm mb-1">旅行城市（JSON 数组）</label>
-        <textarea id="about-personal-travel-cities" class="w-full min-h-[80px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" placeholder='[{"province":"北京","city":"北京","visited":true}]'></textarea>
-      </div>
-      <div class="rounded border border-[var(--button-border-color)] p-3">
-        <TravelMap editable={true} storageInputId="about-personal-travel-cities" />
-      </div>
-    </div>
-    <p id="about-personal-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
-  </div>
-
-  <!-- About Profile -->
-  <div class="rounded-lg border border-[var(--button-border-color)] p-5">
-    <h2 class="text-xl font-semibold mb-4">关于特质</h2>
-    <div class="flex gap-3 mb-3">
-      <button id="load-about-profile-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">加载</button>
-      <button id="save-about-profile-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">保存</button>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-      <div>
-        <label class="block text-sm mb-1">MBTI</label>
-        <input id="about-mbti" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-      </div>
-      <div>
-        <label class="block text-sm mb-1">MBTI 介绍链接</label>
-        <input id="about-mbti-link" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-      </div>
-      <div>
-        <label class="block text-sm mb-1">所学专业</label>
-        <input id="about-major" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-      </div>
-      <div>
-        <label class="block text-sm mb-1">专业百科链接</label>
-        <input id="about-major-link" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-      </div>
-      <div>
-        <label class="block text-sm mb-1">最近在做</label>
-        <input id="about-recent-doing" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-      </div>
-      <div>
-        <label class="block text-sm mb-1">最近读书</label>
-        <input id="about-recent-reading" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-      </div>
-    </div>
-    <p id="about-profile-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
-  </div>
-
-  <!-- Tools Links -->
-  <div class="rounded-lg border border-[var(--button-border-color)] p-5">
-    <h2 class="text-xl font-semibold mb-4">工具链接</h2>
-    <div class="flex gap-3 mb-3">
-      <button id="load-tools-links-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">加载</button>
-      <button id="save-tools-links-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">保存</button>
-      <button id="insert-tools-link-template-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">插入模板</button>
-    </div>
-    <textarea id="tools-links-content" class="w-full min-h-[200px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2 font-mono text-sm" placeholder="[]"></textarea>
-
-    <details class="mt-3 rounded border border-[var(--button-border-color)] p-3">
-      <summary class="cursor-pointer text-sm font-medium">颜色选择器（渐变背景）</summary>
-      <div class="mt-3 space-y-3">
-        <div class="flex flex-wrap gap-2">
-          <button class="gradient-preset-btn rounded border-2 border-transparent px-3 py-1.5 text-sm text-white" data-grad="linear-gradient(-45deg, hsl(235, 45%, 46%) 0%, hsl(275, 42%, 42%) 100%)" style="background:linear-gradient(-45deg, hsl(235, 45%, 46%) 0%, hsl(275, 42%, 42%) 100%)">蓝紫</button>
-          <button class="gradient-preset-btn rounded border-2 border-transparent px-3 py-1.5 text-sm text-white" data-grad="linear-gradient(-45deg, hsl(0, 65%, 50%) 0%, hsl(40, 62%, 48%) 100%)" style="background:linear-gradient(-45deg, hsl(0, 65%, 50%) 0%, hsl(40, 62%, 48%) 100%)">红橙</button>
-          <button class="gradient-preset-btn rounded border-2 border-transparent px-3 py-1.5 text-sm text-white" data-grad="linear-gradient(-45deg, hsl(150, 50%, 40%) 0%, hsl(190, 47%, 36%) 100%)" style="background:linear-gradient(-45deg, hsl(150, 50%, 40%) 0%, hsl(190, 47%, 36%) 100%)">青绿</button>
-          <button class="gradient-preset-btn rounded border-2 border-transparent px-3 py-1.5 text-sm text-white" data-grad="linear-gradient(-45deg, hsl(270, 55%, 45%) 0%, hsl(310, 52%, 41%) 100%)" style="background:linear-gradient(-45deg, hsl(270, 55%, 45%) 0%, hsl(310, 52%, 41%) 100%)">紫粉</button>
-        </div>
-        <div class="grid grid-cols-3 gap-3">
-          <div>
-            <label class="block text-sm mb-1">色相 (H)</label>
-            <input id="color-hue-slider" type="range" min="0" max="360" value="235" class="w-full" />
-          </div>
-          <div>
-            <label class="block text-sm mb-1">饱和度 (S%)</label>
-            <input id="color-sat-slider" type="range" min="10" max="80" value="45" class="w-full" />
-          </div>
-          <div>
-            <label class="block text-sm mb-1">亮度 (L%)</label>
-            <input id="color-light-slider" type="range" min="20" max="70" value="46" class="w-full" />
-          </div>
-        </div>
-        <div id="color-preview" class="h-12 rounded border border-[var(--button-border-color)]" style="background:linear-gradient(-45deg, hsl(235, 45%, 46%) 0%, hsl(275, 42%, 42%) 100%)"></div>
-        <p id="color-preview-text" class="text-xs text-[var(--text-color)]/70 font-mono break-all">linear-gradient(-45deg, hsl(235, 45%, 46%) 0%, hsl(275, 42%, 42%) 100%)</p>
-        <button id="apply-gradient-btn" class="rounded border border-[var(--button-border-color)] px-3 py-1.5 text-sm hover:bg-[var(--button-hover-color)]">应用到当前光标所在条目</button>
-      </div>
-    </details>
-    <p id="tools-links-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
-  </div>
-
-  <!-- Site Slogan -->
-  <div class="rounded-lg border border-[var(--button-border-color)] p-5">
-    <h2 class="text-xl font-semibold mb-4">网站标语</h2>
-    <div class="flex gap-3 mb-3">
-      <button id="load-site-slogan-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">加载</button>
-      <button id="save-site-slogan-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">保存</button>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-      <div>
-        <label class="block text-sm mb-1">中文标语</label>
-        <input id="site-slogan-zh" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-      </div>
-      <div>
-        <label class="block text-sm mb-1">English Slogan</label>
-        <input id="site-slogan-en" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-      </div>
-    </div>
-    <p id="site-slogan-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
-  </div>
-
-  <!-- Header Contact -->
-  <div class="rounded-lg border border-[var(--button-border-color)] p-5">
-    <h2 class="text-xl font-semibold mb-4">联系方式（头部导航）</h2>
-    <div class="flex gap-3 mb-3">
-      <button id="load-header-contact-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">加载</button>
-      <button id="save-header-contact-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">保存</button>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-      <div>
-        <label class="block text-sm mb-1">GitHub 首页链接</label>
-        <input id="header-github" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-      </div>
-      <div>
-        <label class="block text-sm mb-1">邮箱地址</label>
-        <input id="header-email" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-      </div>
-    </div>
-    <p id="header-contact-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
-  </div>
-
-  <!-- Blog Guide -->
-  <div class="rounded-lg border border-[var(--button-border-color)] p-5">
-    <h2 class="text-xl font-semibold mb-4">博客介绍弹窗内容</h2>
-    <div class="flex gap-3 mb-3">
-      <button id="load-blog-guide-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">加载</button>
-      <button id="save-blog-guide-btn" class="rounded border border-[var(--button-border-color)] px-4 py-2 hover:bg-[var(--button-hover-color)]">保存</button>
-    </div>
-    <div class="space-y-4">
-      <fieldset class="rounded border border-[var(--button-border-color)] p-3">
-        <legend class="text-sm font-medium px-2">中文（zh-cn）</legend>
-        <div class="space-y-2">
-          <div>
-            <label class="block text-sm mb-1">标题</label>
-            <input id="blog-guide-zh-title" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-          </div>
-          <div>
-            <label class="block text-sm mb-1">副标题</label>
-            <input id="blog-guide-zh-subtitle" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-          </div>
-          <div>
-            <label class="block text-sm mb-1">条目（每行一条）</label>
-            <textarea id="blog-guide-zh-items" class="w-full min-h-[100px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2"></textarea>
-          </div>
-        </div>
-      </fieldset>
-      <fieldset class="rounded border border-[var(--button-border-color)] p-3">
-        <legend class="text-sm font-medium px-2">English（en）</legend>
-        <div class="space-y-2">
-          <div>
-            <label class="block text-sm mb-1">Title</label>
-            <input id="blog-guide-en-title" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-          </div>
-          <div>
-            <label class="block text-sm mb-1">Subtitle</label>
-            <input id="blog-guide-en-subtitle" type="text" class="w-full rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2" />
-          </div>
-          <div>
-            <label class="block text-sm mb-1">Items (one per line)</label>
-            <textarea id="blog-guide-en-items" class="w-full min-h-[100px] rounded border border-[var(--button-border-color)] bg-transparent px-3 py-2"></textarea>
-          </div>
-        </div>
-      </fieldset>
-    </div>
-    <p id="blog-guide-msg" class="text-sm mt-3 text-[var(--text-color)]/70"></p>
+  <div class="admin-subpanels">
+    <div data-subpanel="about-markdown" class="admin-subpanel"><AboutMarkdown /></div>
+    <div data-subpanel="about-timeline" class="admin-subpanel hidden"><AboutTimeline /></div>
+    <div data-subpanel="about-personal" class="admin-subpanel hidden"><AboutPersonal /></div>
+    <div data-subpanel="about-profile" class="admin-subpanel hidden"><AboutProfile /></div>
+    <div data-subpanel="tools-links" class="admin-subpanel hidden"><ToolsLinks /></div>
+    <div data-subpanel="site-slogan" class="admin-subpanel hidden"><SiteSlogan /></div>
+    <div data-subpanel="header-contact" class="admin-subpanel hidden"><HeaderContact /></div>
+    <div data-subpanel="blog-guide" class="admin-subpanel hidden"><BlogGuide /></div>
   </div>
 </div>
+
+<style>
+  .admin-subtab {
+    background: var(--bg-color);
+    color: var(--text-color);
+  }
+  .admin-subtab:hover {
+    color: var(--link-color);
+  }
+  .admin-subtab[aria-selected="true"] {
+    color: var(--link-color);
+    border-bottom-color: var(--link-color);
+  }
+  /* 隐藏滚动条但保留滚动能力 */
+  .admin-subtabs::-webkit-scrollbar {
+    height: 4px;
+  }
+  .admin-subtabs::-webkit-scrollbar-thumb {
+    background: var(--button-border-color);
+    border-radius: 2px;
+  }
+</style>
+
+<script>
+  (function () {
+    const container = document.querySelector('.admin-site-settings');
+    if (!container) return;
+    const tabs = Array.from(container.querySelectorAll<HTMLElement>('[data-subtab]'));
+    const panels = Array.from(container.querySelectorAll<HTMLElement>('[data-subpanel]'));
+
+    function activate(key: string) {
+      tabs.forEach((tab) => {
+        const active = tab.dataset.subtab === key;
+        tab.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      panels.forEach((panel) => {
+        const active = panel.dataset.subpanel === key;
+        panel.classList.toggle('hidden', !active);
+      });
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const key = tab.dataset.subtab;
+        if (key) activate(key);
+      });
+    });
+  })();
+</script>

@@ -12,6 +12,7 @@ import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.mjs";
 import { MusicCardComponent } from "./src/plugins/rehype-component-music-card.mjs";
 import { GithubCardComponent } from './src/plugins/rehype-component-github-card.mjs';
 import { QuoteComponent } from "./src/plugins/rehype-component-quote.mjs"
+import { DerivationComponent } from './src/plugins/rehype-component-derivation.mjs';
 import { customFigurePlugin } from "./src/plugins/rehype-figure-plugin.mjs";
 import { remarkCombined } from './src/plugins/remark-combined.mjs';
 import { remarkTypst } from './src/plugins/remark-typst.mjs';
@@ -70,6 +71,7 @@ export default defineConfig({
             github: GithubCardComponent,
             music: MusicCardComponent,
             quote: QuoteComponent,
+            derivation: DerivationComponent,
             note: (x, y) => AdmonitionComponent(x, y, "note"),
             tip: (x, y) => AdmonitionComponent(x, y, "tip"),
             important: (x, y) => AdmonitionComponent(x, y, "important"),

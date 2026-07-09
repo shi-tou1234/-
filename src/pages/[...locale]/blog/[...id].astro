@@ -11,6 +11,7 @@ import LicenseCard from '@components/misc/LicenseCard.astro'
 import BlogNavi from '@components/control/BlogNavi.astro'
 import ReadingTime from '@components/misc/ReadingTime.astro'
 import Comments from '@components/misc/Comments.astro'
+import DerivationPopup from '@components/misc/DerivationPopup.astro'
 
 import { getCollection, render } from 'astro:content'
 import i18nit from '@i18n/translation'
@@ -149,6 +150,7 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
             <Markdown class="mb-6 markdown-content onload-animation">
                 <Content />
             </Markdown>
+            <DerivationPopup />
             {licenseConfig.enable &&
             <LicenseCard title={entry.data.title} pubDate={entry.data.pubDate}/>
             }

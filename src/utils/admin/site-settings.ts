@@ -653,3 +653,22 @@ export function initSiteSettingsHandlers() {
     }
   });
 }
+
+// 统一加载入口：触发所有设置模块的"加载"按钮，登录后自动调用
+export function loadAllSiteSettings() {
+  const token = getToken();
+  if (!token) return;
+  const loadButtonIds = [
+    "load-about-markdown-btn",
+    "load-about-timeline-btn",
+    "load-about-personal-btn",
+    "load-about-profile-btn",
+    "load-tools-links-btn",
+    "load-header-contact-btn",
+    "load-blog-guide-btn",
+    "load-site-slogan-btn",
+  ];
+  loadButtonIds.forEach((id) => {
+    document.getElementById(id)?.click();
+  });
+}

@@ -32,6 +32,197 @@ import {
   ABOUT_SPEC_PATH_PREFIX,
 } from "./constants";
 
+// 本地草稿 key（自动保存编辑器状态，刷新可恢复）
+const POST_DRAFT_KEY = "cmchen_admin_post_draft";
+
+// ===== Post list item 渲染（替代原 <option>） =====
+
+interface PostListItemMeta {
+  title?: string;
+  pubDate?: string;
+  pinned?: boolean;
+  category?: string;
+}
+
+function parseFrontmatterKV(markdown: string): Record<string, string> {
+  const matched = String(markdown || "").match(/^---\n([\s\S]*?)\n---/);
+  if (!matched?.[1]) return {};
+  const fm: Record<string, string> = {};
+  matched[1].split("\n").forEach((line) => {
+    const idx = line.indexOf(":");
+    if (idx <= 0) return;
+    fm[line.slice(0, idx).trim()] = line.slice(idx + 1).trim().replace(/^['"]|['"]$/g, "");
+  });
+  return fm;
+}
+
+function renderPostListItem(entry: { path: string; slug: string; lang: string }, meta?: PostListItemMeta) {
+  const item = document.createElement("div");
+  item.className = "post-list-item";
+  item.dataset.path = entry.path;
+  item.setAttribute("role", "option");
+  item.tabIndex = 0;
+
+  const titleRow = document.createElement("div");
+  titleRow.className = "post-list-item-title";
+
+  if (meta?.pinned) {
+    const pin = document.createElement("span");
+    pin.className = "post-list-item-pin";
+    pin.textContent = "📌";
+    pin.title = "已置顶";
+    titleRow.appendChild(pin);
+  }
+
+  const titleText = document.createElement("span");
+  titleText.textContent = meta?.title || entry.slug;
+  titleText.title = entry.path;
+  titleRow.appendChild(titleText);
+
+  const metaRow = document.createElement("div");
+  metaRow.className = "post-list-item-meta";
+
+  const langTag = document.createElement("span");
+  langTag.textContent = entry.lang;
+  metaRow.appendChild(langTag);
+
+  if (meta?.pubDate) {
+    const dateTag = document.createElement("span");
+    dateTag.textContent = String(meta.pubDate).slice(0, 10);
+    metaRow.appendChild(dateTag);
+  }
+
+  if (meta?.category) {
+    const catTag = document.createElement("span");
+    catTag.textContent = meta.category;
+    metaRow.appendChild(catTag);
+  }
+
+  item.appendChild(titleRow);
+  item.appendChild(metaRow);
+  return item;
+}
+
+function updatePostListItem(path: string, meta: PostListItemMeta) {
+  const container = document.getElementById("post-select");
+  if (!container) return;
+  const item = container.querySelector<HTMLElement>(`[data-path="${CSS.escape(path)}"]`);
+  if (!item) return;
+  const newItem = renderPostListItem(
+    { path, slug: item.dataset.slug || "", lang: item.dataset.lang || "" },
+    meta
+  );
+  // 保留 dataset
+  newItem.dataset.slug = item.dataset.slug || "";
+  newItem.dataset.lang = item.dataset.lang || "";
+  // 保留选中状态
+  if (item.classList.contains("is-selected")) newItem.classList.add("is-selected");
+  item.replaceWith(newItem);
+}
+
+function setSelectedPostPath(path: string) {
+  const container = document.getElementById("post-select");
+  if (!container) return;
+  container.querySelectorAll<HTMLElement>(".post-list-item").forEach((el) => {
+    el.classList.toggle("is-selected", el.dataset.path === path);
+  });
+}
+
+function getSelectedPostPath(): string {
+  const container = document.getElementById("post-select");
+  return container?.querySelector<HTMLElement>(".post-list-item.is-selected")?.dataset.path || "";
+}
+
+// ===== 本地草稿自动保存 =====
+
+function collectPostDraft() {
+  const get = (id: string) => (document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | null)?.value || "";
+  const pinnedEl = document.getElementById("post-pinned") as HTMLInputElement | null;
+  return {
+    title: get("post-title"),
+    slug: get("post-slug"),
+    lang: get("post-lang"),
+    date: get("post-date"),
+    desc: get("post-desc"),
+    cover: get("post-cover"),
+    category: get("post-category"),
+    subcategory: get("post-subcategory"),
+    content: get("post-content"),
+    pinned: pinnedEl?.checked || false,
+    updatedAt: Date.now(),
+  };
+}
+
+function savePostDraftLocally() {
+  try {
+    const draft = collectPostDraft();
+    localStorage.setItem(POST_DRAFT_KEY, JSON.stringify(draft));
+    const statusEl = document.getElementById("post-autosave-status");
+    if (statusEl) {
+      const d = new Date();
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mm = String(d.getMinutes()).padStart(2, "0");
+      statusEl.textContent = `已自动保存 ${hh}:${mm}`;
+    }
+  } catch (err) {
+    console.warn("[admin] 草稿自动保存失败:", err);
+  }
+}
+
+function loadPostDraftLocally(): boolean {
+  const raw = localStorage.getItem(POST_DRAFT_KEY);
+  if (!raw) return false;
+  try {
+    const draft = JSON.parse(raw);
+    const setVal = (id: string, val: string) => {
+      const el = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | null;
+      if (el && typeof val === "string") el.value = val;
+    };
+    setVal("post-title", draft.title || "");
+    setVal("post-slug", draft.slug || "");
+    setVal("post-lang", draft.lang || "zh-cn");
+    setVal("post-date", draft.date || "");
+    setVal("post-desc", draft.desc || "");
+    setVal("post-cover", draft.cover || "");
+    setVal("post-category", draft.category || "");
+    setVal("post-subcategory", draft.subcategory || "");
+    setVal("post-content", draft.content || "");
+    const pinnedEl = document.getElementById("post-pinned") as HTMLInputElement | null;
+    if (pinnedEl) pinnedEl.checked = !!draft.pinned;
+    return true;
+  } catch {
+    localStorage.removeItem(POST_DRAFT_KEY);
+    return false;
+  }
+}
+
+function clearPostDraftLocally() {
+  localStorage.removeItem(POST_DRAFT_KEY);
+  const statusEl = document.getElementById("post-autosave-status");
+  if (statusEl) statusEl.textContent = "";
+}
+
+// ===== 实时预览 iframe postMessage =====
+
+function pushContentToPreview() {
+  const iframe = document.getElementById("post-preview-iframe") as HTMLIFrameElement | null;
+  const content = (document.getElementById("post-content") as HTMLTextAreaElement | null)?.value || "";
+  if (!iframe || !iframe.contentWindow) return;
+  iframe.contentWindow.postMessage({ type: "admin-preview-update", content }, window.location.origin);
+}
+
+// debounce 工具
+function debounce<T extends (...args: any[]) => void>(fn: T, wait: number): T {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  return ((...args: any[]) => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), wait);
+  }) as T;
+}
+
+const pushPreviewDebounced = debounce(pushContentToPreview, 300);
+const autoSaveDebounced = debounce(savePostDraftLocally, 2000);
+
 // ===== Post helper functions =====
 
 function initPostDateDefault() {
@@ -127,7 +318,10 @@ function sanitizeMarkdownImageAlt(content: string) {
   return String(content || "").replace(/!\[[^\]]*\]\(([^)]+)\)/g, (_matched, url) => `![](${url})`);
 }
 
-async function loadCategoryOptions(preloadedEntries: { path: string; slug: string; lang: string }[]) {
+async function loadCategoryOptions(
+  preloadedEntries: { path: string; slug: string; lang: string }[],
+  onEntryParsed?: (entry: { path: string; slug: string; lang: string }, markdown: string, frontmatter: Record<string, string>) => void
+) {
   const token = getToken();
   const branch = getBranch();
   if (!token) {
@@ -135,13 +329,15 @@ async function loadCategoryOptions(preloadedEntries: { path: string; slug: strin
     return;
   }
 
+  // 缓存命中时，仅复用分类元数据；列表项的标题/日期/置顶信息仍需逐篇拉取（轻量回填）
+  let cacheHit = false;
   try {
     const cached = localStorage.getItem(CATEGORY_CACHE_KEY);
     if (cached) {
       const cache = JSON.parse(cached);
       if (cache && cache.branch === branch && (Date.now() - cache.ts) < CATEGORY_CACHE_TTL && cache.topLevelCategories && cache.topLevelCategories.length > 0) {
         renderCategoryOptions(cache);
-        return;
+        cacheHit = true;
       }
     }
   } catch (err) { console.warn("[admin] 分类缓存读取失败:", err); }
@@ -161,12 +357,18 @@ async function loadCategoryOptions(preloadedEntries: { path: string; slug: strin
         const markdown = decodeFileContent(meta?.content || "");
         const cats = extractCategoriesFromMarkdown(markdown);
         const rootCategory = getPrimaryCategoryFromItems(cats);
-        if (!rootCategory) return;
-        categorySet.add(rootCategory);
-        const subcategories = getSubcategoriesFromItems(cats);
-        if (subcategories.length > 0) {
-          if (!subcategoriesByRoot[rootCategory]) subcategoriesByRoot[rootCategory] = new Set();
-          for (const sub of subcategories) subcategoriesByRoot[rootCategory].add(sub);
+        if (rootCategory) {
+          categorySet.add(rootCategory);
+          const subcategories = getSubcategoriesFromItems(cats);
+          if (subcategories.length > 0) {
+            if (!subcategoriesByRoot[rootCategory]) subcategoriesByRoot[rootCategory] = new Set();
+            for (const sub of subcategories) subcategoriesByRoot[rootCategory].add(sub);
+          }
+        }
+        // 回填列表项的标题/日期/置顶信息
+        if (onEntryParsed) {
+          const fm = parseFrontmatterKV(markdown);
+          onEntryParsed(entry, markdown, fm);
         }
       } catch (err) { console.warn("[admin] 单篇文章分类提取失败:", entry?.path, err); }
     };
@@ -183,25 +385,27 @@ async function loadCategoryOptions(preloadedEntries: { path: string; slug: strin
     }
     await Promise.all(entryWorkers);
 
-    const categoryMeta = {
-      topLevelCategories: Array.from(categorySet),
-      subcategoriesByRoot: Object.fromEntries(
-        Object.entries(subcategoriesByRoot).map(([rootCategory, values]) => [rootCategory, Array.from(values)])
-      ),
-    };
-    renderCategoryOptions(categoryMeta);
-
-    try {
-      localStorage.setItem(CATEGORY_CACHE_KEY, JSON.stringify({
-        branch,
-        ts: Date.now(),
-        topLevelCategories: categoryMeta.topLevelCategories,
-        subcategoriesByRoot: categoryMeta.subcategoriesByRoot,
-      }));
-    } catch (err) { console.warn("[admin] 分类缓存写入失败:", err); }
+    // 缓存未命中时才写入；命中时跳过避免覆盖未拉取到的完整分类
+    if (!cacheHit) {
+      const categoryMeta = {
+        topLevelCategories: Array.from(categorySet),
+        subcategoriesByRoot: Object.fromEntries(
+          Object.entries(subcategoriesByRoot).map(([rootCategory, values]) => [rootCategory, Array.from(values)])
+        ),
+      };
+      renderCategoryOptions(categoryMeta);
+      try {
+        localStorage.setItem(CATEGORY_CACHE_KEY, JSON.stringify({
+          branch,
+          ts: Date.now(),
+          topLevelCategories: categoryMeta.topLevelCategories,
+          subcategoriesByRoot: categoryMeta.subcategoriesByRoot,
+        }));
+      } catch (err) { console.warn("[admin] 分类缓存写入失败:", err); }
+    }
   } catch (err) {
     console.warn("[admin] 加载分类选项失败:", err);
-    renderCategoryOptions({ topLevelCategories: [], subcategoriesByRoot: {} });
+    if (!cacheHit) renderCategoryOptions({ topLevelCategories: [], subcategoriesByRoot: {} });
   }
 }
 
@@ -233,8 +437,7 @@ function clearPostEditor() {
 }
 
 function getSelectedPostSlug() {
-  const selectEl = document.getElementById("post-select");
-  const selectedPath = selectEl?.value || "";
+  const selectedPath = getSelectedPostPath();
   if (!selectedPath) return "";
   const matched = selectedPath.match(/^src\/content\/blog\/(.+)\/(zh-cn|en)\.md$/);
   return matched?.[1] || "";
@@ -297,37 +500,46 @@ export async function loadPostList() {
     usedFallback = true;
   }
 
+  // 渲染列表项（初始仅 slug + lang，后续异步回填标题/日期/分类/置顶）
   if (selectEl) {
     selectEl.innerHTML = "";
     if (entries.length === 0) {
-      const option = document.createElement("option");
-      option.value = "";
-      option.textContent = "暂无文章";
-      selectEl.appendChild(option);
+      const empty = document.createElement("div");
+      empty.className = "post-list-empty";
+      empty.textContent = "暂无文章";
+      selectEl.appendChild(empty);
     } else {
       entries.forEach((entry) => {
-        const option = document.createElement("option");
-        option.value = entry.path;
-        option.textContent = `${entry.slug} (${entry.lang})`;
-        selectEl.appendChild(option);
+        const item = renderPostListItem(entry);
+        item.dataset.slug = entry.slug;
+        item.dataset.lang = entry.lang;
+        selectEl.appendChild(item);
       });
     }
   }
 
+  const enrichCallback = (entry: { path: string; slug: string; lang: string }, _markdown: string, fm: Record<string, string>) => {
+    updatePostListItem(entry.path, {
+      title: fm.title,
+      pubDate: fm.pubDate,
+      pinned: fm.pinned === "true" || fm.pinned === true,
+      category: extractCategoriesFromMarkdown(_markdown)[0] || "",
+    });
+  };
+
   if (usedFallback) {
     setMsg(msgEl, `已加载 ${entries.length} 篇文章（回退模式：GitHub API 不可达）`);
-    await loadCategoryOptions(entries).catch(() => {});
+    await loadCategoryOptions(entries, enrichCallback).catch(() => {});
     return;
   }
 
   setMsg(msgEl, `已加载 ${entries.length} 篇文章`);
-  await loadCategoryOptions(entries).catch(() => {});
+  await loadCategoryOptions(entries, enrichCallback).catch(() => {});
 }
 
 async function loadSelectedPostToEditor() {
   const msgEl = document.getElementById("post-msg");
-  const selectEl = document.getElementById("post-select");
-  const selectedPath = selectEl?.value || "";
+  const selectedPath = getSelectedPostPath();
   const token = getToken();
   const branch = getBranch();
   const categorySelect = document.getElementById("post-category-select");
@@ -380,6 +592,10 @@ async function loadSelectedPostToEditor() {
     pinnedCheckbox.checked = frontmatter.pinned === "true" || frontmatter.pinned === true;
   }
 
+  // 载入新文章后清掉旧草稿，避免误覆盖；并推送到预览 iframe
+  clearPostDraftLocally();
+  pushContentToPreview();
+
   setMsg(msgEl, `已载入：${slug} (${lang})`);
 }
 
@@ -430,8 +646,16 @@ function insertMarkdownSnippet(type: string) {
 
 export function initPostHandlers() {
   const categorySelect = document.getElementById("post-category-select");
+  const postSelectEl = document.getElementById("post-select");
 
   initPostDateDefault();
+
+  // 首次进入后台时尝试恢复本地草稿（仅在未选择文章时）
+  const restored = loadPostDraftLocally();
+  if (restored) {
+    setMsg(document.getElementById("post-msg"), "已恢复上次未保存的草稿");
+    setTimeout(pushContentToPreview, 100);
+  }
 
   document.getElementById("about-music-files")?.addEventListener("change", () => {
     const files = document.getElementById("about-music-files")?.files;
@@ -485,7 +709,9 @@ export function initPostHandlers() {
 
   document.getElementById("new-post-btn")?.addEventListener("click", () => {
     clearPostEditor();
+    clearPostDraftLocally();
     setMsg(document.getElementById("post-msg"), "已切换到新建文章模式");
+    pushContentToPreview();
   });
 
   document.getElementById("open-preview-editor-btn")?.addEventListener("click", () => {
@@ -499,29 +725,108 @@ export function initPostHandlers() {
     const applied = applyPreviewResult();
     if (!applied) {
       setMsg(document.getElementById("post-msg"), "未检测到预览回填内容，请先在预览页点击\u201C返回发布\u201D", true);
+    } else {
+      pushContentToPreview();
     }
   });
 
-  document.getElementById("post-select")?.addEventListener("dblclick", async () => {
-    const msgEl = document.getElementById("post-msg");
-    try {
-      await loadSelectedPostToEditor();
-    } catch (error) {
-      setMsg(msgEl, String(error), true);
-    }
+  // 列表项点击：选中；双击/Enter：载入到编辑器
+  postSelectEl?.addEventListener("click", (event: MouseEvent) => {
+    const target = (event.target as HTMLElement)?.closest<HTMLElement>(".post-list-item");
+    if (!target) return;
+    const path = target.dataset.path || "";
+    if (!path) return;
+    setSelectedPostPath(path);
   });
+
+  postSelectEl?.addEventListener("dblclick", (event: MouseEvent) => {
+    const target = (event.target as HTMLElement)?.closest<HTMLElement>(".post-list-item");
+    if (!target) return;
+    const path = target.dataset.path || "";
+    if (!path) return;
+    setSelectedPostPath(path);
+    loadSelectedPostToEditor().catch((error) => {
+      setMsg(document.getElementById("post-msg"), String(error), true);
+    });
+  });
+
+  postSelectEl?.addEventListener("keydown", (event: KeyboardEvent) => {
+    if (event.key !== "Enter") return;
+    const target = (event.target as HTMLElement)?.closest<HTMLElement>(".post-list-item");
+    if (!target) return;
+    event.preventDefault();
+    const path = target.dataset.path || "";
+    if (!path) return;
+    setSelectedPostPath(path);
+    loadSelectedPostToEditor().catch((error) => {
+      setMsg(document.getElementById("post-msg"), String(error), true);
+    });
+  });
+
+  // 搜索过滤
+  document.getElementById("post-search")?.addEventListener("input", (event: Event) => {
+    const keyword = ((event.target as HTMLInputElement)?.value || "").trim().toLowerCase();
+    postSelectEl?.querySelectorAll<HTMLElement>(".post-list-item").forEach((item) => {
+      if (!keyword) {
+        item.style.display = "";
+        return;
+      }
+      const slug = (item.dataset.slug || "").toLowerCase();
+      const title = (item.querySelector(".post-list-item-title")?.textContent || "").toLowerCase();
+      const lang = (item.dataset.lang || "").toLowerCase();
+      const matched = slug.includes(keyword) || title.includes(keyword) || lang.includes(keyword);
+      item.style.display = matched ? "" : "none";
+    });
+  });
+
+  // 工具栏按钮 → insertMarkdownSnippet
+  document.querySelectorAll<HTMLElement>(".toolbar-btn[data-action]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const action = btn.dataset.action || "";
+      if (!action) return;
+      insertMarkdownSnippet(action);
+      pushContentToPreview();
+      autoSaveDebounced();
+    });
+  });
+
+  // 正文 textarea：实时推送预览 + 自动保存草稿
+  document.getElementById("post-content")?.addEventListener("input", () => {
+    pushPreviewDebounced();
+    autoSaveDebounced();
+  });
+
+  // 元数据字段变化时也自动保存草稿
+  ["post-title", "post-slug", "post-lang", "post-date", "post-desc", "post-cover", "post-category", "post-subcategory"].forEach((id) => {
+    document.getElementById(id)?.addEventListener("input", autoSaveDebounced);
+  });
+  document.getElementById("post-pinned")?.addEventListener("change", autoSaveDebounced);
+
+  // iframe 加载完成后推送初始内容
+  const previewIframe = document.getElementById("post-preview-iframe") as HTMLIFrameElement | null;
+  if (previewIframe) {
+    previewIframe.addEventListener("load", () => {
+      // iframe 每次加载（含 reload）都推送当前内容
+      pushContentToPreview();
+    });
+  }
 
   document.getElementById("insert-iframe-btn")?.addEventListener("click", () => {
     const textarea = document.getElementById("post-content") as HTMLTextAreaElement | null;
     const iframeTpl = `\n<iframe src="https://www.youtube.com/embed/VIDEO_ID" title="Video" frameborder="0" allowfullscreen></iframe>\n`;
     if (textarea) textarea.value = `${textarea.value || ""}${iframeTpl}`;
+    pushContentToPreview();
+    autoSaveDebounced();
   });
 
+  // 兼容旧的隐藏 select + 按钮（仍可被外部代码触发）
   document.getElementById("insert-md-snippet-btn")?.addEventListener("click", () => {
     const selectEl = document.getElementById("post-md-snippet") as HTMLSelectElement | null;
     const type = (selectEl?.value || "").trim();
     if (!type) return;
     insertMarkdownSnippet(type);
+    pushContentToPreview();
+    autoSaveDebounced();
   });
 
   window.addEventListener("focus", () => {

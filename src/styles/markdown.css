@@ -819,3 +819,92 @@ rt {
     transform: none;
   }
 }
+
+/* ===== 公式推导浮层（:::derivation 容器）===== */
+
+/* 隐藏原始 derivation 块（内容由浮层接管） */
+.markdown-content .derivation-block {
+  display: none;
+}
+
+/* 公式可推导提示：虚线下划线 + 可交互 */
+.markdown-content .katex-display.derivable,
+.markdown-content .katex.derivable {
+  border-bottom: 1px dashed var(--button-border-color);
+  cursor: help;
+  position: relative;
+  transition: border-color 0.32s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.markdown-content .katex-display.derivable:hover,
+.markdown-content .katex.derivable:hover,
+.markdown-content .katex-display.derivable:focus-visible,
+.markdown-content .katex.derivable:focus-visible {
+  border-color: var(--link-color);
+  outline: none;
+}
+
+/* 移动端展开图标提示（hover: none 设备） */
+@media (hover: none) {
+  .markdown-content .katex-display.derivable::after {
+    content: "🔍";
+    position: absolute;
+    top: -0.5rem;
+    right: 0;
+    font-size: 0.75rem;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+}
+
+/* 浮层（fixed 定位，避开父容器 overflow 裁剪） */
+.derivation-popup {
+  position: fixed;
+  background: var(--bg-color);
+  border: 1px solid var(--button-border-color);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 8px 24px var(--shadow-color);
+  z-index: 1200;
+  max-height: 60vh;
+  overflow-y: auto;
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: opacity 0.32s cubic-bezier(0.23, 1, 0.320, 1),
+              transform 0.32s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.derivation-popup.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.derivation-popup-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-color);
+  opacity: 0.65;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.02em;
+}
+
+/* 浮层内继承 markdown 样式，保证公式/列表渲染一致 */
+.derivation-popup > div:last-child {
+  font-size: calc(1rem * var(--font-size-scale, 1));
+  line-height: 1.7;
+  color: var(--text-color);
+}
+
+.derivation-popup .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .derivation-popup {
+    transition: none;
+  }
+}

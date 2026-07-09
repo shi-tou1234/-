@@ -31,7 +31,10 @@ function init() {
         alert('部分依赖加载失败，请检查网络连接后刷新页面');
         return;
     }
-    
+
+    // embed 模式：后台实时预览用，隐藏编辑器 UI，仅显示预览区，通过 postMessage 接收内容
+    var isEmbed = new URLSearchParams(window.location.search).get('embed') === '1';
+
     editor = document.getElementById('editor');
     preview = document.getElementById('preview');
     wordCount = document.getElementById('word-count');
@@ -45,9 +48,31 @@ function init() {
     viewModeBtns = document.querySelectorAll('.view-mode-btn');
     previewTitle = document.getElementById('preview-title');
     returnToAdminBtn = document.getElementById('return-to-admin');
-    
+
     if (!editor || !preview) {
         console.error('DOM 元素获取失败');
+        return;
+    }
+
+    if (isEmbed) {
+        // 隐藏工具栏与编辑区，预览区全宽
+        var toolbar = document.querySelector('.toolbar');
+        var editorPane = document.querySelector('.editor-pane');
+        if (toolbar) toolbar.style.display = 'none';
+        if (editorPane) editorPane.style.display = 'none';
+        document.body.classList.add('embed-mode');
+        // 监听后台推送的预览内容
+        window.addEventListener('message', function(ev) {
+            var data = ev.data || {};
+            if (data.type === 'admin-preview-update' && typeof data.content === 'string') {
+                editor.value = data.content;
+                updatePreview();
+            }
+        });
+        // embed 模式不锁定滚动，不自动保存，不读取 draft
+        editor.value = '';
+        updatePreview();
+        isInitialized = true;
         return;
     }
     

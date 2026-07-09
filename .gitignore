@@ -26,3 +26,6 @@ pnpm-debug.log*
 
 # vscode setting folder
 .vscode/
+
+# TRAE IDE 临时文件
+.trae/

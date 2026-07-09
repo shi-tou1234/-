@@ -22,6 +22,8 @@ export function initLoginHandlers(loadPostList: () => Promise<void>) {
     if (passed) {
       setMsg(loginMsg, "登录成功");
       unlockPanel();
+      // 通知布局层登录成功（AdminLayout 会切换到文章 Tab）
+      document.dispatchEvent(new CustomEvent("admin:login-success"));
       loadPostList().catch((error) => {
         setMsg(document.getElementById("post-msg"), String(error), true);
       });
