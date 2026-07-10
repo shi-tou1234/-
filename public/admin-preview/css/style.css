@@ -710,12 +710,12 @@ html, body {
 
 /* ===== embed 模式（后台实时预览）===== */
 body.embed-mode {
-    overflow: auto;
-    height: auto;
+    overflow: hidden;
+    height: 100vh;
 }
 
 body.embed-mode .main-content {
-    overflow: visible;
+    overflow: hidden;
 }
 
 body.embed-mode .preview-pane {
@@ -726,5 +726,10 @@ body.embed-mode .preview-pane {
 
 body.embed-mode .preview {
     padding: 1rem 1.25rem;
+    overflow-y: auto;
+}
+
+body.embed-mode .source-view {
+    overflow-y: auto;
 }
 

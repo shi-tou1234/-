@@ -69,6 +69,16 @@ function init() {
                 updatePreview();
             }
         });
+        // 绑定视图模式切换（源码/预览）
+        if (viewModeBtns && viewModeBtns.length > 0) {
+            viewModeBtns.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var mode = btn.dataset.view;
+                    if (mode === currentViewMode) return;
+                    setViewMode(mode);
+                });
+            });
+        }
         // embed 模式不锁定滚动，不自动保存，不读取 draft
         editor.value = '';
         updatePreview();
