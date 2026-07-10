@@ -47,8 +47,11 @@ const pageLang = lang || "zh-cn";
     <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, max-image-preview:none">
     <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
     <link rel="icon" href={siteConfig.favicon} type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.font.im" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.font.im/css2?family=Noto+Serif+SC:wght@400;700&display=swap">
+    <link rel="preload" as="style" href="https://fonts.font.im/css2?family=EB+Garamond&display=swap">
     <link rel="stylesheet" href="https://fonts.font.im/css2?family=Noto+Serif+SC:wght@400;700&display=swap">
-    <link rel="stylesheet" href="https://fonts.font.im/css2?family=EB+Garamond">
+    <link rel="stylesheet" href="https://fonts.font.im/css2?family=EB+Garamond&display=swap">
     <title>{pageTitle}</title>
     <ClientRouter />
 </head>
@@ -124,7 +127,7 @@ const pageLang = lang || "zh-cn";
             clearLoaderTimers();
             loaderTimeout = setTimeout(() => {
               showLoadingOverlay();
-            }, 500); 
+            }, 200);
 
             // 兜底：任何异常场景都不要让遮罩永久阻塞交互
             loaderWatchdog = setTimeout(() => {
@@ -157,52 +160,7 @@ const pageLang = lang || "zh-cn";
         window.addEventListener('error', hideLoadingOverlay);
         window.addEventListener('unhandledrejection', hideLoadingOverlay);
 
-        // 全局防爬虫：后台页面不启用，避免影响管理操作
-        const isAdminPath = window.location.pathname.includes('/admin');
-        if (!isAdminPath && !window.__antiCrawlerGuardInstalled) {
-          window.__antiCrawlerGuardInstalled = true;
 
-          const shouldBlockAutomation = () => {
-            const ua = navigator.userAgent.toLowerCase();
-            const botSignals = [
-              'headless',
-              'selenium',
-              'puppeteer',
-              'playwright',
-              'phantomjs',
-              'spider',
-              'crawler',
-              'scrapy',
-              'curl',
-              'wget'
-            ];
-
-            return navigator.webdriver || botSignals.some((signal) => ua.includes(signal));
-          };
-
-          const blockPage = () => {
-            document.documentElement.innerHTML = '';
-          };
-
-          if (shouldBlockAutomation()) {
-            blockPage();
-          }
-
-          document.addEventListener('keydown', (e) => {
-            if (
-              e.key === 'F12' ||
-              ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'J', 'C', 'K'].includes(e.key.toUpperCase())) ||
-              ((e.ctrlKey || e.metaKey) && ['U', 'S', 'P'].includes(e.key.toUpperCase()))
-            ) {
-              e.preventDefault();
-              e.stopPropagation();
-            }
-          }, { capture: true });
-
-          // NOTE:
-          // Avoid DevTools-size/timing heuristics here. Browser zoom can change
-          // outer/inner viewport metrics and cause false positives that blank the page.
-        }
         </script>
 </body>
 </html>
