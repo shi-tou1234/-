@@ -211,7 +211,7 @@ const aboutPersonal: AboutPersonal = {
       ]
     },
     {
-      "date": "2026.7.9",
+      "date": "2026.7.8",
       "content": [
         "密码哈希 PBKDF2 迭代次数增加",
         "GitHub/Music 卡片、ruby/title 文本加输入校验 XSS 转义",
@@ -227,9 +227,19 @@ const aboutPersonal: AboutPersonal = {
       ]
     },
     {
-      "date": "2026.7.10",
+      "date": "2026.7.9",
       "content": [
         "合并重复函数，避免行为分叉，修正误导日志"
+      ]
+    },
+    {
+      "date": "2025.7.10",
+      "content": [
+        "实现推导浮层功能：自定义 remark 插件渲染 ，hover 公式弹出推导内容；",
+        "后台三栏分屏编辑器重写，后台工具栏新增推导按钮",
+        "为 48 篇笔记批量添加约 650 个 推导；",
+        "移除反爬虫键盘拦截；字体预加载优化；tsParticles 移动端禁用 + 粒子数减半；主题切换不再重建粒子；loading 阈值 500→200ms；移除死依赖 leaflet/overlayscrollbars；",
+        "新增 ESLint + Prettier + Lighthouse CI 配置；CI 加 astro check + lint，修复依赖变更后 CI 安装失败"
       ]
     }
   ],
