@@ -711,7 +711,11 @@ html, body {
 /* ===== embed 模式（后台实时预览）===== */
 body.embed-mode {
     overflow: hidden;
-    height: 100vh;
+    height: 100%;
+}
+
+body.embed-mode .app-container {
+    height: 100%;
 }
 
 body.embed-mode .main-content {
@@ -722,14 +726,19 @@ body.embed-mode .preview-pane {
     flex: 1;
     width: 100%;
     border-right: none;
+    min-height: 0;
 }
 
 body.embed-mode .preview {
     padding: 1rem 1.25rem;
     overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 
 body.embed-mode .source-view {
     overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 
