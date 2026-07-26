@@ -11,48 +11,47 @@
 
 /* 颜色变量 */
 :root {
-    --bg-color: #ffffff;
-    --text-color: #000000;
-    --shadow-color: rgba(0, 0, 0, 0.15);
-    --cover-subtitle-color: #999;
-    --link-color: #003b6e;
-    --button-hover-color: #f5f5f5;
-    --button-border-color: #e5e5e5;
-    --postcard-bg-color: #fafafa;
-    --border-color: #e5e5e5;
+    --bg-color: #fdf8f0;
+    --text-color: #2c2416;
+    --shadow-color: rgba(139, 69, 19, 0.1);
+    --cover-subtitle-color: #8b7355;
+    --link-color: #8b4513;
+    --button-hover-color: #f5ede0;
+    --button-border-color: #e8dcc8;
+    --postcard-bg-color: #faf3e8;
+    --border-color: #e8dcc8;
 
-    --selection-color: #e5e5e5;
+    --selection-color: #fde8c8;
 
     --warning-text-color: #4d3800;
     --warning-bg-color: #fff7ed;
     --warning-border-color: #e6a700;
 
     /* 滚动条颜色 */
-    --scrollbar-thumb: #c1c1c1;
-    --scrollbar-thumb-hover: #a8a8a8;
-    --scrollbar-track: #e1e1e1;
+    --scrollbar-thumb: #c4a882;
+    --scrollbar-thumb-hover: #a8896a;
+    --scrollbar-track: #e8dcc8;
   }
 
   [data-theme="dark"] {
-    --bg-color: #0a0a0a;
-    --text-color: #ffffff;
-    --shadow-color: rgba(255, 255, 255, 0.15);
-    --cover-subtitle-color: #999;
-    --link-color: #57ace7;
-    --button-hover-color: #262626;
-    --button-border-color: #3d3d3d;
-    --postcard-bg-color: #242526;
-    --border-color: #3d3d3d;
+    --bg-color: #1a1612;
+    --text-color: #e8ddd0;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --cover-subtitle-color: #a89880;
+    --link-color: #e0a060;
+    --button-hover-color: #2a2420;
+    --button-border-color: #3d3428;
+    --postcard-bg-color: #241f18;
+    --border-color: #3d3428;
 
-
-    --selection-color: #3b3b3b;
+    --selection-color: #44361a;
 
     --warning-text-color: #f2d680;
     --warning-bg-color: #332a00;
     --warning-border-color: #ad8002;
 
     /* 滚动条颜色 */
-    --scrollbar-thumb: #4a5568;
-    --scrollbar-thumb-hover: #2d3748;
-    --scrollbar-track: #1a202c;
+    --scrollbar-thumb: #5a4a3a;
+    --scrollbar-thumb-hover: #4a3a2a;
+    --scrollbar-track: #2a2218;
   }
