@@ -26,13 +26,57 @@ import { externalUrlsConfig } from "../../config";
   data-reactions-enabled="1"
   data-emit-metadata="0"
   data-input-position="top"
-  data-theme="preferred_color_scheme"
+  data-theme="light"
   data-lang="zh-CN"
   crossorigin="anonymous"
   async
   is:inline
   data-astro-rerun
 ></script>
+
+<script is:inline>
+(function() {
+  function getGiscusTheme() {
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (theme === 'dark') return 'dark';
+    if (theme) return 'light';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function setGiscusTheme(theme) {
+    var iframe = document.querySelector('iframe.giscus-frame');
+    if (!iframe) return;
+    iframe.contentWindow.postMessage({
+      giscus: { setConfig: { theme: theme } }
+    }, 'https://giscus.app');
+  }
+
+  function initGiscusThemeSync() {
+    // Set initial theme on the script tag before Giscus loads
+    var script = document.querySelector('script[src="https://giscus.app/client.js"]');
+    if (script) {
+      script.setAttribute('data-theme', getGiscusTheme());
+    }
+
+    // Observe theme changes
+    var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        if (m.attributeName === 'data-theme') {
+          setGiscusTheme(getGiscusTheme());
+        }
+      });
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  }
+
+  document.addEventListener('astro:page-load', initGiscusThemeSync);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGiscusThemeSync);
+  } else {
+    initGiscusThemeSync();
+  }
+})();
+</script>
 
 <style is:global>
   .giscus-comments {
