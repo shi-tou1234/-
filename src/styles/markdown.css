@@ -11,7 +11,7 @@
 }
 
 .markdown-content {
-  line-height: 1.75;
+  line-height: 2.05;
   transition: font-size 0.3s ease;
 }
 
@@ -60,7 +60,7 @@
 }
 
 .markdown-content p {
-  margin: 0.8rem 0;
+  margin: 1.1rem 0;
   text-align: justify;
 }
 
@@ -136,7 +136,8 @@
 }
 
 .markdown-content li {
-  margin: 0.3rem 0;
+  margin: 0.45rem 0;
+  line-height: 1.85;
 }
 
 .markdown-content li > ul,
@@ -151,6 +152,7 @@
   border-left: 4px solid var(--quote-left-color);
   background-color: rgba(0, 0, 0, 0.03);
   color: #666;
+  line-height: 1.9;
 }
 
 [data-theme="dark"] .markdown-content blockquote {
@@ -186,7 +188,7 @@
   border-radius: 10px;
   border: 1px solid var(--button-border-color);
   font-family: 'JetBrains Mono Variable', ui-monospace;
-  line-height: 1.5;
+  line-height: 1.75;
   position: relative;
 }
 
