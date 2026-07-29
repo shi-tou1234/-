@@ -87,20 +87,27 @@ const {
 
 <style>
   .travel-map-wrapper {
-    --tm-bg-main: linear-gradient(145deg, rgba(30, 60, 114, 0.92), rgba(42, 82, 152, 0.88));
-    --tm-card-bg: rgba(255, 255, 255, 0.08);
-    --tm-card-border: rgba(255, 255, 255, 0.18);
-    --tm-text: #f8fafc;
-    --tm-subtle: rgba(248, 250, 252, 0.72);
-    --tm-strong: #ffd700;
-    --tm-accent: #ff6b6b;
-    --tm-ok: #2ed573;
+    --tm-bg-main: color-mix(in srgb, var(--bg-color) 92%, transparent);
+    --tm-card-bg: color-mix(in srgb, var(--bg-color) 80%, transparent);
+    --tm-card-border: var(--border-color);
+    --tm-text: var(--text-color);
+    --tm-subtle: color-mix(in srgb, var(--text-color) 70%, transparent);
+    --tm-strong: var(--link-color);
+    --tm-accent: color-mix(in srgb, var(--link-color) 75%, var(--text-color));
+    --tm-ok: color-mix(in srgb, var(--link-color) 70%, #2e8b57);
+    --tm-map-area: color-mix(in srgb, var(--text-color) 8%, transparent);
+    --tm-map-border: color-mix(in srgb, var(--text-color) 18%, transparent);
+    --tm-map-emphasis: var(--link-color);
+    --tm-tooltip-bg: var(--bg-color);
+    --tm-tooltip-border: var(--border-color);
+    --tm-tooltip-text: var(--text-color);
+    --tm-tooltip-action: var(--link-color);
     color: var(--tm-text);
     background: var(--tm-bg-main);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid var(--tm-card-border);
     border-radius: 24px;
     padding: 18px;
-    box-shadow: 0 18px 48px rgba(9, 18, 36, 0.35);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--shadow-color) 60%, transparent);
   }
 
   .travel-map-wrapper * {
@@ -168,9 +175,9 @@ const {
 
   .back-btn {
     display: none;
-    border: 1px solid rgba(255, 215, 0, 0.35);
+    border: 1px solid color-mix(in srgb, var(--tm-strong) 35%, transparent);
     border-radius: 10px;
-    background: rgba(255, 215, 0, 0.18);
+    background: color-mix(in srgb, var(--tm-strong) 16%, transparent);
     color: var(--tm-strong);
     font-size: 0.8rem;
     font-weight: 600;
@@ -207,7 +214,7 @@ const {
   }
 
   .crumb-current {
-    color: #fff;
+    color: var(--tm-text);
     font-weight: 600;
   }
 
@@ -216,7 +223,7 @@ const {
     height: 560px;
     border-radius: 14px;
     overflow: hidden;
-    background: radial-gradient(circle at 20% 15%, rgba(255, 215, 0, 0.08), transparent 56%);
+    background: radial-gradient(circle at 20% 15%, color-mix(in srgb, var(--tm-strong) 10%, transparent), transparent 56%);
   }
 
   .legend {
@@ -237,9 +244,9 @@ const {
     width: calc(100% - 28px);
     max-width: 460px;
     text-align: center;
-    color: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(15, 23, 42, 0.5);
+    color: color-mix(in srgb, var(--tm-text) 85%, transparent);
+    border: 1px solid var(--tm-card-border);
+    background: color-mix(in srgb, var(--bg-color) 85%, transparent);
     border-radius: 12px;
     font-size: 0.86rem;
     line-height: 1.5;
@@ -258,15 +265,15 @@ const {
     width: 14px;
     height: 14px;
     border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid color-mix(in srgb, var(--tm-text) 18%, transparent);
   }
 
   .legend-color.visited {
-    background: linear-gradient(135deg, #ffd700, #ff6b6b);
+    background: linear-gradient(135deg, var(--tm-strong), var(--tm-accent));
   }
 
   .legend-color.unvisited {
-    background: rgba(255, 255, 255, 0.12);
+    background: color-mix(in srgb, var(--tm-text) 10%, transparent);
   }
 
   .sidebar {
@@ -288,21 +295,21 @@ const {
   .search-box {
     width: 100%;
     margin-top: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid color-mix(in srgb, var(--tm-text) 22%, transparent);
+    background: color-mix(in srgb, var(--bg-color) 60%, transparent);
     border-radius: 10px;
-    color: #fff;
+    color: var(--tm-text);
     font-size: 0.85rem;
     padding: 9px 11px;
     outline: none;
   }
 
   .search-box::placeholder {
-    color: rgba(255, 255, 255, 0.55);
+    color: var(--tm-subtle);
   }
 
   .search-box:focus {
-    border-color: rgba(255, 215, 0, 0.5);
+    border-color: color-mix(in srgb, var(--tm-strong) 50%, transparent);
   }
 
   .city-list {
@@ -320,8 +327,8 @@ const {
     align-items: center;
     gap: 6px;
     border-radius: 999px;
-    border: 1px solid rgba(255, 215, 0, 0.3);
-    background: rgba(255, 215, 0, 0.14);
+    border: 1px solid color-mix(in srgb, var(--tm-strong) 30%, transparent);
+    background: color-mix(in srgb, var(--tm-strong) 14%, transparent);
     color: var(--tm-strong);
     font-size: 0.77rem;
     padding: 5px 10px;
@@ -340,24 +347,24 @@ const {
   }
 
   .travel-map-wrapper[data-editable="true"] .city-tag:hover {
-    border-color: rgba(255, 107, 107, 0.5);
-    background: rgba(255, 107, 107, 0.2);
-    color: #ffd2d2;
+    border-color: color-mix(in srgb, var(--tm-accent) 50%, transparent);
+    background: color-mix(in srgb, var(--tm-accent) 18%, transparent);
+    color: color-mix(in srgb, var(--tm-accent) 90%, var(--tm-text));
   }
 
   .empty-state {
     width: 100%;
     text-align: center;
     font-size: 0.82rem;
-    color: rgba(255, 255, 255, 0.55);
+    color: var(--tm-subtle);
     padding: 24px 8px;
   }
 
   .clear-btn {
     width: 100%;
-    border: 1px solid rgba(255, 107, 107, 0.45);
-    background: rgba(255, 107, 107, 0.18);
-    color: #ffd2d2;
+    border: 1px solid color-mix(in srgb, var(--tm-accent) 45%, transparent);
+    background: color-mix(in srgb, var(--tm-accent) 16%, transparent);
+    color: color-mix(in srgb, var(--tm-accent) 90%, var(--tm-text));
     border-radius: 10px;
     padding: 10px;
     font-size: 0.86rem;
@@ -366,7 +373,7 @@ const {
   }
 
   .clear-btn:hover {
-    background: rgba(255, 107, 107, 0.25);
+    background: color-mix(in srgb, var(--tm-accent) 24%, transparent);
   }
 
   .loading {
@@ -374,7 +381,7 @@ const {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: rgba(255, 255, 255, 0.85);
+    color: color-mix(in srgb, var(--tm-text) 85%, transparent);
     font-size: 0.9rem;
     pointer-events: none;
   }
@@ -385,9 +392,9 @@ const {
     right: 18px;
     transform: translateX(420px);
     transition: transform 0.24s ease;
-    background: rgba(46, 213, 115, 0.92);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
+    background: var(--tm-ok);
+    border: 1px solid color-mix(in srgb, var(--tm-text) 18%, transparent);
+    color: var(--bg-color);
     border-radius: 10px;
     font-size: 0.84rem;
     padding: 10px 14px;
@@ -405,7 +412,7 @@ const {
 
   .city-list::-webkit-scrollbar-thumb {
     border-radius: 4px;
-    background: rgba(255, 255, 255, 0.3);
+    background: color-mix(in srgb, var(--tm-text) 28%, transparent);
   }
 
   .city-list::-webkit-scrollbar-track {
@@ -697,6 +704,39 @@ const {
         visitedCitySetByProvince: new Map(),
       };
 
+      function getCssColor(name, fallback) {
+        const value = getComputedStyle(wrapper).getPropertyValue(name).trim();
+        return value || fallback;
+      }
+
+      const themeColors = {
+        strong: getCssColor("--tm-strong", "#8b4513"),
+        accent: getCssColor("--tm-accent", "#a0522d"),
+        text: getCssColor("--tm-text", "#2c2416"),
+        subtle: getCssColor("--tm-subtle", "rgba(44, 36, 22, 0.7)"),
+        mapArea: getCssColor("--tm-map-area", "rgba(44, 36, 22, 0.08)"),
+        mapBorder: getCssColor("--tm-map-border", "rgba(44, 36, 22, 0.18)"),
+        mapEmphasis: getCssColor("--tm-map-emphasis", "#8b4513"),
+        tooltipBg: getCssColor("--tm-tooltip-bg", "#fdf8f0"),
+        tooltipBorder: getCssColor("--tm-tooltip-border", "#e8dcc8"),
+        tooltipText: getCssColor("--tm-tooltip-text", "#2c2416"),
+        tooltipAction: getCssColor("--tm-tooltip-action", "#8b4513"),
+      };
+
+      function visitedGradient() {
+        return {
+          type: "linear",
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            { offset: 0, color: themeColors.strong },
+            { offset: 1, color: themeColors.accent },
+          ],
+        };
+      }
+
       function setLoading(loading) {
         if (loadingEl instanceof HTMLElement) {
           loadingEl.style.display = loading ? "block" : "none";
@@ -841,17 +881,7 @@ const {
             value: visited ? 1 : 0,
             itemStyle: visited
               ? {
-                  areaColor: {
-                    type: "linear",
-                    x: 0,
-                    y: 0,
-                    x2: 0,
-                    y2: 1,
-                    colorStops: [
-                      { offset: 0, color: "#ffd700" },
-                      { offset: 1, color: "#ff6b6b" },
-                    ],
-                  },
+                  areaColor: visitedGradient(),
                 }
               : undefined,
           };
@@ -929,17 +959,7 @@ const {
               value: provinceVisited ? 1 : 0,
               itemStyle: provinceVisited
                 ? {
-                    areaColor: {
-                      type: "linear",
-                      x: 0,
-                      y: 0,
-                      x2: 0,
-                      y2: 1,
-                      colorStops: [
-                        { offset: 0, color: "#ffd700" },
-                        { offset: 1, color: "#ff6b6b" },
-                      ],
-                    },
+                    areaColor: visitedGradient(),
                   }
                 : undefined,
             };
@@ -950,13 +970,13 @@ const {
               backgroundColor: "transparent",
               tooltip: {
                 trigger: "item",
-                backgroundColor: "rgba(0,0,0,0.78)",
-                borderColor: "rgba(255,215,0,0.3)",
-                textStyle: { color: "#fff" },
+                backgroundColor: themeColors.tooltipBg,
+                borderColor: themeColors.tooltipBorder,
+                textStyle: { color: themeColors.tooltipText },
                 formatter: (params) => {
                   const count = getVisitedCountInProvince(params.name);
                   const action = editable ? "点击进入城市视图" : "点击查看城市分布";
-                  return `<div style="font-weight:600">${params.name}</div><div>已标记城市：${count}</div><div style="margin-top:4px;color:#ffd700;font-size:12px">${action}</div>`;
+                  return `<div style="font-weight:600;color:${themeColors.tooltipText}">${params.name}</div><div style="color:${themeColors.tooltipText}">已标记城市：${count}</div><div style="margin-top:4px;color:${themeColors.tooltipAction};font-size:12px">${action}</div>`;
                 },
               },
               series: [
@@ -968,21 +988,21 @@ const {
                   zoom: 1.16,
                   label: {
                     show: true,
-                    color: "rgba(255,255,255,0.72)",
+                    color: themeColors.subtle,
                     fontSize: 10,
                   },
                   emphasis: {
                     label: {
-                      color: "#fff",
+                      color: themeColors.text,
                       fontWeight: "bold",
                     },
                     itemStyle: {
-                      areaColor: "#4f46e5",
+                      areaColor: themeColors.mapEmphasis,
                     },
                   },
                   itemStyle: {
-                    areaColor: "rgba(255,255,255,0.08)",
-                    borderColor: "rgba(255,255,255,0.22)",
+                    areaColor: themeColors.mapArea,
+                    borderColor: themeColors.mapBorder,
                     borderWidth: 1,
                   },
                   data: seriesData,
@@ -1025,15 +1045,15 @@ const {
               backgroundColor: "transparent",
               tooltip: {
                 trigger: "item",
-                backgroundColor: "rgba(0,0,0,0.78)",
-                borderColor: "rgba(255,215,0,0.3)",
-                textStyle: { color: "#fff" },
+                backgroundColor: themeColors.tooltipBg,
+                borderColor: themeColors.tooltipBorder,
+                textStyle: { color: themeColors.tooltipText },
                 formatter: (params) => {
                   const isVisited = Number(params.value) > 0;
                   if (editable) {
-                    return `<div style="font-weight:600">${params.name}</div><div>${isVisited ? "已去过" : "未标记"}</div><div style="margin-top:4px;color:#ffd700;font-size:12px">点击切换状态</div>`;
+                    return `<div style="font-weight:600;color:${themeColors.tooltipText}">${params.name}</div><div style="color:${themeColors.tooltipText}">${isVisited ? "已去过" : "未标记"}</div><div style="margin-top:4px;color:${themeColors.tooltipAction};font-size:12px">点击切换状态</div>`;
                   }
-                  return `<div style="font-weight:600">${params.name}</div><div>${isVisited ? "已去过" : "未标记"}</div>`;
+                  return `<div style="font-weight:600;color:${themeColors.tooltipText}">${params.name}</div><div style="color:${themeColors.tooltipText}">${isVisited ? "已去过" : "未标记"}</div>`;
                 },
               },
               series: [
@@ -1045,21 +1065,21 @@ const {
                   zoom: 0.92,
                   label: {
                     show: true,
-                    color: "rgba(255,255,255,0.78)",
+                    color: themeColors.subtle,
                     fontSize: 10,
                   },
                   emphasis: {
                     label: {
-                      color: "#fff",
+                      color: themeColors.text,
                       fontWeight: "bold",
                     },
                     itemStyle: {
-                      areaColor: "#4f46e5",
+                      areaColor: themeColors.mapEmphasis,
                     },
                   },
                   itemStyle: {
-                    areaColor: "rgba(255,255,255,0.08)",
-                    borderColor: "rgba(255,255,255,0.22)",
+                    areaColor: themeColors.mapArea,
+                    borderColor: themeColors.mapBorder,
                     borderWidth: 1,
                   },
                   data,

@@ -42,6 +42,13 @@ const toolsLinks: ToolLink[] = [
     description: "在线 Markdown 编辑与实时预览工具",
     color: "linear-gradient(-45deg, hsl(260, 25%, 56%) 0%, hsl(300, 22%, 52%) 100%)",
   },
+  {
+    name: "百宝箱",
+    url: "https://shi-tou1234.github.io/box/",
+    icon: "fa6-solid:box-open",
+    description: "个人收集的常用工具与资源合集",
+    color: "linear-gradient(-45deg, hsl(30, 35%, 55%) 0%, hsl(45, 30%, 52%) 100%)",
+  },
 ]
 
 export default toolsLinks
