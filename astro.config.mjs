@@ -42,7 +42,7 @@ export default defineConfig({
   integrations: [icon({
     include: {
       "fa6-brands": ["creative-commons", "github"],
-      "fa6-solid": ["align-justify", "arrow-left", "arrow-right", "arrow-up", "calculator", "circle", "circle-question", "envelope", "file-lines", "globe", "magnifying-glass", "table", "text-height"],
+      "fa6-solid": ["align-justify", "arrow-left", "arrow-right", "arrow-up", "box-open", "calculator", "circle", "circle-question", "envelope", "file-lines", "globe", "magnifying-glass", "table", "text-height"],
       "material-symbols": ["dark-mode-outline-rounded", "radio-button-partial-outline", "wb-sunny-outline-rounded"],
       "simple-icons": ["astro", "github", "gitee", "svelte", "tailwindcss"]
     }
