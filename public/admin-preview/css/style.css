@@ -1,42 +1,42 @@
 /* ===== 基础变量 ===== */
 :root {
-    /* 亮色主题 */
-    --bg-primary: #ffffff;
-    --bg-secondary: #f6f8fa;
-    --bg-tertiary: #f0f2f5;
-    --text-primary: #24292f;
-    --text-secondary: #57606a;
-    --text-tertiary: #8c959f;
-    --border-color: #d0d7de;
-    --accent-color: #0969da;
-    --accent-hover: #0550ae;
-    --success-color: #1a7f37;
-    --warning-color: #9a6700;
-    --danger-color: #cf222e;
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+    /* 亮色主题 — 温暖大地色调，匹配后台主色调 */
+    --bg-primary: #fdf8f0;
+    --bg-secondary: #f5ede0;
+    --bg-tertiary: #f0e8db;
+    --text-primary: #2c2416;
+    --text-secondary: #6b5a42;
+    --text-tertiary: #8b7a62;
+    --border-color: #e8dcc8;
+    --accent-color: #8b4513;
+    --accent-hover: #723710;
+    --success-color: #2e7d4f;
+    --warning-color: #d4940a;
+    --danger-color: #c0392b;
+    --shadow: 0 1px 3px rgba(44, 36, 22, 0.06);
+    --shadow-lg: 0 8px 24px rgba(44, 36, 22, 0.08);
     --radius: 6px;
     --radius-lg: 8px;
-    --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    --font-sans: 'Inter', 'IBM Plex Sans', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* 暗色主题 */
+/* 暗色主题 — 暖棕暗色 */
 [data-theme="dark"] {
-    --bg-primary: #0d1117;
-    --bg-secondary: #161b22;
-    --bg-tertiary: #21262d;
-    --text-primary: #c9d1d9;
-    --text-secondary: #8b949e;
-    --text-tertiary: #6e7681;
-    --border-color: #30363d;
-    --accent-color: #58a6ff;
-    --accent-hover: #79c0ff;
-    --success-color: #3fb950;
-    --warning-color: #d29922;
-    --danger-color: #f85149;
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --bg-primary: #1a1612;
+    --bg-secondary: #241f18;
+    --bg-tertiary: #322b22;
+    --text-primary: #e8ddd0;
+    --text-secondary: #b3a590;
+    --text-tertiary: #8b7a62;
+    --border-color: #3d3428;
+    --accent-color: #e0a060;
+    --accent-hover: #f0b870;
+    --success-color: #27ae60;
+    --warning-color: #f1c40f;
+    --danger-color: #e74c3c;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.42);
 }
 
 /* ===== 重置样式 ===== */
@@ -563,7 +563,7 @@ html, body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--text-tertiary);
+    background: var(--accent-color);
 }
 
 /* ===== 响应式设计 ===== */
