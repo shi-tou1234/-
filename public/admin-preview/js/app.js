@@ -62,11 +62,14 @@ function init() {
         if (editorPane) editorPane.style.display = 'none';
         document.body.classList.add('embed-mode');
         // 监听后台推送的预览内容
-        window.addEventListener('message', function(ev) {
+                window.addEventListener('message', function(ev) {
             var data = ev.data || {};
             if (data.type === 'admin-preview-update' && typeof data.content === 'string') {
                 editor.value = data.content;
                 updatePreview();
+            }
+            if (data.theme && (data.theme === 'light' || data.theme === 'dark')) {
+                setTheme(data.theme);
             }
         });
         // 绑定视图模式切换（源码/预览）

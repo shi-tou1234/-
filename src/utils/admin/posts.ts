@@ -204,11 +204,22 @@ function clearPostDraftLocally() {
 
 // ===== 实时预览 iframe postMessage =====
 
+function getAdminPageTheme() {
+  const rootTheme = document.documentElement.getAttribute("data-theme");
+  if (rootTheme === "dark") return "dark";
+  if (rootTheme === "light") return "light";
+  if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
+  return "light";
+}
+
 function pushContentToPreview() {
   const iframe = document.getElementById("post-preview-iframe") as HTMLIFrameElement | null;
   const content = (document.getElementById("post-content") as HTMLTextAreaElement | null)?.value || "";
   if (!iframe || !iframe.contentWindow) return;
-  iframe.contentWindow.postMessage({ type: "admin-preview-update", content }, window.location.origin);
+  iframe.contentWindow.postMessage(
+    { type: "admin-preview-update", content, theme: getAdminPageTheme() },
+    window.location.origin
+  );
 }
 
 // debounce 工具
@@ -803,7 +814,7 @@ export function initPostHandlers() {
   });
   document.getElementById("post-pinned")?.addEventListener("change", autoSaveDebounced);
 
-  // iframe 加载完成后推送初始内容
+    // iframe 加载完成后推送初始内容
   const previewIframe = document.getElementById("post-preview-iframe") as HTMLIFrameElement | null;
   if (previewIframe) {
     previewIframe.addEventListener("load", () => {
@@ -811,6 +822,15 @@ export function initPostHandlers() {
       pushContentToPreview();
     });
   }
+
+  // 后台主题切换时同步预览 iframe 主题
+  const themeObserver = new MutationObserver(() => {
+    pushContentToPreview();
+  });
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
 
   document.getElementById("insert-iframe-btn")?.addEventListener("click", () => {
     const textarea = document.getElementById("post-content") as HTMLTextAreaElement | null;

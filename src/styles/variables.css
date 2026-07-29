@@ -11,17 +11,17 @@
 
 /* 颜色变量 */
 :root {
-    --bg-color: #fdf8f0;
+    --bg-color: #f8f0dd;
     --text-color: #2c2416;
     --shadow-color: rgba(139, 69, 19, 0.1);
     --cover-subtitle-color: #8b7355;
     --link-color: #8b4513;
-    --button-hover-color: #f5ede0;
-    --button-border-color: #e8dcc8;
-    --postcard-bg-color: #faf3e8;
-    --border-color: #e8dcc8;
+    --button-hover-color: #f1e6d0;
+    --button-border-color: #e5d6b8;
+    --postcard-bg-color: #f7efd8;
+    --border-color: #e5d6b8;
 
-    --selection-color: #fde8c8;
+    --selection-color: #fae2b5;
 
     --warning-text-color: #4d3800;
     --warning-bg-color: #fff7ed;
