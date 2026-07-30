@@ -48,6 +48,13 @@ const toolsLinks: ToolLink[] = [
     "icon": "fa6-solid:box-open",
     "description": "焊接元器件查询",
     "color": "linear-gradient(-45deg, hsl(30, 35%, 55%) 0%, hsl(45, 30%, 52%) 100%)"
+  },
+  {
+    "name": "常用跳转链接",
+    "url": "https://shi-tou1234.github.io/links/",
+    "icon": "fa6-solid:link",
+    "description": "电子信息专业常用链接",
+    "color": "linear-gradient(-45deg, hsl(207, 56%, 64%) 0%, hsl(247, 53%, 60%) 100%)"
   }
 ]
 
