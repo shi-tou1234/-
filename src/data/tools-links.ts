@@ -55,13 +55,6 @@ const toolsLinks: ToolLink[] = [
     "icon": "fa6-solid:link",
     "description": "电子信息专业常用链接",
     "color": "linear-gradient(-45deg, hsl(207, 56%, 64%) 0%, hsl(247, 53%, 60%) 100%)"
-  },
-  {
-    "name": "Links 源码",
-    "url": "https://github.com/shi-tou1234/links",
-    "icon": "fa6-brands:github",
-    "description": "常用链接页面项目源码仓库",
-    "color": "linear-gradient(-45deg, hsl(210, 28%, 38%) 0%, hsl(215, 20%, 48%) 100%)"
   }
 ]
 
