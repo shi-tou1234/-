@@ -33,6 +33,10 @@ function initPostToc() {
   const root = document.getElementById('post-toc-root');
   if (!(root instanceof HTMLElement)) return;
 
+  // 同一页面重复初始化时跳过，避免初始化两遍、监听叠加
+  if (root.dataset.tocBound === 'true') return;
+  root.dataset.tocBound = 'true';
+
   const markdown = document.querySelector('.markdown-content');
   if (!(markdown instanceof HTMLElement)) return;
 
@@ -295,13 +299,20 @@ function initPostToc() {
   };
   closeBtn.onclick = () => setPanelOpen(false);
 
-  document.addEventListener('click', (event) => {
+  // 点击目录外关闭（换页时先摘掉上一次的，避免累积）
+  const oldClickHandler = window.__postTocClickHandler;
+  if (oldClickHandler) {
+    document.removeEventListener('click', oldClickHandler);
+  }
+  const handleDocClick = (event) => {
     if (!panel.classList.contains('is-open')) return;
     const target = event.target;
     if (target instanceof Node && !panel.contains(target) && target !== fab && !fab.contains(target)) {
       setPanelOpen(false);
     }
-  });
+  };
+  document.addEventListener('click', handleDocClick);
+  window.__postTocClickHandler = handleDocClick;
 
   let touchStartY = 0;
   let touchCurrentY = 0;

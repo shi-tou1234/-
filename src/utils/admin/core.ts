@@ -3,6 +3,7 @@ import {
   decodeFileContent,
   getNowDateTimeLocal,
   normalizeSlug,
+  sanitizeFileName,
   toIsoDateTime,
   buildPostMarkdown,
 } from "@/utils/admin-service";
@@ -242,7 +243,7 @@ export async function fileToBase64(file: File) {
 export async function uploadBlogAssetFile({ slug, lang, file, token, branch }: {
   slug: string; lang: string; file: File; token: string; branch: string;
 }) {
-  const safeName = file.name.replace(/\s+/g, "-");
+  const safeName = sanitizeFileName(file.name);
   const path = `src/content/blog/${slug}/assets/${safeName}`;
   const b64 = await fileToBase64(file);
   await adminService.uploadFile(path, b64, `upload: ${safeName} for ${slug} (${lang})`, token, branch);
@@ -252,7 +253,7 @@ export async function uploadBlogAssetFile({ slug, lang, file, token, branch }: {
 export async function uploadAboutMusicFile({ file, token, branch }: {
   file: File; token: string; branch: string;
 }) {
-  const safeName = file.name.replace(/\s+/g, "-").replace(/[^\w.\-\u4e00-\u9fa5]/g, "");
+  const safeName = sanitizeFileName(file.name);
   const path = `public/music/${safeName}`;
   const b64 = await fileToBase64(file);
   await adminService.uploadFile(path, b64, `about: upload music ${safeName}`, token, branch);
@@ -358,6 +359,7 @@ export {
   decodeFileContent,
   getNowDateTimeLocal,
   normalizeSlug,
+  sanitizeFileName,
   parseAboutPersonalFromTs,
   parseAboutProfileFromTs,
   parseToolsLinksFromTs,

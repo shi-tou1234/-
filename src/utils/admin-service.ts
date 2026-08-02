@@ -287,9 +287,38 @@ export function normalizeSlug(input: string): string {
     .trim()
     .toLowerCase()
     .replace(/\s+/g, "-")
-    .replace(/[<>:"\\|?*#%{}\[\]^`~]/g, "")
+    .replace(/[<>:"\\|?*#%{}\[\]^`~\/]/g, "")
     .replace(/\.{2,}/g, ".")
     .replace(/^-+|-+$/g, "");
+}
+
+/**
+ * 将文件名/路径段清洗为安全字符：只保留 字母/数字/下划线/点/横线/中文，
+ * 路径分隔符与其余字符一律换成横线，连续点压缩防目录穿越。
+ * 供上传文件、导出等场景统一使用，避免 `../../evil.png` 这类花招。
+ */
+export function sanitizeFileName(input: string): string {
+  return String(input || "")
+    .replace(/[\/\\]/g, "-")
+    .replace(/\.{2,}/g, ".")
+    .replace(/[^\w.\-一-龥]/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/**
+ * 将写入 frontmatter 的自由文本清洗为安全值：
+ * 去掉换行/制表符/控制字符（防止破坏 `---` 结构或被塞入假配置），
+ * 含特殊符号时用双引号包住并转义。
+ */
+function escapeFrontmatterValue(value: string): string {
+  const str = String(value ?? "")
+    .replace(/[\r\n\t]+/g, " ")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "");
+  const needsQuote =
+    /[:#"']|\s$|^\s/.test(str) || /^[-?@`!&*%,\[\]{}|>]/.test(str);
+  if (!needsQuote) return str;
+  return `"${str.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
 }
 
 export function buildPostMarkdown(data: {
@@ -304,15 +333,16 @@ export function buildPostMarkdown(data: {
   content: string;
   pinned?: boolean;
 }): string {
-  const imageLine = data.image ? `image: ${data.image}\n` : "";
+  const imageLine = data.image ? `image: ${escapeFrontmatterValue(data.image)}\n` : "";
   const categories = normalizeCategoryItems([data.category, data.subCategory || ""]);
-  const categoryLine = categories[0] ? `category: ${categories[0]}\n` : "";
-  const categoriesLine = categories.length > 0
-    ? `categories:\n${categories.map((category) => `  - ${category}`).join("\n")}\n`
+  const safeCategories = categories.map(escapeFrontmatterValue);
+  const categoryLine = safeCategories[0] ? `category: ${safeCategories[0]}\n` : "";
+  const categoriesLine = safeCategories.length > 0
+    ? `categories:\n${safeCategories.map((category) => `  - ${category}`).join("\n")}\n`
     : "";
   const updatedDateLine = data.updatedDate ? `updatedDate: ${data.updatedDate}\n` : "";
   const pinnedLine = data.pinned ? `pinned: true\n` : "";
-  return `---\ntitle: ${data.title}\npubDate: ${data.date}\n${updatedDateLine}draft: false\n${pinnedLine}description: ${data.description}\n${imageLine}${categoryLine}${categoriesLine}slugId: ${data.slugId}\n---\n\n${data.content}\n`;
+  return `---\ntitle: ${escapeFrontmatterValue(data.title)}\npubDate: ${data.date}\n${updatedDateLine}draft: false\n${pinnedLine}description: ${escapeFrontmatterValue(data.description)}\n${imageLine}${categoryLine}${categoriesLine}slugId: ${escapeFrontmatterValue(data.slugId)}\n---\n\n${data.content}\n`;
 }
 
 export function toIsoDateTime(dateTimeLocalValue: string): string {
@@ -789,8 +819,8 @@ export class AdminService {
     branch: string,
   ): Promise<string | null> {
     const endpoints = [
-      `https://raw.githubusercontent.com/${this.owner}/${this.repo}/${encodeURIComponent(branch)}/${filePath}`,
-      `https://cdn.jsdelivr.net/gh/${encodeURIComponent(this.owner)}/${encodeURIComponent(this.repo)}@${encodeURIComponent(branch)}/${filePath}`,
+      `https://raw.githubusercontent.com/${this.owner}/${this.repo}/${encodeURIComponent(branch)}/${this.encodePath(filePath)}`,
+      `https://cdn.jsdelivr.net/gh/${encodeURIComponent(this.owner)}/${encodeURIComponent(this.repo)}@${encodeURIComponent(branch)}/${this.encodePath(filePath)}`,
     ];
 
     for (const endpoint of endpoints) {

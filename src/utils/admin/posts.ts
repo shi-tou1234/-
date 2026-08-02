@@ -850,11 +850,7 @@ export function initPostHandlers() {
     autoSaveDebounced();
   });
 
-  window.addEventListener("focus", () => {
-    applyPreviewResult();
-  });
-
-  // Upload cover
+  // 上传 cover
   document.getElementById("upload-cover-btn")?.addEventListener("click", async () => {
     const msgEl = document.getElementById("post-msg");
     try {

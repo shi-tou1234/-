@@ -8,6 +8,7 @@ import {
   listBlogMarkdownEntriesByRssFallback,
   decodeFileContent,
   extractCategoriesFromMarkdown,
+  sanitizeFileName,
 } from "./core";
 
 function parsePostMarkdown(markdown: string) {
@@ -139,7 +140,7 @@ async function exportPosts(format: "csv" | "markdown") {
       ];
       csvRows.push(row);
       const langDir = post.lang === "zh-cn" ? "中文" : "English";
-      const filePath = `${langDir}/${post.slug}.csv`;
+      const filePath = `${langDir}/${sanitizeFileName(post.slug)}.csv`;
       zip.file(filePath, `\uFEFF${row.join(",")}\n`);
     }
     const csvContent = csvRows.map((r) => r.join(",")).join("\n");
@@ -147,7 +148,7 @@ async function exportPosts(format: "csv" | "markdown") {
   } else if (format === "markdown") {
     for (const post of posts) {
       const langDir = post.lang === "zh-cn" ? "中文" : "English";
-      const filePath = `${langDir}/${post.slug}.md`;
+      const filePath = `${langDir}/${sanitizeFileName(post.slug)}.md`;
       zip.file(filePath, post.markdown);
     }
   }

@@ -32,7 +32,6 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
     initExportHandlers,
     initSiteSettingsHandlers,
     loadGitHubDraft,
-    applyPreviewResult,
     loadPostList,
     loadAllSiteSettings,
     setMsg,
@@ -47,7 +46,6 @@ const pageTitle = `后台管理 - ${siteConfig.title}`;
 
   // Load saved state
   loadGitHubDraft();
-  applyPreviewResult();
 
   // Auto-load post list + site settings if already logged in
   if (sessionStorage.getItem("cmchen_admin_ok") === "1") {

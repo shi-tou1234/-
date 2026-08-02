@@ -5,6 +5,12 @@
 
 <script>
   function initDerivationPopup() {
+    // 换页/重复初始化时先摘掉上一次挂的全局监听，避免越积越多
+    if (window.__derivationPopupCleanup) {
+      window.__derivationPopupCleanup();
+      window.__derivationPopupCleanup = null;
+    }
+
     const blocks = document.querySelectorAll<HTMLElement>('.markdown-content .derivation-block');
     if (blocks.length === 0) return;
 
@@ -28,6 +34,10 @@
       popup.appendChild(title);
       popup.appendChild(body);
       popup.addEventListener('click', (e) => e.stopPropagation());
+      // 鼠标移出浮层时关闭（必须在浮层创建后绑定，之前绑定在空元素上从未生效）
+      popup.addEventListener('mouseleave', () => {
+        hidePopup();
+      });
       document.body.appendChild(popup);
       return popup;
     }
@@ -106,6 +116,10 @@
       const formula = findPrecedingFormula(block);
       if (!formula) return;
 
+      // 同一页面重复初始化时跳过已绑定的公式，避免叠加监听
+      if (formula.dataset.derivationBound === 'true') return;
+      formula.dataset.derivationBound = 'true';
+
       // 标记公式为可推导
       formula.classList.add('derivable');
       formula.setAttribute('tabindex', '0');
@@ -132,9 +146,6 @@
             if (!popup?.matches(':hover')) hidePopup();
           }, 200);
         });
-        popup?.addEventListener('mouseleave', () => {
-          hidePopup();
-        });
       }
 
       // 桌面 + 触屏：focus 显示
@@ -158,21 +169,35 @@
       });
     });
 
-    // 点击外部 / ESC 关闭
-    document.addEventListener('click', (e) => {
+    // 点击外部 / ESC 关闭（具名函数，换页时能摘掉）
+    const handleDocClick = (e) => {
       if (!popup?.classList.contains('is-visible')) return;
       if (!(e.target instanceof Node)) return;
       if (popup.contains(e.target) || currentFormula?.contains(e.target)) return;
       hidePopup();
-    });
-    document.addEventListener('keydown', (e) => {
+    };
+    const handleKeydown = (e) => {
       if (e.key === 'Escape') hidePopup();
-    });
-
+    };
     // 滚动时隐藏（避免浮层位置错乱）
-    window.addEventListener('scroll', () => {
+    const handleScroll = () => {
       if (popup?.classList.contains('is-visible')) hidePopup();
-    }, { passive: true });
+    };
+
+    document.addEventListener('click', handleDocClick);
+    document.addEventListener('keydown', handleKeydown);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // 下次换页/重新初始化时调用：摘掉本页挂的全局监听并移除浮层
+    window.__derivationPopupCleanup = () => {
+      document.removeEventListener('click', handleDocClick);
+      document.removeEventListener('keydown', handleKeydown);
+      window.removeEventListener('scroll', handleScroll);
+      if (popup) {
+        popup.remove();
+        popup = null;
+      }
+    };
   }
 
   // View Transitions 兼容

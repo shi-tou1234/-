@@ -264,12 +264,17 @@ export async function resolveCoverImage(
   categories: string[],
 ): Promise<ResolvedCover> {
   if (userImage) {
-    return {
-      imageUrl: userImage,
-      photographer: '',
-      photographerUrl: '',
-      source: 'user',
+    // 用户指定的封面文件不存在时，当作「没填封面」继续走 API 兜底，避免页面显示破图
+    const localPath = path.resolve(process.cwd(), 'src', userImage)
+    if (fs.existsSync(localPath)) {
+      return {
+        imageUrl: userImage,
+        photographer: '',
+        photographerUrl: '',
+        source: 'user',
+      }
     }
+    console.warn(`[cover-image] 封面文件不存在，改用 API 兜底: ${userImage}`)
   }
 
   if (!coverImageConfig.enabled) {
