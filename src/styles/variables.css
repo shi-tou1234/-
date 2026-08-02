@@ -4,6 +4,23 @@
   --page-width: min(776px, 90vw);
   --toc-width: 240px;
 
+  /* 头部高度（侧边栏/目录/内容区避让用，改头部高度只改这里） */
+  --header-height: 72px;
+  --header-height-lg: 88px;
+
+  /* 层级档位：全站统一，避免随意数字互相盖错层 */
+  --z-header: 50;
+  --z-search: 100;
+  --z-nav: 900;
+  --z-backtop: 1000;
+  --z-modal: 1200;
+  --z-mask: 1190;
+  --z-guide: 1300;
+  --z-update: 1400;
+  --z-loading: 9999;
+  --z-lightbox: 10000;
+  --z-top: 99999;
+
   /* 字体大小缩放 */
   --font-size-scale: 1;
 }

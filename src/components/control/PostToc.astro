@@ -520,7 +520,7 @@ onPageLifecycle(initPostToc);
 @media (max-width: 1023px) {
   .post-toc-root {
     display: block;
-    z-index: 1200;
+    z-index: var(--z-modal);
   }
 
   .post-toc-fab {
@@ -572,7 +572,7 @@ onPageLifecycle(initPostToc);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.22s ease;
-    z-index: 1190;
+    z-index: var(--z-mask);
   }
 
   .post-toc-backdrop.is-open {
@@ -584,7 +584,7 @@ onPageLifecycle(initPostToc);
     position: fixed;
     right: 0.8rem;
     left: 0.8rem;
-    top: calc(60px + 3.2rem);
+    top: calc(var(--header-height) - 12px + 3.2rem);
     bottom: auto;
     width: auto;
     max-height: 55vh;
@@ -593,7 +593,7 @@ onPageLifecycle(initPostToc);
     opacity: 0;
     pointer-events: none;
     transition: transform 0.22s ease, opacity 0.22s ease;
-    z-index: 1200;
+    z-index: var(--z-modal);
   }
 
   .post-toc-panel.is-open {

@@ -38,11 +38,11 @@ const navToolsLabel = '工具栏';
     <div>
       <Header />
     </div>
-    <main id="main-content" class="relative z-10 flex-grow transition-fade pt-[72px] md:pt-[88px]">
+    <main id="main-content" class="relative z-10 flex-grow transition-fade pt-[var(--header-height)] md:pt-[var(--header-height-lg)]">
       <slot />
     </main>
 
-    <div id="blog-guide-modal" class="hidden fixed inset-0 z-[1300]" role="dialog" aria-modal="true" aria-labelledby="blog-guide-title">
+    <div id="blog-guide-modal" class="hidden fixed inset-0 z-[var(--z-guide)]" role="dialog" aria-modal="true" aria-labelledby="blog-guide-title">
       <div id="blog-guide-mask" class="absolute inset-0 bg-black/30 backdrop-blur-[2px]"></div>
       <div class="relative z-10 h-full overflow-y-auto px-4 pt-24 pb-6 md:pt-28">
       <div class="blog-guide-panel mx-auto w-[min(94vw,920px)] rounded-xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/97 p-6 text-[var(--text-color)] shadow-[0_8px_24px_var(--shadow-color)]">
@@ -64,7 +64,7 @@ const navToolsLabel = '工具栏';
     </div>
 
     {updateNotice && (
-      <div id="blog-update-modal" class="hidden fixed inset-0 z-[1400]" role="dialog" aria-modal="true" aria-labelledby="blog-update-title">
+      <div id="blog-update-modal" class="hidden fixed inset-0 z-[var(--z-update)]" role="dialog" aria-modal="true" aria-labelledby="blog-update-title">
         <div id="blog-update-mask" class="absolute inset-0 bg-black/35 backdrop-blur-[2px]"></div>
         <div class="relative z-10 flex min-h-full items-center justify-center px-4 py-10">
           <div class="blog-update-panel w-[min(92vw,560px)] rounded-xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/98 p-6 shadow-[0_12px_30px_var(--shadow-color)] text-[var(--text-color)]">
@@ -120,7 +120,7 @@ const navToolsLabel = '工具栏';
     <Search />
     <KeyboardShortcuts />
 
-    <button id="backtop-global" title="回到顶部" class="fixed bottom-[8vh] right-6 w-10 h-10 rounded-full bg-[--bg-color] cursor-pointer items-center justify-center z-[1000] transition-all duration-300 opacity-90 border-0 hover:scale-110 active:scale-90 hover:shadow-[0_4px_15px_rgba(59,130,246,0.4)]" style="display:none">
+    <button id="backtop-global" title="回到顶部" class="fixed bottom-[8vh] right-6 w-10 h-10 rounded-full bg-[--bg-color] cursor-pointer items-center justify-center z-[var(--z-backtop)] transition-all duration-300 opacity-90 border-0 hover:scale-110 active:scale-90 hover:shadow-[0_4px_15px_rgba(59,130,246,0.4)]" style="display:none">
       <svg class="absolute top-0 left-0 w-full h-full -rotate-90" viewBox="0 0 48 48">
         <circle id="circle-global" cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="2"></circle>
         <circle id="progress-circle-global" cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="0 125.6" stroke-linecap="round"></circle>
@@ -649,7 +649,7 @@ const navToolsLabel = '工具栏';
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 900;
+  z-index: var(--z-nav);
   display: none;
   align-items: center;
   justify-content: space-around;

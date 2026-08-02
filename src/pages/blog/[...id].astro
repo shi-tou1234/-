@@ -503,9 +503,9 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
             position: fixed;
             left: auto;
             right: 0.75rem;
-            top: calc(72px + 0.5rem);
+            top: calc(var(--header-height) + 0.5rem);
             bottom: auto;
-            z-index: 1200;
+            z-index: var(--z-modal);
             display: flex;
             flex-direction: column;
             align-items: flex-end;
