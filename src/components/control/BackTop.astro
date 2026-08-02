@@ -12,53 +12,24 @@ import { Icon } from "astro-icon/components";
   </button>
 </div>
 
-<script is:inline>
-(function() {
-  var _backTopAbortController = null;
+<script>
+  import { initBackToTop } from "../../utils/back-to-top";
 
   function initBackTop() {
-    if (_backTopAbortController) {
-      _backTopAbortController.abort();
-      _backTopAbortController = null;
-    }
-
-    var backTopButton = document.getElementById('backTop');
-    var progressCircle = document.getElementById('progress-circle');
-    if (!backTopButton || !progressCircle) return;
-
-    _backTopAbortController = new AbortController();
-    var signal = _backTopAbortController.signal;
-
-    var handleScroll = function() {
-      var scrollTop = window.scrollY || document.documentElement.scrollTop;
-      var documentHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      var scrollPercent = documentHeight > 0 ? Math.min(100, Math.round((scrollTop / documentHeight) * 100)) : 0;
-
-      var circumference = 2 * Math.PI * 20;
-      var offset = circumference - (scrollPercent / 100) * circumference;
-      progressCircle.style.strokeDasharray = circumference - offset + ' ' + offset;
-    };
-
-    var scrollToTop = function() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true, signal: signal });
-    backTopButton.addEventListener('click', scrollToTop, { signal: signal });
-    handleScroll();
+    initBackToTop(
+      document.getElementById('backTop'),
+      document.getElementById('progress-circle')
+    );
   }
 
   document.addEventListener('astro:page-load', initBackTop);
   document.addEventListener('astro:after-swap', initBackTop);
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-      if (document.getElementById('backTop')) initBackTop();
-    });
+    document.addEventListener('DOMContentLoaded', initBackTop);
   } else {
-    if (document.getElementById('backTop')) initBackTop();
+    initBackTop();
   }
-})();
 </script>
 
 <style is:global>

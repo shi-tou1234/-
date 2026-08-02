@@ -8,20 +8,8 @@ import {
   decodeFileContent,
   extractCategoriesFromMarkdown,
   sanitizeFileName,
+  parsePostFrontmatter,
 } from "./core";
-
-function parsePostMarkdown(markdown: string) {
-  const matched = markdown.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
-  if (!matched) return { frontmatter: {} as Record<string, string>, content: markdown || "" };
-  const rawFrontmatter = matched[1] || "";
-  const frontmatter: Record<string, string> = {};
-  rawFrontmatter.split("\n").forEach((line) => {
-    const idx = line.indexOf(":");
-    if (idx <= 0) return;
-    frontmatter[line.slice(0, idx).trim()] = line.slice(idx + 1).trim();
-  });
-  return { frontmatter, content: matched[2] || "" };
-}
 
 function escapeCsvField(value: string) {
   const str = String(value || "");
@@ -129,7 +117,7 @@ async function exportPosts(format: "csv" | "markdown") {
   if (format === "csv") {
     const csvRows: string[][] = [["title", "slug", "lang", "date", "description", "category"]];
     for (const post of posts) {
-      const { frontmatter } = parsePostMarkdown(post.markdown);
+      const { frontmatter } = parsePostFrontmatter(post.markdown);
       const categories = extractCategoriesFromMarkdown(post.markdown);
       const row = [
         escapeCsvField(frontmatter.title || ""),

@@ -5,6 +5,7 @@ import {
   buildSearchQuery,
   type CoverImageConfig,
 } from '@/data/cover-image-config'
+import { hashString } from './hash'
 
 interface CoverImageResult {
   url: string
@@ -345,12 +346,4 @@ export async function resolveCoverImage(
   }
 
   return { imageUrl: '', photographer: '', photographerUrl: '', source: 'none' }
-}
-
-function hashString(input: string): number {
-  let hash = 0
-  for (let i = 0; i < input.length; i += 1) {
-    hash = (hash * 31 + input.charCodeAt(i)) | 0
-  }
-  return Math.abs(hash)
 }

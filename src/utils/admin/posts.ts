@@ -23,6 +23,7 @@ import {
   getPrimaryCategoryFromItems,
   getSubcategoriesFromItems,
   extractCategoriesFromMarkdown,
+  parsePostFrontmatter,
 } from "./core";
 import {
   CATEGORY_OPTIONS_LIMIT,
@@ -41,18 +42,6 @@ interface PostListItemMeta {
   pubDate?: string;
   pinned?: boolean;
   category?: string;
-}
-
-function parseFrontmatterKV(markdown: string): Record<string, string> {
-  const matched = String(markdown || "").match(/^---\n([\s\S]*?)\n---/);
-  if (!matched?.[1]) return {};
-  const fm: Record<string, string> = {};
-  matched[1].split("\n").forEach((line) => {
-    const idx = line.indexOf(":");
-    if (idx <= 0) return;
-    fm[line.slice(0, idx).trim()] = line.slice(idx + 1).trim().replace(/^['"]|['"]$/g, "");
-  });
-  return fm;
 }
 
 function renderPostListItem(entry: { path: string; slug: string; lang: string }, meta?: PostListItemMeta) {
@@ -250,24 +239,6 @@ function toDateTimeLocalValue(isoLikeValue: string) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-function parsePostMarkdown(markdown: string) {
-  const matched = markdown.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
-  if (!matched) {
-    return { frontmatter: {} as Record<string, string>, content: markdown || "" };
-  }
-  const rawFrontmatter = matched[1] || "";
-  const bodyContent = matched[2] || "";
-  const frontmatter: Record<string, string> = {};
-  rawFrontmatter.split("\n").forEach((line) => {
-    const idx = line.indexOf(":");
-    if (idx <= 0) return;
-    const key = line.slice(0, idx).trim();
-    const value = line.slice(idx + 1).trim();
-    frontmatter[key] = value;
-  });
-  return { frontmatter, content: bodyContent };
-}
-
 function normalizeCategoryOptionList(categories: string[]) {
   return [...new Set((categories || []).map((item) => String(item).trim()).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b, "zh-Hans-CN", { sensitivity: "base" }))
@@ -377,7 +348,7 @@ async function loadCategoryOptions(
         }
         // 回填列表项的标题/日期/置顶信息
         if (onEntryParsed) {
-          const fm = parseFrontmatterKV(markdown);
+          const fm = parsePostFrontmatter(markdown).frontmatter;
           onEntryParsed(entry, markdown, fm);
         }
       } catch (err) { console.warn("[admin] 单篇文章分类提取失败:", entry?.path, err); }
@@ -555,7 +526,7 @@ async function loadSelectedPostToEditor() {
   if (!meta?.content) throw new Error("文章内容为空或不存在");
 
   const rawMarkdown = decodeFileContent(meta.content);
-  const { frontmatter, content } = parsePostMarkdown(rawMarkdown);
+  const { frontmatter, content } = parsePostFrontmatter(rawMarkdown);
 
   const slugMatched = selectedPath.match(/^src\/content\/blog\/(.+)\/(zh-cn|en)\.md$/);
   const slug = slugMatched?.[1] || "";

@@ -577,56 +577,30 @@ const navToolsLabel = '工具栏';
 </script>
 
 <script>
-  (function() {
-    var _globalBackTopAbortController = null;
+  import { initBackToTop } from "../utils/back-to-top";
 
-    function initGlobalBackTop() {
-      if (_globalBackTopAbortController) {
-        _globalBackTopAbortController.abort();
-        _globalBackTopAbortController = null;
-      }
+  function initGlobalBackTop() {
+    if (document.querySelector('.post-right-sidebar')) return;
 
-      if (document.querySelector('.post-right-sidebar')) return;
+    var btn = document.getElementById('backtop-global');
+    if (btn) btn.style.display = 'flex';
 
-      var btn = document.getElementById('backtop-global');
-      var progressCircle = document.getElementById('progress-circle-global');
-      if (!btn || !progressCircle) return;
+    initBackToTop(
+      document.getElementById('backtop-global'),
+      document.getElementById('progress-circle-global')
+    );
+  }
 
-      _globalBackTopAbortController = new AbortController();
-      var signal = _globalBackTopAbortController.signal;
+  document.addEventListener('astro:page-load', initGlobalBackTop);
+  document.addEventListener('astro:after-swap', initGlobalBackTop);
 
-      btn.style.display = 'flex';
-
-      var handleScroll = function() {
-        var scrollTop = window.scrollY || document.documentElement.scrollTop;
-        var documentHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        var scrollPercent = documentHeight > 0 ? Math.min(100, Math.round((scrollTop / documentHeight) * 100)) : 0;
-
-        var circumference = 2 * Math.PI * 20;
-        var offset = circumference - (scrollPercent / 100) * circumference;
-        progressCircle.style.strokeDasharray = (circumference - offset) + ' ' + offset;
-      };
-
-      var scrollToTop = function() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      };
-
-      window.addEventListener('scroll', handleScroll, { passive: true, signal: signal });
-      btn.addEventListener('click', scrollToTop, { signal: signal });
-      handleScroll();
-    }
-
-    document.addEventListener('astro:page-load', initGlobalBackTop);
-    document.addEventListener('astro:after-swap', initGlobalBackTop);
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() {
-        if (document.getElementById('backtop-global')) initGlobalBackTop();
-      });
-    } else {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
       if (document.getElementById('backtop-global')) initGlobalBackTop();
-    }
-  })();
+    });
+  } else {
+    if (document.getElementById('backtop-global')) initGlobalBackTop();
+  }
 </script>
 
 <style is:global>

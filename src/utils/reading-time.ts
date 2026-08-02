@@ -1,11 +1,7 @@
+import { cleanPostText } from './post-preview';
+
 function extractReadableCounts(content: string) {
-  const cleaned = content
-    .replace(/```[\s\S]*?```/g, ' ')
-    .replace(/`[^`]*`/g, ' ')
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
-    .replace(/\[[^\]]*\]\([^)]*\)/g, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/[#>*_~\-|]+/g, ' ');
+  const cleaned = cleanPostText(content);
 
   const cjkChars = (cleaned.match(/[\u3400-\u9FFF]/g) || []).length;
   const latinWords = (cleaned.match(/[A-Za-z0-9]+(?:[-'][A-Za-z0-9]+)*/g) || []).length;

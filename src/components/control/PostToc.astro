@@ -28,7 +28,10 @@ const { title } = Astro.props;
   </aside>
 </div>
 
-<script is:inline>
+<script>
+  import { onPageLifecycle } from "../../utils/page-lifecycle";
+  import { getScrollProgressPercent } from "../../utils/scroll";
+
 function initPostToc() {
   const root = document.getElementById('post-toc-root');
   if (!(root instanceof HTMLElement)) return;
@@ -119,14 +122,7 @@ function initPostToc() {
     const progressText = document.getElementById('post-toc-progress-text');
     if (!progressBar || !progressText) return;
 
-    const scrollTop = window.scrollY;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    if (docHeight <= 0) {
-      progressBar.style.width = '0%';
-      progressText.textContent = '0%';
-      return;
-    }
-    const percent = Math.min(Math.max(Math.round((scrollTop / docHeight) * 100), 0), 100);
+    const percent = getScrollProgressPercent();
     progressBar.style.width = `${percent}%`;
     progressText.textContent = `${percent}%`;
   };
@@ -385,9 +381,7 @@ function initPostToc() {
   }
 }
 
-document.addEventListener('astro:page-load', initPostToc);
-document.addEventListener('astro:after-swap', initPostToc);
-initPostToc();
+onPageLifecycle(initPostToc);
 </script>
 
 <style is:global>

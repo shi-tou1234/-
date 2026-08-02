@@ -62,6 +62,22 @@ export function setMsg(el: HTMLElement | null | undefined, message: string, isEr
   el.style.color = isError ? "#dc2626" : "";
 }
 
+/**
+ * 解析文章 frontmatter：返回键值对象与正文。统一供后台各模块使用，避免多套解析逻辑不一致。
+ */
+export function parsePostFrontmatter(markdown: string): { frontmatter: Record<string, string>; content: string } {
+  const matched = String(markdown || "").match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+  if (!matched) return { frontmatter: {}, content: markdown || "" };
+  const rawFrontmatter = matched[1] || "";
+  const frontmatter: Record<string, string> = {};
+  rawFrontmatter.split("\n").forEach((line) => {
+    const idx = line.indexOf(":");
+    if (idx <= 0) return;
+    frontmatter[line.slice(0, idx).trim()] = line.slice(idx + 1).trim().replace(/^['"]|['"]$/g, "");
+  });
+  return { frontmatter, content: matched[2] || "" };
+}
+
 export function unlockPanel() {
   const loginSection = document.getElementById("login-section");
   const adminPanel = document.getElementById("admin-panel");
