@@ -9,12 +9,17 @@ import {
 
 export function initLoginHandlers(loadPostList: () => Promise<void>) {
   const loginMsg = document.getElementById("login-msg");
+  const loginBtn = document.getElementById("login-btn") as HTMLButtonElement | null;
 
   if (sessionStorage.getItem("cmchen_admin_ok") === "1") {
     unlockPanel();
   }
 
-  loadSecurityConfig();
+  // 安全配置加载完成前禁用登录按钮，避免手快时拿空数据误判「密码错误」
+  if (loginBtn) loginBtn.disabled = true;
+  loadSecurityConfig().finally(() => {
+    if (loginBtn) loginBtn.disabled = false;
+  });
 
   document.getElementById("login-btn")?.addEventListener("click", async () => {
     const pwd = document.getElementById("admin-password")?.value || "";
@@ -34,28 +39,32 @@ export function initLoginHandlers(loadPostList: () => Promise<void>) {
 
   document.getElementById("change-password-btn")?.addEventListener("click", async () => {
     const msgEl = document.getElementById("pwd-msg");
-    const oldPwd = document.getElementById("old-password")?.value || "";
-    const newPwd = document.getElementById("new-password")?.value || "";
-    const token = getToken();
-    const branch = (document.getElementById("gh-branch")?.value || "main").trim();
+    try {
+      const oldPwd = document.getElementById("old-password")?.value || "";
+      const newPwd = document.getElementById("new-password")?.value || "";
+      const token = getToken();
+      const branch = (document.getElementById("gh-branch")?.value || "main").trim();
 
-    if (!token) {
-      setMsg(msgEl, "请先填写 GitHub Token", true);
-      return;
+      if (!token) {
+        setMsg(msgEl, "请先填写 GitHub Token", true);
+        return;
+      }
+
+      const { adminService } = await import("./core");
+      await adminService.changePassword({
+        oldPassword: oldPwd,
+        newPassword: newPwd,
+        token,
+        branch
+      });
+
+      setMsg(msgEl, "密码修改成功，已全站生效（跨设备统一）");
+      const oldInput = document.getElementById("old-password");
+      const newInput = document.getElementById("new-password");
+      if (oldInput) oldInput.value = "";
+      if (newInput) newInput.value = "";
+    } catch (error) {
+      setMsg(msgEl, `修改失败：${error instanceof Error ? error.message : String(error)}`, true);
     }
-
-    const { adminService } = await import("./core");
-    await adminService.changePassword({
-      oldPassword: oldPwd,
-      newPassword: newPwd,
-      token,
-      branch
-    });
-
-    setMsg(msgEl, "密码修改成功，已全站生效（跨设备统一）");
-    const oldInput = document.getElementById("old-password");
-    const newInput = document.getElementById("new-password");
-    if (oldInput) oldInput.value = "";
-    if (newInput) newInput.value = "";
   });
 }

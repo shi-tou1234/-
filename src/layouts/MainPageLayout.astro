@@ -536,20 +536,6 @@ const navToolsLabel = '工具栏';
       openBtn.dataset.bound = "1";
     }
 
-    const oldDelegatedHandler = window.__blogGuideDelegatedOpenHandler;
-    if (oldDelegatedHandler) {
-      document.removeEventListener("click", oldDelegatedHandler);
-    }
-    const delegatedHandler = (event) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      const trigger = target.closest("#blog-guide-open-btn");
-      if (!trigger) return;
-      setGuideVisible(true);
-    };
-    document.addEventListener("click", delegatedHandler);
-    window.__blogGuideDelegatedOpenHandler = delegatedHandler;
-
     const closeGuide = () => {
       safeStorageSet(blogGuideSeenKey, "1");
       setGuideVisible(false);
@@ -768,13 +754,12 @@ const navToolsLabel = '工具栏';
   }
 }
 
-html.post-reading-fullscreen ~ body,
 html.post-reading-fullscreen .mobile-bottom-nav {
   display: none !important;
 }
 
 @media (max-width: 775px) {
-  html.post-reading-fullscreen ~ body {
+  html.post-reading-fullscreen body {
     padding-bottom: 0;
   }
 }
