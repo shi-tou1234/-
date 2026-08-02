@@ -45,9 +45,9 @@
 ### 数据可视化
 - **访问统计热力图**：基于 GitHub 贡献图风格的访问可视化
 - **ECharts 集成**：支持复杂数据图表展示
-## 致谢
 
-本项目深受 [motues/Momo](https://github.com/motues/Momo) 启发，并在此基础上进行了深度功能进化。
+## 致谢
+- 本项目深受 [motues/Momo](https://github.com/motues/Momo) 启发，并在此基础上进行了深度功能进化。
 ---
 
 <p align="center">Made with ❤️ by cmchen</p>
