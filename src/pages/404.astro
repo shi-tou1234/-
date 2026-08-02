@@ -14,7 +14,7 @@ const pageTitle = "404 - " + siteConfig.title;
 
 // 获取所有文章用于随机推荐
 const allBlogPosts = await getBlogEntrySort();
-const candidatePosts = allBlogPosts.filter((post) => post.id !== 'welcome');
+const candidatePosts = allBlogPosts;
 
 // 随机选取 4 篇推荐文章（构建时固定，每次部署会变）
 const recommendCount = Math.min(4, candidatePosts.length);

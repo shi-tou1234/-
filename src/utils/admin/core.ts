@@ -51,14 +51,8 @@ export let categoryOptionMeta = {
   subcategoriesByRoot: {} as Record<string, string[]>,
 };
 
-let aboutPersonalDraft: Record<string, any> | null = null;
-
 export function setCategoryOptionMeta(meta: typeof categoryOptionMeta) {
   categoryOptionMeta = meta;
-}
-
-export function setAboutPersonalDraft(draft: Record<string, any> | null) {
-  aboutPersonalDraft = draft;
 }
 
 // Utility functions
@@ -307,42 +301,6 @@ export async function renderPdfPagesToImages(file: File) {
   }
 
   return generatedFiles;
-}
-
-export async function listBlogMarkdownEntriesByRssFallback() {
-  const rssUrl = new URL("rss.xml", `${window.location.origin}${BASE_URL}`).toString();
-  const response = await fetch(`${rssUrl}?t=${Date.now()}`, { cache: "no-store" });
-  if (!response.ok) throw new Error(`RSS 回退读取失败：HTTP ${response.status}`);
-
-  const xmlText = await response.text();
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(xmlText, "application/xml");
-  const links = Array.from(doc.querySelectorAll("item > link")).map((el) => (el.textContent || "").trim()).filter(Boolean);
-
-  const basePath = BASE_URL.endsWith("/") ? BASE_URL.slice(0, -1) : BASE_URL;
-  const map = new Map<string, { path: string; slug: string; lang: string }>();
-
-  for (const link of links) {
-    try {
-      const url = new URL(link, window.location.origin);
-      let pathname = url.pathname;
-      if (basePath && pathname.startsWith(basePath)) {
-        pathname = pathname.slice(basePath.length) || "/";
-      }
-
-      const matched = pathname.match(/^\/(?:((?:zh-cn|en))\/)?blog\/(.+?)\/?$/);
-      if (!matched?.[2]) continue;
-
-      const lang = matched[1] || "zh-cn";
-      const slug = decodeURIComponent(matched[2]);
-      const path = `src/content/blog/${slug}/${lang}.md`;
-      map.set(path, { path, slug, lang });
-    } catch {
-      continue;
-    }
-  }
-
-  return Array.from(map.values()).sort((a, b) => `${a.slug}/${a.lang}`.localeCompare(`${b.slug}/${b.lang}`));
 }
 
 // Re-export from admin-service for convenience

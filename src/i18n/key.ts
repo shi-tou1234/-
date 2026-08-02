@@ -48,8 +48,4 @@ export interface Translation {
         next: string;
         prev: string;
     };
-    langNote: {
-        note: string;
-        description: string;
-    }
 }

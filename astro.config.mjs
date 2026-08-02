@@ -19,7 +19,6 @@ import { remarkTypst } from './src/plugins/remark-typst.mjs';
 import { remarkAutoMath } from './src/plugins/remark-auto-math.mjs';
 import { remarkNormalizeLinks } from './src/plugins/remark-normalize-links.mjs';
 
-import svelte from "@astrojs/svelte";
 
 
 // https://astro.build/config
@@ -44,9 +43,9 @@ export default defineConfig({
       "fa6-brands": ["creative-commons", "github"],
       "fa6-solid": ["align-justify", "arrow-left", "arrow-right", "arrow-up", "box-open", "calculator", "circle", "circle-question", "envelope", "file-lines", "globe", "link", "magnifying-glass", "table", "text-height"],
       "material-symbols": ["dark-mode-outline-rounded", "radio-button-partial-outline", "wb-sunny-outline-rounded"],
-      "simple-icons": ["astro", "github", "gitee", "svelte", "tailwindcss"]
+      "simple-icons": ["astro", "github", "gitee", "tailwindcss"]
     }
-  }), svelte()],
+  })],
   markdown: {
     shikiConfig: {
       theme: 'one-dark-pro', // code theme

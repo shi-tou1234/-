@@ -5,7 +5,6 @@ import {
   saveGitHubDraft,
   getFileMeta,
   listBlogMarkdownEntries,
-  listBlogMarkdownEntriesByRssFallback,
   decodeFileContent,
   extractCategoriesFromMarkdown,
   sanitizeFileName,
@@ -76,8 +75,10 @@ async function exportPosts(format: "csv" | "markdown") {
   let entries: { path: string; slug: string; lang: string }[];
   try {
     entries = await listBlogMarkdownEntries(token, branch);
-  } catch {
-    entries = await listBlogMarkdownEntriesByRssFallback();
+  } catch (error) {
+    setMsg(msgEl, `获取文章列表失败：${error instanceof Error ? error.message : String(error)}`, true);
+    if (progressWrap) progressWrap.classList.add("hidden");
+    return;
   }
 
   if (entries.length === 0) {

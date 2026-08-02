@@ -22,7 +22,7 @@ const {
   initialCategory = '',
 } = Astro.props;
 
-const visiblePosts = posts.filter((post) => post.id !== 'welcome');
+const visiblePosts = posts;
 const categoriesMap = buildCategoriesMap(visiblePosts, language);
 const topLevelCategoriesMap = buildTopLevelCategoriesMap(visiblePosts, language);
 const subcategoriesByRoot = buildSubcategoriesByRoot(visiblePosts, language);

@@ -50,10 +50,6 @@ const translation: Translation = {
         next: "下一篇",
         prev: "上一篇"
     },
-    langNote: {
-        note: "注意：",
-        description: "当前页面不支持简体中文，使用默认语言版本"
-    }
 }
 
 export default translation;

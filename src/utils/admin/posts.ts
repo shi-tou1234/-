@@ -8,7 +8,6 @@ import {
   deleteFile,
   listFilesByPrefix,
   listBlogMarkdownEntries,
-  listBlogMarkdownEntriesByRssFallback,
   uploadBlogAssetFile,
   renderPdfPagesToImages,
   savePreviewDraft,
@@ -494,7 +493,6 @@ export async function loadPostList() {
   setMsg(msgEl, "加载文章列表中...");
   saveGitHubDraft();
   let entries: { path: string; slug: string; lang: string }[] = [];
-  let usedFallback = false;
   try {
     entries = await listBlogMarkdownEntries(token, branch);
   } catch (err: any) {
@@ -506,9 +504,10 @@ export async function loadPostList() {
       if (selectEl) selectEl.innerHTML = "";
       return;
     }
-    console.warn("[admin] 文章列表加载失败，回退到 RSS:", err);
-    entries = await listBlogMarkdownEntriesByRssFallback();
-    usedFallback = true;
+    console.warn("[admin] 文章列表加载失败:", err);
+    setMsg(msgEl, "文章列表加载失败，请检查网络后重试", true);
+    if (selectEl) selectEl.innerHTML = "";
+    return;
   }
 
   // 渲染列表项（初始仅 slug + lang，后续异步回填标题/日期/分类/置顶）
@@ -537,12 +536,6 @@ export async function loadPostList() {
       category: extractCategoriesFromMarkdown(_markdown)[0] || "",
     });
   };
-
-  if (usedFallback) {
-    setMsg(msgEl, `已加载 ${entries.length} 篇文章（回退模式：GitHub API 不可达）`);
-    await loadCategoryOptions(entries, enrichCallback).catch(() => {});
-    return;
-  }
 
   setMsg(msgEl, `已加载 ${entries.length} 篇文章`);
   await loadCategoryOptions(entries, enrichCallback).catch(() => {});
@@ -836,16 +829,6 @@ export function initPostHandlers() {
     const textarea = document.getElementById("post-content") as HTMLTextAreaElement | null;
     const iframeTpl = `\n<iframe src="https://www.youtube.com/embed/VIDEO_ID" title="Video" frameborder="0" allowfullscreen></iframe>\n`;
     if (textarea) textarea.value = `${textarea.value || ""}${iframeTpl}`;
-    pushContentToPreview();
-    autoSaveDebounced();
-  });
-
-  // 兼容旧的隐藏 select + 按钮（仍可被外部代码触发）
-  document.getElementById("insert-md-snippet-btn")?.addEventListener("click", () => {
-    const selectEl = document.getElementById("post-md-snippet") as HTMLSelectElement | null;
-    const type = (selectEl?.value || "").trim();
-    if (!type) return;
-    insertMarkdownSnippet(type);
     pushContentToPreview();
     autoSaveDebounced();
   });

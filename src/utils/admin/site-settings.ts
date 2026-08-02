@@ -6,7 +6,6 @@ import {
   getFileMeta,
   upsertFile,
   uploadAboutMusicFile,
-  setAboutPersonalDraft,
   decodeFileContent,
   parseAboutPersonalFromTs,
   buildAboutPersonalTs,
@@ -197,7 +196,6 @@ export function initSiteSettingsHandlers() {
       const meta = await getFileMeta(ABOUT_PERSONAL_PATH, token, branch);
       const content = decodeFileContent(meta?.content || "");
       const parsed = parseAboutPersonalFromTs(content);
-      setAboutPersonalDraft(parsed);
 
       const timelineInput = document.getElementById("about-timeline-content");
       if (timelineInput) timelineInput.value = timelineToTextarea(parsed?.siteTimeline || []);
@@ -238,7 +236,6 @@ export function initSiteSettingsHandlers() {
       const meta = await getFileMeta(ABOUT_PERSONAL_PATH, token, branch);
       const content = decodeFileContent(meta?.content || "");
       const parsed = parseAboutPersonalFromTs(content);
-      setAboutPersonalDraft(parsed);
 
       const introEl = document.getElementById("about-personal-intro");
       const musicEl = document.getElementById("about-personal-music");

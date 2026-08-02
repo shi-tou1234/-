@@ -37,7 +37,6 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 
 
-const indexPage = getRelativeLocaleUrl(currentLang, '/');
 const pageTitle = `${siteConfig.title} - ${siteConfig.subTitle}`;
 const allEntries = await getBlogEntrySort();
 const latestUpdatedEntry = allEntries.reduce((latest, current) => {

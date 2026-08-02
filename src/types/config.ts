@@ -16,12 +16,6 @@ export type ProfileConfig = {
     description: string;
     indexPage?: string;
     startYear: number;
-    links?: {
-        name: string;
-        url: string;
-        icon: string;
-        color: string;
-    }[];
 }
 
 export type LicenseConfig = {
