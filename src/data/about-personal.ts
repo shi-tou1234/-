@@ -220,7 +220,7 @@ const aboutPersonal: AboutPersonal = {
         "base64url 编解码改用 TextEncoder/btoa",
         "移除 Node Buffer 依赖，移除废弃 escape/unescape清理",
         "删除垃圾文件、无效 tsconfig 别名、未使用 prop、重复CSS、死函数、调试 log，",
-        "提取公共 hashString 和插件工具 plugin-utils.mjs 复用插件 .js 改名为 .mjs 后缀配置，2026.7.9|GitHub API/Giscus/高德地图等外部 URL 集中到externalUrlsConfig newpost",
+        "提取公共 hashString 和插件工具 plugin-utils.mjs 复用插件 .js 改名为 .mjs 后缀配置",
         "脚本字段统一为 slugId/pubDate",
         "修复content.config.ts 缩进，保留双字段兼容新旧文章可观测性",
         "多处静默 catch 补 console.warn，鉴权错误（401/403）提示重新登录"
@@ -229,7 +229,8 @@ const aboutPersonal: AboutPersonal = {
     {
       "date": "2026.7.9",
       "content": [
-        "合并重复函数，避免行为分叉，修正误导日志"
+        "合并重复函数，避免行为分叉，修正误导日志",
+        "GitHub API/Giscus/高德地图等外部 URL 集中到externalUrlsConfig newpost"
       ]
     },
     {
