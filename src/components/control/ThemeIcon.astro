@@ -25,32 +25,20 @@ if (typeof window !== 'undefined') {
       return 'system';
     };
 
-    const setTheme = (themeSet) => { 
-      if (themeSet === 'dark') {
-        htmlRoot.setAttribute('data-theme', 'dark');
-        htmlRoot.classList.remove('system-theme');
-      } else if (themeSet === 'light') {
-        htmlRoot.removeAttribute('data-theme');
-        htmlRoot.classList.remove('system-theme');
-      } else {
-        htmlRoot.classList.add('system-theme');
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          htmlRoot.setAttribute('data-theme', 'dark');
-        } else {
-          htmlRoot.removeAttribute('data-theme');
-        }
-      }
+    const setTheme = (themeSet) => {
+      htmlRoot.classList.toggle('system-theme', themeSet === 'system');
+      // 始终显式设置 data-theme（亮色也设成 light），避免删属性导致部分样式失效
+      const resolved = themeSet === 'system'
+        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : themeSet;
+      htmlRoot.setAttribute('data-theme', resolved);
       window.localStorage.setItem('theme', themeSet);
     };
 
     // 系统主题变化监听器
     const handleSystemThemeChange = (e) => {
       if (htmlRoot.classList.contains('system-theme')) {
-        if (e.matches) {
-          htmlRoot.setAttribute('data-theme', 'dark');
-        } else {
-          htmlRoot.removeAttribute('data-theme');
-        }
+        htmlRoot.setAttribute('data-theme', e.matches ? 'dark' : 'light');
       }
     };
 

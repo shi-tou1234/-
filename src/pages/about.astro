@@ -20,10 +20,6 @@ type TravelInput = {
   visited?: boolean;
 };
 
-export async function getStaticPaths() {
-  return [{ params: { locale: undefined } }];
-}
-
 const currentLang = 'zh-cn';
 const t = i18nit(currentLang);
 

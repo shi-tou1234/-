@@ -27,9 +27,8 @@ export const getStaticPaths = (async ({ paginate }) => {
     if (aPinned !== bPinned) return bPinned - aPinned;
     return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
   });
-  const paginatedPaths = paginate(sortedBlogEntries, { 
-    pageSize: siteConfig.pageSize,
-    params: { locale: undefined }
+  const paginatedPaths = paginate(sortedBlogEntries, {
+    pageSize: siteConfig.pageSize
   });
   
   return paginatedPaths;

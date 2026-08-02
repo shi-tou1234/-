@@ -9,10 +9,6 @@ import i18nit from '@i18n/translation'
 import toolsLinks from '@/data/tools-links'
 
 
-export async function getStaticPaths() {
-	return [{ params: { locale: undefined } }];
-}
-
 const currentLang = 'zh-cn';
 const t = i18nit(currentLang);
 

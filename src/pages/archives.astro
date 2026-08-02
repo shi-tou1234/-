@@ -12,10 +12,6 @@ import i18nit from '@i18n/translation'
 const currentLang = 'zh-cn';
 const t = i18nit(currentLang);
 
-export async function getStaticPaths() {
-	return [{ params: { locale: undefined } }];
-}
-
 const allBlogPosts = await getBlogEntrySort();
 
 const pageTitle = t("header.archive") + " - " + siteConfig.title;

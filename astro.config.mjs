@@ -30,14 +30,6 @@ export default defineConfig({
       entrypoint: 'astro/assets/services/sharp'
     }
   },
-  i18n: {
-    locales: ['zh-cn'],
-    defaultLocale: 'zh-cn',
-    routing: {
-      prefixDefaultLocale: false,
-      redirectToDefaultLocale: false
-    }
-  },
   integrations: [icon({
     include: {
       "fa6-brands": ["creative-commons", "github"],

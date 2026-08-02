@@ -20,17 +20,13 @@ const pageLang = lang || "zh-cn";
 <head>
     <script is:inline>
         (function() {
+        // 只负责「首屏就位」：按已保存的明暗主题或跟随系统设置好 data-theme，避免闪白
         const savedTheme = localStorage.getItem('theme');
-        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         let theme;
-        if ( savedTheme === 'system') {
-          theme = systemTheme;
+        if (savedTheme === 'dark' || savedTheme === 'light') {
+          theme = savedTheme;
         } else {
-          theme = savedTheme || 'light';
-        }
-        // 仅在用户未明确选择时写入；保留 'system' 值不被覆盖
-        if (savedTheme !== 'system') {
-          localStorage.setItem('theme', theme);
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
         document.documentElement.setAttribute('data-theme', theme);
         })();
