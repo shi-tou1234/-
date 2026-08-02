@@ -44,6 +44,26 @@
     --warning-bg-color: #fff7ed;
     --warning-border-color: #e6a700;
 
+    /* 提示框颜色（note/tip/important/caution） */
+    --admonition-note-bg: #eeeeee;
+    --admonition-note-border: #757575;
+    --admonition-note-title: #474747;
+    --admonition-tip-bg: #e6f6e6;
+    --admonition-tip-border: #009400;
+    --admonition-tip-title: #003100;
+    --admonition-important-bg: #eef9fd;
+    --admonition-important-border: #4cb3d4;
+    --admonition-important-title: #193c47;
+    --admonition-caution-bg: #ffebec;
+    --admonition-caution-border: #e13238;
+    --admonition-caution-title: #4b1113;
+
+    /* 次要文字（正文灰色等） */
+    --muted-text-color: #666;
+
+    /* 引用块左侧竖线 */
+    --quote-left-color: #d4a574;
+
     /* 滚动条颜色 */
     --scrollbar-thumb: #c4a882;
     --scrollbar-thumb-hover: #a8896a;
@@ -66,6 +86,23 @@
     --warning-text-color: #f2d680;
     --warning-bg-color: #332a00;
     --warning-border-color: #ad8002;
+
+    --admonition-note-bg: #2d2d2d;
+    --admonition-note-border: #757575;
+    --admonition-note-title: #c7c7c7;
+    --admonition-tip-bg: #1a2e1a;
+    --admonition-tip-border: #009400;
+    --admonition-tip-title: #a8e6a8;
+    --admonition-important-bg: #1a2d33;
+    --admonition-important-border: #4cb3d4;
+    --admonition-important-title: #a3d9e9;
+    --admonition-caution-bg: #3b1d1e;
+    --admonition-caution-border: #e13238;
+    --admonition-caution-title: #f2a0a3;
+
+    --muted-text-color: #aaa;
+
+    --quote-left-color: #5a4a3a;
 
     /* 滚动条颜色 */
     --scrollbar-thumb: #5a4a3a;

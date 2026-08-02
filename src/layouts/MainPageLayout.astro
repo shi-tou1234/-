@@ -120,7 +120,7 @@ const navToolsLabel = '工具栏';
     <Search />
     <KeyboardShortcuts />
 
-    <button id="backtop-global" title="回到顶部" class="fixed bottom-[8vh] right-6 w-10 h-10 rounded-full bg-[--bg-color] cursor-pointer items-center justify-center z-[var(--z-backtop)] transition-all duration-300 opacity-90 border-0 hover:scale-110 active:scale-90 hover:shadow-[0_4px_15px_rgba(59,130,246,0.4)]" style="display:none">
+    <button id="backtop-global" title="回到顶部" class="fixed bottom-[8vh] right-6 w-10 h-10 rounded-full bg-[--bg-color] cursor-pointer items-center justify-center z-[var(--z-backtop)] transition-all duration-300 opacity-90 border-0 hover:scale-110 active:scale-90 hover:shadow-[0_4px_15px_rgba(139,69,19,0.4)]" style="display:none">
       <svg class="absolute top-0 left-0 w-full h-full -rotate-90" viewBox="0 0 48 48">
         <circle id="circle-global" cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="2"></circle>
         <circle id="progress-circle-global" cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="0 125.6" stroke-linecap="round"></circle>
@@ -237,9 +237,9 @@ const navToolsLabel = '工具栏';
   function getParticleColor() {
     const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
     if (currentTheme === "dark") {
-      return ["#38bdf8", "#818cf8", "#a78bfa", "#22d3ee"];
+      return ["#e0a060", "#d4a574", "#c89b6f", "#b8860b"];
     }
-    return ["#2563eb", "#a855f7", "#ec4899", "#06b6d4"];
+    return ["#8b4513", "#a0522d", "#b8860b", "#cd853f"];
   }
 
   async function mountParticles() {
