@@ -78,6 +78,8 @@ const fakeResult: SearchResult[] = [
 </div>
 
 <script>
+import { lockBodyScroll } from "../../utils/modal";
+
 function initSearchModal() {
   const searchButton = document.getElementById('search-button');
   const searchModal = document.getElementById('search-modal');
@@ -109,6 +111,7 @@ function initSearchModal() {
 
   const openModal = () => {
     previousFocusedElement = document.activeElement;
+    lockBodyScroll(true);
     searchModal.classList.remove('opacity-0', 'pointer-events-none');
     searchModal.setAttribute('aria-hidden', 'false');
     searchModal.offsetHeight;
@@ -123,6 +126,7 @@ function initSearchModal() {
   };
 
   const closeModal = () => {
+    lockBodyScroll(false);
     requestAnimationFrame(() => {
       modalBackdrop?.classList.add('opacity-0');
       modalBackdrop?.classList.remove('show');

@@ -17,6 +17,8 @@ const copyErrorLabel = '复制失败'
 </div>
 
 <script define:vars={{ copyButtonLabel, copyDoneLabel, copyErrorLabel }}>
+  import { trapFocus } from "../../utils/modal";
+
   const LIGHTBOX_ID = 'markdown-image-lightbox';
   const LIGHTBOX_MIN_SCALE = 1;
   const LIGHTBOX_MAX_SCALE = 6;
@@ -456,6 +458,8 @@ const copyErrorLabel = '复制失败'
       } else if (event.key === '-' || event.key === '_') {
         event.preventDefault();
         changeLightboxScale(-LIGHTBOX_ZOOM_STEP);
+      } else if (event.key === 'Tab') {
+        trapFocus(lightbox, event);
       }
     });
 

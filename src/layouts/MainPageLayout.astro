@@ -344,6 +344,7 @@ const navToolsLabel = '工具栏';
 </script>
 
 <script define:vars={{ updateNotice, baseUrl }}>
+  import { trapFocus } from "../utils/modal";
 
   function getNormalizedPathname() {
     const rawPath = window.location.pathname.replace(/\/+$/, "") || "/";
@@ -416,6 +417,9 @@ const navToolsLabel = '工具栏';
         modal.classList.add("is-open");
         syncPageScrollLock();
       });
+      // 打开后把焦点移进弹窗
+      const closeBtn = document.getElementById("blog-guide-close-btn");
+      if (closeBtn) closeBtn.focus();
     } else {
       modal.classList.remove("is-open");
       guideHideTimer = setTimeout(() => {
@@ -550,6 +554,24 @@ const navToolsLabel = '工具栏';
       mask.addEventListener("click", closeGuide);
       mask.dataset.bound = "1";
     }
+
+    // Esc 关闭 + 焦点圈住（弹窗打开时才生效）
+    const oldGuideKeydownHandler = window.__blogGuideKeydownHandler;
+    if (oldGuideKeydownHandler) {
+      document.removeEventListener("keydown", oldGuideKeydownHandler);
+    }
+    const handleGuideKeydown = (event) => {
+      if (!modal.classList.contains("is-open")) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeGuide();
+        openBtn.focus();
+        return;
+      }
+      trapFocus(modal, event);
+    };
+    document.addEventListener("keydown", handleGuideKeydown);
+    window.__blogGuideKeydownHandler = handleGuideKeydown;
   }
 
   const safeInitGuide = () => {
