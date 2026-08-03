@@ -45,14 +45,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Type check
-        run: pnpm run check
-        continue-on-error: true
-
-      - name: Lint
-        run: pnpm run lint
-        continue-on-error: true
-
       - name: Build
         run: pnpm run build
 
