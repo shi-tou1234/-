@@ -111,15 +111,9 @@ const noRecommendHint = '暂时没有可推荐的文章，去首页逛逛吧～'
 
   .recommend-tag {
     --cat-hue: 210;
-    color: hsl(var(--cat-hue), 65%, 42%);
-    background: hsla(var(--cat-hue), 65%, 50%, 0.1);
-    border: 1px solid hsla(var(--cat-hue), 65%, 50%, 0.28);
-  }
-
-  [data-theme='dark'] .recommend-tag {
-    color: hsl(var(--cat-hue), 65%, 68%);
-    background: hsla(var(--cat-hue), 65%, 50%, 0.16);
-    border-color: hsla(var(--cat-hue), 65%, 50%, 0.36);
+    color: var(--cat-tag-color);
+    background: var(--cat-tag-bg);
+    border: 1px solid var(--cat-tag-border);
   }
 
   .recommend-card:nth-child(2n) .recommend-tag {

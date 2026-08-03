@@ -277,19 +277,12 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
     .post-card__placeholder {
         position: relative;
         overflow: hidden;
-        background:
-            radial-gradient(circle at 16% 22%, rgba(255, 190, 219, 0.62), transparent 38%),
-            radial-gradient(circle at 84% 20%, rgba(138, 232, 255, 0.58), transparent 36%),
-            radial-gradient(circle at 72% 86%, rgba(188, 173, 255, 0.48), transparent 40%),
-            linear-gradient(136deg, #ffeaf4 0%, #f7f1ff 46%, #e6f8ff 100%);
+        background: var(--postcard-placeholder-bg);
     }
 
-    [data-theme='dark'] .post-card__placeholder {
-        background:
-            radial-gradient(circle at 18% 20%, rgba(255, 173, 214, 0.28), transparent 34%),
-            radial-gradient(circle at 84% 18%, rgba(125, 216, 255, 0.28), transparent 32%),
-            radial-gradient(circle at 70% 86%, rgba(155, 130, 255, 0.24), transparent 38%),
-            linear-gradient(136deg, #242429 0%, #2d2a38 44%, #23313a 100%);
+    [data-theme="dark"] .post-card__decor-item {
+        filter: brightness(0.7) saturate(0.75);
+        border-color: rgba(255, 255, 255, 0.45);
     }
 
     .post-card__decor-grid {
@@ -347,7 +340,7 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), filter 0.24s ease, box-shadow 0.24s ease;
     }
 
-    [data-theme='dark'] .post-card__tag {
+    [data-theme="dark"] .post-card__tag {
         background: var(--post-tag-bg-dark);
         color: var(--post-tag-text-dark);
         border-color: var(--post-tag-border-dark);

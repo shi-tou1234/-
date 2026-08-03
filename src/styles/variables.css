@@ -64,6 +64,48 @@
     /* 引用块左侧竖线 */
     --quote-left-color: #d4a574;
 
+    /* markdown 正文/表格底色 */
+    --blockquote-bg: rgba(0, 0, 0, 0.03);
+    --inline-code-bg: rgba(0, 0, 0, 0.05);
+    --pre-bg: transparent;
+    --th-bg: rgba(0, 0, 0, 0.03);
+
+    /* 音乐卡片文字 */
+    --music-title-color: var(--text-color);
+    --music-artist-color: var(--cover-subtitle-color);
+
+    /* 加载失败提示 */
+    --error-bg: #ffe6e6;
+    --error-border: #ff6b6b;
+
+    /* 全屏加载遮罩 */
+    --overlay-bg: rgba(255, 255, 255, 0.7);
+
+    /* 平台图标颜色（配合 CSS mask 使用） */
+    --netease-logo-color: #ff2822;
+    --github-logo-color: #0a0a0a;
+    --github-icon-color: #666666;
+
+    /* 分类标签（配合 --cat-hue 使用） */
+    --cat-tag-color: hsl(var(--cat-hue), 65%, 42%);
+    --cat-tag-bg: hsla(var(--cat-hue), 65%, 50%, 0.1);
+    --cat-tag-border: hsla(var(--cat-hue), 65%, 50%, 0.28);
+
+    /* 归档芯片数字角标 */
+    --chip-badge-bg: color-mix(in srgb, white 72%, transparent);
+    --chip-badge-color: color-mix(in srgb, var(--text-color) 84%, black 16%);
+    --chip-badge-border: color-mix(in srgb, var(--button-border-color) 55%, transparent);
+    --chip-badge-active-bg: #ffffff;
+    --chip-badge-active-color: color-mix(in srgb, var(--link-color) 72%, black 28%);
+    --chip-badge-active-border: color-mix(in srgb, #ffffff 78%, transparent);
+
+    /* 文章卡片占位图背景 */
+    --postcard-placeholder-bg:
+        radial-gradient(circle at 16% 22%, rgba(255, 190, 219, 0.62), transparent 38%),
+        radial-gradient(circle at 84% 20%, rgba(138, 232, 255, 0.58), transparent 36%),
+        radial-gradient(circle at 72% 86%, rgba(188, 173, 255, 0.48), transparent 40%),
+        linear-gradient(136deg, #ffeaf4 0%, #f7f1ff 46%, #e6f8ff 100%);
+
     /* 滚动条颜色 */
     --scrollbar-thumb: #c4a882;
     --scrollbar-thumb-hover: #a8896a;
@@ -103,6 +145,48 @@
     --muted-text-color: #aaa;
 
     --quote-left-color: #5a4a3a;
+
+    /* markdown 正文/表格底色 */
+    --blockquote-bg: rgba(255, 255, 255, 0.05);
+    --inline-code-bg: rgba(255, 255, 255, 0.1);
+    --pre-bg: rgba(0, 0, 0, 0.25);
+    --th-bg: rgba(255, 255, 255, 0.05);
+
+    /* 音乐卡片文字 */
+    --music-title-color: #ffffff;
+    --music-artist-color: var(--muted-text-color);
+
+    /* 加载失败提示 */
+    --error-bg: #4d2626;
+    --error-border: #733030;
+
+    /* 全屏加载遮罩 */
+    --overlay-bg: rgba(0, 0, 0, 0.7);
+
+    /* 平台图标颜色 */
+    --netease-logo-color: #c20c0c;
+    --github-logo-color: #aaaaaa;
+    --github-icon-color: #aaaaaa;
+
+    /* 分类标签 */
+    --cat-tag-color: hsl(var(--cat-hue), 65%, 68%);
+    --cat-tag-bg: hsla(var(--cat-hue), 65%, 50%, 0.16);
+    --cat-tag-border: hsla(var(--cat-hue), 65%, 50%, 0.36);
+
+    /* 归档芯片数字角标 */
+    --chip-badge-bg: rgba(255, 255, 255, 0.94);
+    --chip-badge-color: #111827;
+    --chip-badge-border: rgba(255, 255, 255, 0.58);
+    --chip-badge-active-bg: #ffffff;
+    --chip-badge-active-color: color-mix(in srgb, var(--link-color) 78%, black 22%);
+    --chip-badge-active-border: rgba(255, 255, 255, 0.72);
+
+    /* 文章卡片占位图背景 */
+    --postcard-placeholder-bg:
+        radial-gradient(circle at 18% 20%, rgba(255, 173, 214, 0.28), transparent 34%),
+        radial-gradient(circle at 84% 18%, rgba(125, 216, 255, 0.28), transparent 32%),
+        radial-gradient(circle at 70% 86%, rgba(155, 130, 255, 0.24), transparent 38%),
+        linear-gradient(136deg, #242429 0%, #2d2a38 44%, #23313a 100%);
 
     /* 滚动条颜色 */
     --scrollbar-thumb: #5a4a3a;

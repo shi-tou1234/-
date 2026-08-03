@@ -898,33 +898,21 @@ const serializedCategoryCounts = JSON.stringify(
   }
 
   .archive-explorer__chip[data-active='true'] span:last-child {
-    background: #ffffff;
-    color: color-mix(in srgb, var(--link-color) 72%, black 28%);
-    border-color: color-mix(in srgb, #ffffff 78%, transparent);
+    background: var(--chip-badge-active-bg);
+    color: var(--chip-badge-active-color);
+    border-color: var(--chip-badge-active-border);
   }
 
   .archive-explorer__chip span:last-child {
     min-width: 1.7rem;
     border-radius: 999px;
-    background: color-mix(in srgb, white 72%, transparent);
-    color: color-mix(in srgb, var(--text-color) 84%, black 16%);
-    border: 1px solid color-mix(in srgb, var(--chip-border) 55%, transparent);
+    background: var(--chip-badge-bg);
+    color: var(--chip-badge-color);
+    border: 1px solid var(--chip-badge-border);
     padding: 0.08rem 0.45rem;
     text-align: center;
     font-size: 0.72rem;
     font-weight: 700;
-  }
-
-  [data-theme='dark'] .archive-explorer__chip span:last-child {
-    background: rgba(255, 255, 255, 0.94);
-    color: #111827;
-    border-color: rgba(255, 255, 255, 0.58);
-  }
-
-  [data-theme='dark'] .archive-explorer__chip[data-active='true'] span:last-child {
-    background: #ffffff;
-    color: color-mix(in srgb, var(--link-color) 78%, black 22%);
-    border-color: rgba(255, 255, 255, 0.72);
   }
 
   .archive-explorer__view-container {
@@ -972,20 +960,14 @@ const serializedCategoryCounts = JSON.stringify(
   .archive-explorer__post-tag {
     --cat-slot: 0;
     --cat-hue: calc(var(--cat-slot) * 45);
-    color: hsl(var(--cat-hue), 65%, 42%);
-    background: hsla(var(--cat-hue), 65%, 50%, 0.1);
-    border: 1px solid hsla(var(--cat-hue), 65%, 50%, 0.28);
+    color: var(--cat-tag-color);
+    background: var(--cat-tag-bg);
+    border: 1px solid var(--cat-tag-border);
     border-radius: 999px;
     padding: 0.1rem 0.5rem;
     font-size: 0.72rem;
     font-weight: 600;
     transition: color 0.2s ease, transform 0.2s ease, background 0.2s ease;
-  }
-
-  [data-theme='dark'] .archive-explorer__post-tag {
-    color: hsl(var(--cat-hue), 65%, 68%);
-    background: hsla(var(--cat-hue), 65%, 50%, 0.16);
-    border-color: hsla(var(--cat-hue), 65%, 50%, 0.36);
   }
 
   .archive-explorer__post-title {
