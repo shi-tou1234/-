@@ -782,7 +782,13 @@ function initMobileBottomNav() {
 
   links.forEach((link) => {
     const href = link.getAttribute('href')?.replace(/\/+$/, '') || '';
-    link.classList.toggle('is-active', href === currentPath || (href !== '/' && currentPath.startsWith(href)));
+    const isActive = href === currentPath || (href !== '/' && currentPath.startsWith(href));
+    link.classList.toggle('is-active', isActive);
+    if (isActive) {
+      link.setAttribute('aria-current', 'page');
+    } else {
+      link.removeAttribute('aria-current');
+    }
   });
 }
 

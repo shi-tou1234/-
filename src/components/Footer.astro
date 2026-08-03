@@ -48,7 +48,8 @@ if (profileConfig.indexPage) {
         display: inline-block;
     }
 
-    .tooltip-wrapper:hover::after {
+    .tooltip-wrapper:hover::after,
+    .tooltip-wrapper:focus-visible::after {
         content: attr(title);
         position: absolute;
         bottom: 80%;
@@ -73,9 +74,12 @@ if (profileConfig.indexPage) {
         text-decoration: none !important;
     }
 
-    .tooltip-wrapper:hover {
-        outline: none !important;
-        border: none !important;
+    /* 鼠标悬停时去掉焦点框，但键盘聚焦时保留（照顾键盘用户） */
+    @media (hover: hover) {
+        .tooltip-wrapper:hover:not(:focus-visible) {
+            outline: none !important;
+            border: none !important;
+        }
     }
 
     @keyframes fadeInTooltip {

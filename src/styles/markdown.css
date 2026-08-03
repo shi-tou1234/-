@@ -165,7 +165,7 @@
 .markdown-content pre .markdown-code-copy-button.is-copied {
   background: var(--link-color);
   border-color: transparent;
-  color: #fff;
+  color: var(--bg-color);
   box-shadow: 0 10px 22px color-mix(in srgb, var(--link-color) 42%, transparent);
 }
 
@@ -721,7 +721,8 @@ rt {
 .markdown-content .katex-display.derivable:focus-visible,
 .markdown-content .katex.derivable:focus-visible {
   border-color: var(--link-color);
-  outline: none;
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
 }
 
 /* 移动端展开图标提示（hover: none 设备） */
