@@ -8,8 +8,9 @@ import { ClientRouter } from "astro:transitions";
 interface Props {
   title: string;
   lang?: string;
+  description?: string;
 }
-const { title, lang } = Astro.props;
+const { title, lang, description } = Astro.props;
 
 const pageTitle = title;
 const pageLang = lang || "zh-cn";
@@ -44,6 +45,7 @@ const pageLang = lang || "zh-cn";
     <link rel="stylesheet" href="https://fonts.font.im/css2?family=EB+Garamond&display=swap">
     <link rel="stylesheet" href="https://fonts.font.im/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&family=ZCOOL+QingKe+HuangYou&display=swap">
     <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
     <ClientRouter />
 </head>
 <body class="min-h-full bg-[var(--bg-color)]">

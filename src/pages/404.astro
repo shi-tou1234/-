@@ -12,18 +12,13 @@ import { formatFullDate } from '@/utils/time'
 
 const pageTitle = "404 - " + siteConfig.title;
 
-// 获取所有文章用于随机推荐
+// 获取所有文章用于推荐
 const allBlogPosts = await getBlogEntrySort();
 const candidatePosts = allBlogPosts;
 
-// 随机选取 4 篇推荐文章（构建时固定，每次部署会变）
+// 固定推荐最新 4 篇（构建时确定，每次部署内容稳定，对收录友好）
 const recommendCount = Math.min(4, candidatePosts.length);
-const recommendPosts: typeof candidatePosts = [];
-const pool = [...candidatePosts];
-for (let i = 0; i < recommendCount && pool.length > 0; i++) {
-  const idx = Math.floor(Math.random() * pool.length);
-  recommendPosts.push(pool.splice(idx, 1)[0]);
-}
+const recommendPosts = candidatePosts.slice(0, recommendCount);
 
 const currentLang = 'zh-cn';
 const minLabel = '分钟';

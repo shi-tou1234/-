@@ -82,7 +82,7 @@ const updatedLabel = '最后更新于';
 const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf() > entry.data.pubDate.valueOf();
 
 ---
-<MainPageLayout title={pageTitle} lang={currentLang}>
+<MainPageLayout title={pageTitle} lang={currentLang} description={entry.data.description}>
     <div class="post-layout-wrapper">
         <aside class="post-left-sidebar" aria-label="同分类文章导航">
             {sameCategoryPosts.length > 0 && activeCategory && (

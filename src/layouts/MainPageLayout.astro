@@ -11,6 +11,7 @@ import { getRelativeLocaleUrl } from '@utils/url-utils';
 interface Props {
   title: string;
   lang: string;
+  description?: string;
   updateNotice?: {
     title: string;
     url: string;
@@ -18,7 +19,7 @@ interface Props {
     version: string;
   } | null;
 }
-const { title, lang, updateNotice = null } = Astro.props;
+const { title, lang, description, updateNotice = null } = Astro.props;
 const guideText = blogGuideContent['zh-cn'];
 const baseUrl = import.meta.env.BASE_URL || '/';
 
@@ -32,7 +33,7 @@ const navAboutLabel = '关于';
 const navToolsLabel = '工具栏';
 ---
 
-<Layout title={title} lang={lang}>
+<Layout title={title} lang={lang} description={description}>
   <div class="flex flex-col min-h-screen">
     <div id="global-page-particles" class="pointer-events-none fixed inset-0 z-0"></div>
     <div>
