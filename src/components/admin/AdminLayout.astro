@@ -161,7 +161,7 @@ const tabs = [
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem 1.25rem;
-    border-bottom: 1px solid var(--button-border-color);
+    border-bottom: 1px solid var(--border-color);
     background: var(--bg-color);
     position: sticky;
     top: 0;
@@ -183,7 +183,7 @@ const tabs = [
   .admin-topbar-link {
     padding: 0.4rem 0.9rem;
     border-radius: 6px;
-    border: 1px solid var(--button-border-color);
+    border: 1px solid var(--border-color);
     color: var(--text-color);
     font-size: 0.85rem;
     cursor: pointer;
@@ -194,7 +194,7 @@ const tabs = [
   }
 
   .admin-topbar-link:hover {
-    background: var(--button-hover-color);
+    background: var(--hover-bg-color);
     border-color: var(--link-color);
   }
 
@@ -207,7 +207,7 @@ const tabs = [
   .admin-sidebar {
     width: 180px;
     flex-shrink: 0;
-    border-right: 1px solid var(--button-border-color);
+    border-right: 1px solid var(--border-color);
     padding: 1rem 0.5rem;
     display: flex;
     flex-direction: column;
@@ -233,11 +233,11 @@ const tabs = [
   }
 
   .admin-tab-btn:hover {
-    background: var(--button-hover-color);
+    background: var(--hover-bg-color);
   }
 
   .admin-tab-btn[aria-selected="true"] {
-    background: var(--button-hover-color);
+    background: var(--hover-bg-color);
     color: var(--link-color);
     font-weight: 600;
   }
@@ -275,7 +275,7 @@ const tabs = [
       overflow-x: auto;
       padding: 0.5rem;
       border-right: none;
-      border-bottom: 1px solid var(--button-border-color);
+      border-bottom: 1px solid var(--border-color);
       gap: 0.25rem;
       -webkit-overflow-scrolling: touch;
     }

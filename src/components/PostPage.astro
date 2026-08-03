@@ -180,17 +180,17 @@ const resolvedCovers = await Promise.all(
     }
 
     .post-list-skeleton__item {
-        border: 1px solid var(--button-border-color);
+        border: 1px solid var(--border-color);
         border-radius: 1.35rem;
         overflow: hidden;
-        background: color-mix(in srgb, var(--bg-color) 90%, var(--button-hover-color));
+        background: color-mix(in srgb, var(--bg-color) 90%, var(--hover-bg-color));
         width: var(--post-card-width);
         margin-inline: auto;
     }
 
     .post-list-skeleton__cover {
         aspect-ratio: 1200 / 630;
-        background: linear-gradient(100deg, color-mix(in srgb, var(--button-hover-color) 76%, transparent), color-mix(in srgb, var(--bg-color) 86%, transparent), color-mix(in srgb, var(--button-hover-color) 76%, transparent));
+        background: linear-gradient(100deg, color-mix(in srgb, var(--hover-bg-color) 76%, transparent), color-mix(in srgb, var(--bg-color) 86%, transparent), color-mix(in srgb, var(--hover-bg-color) 76%, transparent));
         background-size: 220% 100%;
         animation: post-list-skeleton-wave 1.5s linear infinite;
     }
@@ -204,7 +204,7 @@ const resolvedCovers = await Promise.all(
     .post-list-skeleton__line {
         height: 0.72rem;
         border-radius: 999px;
-        background: linear-gradient(100deg, color-mix(in srgb, var(--button-hover-color) 70%, transparent), color-mix(in srgb, var(--bg-color) 90%, transparent), color-mix(in srgb, var(--button-hover-color) 70%, transparent));
+        background: linear-gradient(100deg, color-mix(in srgb, var(--hover-bg-color) 70%, transparent), color-mix(in srgb, var(--bg-color) 90%, transparent), color-mix(in srgb, var(--hover-bg-color) 70%, transparent));
         background-size: 220% 100%;
         animation: post-list-skeleton-wave 1.5s linear infinite;
     }

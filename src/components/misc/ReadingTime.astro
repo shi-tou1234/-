@@ -14,11 +14,11 @@ const wordLabel = language.toLowerCase().startsWith('zh') ? `${words} 字` : `${
 
 <div class="inline-flex items-center gap-2">
   {words > 0 && (
-    <span class="rounded border border-[var(--button-border-color)] bg-[var(--bg-color)]/85 px-2 py-1 text-xs text-[var(--text-color)] shadow-sm">
+    <span class="rounded border border-[var(--border-color)] bg-[var(--bg-color)]/85 px-2 py-1 text-xs text-[var(--text-color)] shadow-sm">
       {wordLabel}
     </span>
   )}
-  <span class="rounded border border-[var(--button-border-color)] bg-[var(--bg-color)]/85 px-2 py-1 text-xs text-[var(--text-color)] shadow-sm">
+  <span class="rounded border border-[var(--border-color)] bg-[var(--bg-color)]/85 px-2 py-1 text-xs text-[var(--text-color)] shadow-sm">
     {t('readingTime.minutes', { minutes })}
   </span>
 </div>

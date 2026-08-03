@@ -399,7 +399,7 @@ onPageLifecycle(initPostToc);
   width: var(--toc-width);
   max-height: 50vh;
   overflow: hidden;
-  border: 1px solid var(--button-border-color);
+  border: 1px solid var(--border-color);
   border-radius: 0.75rem;
   background: color-mix(in srgb, var(--bg-color) 92%, transparent);
   box-shadow: 0 6px 20px var(--shadow-color);
@@ -412,7 +412,7 @@ onPageLifecycle(initPostToc);
   justify-content: space-between;
   gap: 0.4rem;
   padding: 0.55rem 0.65rem;
-  border-bottom: 1px solid var(--button-border-color);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .post-toc-panel__title {
@@ -426,7 +426,7 @@ onPageLifecycle(initPostToc);
   display: none;
   width: 1.6rem;
   height: 1.6rem;
-  border: 1px solid var(--button-border-color);
+  border: 1px solid var(--border-color);
   border-radius: 999px;
   background: transparent;
   color: var(--text-color);
@@ -445,7 +445,7 @@ onPageLifecycle(initPostToc);
   flex: 1 1 auto;
   height: 3px;
   border-radius: 999px;
-  background: var(--button-border-color);
+  background: var(--border-color);
   overflow: hidden;
   min-width: 2rem;
 }
@@ -495,14 +495,14 @@ onPageLifecycle(initPostToc);
 }
 
 .post-toc-item a:hover {
-  background: var(--button-hover-color);
+  background: var(--hover-bg-color);
   color: var(--text-color);
   transform: translateX(2px);
 }
 
 .post-toc-item a.is-active {
   color: var(--link-color);
-  background: var(--button-hover-color);
+  background: var(--hover-bg-color);
   font-weight: 700;
 }
 
@@ -532,7 +532,7 @@ onPageLifecycle(initPostToc);
     height: 2.5rem;
     padding: 0 0.85rem;
     border-radius: 999px;
-    border: 1px solid var(--button-border-color);
+    border: 1px solid var(--border-color);
     background: color-mix(in srgb, var(--bg-color) 94%, transparent);
     color: var(--text-color);
     box-shadow: 0 6px 18px var(--shadow-color);

@@ -7,7 +7,7 @@ import { Icon } from "astro-icon/components";
     <Icon name="fa6-solid:text-height" class="w-4 h-4" />
 </button>
 
-<div id="font-size-menu" class="hidden absolute right-0 mt-2 bg-[var(--bg-color)] border border-[var(--button-border-color)] rounded-lg shadow-[0_8px_24px_var(--shadow-color)] z-[var(--z-header)] p-4 w-[220px] max-w-[calc(100vw-1rem)]">
+<div id="font-size-menu" class="hidden absolute right-0 mt-2 bg-[var(--bg-color)] border border-[var(--border-color)] rounded-lg shadow-[0_8px_24px_var(--shadow-color)] z-[var(--z-header)] p-4 w-[220px] max-w-[calc(100vw-1rem)]">
     <div class="flex items-center justify-between mb-2">
         <span class="text-xs text-[var(--text-color)]/70">字体大小</span>
         <span id="font-size-value" class="text-xs font-bold text-[var(--link-color)]">100%</span>
@@ -21,7 +21,7 @@ import { Icon } from "astro-icon/components";
             max="150"
             value="100"
             step="5"
-            class="flex-1 h-1.5 rounded-full appearance-none bg-[var(--button-border-color)] cursor-pointer
+            class="flex-1 h-1.5 rounded-full appearance-none bg-[var(--border-color)] cursor-pointer
                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4
                    [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--link-color)]
                    [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform
@@ -33,7 +33,7 @@ import { Icon } from "astro-icon/components";
         <span class="text-sm text-[var(--text-color)]/60">A</span>
     </div>
     <div class="flex justify-start mt-2">
-        <button id="font-size-reset" class="text-xs px-2 py-1 rounded border border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)] transition-all duration-200">还原默认</button>
+        <button id="font-size-reset" class="text-xs px-2 py-1 rounded border border-[var(--border-color)] hover:bg-[var(--hover-bg-color)] transition-all duration-200">还原默认</button>
     </div>
 </div>
 

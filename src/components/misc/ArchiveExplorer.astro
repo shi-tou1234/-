@@ -126,7 +126,7 @@ const serializedCategoryCounts = JSON.stringify(
               <section class="archive-explorer__month space-y-2" data-archive-month>
                 <button
                   type="button"
-                  class="archive-explorer__month-header inline-flex items-center gap-2 rounded-lg px-2 py-1 text-base font-semibold text-[var(--text-color)]/80 transition-colors hover:bg-[var(--button-hover-color)] hover:text-[var(--text-color)]"
+                  class="archive-explorer__month-header inline-flex items-center gap-2 rounded-lg px-2 py-1 text-base font-semibold text-[var(--text-color)]/80 transition-colors hover:bg-[var(--hover-bg-color)] hover:text-[var(--text-color)]"
                   data-archive-month-toggle
                   title={collapseHint}
                   aria-expanded="true"
@@ -145,7 +145,7 @@ const serializedCategoryCounts = JSON.stringify(
                     return (
                       <a
                         href={getRelativeLocaleUrl(language, `/blog/${post.id}`)}
-                        class="archive-explorer__post group block rounded-xl px-3 py-3 text-[var(--text-color)] hover:bg-[var(--button-hover-color)] active:bg-[var(--button-hover-color)]"
+                        class="archive-explorer__post group block rounded-xl px-3 py-3 text-[var(--text-color)] hover:bg-[var(--hover-bg-color)] active:bg-[var(--hover-bg-color)]"
                         data-archive-post
                         data-categories={postCategories.map((category) => category.toLowerCase()).join('||')}
                       >
@@ -166,7 +166,7 @@ const serializedCategoryCounts = JSON.stringify(
                             <div class="flex flex-wrap items-center gap-2">
                               <h3 class="archive-explorer__post-title truncate text-2xl font-medium tracking-[0.01em]" data-summary-short={shortSummary}>{post.data.title}</h3>
                               {post.isFallback && (
-                                <span class="rounded border border-[var(--button-border-color)] bg-[var(--button-hover-color)] px-1.5 py-0.5 text-xs text-[var(--text-color)]/70">fallback</span>
+                                <span class="rounded border border-[var(--border-color)] bg-[var(--hover-bg-color)] px-1.5 py-0.5 text-xs text-[var(--text-color)]/70">fallback</span>
                               )}
                             </div>
                             <div class="archive-explorer__post-summary-wrap">
@@ -196,13 +196,13 @@ const serializedCategoryCounts = JSON.stringify(
       </section>
     ))}
 
-    <div class="archive-explorer__empty hidden rounded-2xl border border-dashed border-[var(--button-border-color)] bg-[var(--bg-color)]/45 px-6 py-10 text-center text-[var(--text-color)]/65" data-archive-empty>
+    <div class="archive-explorer__empty hidden rounded-2xl border border-dashed border-[var(--border-color)] bg-[var(--bg-color)]/45 px-6 py-10 text-center text-[var(--text-color)]/65" data-archive-empty>
       {emptyLabel}
     </div>
   </section>
 
   <aside class="archive-explorer__sidebar lg:sticky lg:top-24 lg:self-start">
-    <div class="rounded-3xl border border-[var(--button-border-color)] bg-[var(--bg-color)]/72 p-4 shadow-sm backdrop-blur">
+    <div class="rounded-3xl border border-[var(--border-color)] bg-[var(--bg-color)]/72 p-4 shadow-sm backdrop-blur">
       <h2 class="archive-explorer__title text-xl font-bold text-[var(--text-color)]"># {filterTitle.replace(/^标签筛选$|^Filter by tags$/,'分类')}</h2>
 
       <div class="archive-explorer__view-container mt-4">
@@ -866,7 +866,7 @@ const serializedCategoryCounts = JSON.stringify(
   .archive-explorer__chip {
     --chip-bg: color-mix(in srgb, var(--bg-color) 86%, transparent);
     --chip-text: var(--text-color);
-    --chip-border: var(--button-border-color);
+    --chip-border: var(--border-color);
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
@@ -886,7 +886,7 @@ const serializedCategoryCounts = JSON.stringify(
 
   .archive-explorer__chip:hover {
     border-color: var(--link-color);
-    background: color-mix(in srgb, var(--button-hover-color) 72%, transparent);
+    background: color-mix(in srgb, var(--hover-bg-color) 72%, transparent);
     transform: translateX(2px);
   }
 
@@ -1011,8 +1011,8 @@ const serializedCategoryCounts = JSON.stringify(
     pointer-events: none;
     opacity: 0;
     transform: translateY(-3px);
-    background: color-mix(in srgb, var(--bg-color) 94%, var(--button-hover-color));
-    border: 1px solid var(--button-border-color);
+    background: color-mix(in srgb, var(--bg-color) 94%, var(--hover-bg-color));
+    border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     padding: 0.2rem 0.45rem;
     font-size: 0.75rem;

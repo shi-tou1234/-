@@ -33,9 +33,8 @@
     --shadow-color: rgba(139, 69, 19, 0.1);
     --cover-subtitle-color: #8b7355;
     --link-color: #8b4513;
-    --button-hover-color: #f1e6d0;
-    --button-border-color: #e5d6b8;
-    --postcard-bg-color: #f7efd8;
+    --hover-bg-color: #f1e6d0;
+    --card-bg-color: #f7efd8;
     --border-color: #e5d6b8;
 
     --selection-color: #fae2b5;
@@ -94,7 +93,7 @@
     /* 归档芯片数字角标 */
     --chip-badge-bg: color-mix(in srgb, white 72%, transparent);
     --chip-badge-color: color-mix(in srgb, var(--text-color) 84%, black 16%);
-    --chip-badge-border: color-mix(in srgb, var(--button-border-color) 55%, transparent);
+    --chip-badge-border: color-mix(in srgb, var(--border-color) 55%, transparent);
     --chip-badge-active-bg: #ffffff;
     --chip-badge-active-color: color-mix(in srgb, var(--link-color) 72%, black 28%);
     --chip-badge-active-border: color-mix(in srgb, #ffffff 78%, transparent);
@@ -118,9 +117,8 @@
     --shadow-color: rgba(0, 0, 0, 0.3);
     --cover-subtitle-color: #a89880;
     --link-color: #e0a060;
-    --button-hover-color: #2a2420;
-    --button-border-color: #3d3428;
-    --postcard-bg-color: #241f18;
+    --hover-bg-color: #2a2420;
+    --card-bg-color: #241f18;
     --border-color: #3d3428;
 
     --selection-color: #44361a;

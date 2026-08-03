@@ -113,7 +113,7 @@
   padding: 2.75rem 1rem 1rem;
   overflow: auto;
   border-radius: 10px;
-  border: 1px solid var(--button-border-color);
+  border: 1px solid var(--border-color);
   background-color: var(--pre-bg);
   font-family: 'JetBrains Mono Variable', ui-monospace;
   line-height: 1.75;
@@ -136,7 +136,7 @@
   justify-content: center;
   min-width: 4.6rem;
   padding: 0.35rem 0.72rem;
-  border: 1px solid var(--button-border-color);
+  border: 1px solid var(--border-color);
   border-radius: 999px;
   background: color-mix(in srgb, var(--bg-color) 88%, transparent);
   color: var(--text-color);
@@ -155,8 +155,8 @@
 }
 
 .markdown-content pre .markdown-code-copy-button:hover {
-  background: var(--button-hover-color);
-  border-color: color-mix(in srgb, var(--link-color) 42%, var(--button-border-color));
+  background: var(--hover-bg-color);
+  border-color: color-mix(in srgb, var(--link-color) 42%, var(--border-color));
   color: var(--link-color);
   transform: translateY(-1px) scale(1.02);
   box-shadow: 0 10px 22px color-mix(in srgb, var(--shadow-color) 42%, transparent);
@@ -176,7 +176,7 @@
 }
 
 .markdown-content pre.astro-code {
-  border: 1px solid var(--button-border-color);
+  border: 1px solid var(--border-color);
   box-shadow: 0 4px 12px var(--shadow-color);
 }
 
@@ -194,10 +194,10 @@
 .markdown-content video {
   width: 100%;
   max-width: 100%;
-  border: 1px solid var(--button-border-color);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   margin: 1rem 0;
-  background: var(--button-hover-color);
+  background: var(--hover-bg-color);
 }
 
 .markdown-content iframe {
@@ -244,7 +244,7 @@
   border-radius: 0.6rem;
   margin: 1rem 0;
   border-left: 4px solid;
-  border: 1px solid var(--button-border-color);
+  border: 1px solid var(--border-color);
 }
 
 .note {
@@ -320,12 +320,12 @@
     width: 100%;
     max-width: 400px;
     margin: 1.5rem auto;
-    /* background: var(--postcard-bg-color); */
+    /* background: var(--card-bg-color); */
     border-radius: 12px;
     /* box-shadow: 0 4px 12px var(--shadow-color); */
     text-decoration: none;
     transition: all 0.8s ease !important; 
-    border: 1px solid var(--button-border-color);
+    border: 1px solid var(--border-color);
     overflow: hidden;
     position: relative;
 }
@@ -356,7 +356,7 @@
     border-radius: 8px;
     background-size: cover;
     background-position: center;
-    background-color: var(--button-hover-color);
+    background-color: var(--hover-bg-color);
     transition: all 0.3s ease;
 }
 
@@ -420,12 +420,12 @@
 .card-github {
     display: block;
     padding: 16px;
-    /* background: var(--postcard-bg-color); */
+    /* background: var(--card-bg-color); */
     border-radius: 8px;
     /* box-shadow: 0 4px 12px var(--shadow-color); */
     text-decoration: none;
     transition: all 0.8s ease !important;
-    border: 1px solid var(--button-border-color);
+    border: 1px solid var(--border-color);
     max-width: 500px;
     margin: 1rem auto;
     width: 100%;
@@ -462,7 +462,7 @@
     border-radius: 50%;
     background-size: cover;
     background-position: center;
-    background-color: var(--button-hover-color);
+    background-color: var(--hover-bg-color);
 }
 
 .card-github .gc-user {
@@ -544,7 +544,7 @@
     padding: 2px 8px;
     border-radius: 10px;
     font-size: 0.8em;
-    background: var(--button-hover-color);
+    background: var(--hover-bg-color);
 }
 
 .card-github .gc-language {
@@ -552,7 +552,7 @@
     padding: 2px 8px;
     border-radius: 10px;
     font-size: 0.8em;
-    background: var(--button-hover-color);
+    background: var(--hover-bg-color);
     margin-left: 8px;
 }
 
@@ -710,7 +710,7 @@ rt {
 /* 公式可推导提示：虚线下划线 + 可交互 */
 .markdown-content .katex-display.derivable,
 .markdown-content .katex.derivable {
-  border-bottom: 1px dashed var(--button-border-color);
+  border-bottom: 1px dashed var(--border-color);
   cursor: help;
   position: relative;
   transition: border-color 0.32s cubic-bezier(0.23, 1, 0.320, 1);
@@ -741,7 +741,7 @@ rt {
 .derivation-popup {
   position: fixed;
   background: var(--bg-color);
-  border: 1px solid var(--button-border-color);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 1rem 1.25rem;
   box-shadow: 0 8px 24px var(--shadow-color);

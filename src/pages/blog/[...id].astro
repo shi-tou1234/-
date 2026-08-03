@@ -128,12 +128,12 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
                 {!showUpdatedDate && <div class="pb-10"></div>}
             </div>
             {image && (
-                <div class="cover h-[55vh] min-h-[260px] max-h-[620px] overflow-hidden rounded-xl ring-1 ring-inset ring-[var(--button-border-color)]">
+                <div class="cover h-[55vh] min-h-[260px] max-h-[620px] overflow-hidden rounded-xl ring-1 ring-inset ring-[var(--border-color)]">
                     <ImageModule src={image} alt={`${entry.data.title} 封面图`} class="w-full h-full object-cover object-center"/>
                 </div>
             )}
             {!image && externalImage && (
-                <div class="cover h-[55vh] min-h-[260px] max-h-[620px] overflow-hidden rounded-xl ring-1 ring-inset ring-[var(--button-border-color)] relative">
+                <div class="cover h-[55vh] min-h-[260px] max-h-[620px] overflow-hidden rounded-xl ring-1 ring-inset ring-[var(--border-color)] relative">
                     <ImageModule src={externalImage} alt={`${entry.data.title} 封面图`} class="w-full h-full object-cover object-center"/>
                     {resolvedCover.photographer && (
                         <span class="absolute bottom-3 right-3 z-10 text-xs px-2.5 py-1 rounded-full bg-black/50 text-white/80 backdrop-blur">
@@ -372,7 +372,7 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
         gap: 0.35rem;
         width: 100%;
         border-radius: 999px;
-        border: 1px solid var(--button-border-color);
+        border: 1px solid var(--border-color);
         background: color-mix(in srgb, var(--bg-color) 92%, transparent);
         color: var(--text-color);
         padding: 0.55rem 1rem;
@@ -389,7 +389,7 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
     .post-back-floating__button:hover {
         transform: scale(1.05);
         box-shadow: 0 12px 32px color-mix(in srgb, var(--shadow-color) 80%, transparent);
-        border-color: color-mix(in srgb, var(--link-color) 40%, var(--button-border-color));
+        border-color: color-mix(in srgb, var(--link-color) 40%, var(--border-color));
     }
 
     .post-back-floating__button:active {
@@ -410,8 +410,8 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
     }
 
     .post-comment-floating__button:hover {
-        background: var(--button-hover-color);
-        border-color: color-mix(in srgb, var(--link-color) 40%, var(--button-border-color));
+        background: var(--hover-bg-color);
+        border-color: color-mix(in srgb, var(--link-color) 40%, var(--border-color));
         transform: translateX(-2px);
     }
 
@@ -426,7 +426,7 @@ const showUpdatedDate = entry.data.updatedDate && entry.data.updatedDate.valueOf
     }
 
     .post-back-floating__button:hover {
-        background: var(--button-hover-color);
+        background: var(--hover-bg-color);
         transform: translateX(-2px);
     }
 

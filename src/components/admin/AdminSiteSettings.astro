@@ -20,7 +20,7 @@ const subTabs = [
 ];
 ---
 <div class="admin-site-settings space-y-4">
-  <div class="admin-subtabs flex gap-1 overflow-x-auto border-b border-[var(--button-border-color)]">
+  <div class="admin-subtabs flex gap-1 overflow-x-auto border-b border-[var(--border-color)]">
     {subTabs.map((tab, idx) => (
       <button
         type="button"
@@ -60,7 +60,7 @@ const subTabs = [
     height: 4px;
   }
   .admin-subtabs::-webkit-scrollbar-thumb {
-    background: var(--button-border-color);
+    background: var(--border-color);
     border-radius: 2px;
   }
 </style>

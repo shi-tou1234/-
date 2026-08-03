@@ -90,7 +90,7 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
 <article
     data-card-reveal
     style={`--card-reveal-delay:${aosDelay}ms; --card-width:min(720px, 88vw);`}
-    class="post-card group relative mx-auto my-5 block min-w-0 w-full max-w-[var(--card-width)] overflow-hidden rounded-[1.35rem] border border-[var(--button-border-color)]/80 bg-[color-mix(in_srgb,var(--bg-color)_96%,transparent)] shadow-[0_12px_34px_color-mix(in_srgb,var(--shadow-color)_58%,transparent)]"
+    class="post-card group relative mx-auto my-5 block min-w-0 w-full max-w-[var(--card-width)] overflow-hidden rounded-[1.35rem] border border-[var(--border-color)]/80 bg-[color-mix(in_srgb,var(--bg-color)_96%,transparent)] shadow-[0_12px_34px_color-mix(in_srgb,var(--shadow-color)_58%,transparent)]"
 >
     <a
         href={pageUrl}
@@ -147,7 +147,7 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
             {title}
             {
                 fallback && (
-                <span class="self-center px-1 ml-2 text-xs text-[var(--text-color)]/70 font-mono uppercase bg-[var(--button-hover-color)] rounded border border-[var(--button-border-color)]">zh-cn</span>
+                <span class="self-center px-1 ml-2 text-xs text-[var(--text-color)]/70 font-mono uppercase bg-[var(--hover-bg-color)] rounded border border-[var(--border-color)]">zh-cn</span>
                 )
             }
         </h2>
@@ -171,7 +171,7 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         position: relative;
         transform: translate3d(0, 0, 0) scale(1);
         background: color-mix(in srgb, var(--bg-color) 96%, transparent);
-        box-shadow: 0 0 0 1px var(--button-border-color), 0 12px 34px color-mix(in srgb, var(--shadow-color) 58%, transparent);
+        box-shadow: 0 0 0 1px var(--border-color), 0 12px 34px color-mix(in srgb, var(--shadow-color) 58%, transparent);
         transition: transform 0.62s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.52s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, background-color 0.3s ease, opacity 0.45s ease;
         will-change: transform, opacity, box-shadow;
     }
@@ -200,9 +200,9 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
 
     .post-card:hover {
         transform: translate3d(0, -6px, 0) scale(1.008);
-        box-shadow: 0 0 0 1px color-mix(in srgb, var(--link-color) 28%, var(--button-border-color)), 0 26px 54px color-mix(in srgb, var(--shadow-color) 100%, transparent);
-        border-color: color-mix(in srgb, var(--link-color) 26%, var(--button-border-color));
-        background: color-mix(in srgb, var(--bg-color) 94%, var(--button-hover-color));
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--link-color) 28%, var(--border-color)), 0 26px 54px color-mix(in srgb, var(--shadow-color) 100%, transparent);
+        border-color: color-mix(in srgb, var(--link-color) 26%, var(--border-color));
+        background: color-mix(in srgb, var(--bg-color) 94%, var(--hover-bg-color));
     }
 
     .post-card:active {
@@ -214,7 +214,7 @@ const pageUrl = getRelativeLocaleUrl(currentLang, "/blog/" + url);
         isolation: isolate;
         aspect-ratio: 1200 / 630;
         line-height: 0;
-        background: linear-gradient(135deg, color-mix(in srgb, var(--bg-color) 84%, var(--button-hover-color)), color-mix(in srgb, var(--bg-color) 72%, var(--link-color)));
+        background: linear-gradient(135deg, color-mix(in srgb, var(--bg-color) 84%, var(--hover-bg-color)), color-mix(in srgb, var(--bg-color) 72%, var(--link-color)));
     }
 
     .post-card__cover::after {

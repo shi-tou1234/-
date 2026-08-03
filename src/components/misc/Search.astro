@@ -46,9 +46,9 @@ const fakeResult: SearchResult[] = [
   <div class="absolute inset-0 modal-backdrop opacity-0" aria-hidden="true"></div>
 
   <div class="fixed inset-0 flex items-start justify-center p-4 pt-[25vh]">
-    <div class="search-modal-content bg-[var(--bg-color)] rounded-xl shadow-xl w-full max-w-2xl border border-[var(--button-border-color)] overflow-hidden scale-80 transition-all duration-300 opacity-0 flex flex-col max-h-[40vh]">
+    <div class="search-modal-content bg-[var(--bg-color)] rounded-xl shadow-xl w-full max-w-2xl border border-[var(--border-color)] overflow-hidden scale-80 transition-all duration-300 opacity-0 flex flex-col max-h-[40vh]">
       <h2 id="search-dialog-title" class="sr-only">{t("search.placeholder")}</h2>
-      <div class="flex items-center p-4 border-b border-[var(--button-border-color)]">
+      <div class="flex items-center p-4 border-b border-[var(--border-color)]">
         <div class="search-modal-input-wrap relative flex items-center flex-1">
           <svg class="search-modal-icon absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--cover-subtitle-color)] transition-colors duration-300 pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -57,17 +57,17 @@ const fakeResult: SearchResult[] = [
             type="text" 
             id="search-input"
             placeholder={t("search.placeholder")+"..."}
-            class="search-modal-input w-full bg-transparent border border-[var(--button-border-color)] rounded-full py-3 pl-10 pr-4 text-[var(--text-color)] outline-none transition-all duration-300"
+            class="search-modal-input w-full bg-transparent border border-[var(--border-color)] rounded-full py-3 pl-10 pr-4 text-[var(--text-color)] outline-none transition-all duration-300"
             autofocus
           />
         </div>
-        <button id="close-search" class="ml-2 p-2 text-[var(--cover-subtitle-color)] rounded-lg hover:bg-[var(--button-hover-color)]">
+        <button id="close-search" class="ml-2 p-2 text-[var(--cover-subtitle-color)] rounded-lg hover:bg-[var(--hover-bg-color)]">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
       </div>
-      <div id="search-recommendations" class="hidden border-b border-[var(--button-border-color)] bg-[var(--button-hover-color)]/20 px-4 py-3 text-sm text-[var(--cover-subtitle-color)]"></div>
+      <div id="search-recommendations" class="hidden border-b border-[var(--border-color)] bg-[var(--hover-bg-color)]/20 px-4 py-3 text-sm text-[var(--cover-subtitle-color)]"></div>
       <div id="search-results" class="overflow-y-auto flex-grow">
         <div class="p-8 text-center text-[var(--cover-subtitle-color)]">
           <p>{t("search.placeholder")}</p>
@@ -238,7 +238,7 @@ document.addEventListener('astro:after-swap', initSearchModal);
   }
 
   .search-modal-input {
-    border: 1px solid var(--button-border-color);
+    border: 1px solid var(--border-color);
     border-radius: 9999px;
     outline: none;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -451,7 +451,7 @@ function displayResults(results) {
   }
 
   searchResults.innerHTML = results.map(result => `
-    <div class="p-4 border-b border-[var(--button-border-color)] hover:bg-[var(--button-hover-color)]">
+    <div class="p-4 border-b border-[var(--border-color)] hover:bg-[var(--hover-bg-color)]">
       <a href="${result.url}" class="block no-underline">
         <h3 class="text-lg font-semibold text-[var(--text-color)] mb-2">${result.meta.title}</h3>
         <p class="text-[var(--cover-subtitle-color)] text-sm">${result.excerpt}</p>
@@ -486,7 +486,7 @@ mark {
 .search-suggestion-chip {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--button-border-color);
+  border: 1px solid var(--border-color);
   border-radius: 999px;
   background: color-mix(in srgb, var(--bg-color) 88%, transparent);
   color: var(--text-color);
@@ -498,8 +498,8 @@ mark {
 
 .search-suggestion-chip:hover {
   transform: translateY(-1px);
-  background: var(--button-hover-color);
-  border-color: color-mix(in srgb, var(--link-color) 35%, var(--button-border-color));
+  background: var(--hover-bg-color);
+  border-color: color-mix(in srgb, var(--link-color) 35%, var(--border-color));
   color: var(--link-color);
 }
 </style>

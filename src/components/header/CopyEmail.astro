@@ -7,7 +7,7 @@ function ensureCopyToast() {
 
   toast = document.createElement('div');
   toast.id = 'copy-email-toast';
-  toast.className = 'fixed top-20 right-6 z-[var(--z-modal)] px-3 py-2 rounded-lg border border-[var(--button-border-color)] bg-[var(--bg-color)] text-[var(--text-color)] shadow-[0_4px_12px_var(--shadow-color)] text-sm opacity-0 pointer-events-none transition-opacity duration-200';
+  toast.className = 'fixed top-20 right-6 z-[var(--z-modal)] px-3 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-color)] text-[var(--text-color)] shadow-[0_4px_12px_var(--shadow-color)] text-sm opacity-0 pointer-events-none transition-opacity duration-200';
   document.body.appendChild(toast);
   return toast;
 }

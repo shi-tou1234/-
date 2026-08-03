@@ -47,29 +47,29 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
       <div id="nav-bar-list" class="transition relative z-10 flex items-center justify-center rounded-outer p-2 overflow-x-auto whitespace-nowrap max-w-[min(58vw,860px)]">
       <a href={ indexPage } class={`nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === indexPage
-                ? 'bg-[var(--button-hover-color)] is-active'
-                : 'hover:bg-[var(--button-hover-color)]'
+                ? 'bg-[var(--hover-bg-color)] is-active'
+                : 'hover:bg-[var(--hover-bg-color)]'
             }`}>
             <span class="nav-link-text">{t("header.home")}</span>
         </a>
       <a href={ archivesPage } class={`nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === archivesPage
-                ? 'bg-[var(--button-hover-color)] is-active'
-                : 'hover:bg-[var(--button-hover-color)]'
+                ? 'bg-[var(--hover-bg-color)] is-active'
+                : 'hover:bg-[var(--hover-bg-color)]'
             }`}>
             <span class="nav-link-text">{t("header.archive")}</span>
         </a>
         <a href={ aboutPage } class={`nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
             Astro.url.pathname === aboutPage
-                ? 'bg-[var(--button-hover-color)] is-active'
-                : 'hover:bg-[var(--button-hover-color)]'
+                ? 'bg-[var(--hover-bg-color)] is-active'
+                : 'hover:bg-[var(--hover-bg-color)]'
             }`}>
             <span class="nav-link-text">{t("header.about")}</span>
         </a>
         <a href={ toolsPage } class={`nav-link-item transition-colors rounded-lg px-2 lg:px-3 py-1 mx-1 hover:text-current shrink-0 ${
           Astro.url.pathname === toolsPage
-                ? 'bg-[var(--button-hover-color)] is-active'
-                : 'hover:bg-[var(--button-hover-color)]'
+                ? 'bg-[var(--hover-bg-color)] is-active'
+                : 'hover:bg-[var(--hover-bg-color)]'
             }`}>
           <span class="nav-link-text">{t("header.tools")}</span>
         </a>
@@ -79,21 +79,21 @@ const toolsPage = getRelativeLocaleUrl(currentLang, "/tools/");
     <!-- tools -->
     <div class="shrink-0 ml-auto flex flex-nowrap gap-2 pl-1 md:pl-2 md:translate-x-48 py-2 justify-end z-30">
         <!-- Search -->
-        <button id="search-button" aria-label="搜索" class="hidden min-[380px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+        <button id="search-button" aria-label="搜索" class="hidden min-[380px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--hover-bg-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--border-color)] transition-all duration-300">
             <Icon name="fa6-solid:magnifying-glass" class="w-4 h-4" />
         </button>
         <!-- Dark Mode -->
-        <ThemeIcon class="hide-on-tiny flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] rounded-lg hover:text-current active:scale-90 border border-[var(--button-border-color)] transition-all duration-300"/>
+        <ThemeIcon class="hide-on-tiny flex items-center justify-center w-10 h-10 hover:bg-[var(--hover-bg-color)] rounded-lg hover:text-current active:scale-90 border border-[var(--border-color)] transition-all duration-300"/>
         <!-- Font Size -->
         <div class="relative">
-          <FontSizeControl class="hide-on-tiny flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] rounded-lg hover:text-current active:scale-90 border border-[var(--button-border-color)] transition-all duration-300" />
+          <FontSizeControl class="hide-on-tiny flex items-center justify-center w-10 h-10 hover:bg-[var(--hover-bg-color)] rounded-lg hover:text-current active:scale-90 border border-[var(--border-color)] transition-all duration-300" />
         </div>
         <!-- Email Copy -->
-        <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" aria-label="复制邮箱" class="hide-on-tiny copy-email-action hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+        <button id="copy-email-btn" data-email={headerContact.email} title="复制邮箱" aria-label="复制邮箱" class="hide-on-tiny copy-email-action hidden min-[430px]:flex items-center justify-center w-10 h-10 hover:bg-[var(--hover-bg-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--border-color)] transition-all duration-300">
           <Icon name="fa6-solid:envelope" class="w-4 h-4" />
         </button>
         <!-- Blog Guide -->
-        <button id="blog-guide-open-btn" type="button" title="博客功能说明" aria-label="博客功能说明" class="hide-on-tiny inline-flex items-center justify-center w-10 h-10 hover:bg-[var(--button-hover-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--button-border-color)] transition-all duration-300">
+        <button id="blog-guide-open-btn" type="button" title="博客功能说明" aria-label="博客功能说明" class="hide-on-tiny inline-flex items-center justify-center w-10 h-10 hover:bg-[var(--hover-bg-color)] active:scale-90 rounded-lg hover:text-current border border-[var(--border-color)] transition-all duration-300">
           <Icon name="fa6-solid:circle-question" class="w-4 h-4" />
         </button>
         <MobileMenu />
