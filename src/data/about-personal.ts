@@ -273,6 +273,22 @@ const aboutPersonal: AboutPersonal = {
         "统一头部高度变量和全局层级档位，减少硬编码",
         "统一配色：替换多组蓝/蓝紫色为主题棕色，提示框、正文、ruby 注音、typst 标题等改用统一变量"
       ]
+    },
+    {
+      "date": "2026.8.3",
+      "content": [
+        "markdown 正文/表格底色、音乐卡片、fetch-error、加载遮罩等 ，14 处颜色覆盖收进 variables.css变量（亮/暗两套自动切换），删掉散落的暗色覆盖块。",
+        "网易云 / GitHub logo / 星标 / fork 图标改用 CSS mask + 颜色变量，删掉暗色 SVG 重复版本。",
+        "PostCard 占位图背景、归档芯片角标与文章标签、404 推荐标签收进变量。",
+        "7 处单引号 [data-theme=dark] 统一成双引号；暗色下文章卡片装饰图调暗。",
+        "button-hover-color → hover-bg-color（实际用于所有 hover 背景，不只按钮）",
+        "button-border-color与 border-color值完全相同 → 合并为border-color",
+        "postcard-bg-color→ card-bg-color",
+        "弹窗统一：新增公共 modal 工具（锁滚动 + 焦点圈住），四个弹窗（搜索/图片放大/指南/移动菜单）补齐「锁滚动 + Esc + 焦点圈住」，行为一致。",
+        "可访问性四项：公式浮层恢复键盘焦点框、暗色下「已复制」/后台保存按钮对比度、底部导航加 aria-current、页脚提示键盘可达。",
+        "SEO：保持全站不收录（noindex 不动）、文章简介接入 meta description、404 改为固定推荐最新 4 篇（不再随机）。",
+        "移除 CI 假检查：删掉「类型检查/代码规范失败也照样部署」的两步。"
+      ]
     }
   ],
   "musicTracks": [
