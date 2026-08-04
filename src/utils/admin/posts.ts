@@ -215,13 +215,14 @@ function pushContentToPreview() {
   );
 }
 
-// 预览专用：把正文里相对博客的 ./assets/<name> 重写成 GitHub raw URL。
+// 预览专用：把正文里相对博客的 ./assets/<name> 重写成 jsDelivr CDN URL。
+// raw.githubusercontent 在部分网络（如国内）不可达，改用项目已使用的 jsDelivr CDN 兜底。
 // 仅用于预览推送，不改变保存在文章里的 markdown（发布照常走 ./assets/ 相对路径）。
 function rewritePreviewAssetPaths(content: string): string {
   const slug = (document.getElementById("post-slug") as HTMLInputElement | null)?.value.trim() || "";
   if (!slug) return content;
   const branch = getBranch();
-  const base = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${encodeURIComponent(branch)}/src/content/blog/${encodeURIComponent(slug)}/assets/`;
+  const base = `https://cdn.jsdelivr.net/gh/${encodeURIComponent(REPO_OWNER)}/${encodeURIComponent(REPO_NAME)}@${encodeURIComponent(branch)}/src/content/blog/${encodeURIComponent(slug)}/assets/`;
   return String(content).replace(/\.\/assets\//g, base);
 }
 
