@@ -239,7 +239,7 @@ const autoSaveDebounced = debounce(savePostDraftLocally, 2000);
 
 // 在正文 textarea 光标处插入（有选中则替换选中），无有效光标时回退到结尾。
 // 插入后把光标放到片段末尾并聚焦，方便继续录入。
-function insertAtCursor(textarea: HTMLTextAreaElement, insertion: string) {
+function insertSnippetAtCaret(textarea: HTMLTextAreaElement, insertion: string) {
   const start = textarea.selectionStart ?? 0;
   const end = textarea.selectionEnd ?? start;
   const hasValidCaret = document.activeElement === textarea || textarea.value.length === 0 || start > 0;
@@ -863,7 +863,7 @@ export function initPostHandlers() {
     const textarea = document.getElementById("post-content") as HTMLTextAreaElement | null;
     if (!textarea) return;
     const iframeTpl = `\n<iframe src="https://www.youtube.com/embed/VIDEO_ID" title="Video" frameborder="0" allowfullscreen></iframe>\n`;
-    insertAtCursor(textarea, iframeTpl);
+    insertSnippetAtCaret(textarea, iframeTpl);
     pushContentToPreview();
     autoSaveDebounced();
   });
@@ -942,7 +942,7 @@ export function initPostHandlers() {
       }).join("\n\n");
 
       if (snippets && textarea) {
-        insertAtCursor(textarea, `\n\n${snippets}\n`);
+        insertSnippetAtCaret(textarea, `\n\n${snippets}\n`);
       }
       const fileInput = document.getElementById("post-files");
       if (fileInput) fileInput.value = "";
