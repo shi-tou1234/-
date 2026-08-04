@@ -30,6 +30,8 @@ import {
   CATEGORY_CACHE_KEY,
   CATEGORY_CACHE_TTL,
   ABOUT_SPEC_PATH_PREFIX,
+  REPO_OWNER,
+  REPO_NAME,
 } from "./constants";
 
 // 本地草稿 key（自动保存编辑器状态，刷新可恢复）
@@ -202,12 +204,25 @@ function getAdminPageTheme() {
 
 function pushContentToPreview() {
   const iframe = document.getElementById("post-preview-iframe") as HTMLIFrameElement | null;
-  const content = (document.getElementById("post-content") as HTMLTextAreaElement | null)?.value || "";
+  let content = (document.getElementById("post-content") as HTMLTextAreaElement | null)?.value || "";
+  if (content.includes("./assets/")) {
+    content = rewritePreviewAssetPaths(content);
+  }
   if (!iframe || !iframe.contentWindow) return;
   iframe.contentWindow.postMessage(
     { type: "admin-preview-update", content, theme: getAdminPageTheme() },
     window.location.origin
   );
+}
+
+// 预览专用：把正文里相对博客的 ./assets/<name> 重写成 GitHub raw URL。
+// 仅用于预览推送，不改变保存在文章里的 markdown（发布照常走 ./assets/ 相对路径）。
+function rewritePreviewAssetPaths(content: string): string {
+  const slug = (document.getElementById("post-slug") as HTMLInputElement | null)?.value.trim() || "";
+  if (!slug) return content;
+  const branch = getBranch();
+  const base = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${encodeURIComponent(branch)}/src/content/blog/${encodeURIComponent(slug)}/assets/`;
+  return String(content).replace(/\.\/assets\//g, base);
 }
 
 // debounce 工具
@@ -221,6 +236,54 @@ function debounce<T extends (...args: any[]) => void>(fn: T, wait: number): T {
 
 const pushPreviewDebounced = debounce(pushContentToPreview, 300);
 const autoSaveDebounced = debounce(savePostDraftLocally, 2000);
+
+// 在正文 textarea 光标处插入（有选中则替换选中），无有效光标时回退到结尾。
+// 插入后把光标放到片段末尾并聚焦，方便继续录入。
+function insertAtCursor(textarea: HTMLTextAreaElement, insertion: string) {
+  const start = textarea.selectionStart ?? 0;
+  const end = textarea.selectionEnd ?? start;
+  const hasValidCaret = document.activeElement === textarea || textarea.value.length === 0 || start > 0;
+  let before: string;
+  let after: string;
+  if (hasValidCaret) {
+    before = textarea.value.slice(0, start);
+    after = textarea.value.slice(end);
+  } else {
+    before = textarea.value;
+    after = "";
+  }
+  textarea.value = before + insertion + after;
+  const newPos = before.length + insertion.length;
+  textarea.setSelectionRange(newPos, newPos);
+  textarea.focus();
+}
+
+// 在上传区旁的缩略图容器里展示一张图片预览（本地 objectURL，与预览 iframe 无关）。
+function addUploadThumb(name: string, url: string) {
+  const container = document.getElementById("post-upload-thumbs");
+  if (!container) return;
+  const item = document.createElement("div");
+  item.className = "post-upload-thumb";
+  item.title = name;
+
+  const img = document.createElement("img");
+  img.src = url;
+  img.alt = name;
+
+  const close = document.createElement("button");
+  close.type = "button";
+  close.className = "post-upload-thumb-remove";
+  close.textContent = "×";
+  close.title = "移除预览";
+  close.addEventListener("click", () => {
+    URL.revokeObjectURL(url);
+    item.remove();
+  });
+
+  item.appendChild(img);
+  item.appendChild(close);
+  container.appendChild(item);
+}
 
 // ===== Post helper functions =====
 
@@ -798,8 +861,9 @@ export function initPostHandlers() {
 
   document.getElementById("insert-iframe-btn")?.addEventListener("click", () => {
     const textarea = document.getElementById("post-content") as HTMLTextAreaElement | null;
+    if (!textarea) return;
     const iframeTpl = `\n<iframe src="https://www.youtube.com/embed/VIDEO_ID" title="Video" frameborder="0" allowfullscreen></iframe>\n`;
-    if (textarea) textarea.value = `${textarea.value || ""}${iframeTpl}`;
+    insertAtCursor(textarea, iframeTpl);
     pushContentToPreview();
     autoSaveDebounced();
   });
@@ -850,7 +914,7 @@ export function initPostHandlers() {
 
       setMsg(msgEl, `上传中...（${files.length} 个文件）`);
 
-      const uploaded: { name: string; type: string; fromPdf: boolean }[] = [];
+      const uploaded: { name: string; type: string }[] = [];
       for (const file of files) {
         const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
         if (isPdf) {
@@ -858,12 +922,16 @@ export function initPostHandlers() {
           const imageFiles = await renderPdfPagesToImages(file);
           for (const imageFile of imageFiles) {
             const result = await uploadBlogAssetFile({ slug, lang, file: imageFile, token, branch });
-            uploaded.push({ ...result, fromPdf: true });
+            uploaded.push(result);
+            addUploadThumb(result.name, URL.createObjectURL(imageFile));
           }
           continue;
         }
         const result = await uploadBlogAssetFile({ slug, lang, file, token, branch });
-        uploaded.push({ ...result, fromPdf: false });
+        uploaded.push(result);
+        if (file.type.startsWith("image/")) {
+          addUploadThumb(result.name, URL.createObjectURL(file));
+        }
       }
 
       const textarea = document.getElementById("post-content") as HTMLTextAreaElement | null;
@@ -874,13 +942,15 @@ export function initPostHandlers() {
       }).join("\n\n");
 
       if (snippets && textarea) {
-        textarea.value = `${textarea.value || ""}\n\n${snippets}\n`;
+        insertAtCursor(textarea, `\n\n${snippets}\n`);
       }
       const fileInput = document.getElementById("post-files");
       if (fileInput) fileInput.value = "";
       const countEl = document.getElementById("post-files-count");
       if (countEl) countEl.textContent = "未选择文件";
       setMsg(msgEl, `上传成功：${uploaded.length} 个文件（目录：${slug}/assets）`);
+      pushContentToPreview();
+      autoSaveDebounced();
     } catch (error) {
       setMsg(msgEl, String(error), true);
     }
