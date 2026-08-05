@@ -289,6 +289,12 @@ const aboutPersonal: AboutPersonal = {
         "SEO：保持全站不收录（noindex 不动）、文章简介接入 meta description、404 改为固定推荐最新 4 篇（不再随机）。",
         "移除 CI 假检查：删掉「类型检查/代码规范失败也照样部署」的两步。"
       ]
+    },
+    {
+      "date": "2026.8.4",
+      "content": [
+        "后台预览增加图片预览功能"
+      ]
     }
   ],
   "musicTracks": [
